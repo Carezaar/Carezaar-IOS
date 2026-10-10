@@ -1,0 +1,154 @@
+[
+  {
+    "key": "source-board-7-care-type",
+    "name": "Care seeker \u00b7 Choose your care type",
+    "width": 394,
+    "height": 741,
+    "page": "Source boards \u00b7 extracted UI panels",
+    "node": "87:19317"
+  },
+  {
+    "key": "source-board-11-care-type",
+    "name": "Caregiver \u00b7 Choose your care type",
+    "width": 390,
+    "height": 755,
+    "page": "Source boards \u00b7 extracted UI panels",
+    "node": "88:19329"
+  },
+  {
+    "key": "source-board-7-needs",
+    "name": "Care seeker \u00b7 Tell us about your needs",
+    "width": 590,
+    "height": 741,
+    "page": "Source boards \u00b7 extracted UI panels",
+    "node": "87:19317"
+  },
+  {
+    "key": "source-board-7-profile",
+    "name": "Care seeker \u00b7 Create your profile",
+    "width": 459,
+    "height": 741,
+    "page": "Source boards \u00b7 extracted UI panels",
+    "node": "87:19317"
+  },
+  {
+    "key": "source-board-11-services",
+    "name": "Caregiver \u00b7 Services & matching preferences",
+    "width": 602,
+    "height": 755,
+    "page": "Source boards \u00b7 extracted UI panels",
+    "node": "88:19329"
+  },
+  {
+    "key": "source-board-11-profile",
+    "name": "Caregiver \u00b7 Finalize profile",
+    "width": 455,
+    "height": 755,
+    "page": "Source boards \u00b7 extracted UI panels",
+    "node": "88:19329"
+  },
+  {
+    "key": "source-board-12-person",
+    "name": "Who should care for me?",
+    "width": 404,
+    "height": 984,
+    "page": "Source boards \u00b7 extracted UI panels",
+    "node": "98:11963"
+  },
+  {
+    "key": "source-board-12-work",
+    "name": "How should they work?",
+    "width": 371,
+    "height": 984,
+    "page": "Source boards \u00b7 extracted UI panels",
+    "node": "98:11963"
+  },
+  {
+    "key": "source-board-12-additional",
+    "name": "Additional preferences",
+    "width": 368,
+    "height": 984,
+    "page": "Source boards \u00b7 extracted UI panels",
+    "node": "98:11963"
+  },
+  {
+    "key": "source-board-12-review",
+    "name": "Review your preferences",
+    "width": 301,
+    "height": 984,
+    "page": "Source boards \u00b7 extracted UI panels",
+    "node": "98:11963"
+  },
+  {
+    "key": "source-board-16-needs",
+    "name": "Tell us about your care needs \u00b7 Detailed rate variant",
+    "width": 720,
+    "height": 1280,
+    "page": "Source boards \u00b7 extracted UI panels",
+    "node": "203:11695"
+  },
+  {
+    "key": "source-board-wa-needs",
+    "name": "Tell us more about your needs \u00b7 WhatsApp variant",
+    "width": 572,
+    "height": 1305,
+    "page": "Source boards \u00b7 extracted UI panels",
+    "node": "283:12012"
+  },
+  {
+    "key": "source-board-wa-schedule",
+    "name": "Your schedule & preferences \u00b7 WhatsApp variant",
+    "width": 602,
+    "height": 1305,
+    "page": "Source boards \u00b7 extracted UI panels",
+    "node": "283:12012"
+  },
+  {
+    "key": "source-board-group-help",
+    "name": "Help Center \u00b7 Guide removed",
+    "width": 579,
+    "height": 1251,
+    "page": "Source boards \u00b7 extracted UI panels",
+    "node": "165:18488"
+  },
+  {
+    "key": "source-board-group-notifications",
+    "name": "Notifications \u00b7 Tabs removed",
+    "width": 592,
+    "height": 1280,
+    "page": "Source boards \u00b7 extracted UI panels",
+    "node": "165:18490"
+  },
+  {
+    "key": "source-board-group-favorites",
+    "name": "Favorites \u00b7 Bottom navigation removed",
+    "width": 579,
+    "height": 1222.9707,
+    "page": "Source boards \u00b7 extracted UI panels",
+    "node": "168:18496"
+  },
+  {
+    "key": "source-board-intro-meaningful",
+    "name": "Make a Meaningful Difference \u00b7 assembled intro variant",
+    "width": 853,
+    "height": 1280,
+    "page": "Source boards \u00b7 extracted UI panels",
+    "node": "288:12014\u201312020 + 287:11685"
+  },
+  {
+    "key": "source-board-7-complete",
+    "name": "Care seeker \u00b7 Complete three-step board",
+    "width": 1536,
+    "height": 1024,
+    "page": "Source boards \u00b7 extracted UI panels",
+    "node": "87:19317"
+  },
+  {
+    "key": "source-board-11-complete",
+    "name": "Caregiver \u00b7 Complete three-step board",
+    "width": 1536,
+    "height": 1024,
+    "page": "Source boards \u00b7 extracted UI panels",
+    "node": "88:19329"
+  }
+]

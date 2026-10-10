@@ -1,0 +1,19 @@
+# Xcode
+build/
+DerivedData/
+*.xcresult
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+*.moved-aside
+
+# Signing and secrets
+*.p12
+*.mobileprovision
+*.cer
+*.p8
+.env
+.env.*
+
+# macOS
+.DS_Store
