@@ -1,0 +1,75 @@
+{
+  "title": "Committed native source: post-push clean build and typed Sign In for both roles",
+  "sourceCommitSHA": "d99543510d7dfcefd130511531d994d5b719050d",
+  "repository": "Carezaar/Carezaar-IOS",
+  "branch": "main",
+  "remoteSHAVerified": true,
+  "actor": "apexstackdev-del",
+  "cleanBuild": "PASS",
+  "cleanBuildLogSHA256": "e871bc55be6c94c95f4e7521bee6bed920acb687ee17dacfc22e77e74900e0bf",
+  "roleResults": [
+    {
+      "role": "client",
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "durationSeconds": 30.413,
+      "logSHA256": "8c17c8e911142b197ef45d34853f7dc23aa88d059915245bf19e117be3d002bb"
+    },
+    {
+      "role": "caregiver",
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "durationSeconds": 25.695,
+      "logSHA256": "d8e906657a4aa276327ce4a6ea7a6ad93d3f13d33e3883b6fa9bcb812d102394"
+    }
+  ],
+  "scope": "Modern iOS Simulator at Large text; public native input and one native Sign In submission per role; strict owned identity preflight uses separate API authentication. Correct role loaded, no hidden native QA login or refresh. No profile/message/relationship/media writes. Simulator Release runtime, physical camera and Yahoo delivery remain unverified; original 374-case status unchanged.",
+  "rootReviewed": true,
+  "independentReviewed": true,
+  "artifacts": [
+    {
+      "path": "Artifacts/client-D3759D05-DE1E-441C-8D94-4225D6178555.json",
+      "description": "P02-012-typed-login-role-list-loaded-client_0_04EF75F9-371C-41E9-8313-2B63F619F4CE.json",
+      "sha256": "70ae2deb3b10da0a8d2a8878976888f93ccee043465035916705cbd627c6b598",
+      "packagedSha256": "70ae2deb3b10da0a8d2a8878976888f93ccee043465035916705cbd627c6b598"
+    },
+    {
+      "path": "Artifacts/client-EFE38756-04E9-4557-9794-E641D08B3E25.png",
+      "description": "P02-012-public-sign-in-control-only_0_67721100-8862-4ECE-99EE-ED5DA11BD2C5.png",
+      "sha256": "ca038db9221f7f30b1a8acc11a7a92b5eea26d283e19acf5b762be2d08e6add3",
+      "packagedSha256": "ca038db9221f7f30b1a8acc11a7a92b5eea26d283e19acf5b762be2d08e6add3"
+    },
+    {
+      "path": "Artifacts/client-EDE84ED2-AF1B-4108-94B3-00120492463C.json",
+      "description": "P02-012-public-sign-in-ready-client_0_9B83BC3A-A36F-4034-BB44-B87CDBD123CC.json",
+      "sha256": "aeea1cf1a92d5c2fc751544a26507d93ce16c94d062231874b4142e5856224c4",
+      "packagedSha256": "aeea1cf1a92d5c2fc751544a26507d93ce16c94d062231874b4142e5856224c4"
+    },
+    {
+      "path": "Artifacts/caregiver-BA4256A8-A66A-4F1D-906E-52AB7C1076FA.json",
+      "description": "P02-012-typed-login-role-list-loaded-caregiver_0_B95DBB57-B336-40E4-84FB-FD179A1FC8F8.json",
+      "sha256": "07c5040106ca935c6ad8c039ef82fff46f4747af1be88a33aff259b7ea3c6da7",
+      "packagedSha256": "07c5040106ca935c6ad8c039ef82fff46f4747af1be88a33aff259b7ea3c6da7"
+    },
+    {
+      "path": "Artifacts/caregiver-B2B9BCF2-9B65-4F0A-8F03-314E852BCDDC.png",
+      "description": "P02-012-public-sign-in-control-only_0_827B2669-3B02-4BE2-8488-4B465E6CA667.png",
+      "sha256": "ca038db9221f7f30b1a8acc11a7a92b5eea26d283e19acf5b762be2d08e6add3",
+      "packagedSha256": "ca038db9221f7f30b1a8acc11a7a92b5eea26d283e19acf5b762be2d08e6add3"
+    },
+    {
+      "path": "Artifacts/caregiver-5F1070E7-950E-4284-B329-52BF4BF0F72E.json",
+      "description": "P02-012-public-sign-in-ready-caregiver_0_4BF2F049-304D-48C1-9BDE-A51932B61EC4.json",
+      "sha256": "3e5a92c4bbb682374639554bb37ed022525d263f480e4bb0847b214c2518a3e0",
+      "packagedSha256": "3e5a92c4bbb682374639554bb37ed022525d263f480e4bb0847b214c2518a3e0"
+    }
+  ],
+  "independentReview": true,
+  "independentReviewScope": "Independently viewed both complete public Sign In button rasters and parsed all4 anonymous JSONs; all6 artifact hashes and clean build-for-testing/both-role completed log hashes match. HEAD and exact NativeLoginRoleUITests source match commit d99543510d7dfcefd130511531d994d5b719050d. Client native typedSignInPASS30.413/caregiverPASS25.695, native count0 before tap\u2192exact1 login/positive authinfo+correct-role loaded list/opposite-role0/refresh0; actual owned ID/role preflight is separate test-runner API authentication, not included in native counts. Source confirms public exact email and secure masked-length input, no hidden QA login launch flag and no profile/message/relationship/media writes. Client listGET2 versus caregiver1 retained, no exactly-one list claim. No private fixture/credential text visible in rasters or JSON; only public control cropped. RootReviewed set on parent explicit completed review authorization. Remote SHA verification is parent-provided, not newly queried by reviewer. ModernLarge Debug simulator smoke only; no Release runtime/physicaldistribution/camera/Yahoo/full374QA readiness or original status promotion.",
+  "publicPackage": {
+    "rootReviewed": true,
+    "independentReviewed": true,
+    "originalEvidencePreserved": true,
+    "rawLogsXCResultsFullScreenPhotosPrivateFixturesIncluded": false
+  }
+}

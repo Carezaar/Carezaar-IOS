@@ -1,5 +1,5 @@
 {
-  "status": "REVIEWABLE \u2014 root privacy scan/review pending; no staging/commit/push",
+  "status": "Source commit d99543510d7dfcefd130511531d994d5b719050d pushed and remotely verified; post-push clean build and typed both-role smoke verified; final delivery reports included in this documentation-only update; full QA incomplete",
   "reports": [
     "IOS_TEST_EXECUTION_REPORT.md",
     "IOS-FUNCTIONAL-PARITY-MATRIX.md",
@@ -317,10 +317,16 @@
       "artifactCount": 1,
       "bytes": 14809,
       "reviewProvenance": "Independently verified the sole anonymous artifact hash and completed BUILD SUCCEEDED/ANALYZE SUCCEEDED log hash. Read actual16051976byte SimulatorRelease Mach-O and verified SHA2560190da8906a78191b24d5dca7be8596e768f7837bb393d8e239972ef6b3c6d37; all32 required Debug markers absent from raw bytes and /usr/bin/strings output, CAREZAAR_API_BASE_URL absent. All57 current productionSwift hashes match the release record. Independently compared all57 path/SHA pairs in oct11-post-a5-current-production-source-inventory.json productionSwiftFiles with release productionSourceInventory and actual current files: identical, zero changed. Associated actual107-unit PASS26.947 is fresh-modern-caregiver-a5-visible-diagnostics.log lines372\u2013375; its separate UI diagnostic failure remains retained. The supplied fresh-modern-caregiver-a5-full-raster.log has UI-only failure and is not the107-unit log. Only log warning is AppIntents metadata skipped because no framework dependency; no compiler source warning identified. Anonymous artifact contains relative sourcepaths/hashes and QA marker names, no credential values/fixture identifiers/private absolute paths/rawlog. SimulatorRelease build/static analysis only with CODE_SIGNING_ALLOWED=NO: no Release runtime, physical signing/distribution, all374 QA coverage or production readiness asserted."
+    },
+    {
+      "index": "Proofs/postpush-main-both-role-typed-smoke-anonymous-proof/index.json",
+      "artifactCount": 6,
+      "bytes": 28130,
+      "reviewProvenance": true
     }
   ],
-  "proofIndexCount": 51,
-  "indexedArtifactCount": 901,
+  "proofIndexCount": 52,
+  "indexedArtifactCount": 907,
   "originalEvidenceIntact": true,
   "excludedTypes": [
     "raw logs",
@@ -342,58 +348,58 @@
   "documents": [
     {
       "path": "IOS_TEST_EXECUTION_REPORT.md",
-      "bytes": 63839,
-      "sha256": "19c8404cd4ef08b82ab435d2fd8c799dc783e2177cd4c5f2915a39cef97f68b7"
+      "bytes": 65020,
+      "sha256": "298db70a9c6ff4a46c56545e8914062ce0fb4fa07d91745165a47a8515faad98"
     },
     {
       "path": "IOS-FUNCTIONAL-PARITY-MATRIX.md",
-      "bytes": 65253,
-      "sha256": "7c1749841a84aa3f262e588189994d9d1890acbc68ff7ad6783032b4887ddbb2"
+      "bytes": 66434,
+      "sha256": "f701c1f97aa02dc76d6e260369ba8c3263376504559c6bfc7786d83373890f19"
     },
     {
       "path": "IOS-FIGMA-PARITY.md",
-      "bytes": 61294,
-      "sha256": "569f5d30dea957b0caa4a639262c993039a1d8e40ee6112bb6fe0c1eb807a1f4"
+      "bytes": 62475,
+      "sha256": "a5c68fd593cf99e511d5fd3c41b7e7a50d947a87202a1255056a774393c96fed"
     },
     {
       "path": "BACKEND-ISSUES-FOR-CLIENT.md",
-      "bytes": 64742,
-      "sha256": "db602752d5cfc8e567cb1adf825ae18867517ac85ca847a4dfb6cdc3ccf0bec2"
+      "bytes": 65923,
+      "sha256": "07b1a70f91db07ae43ccadb6f203e72e046dc87dc1b9b564a5a33614c861cabc"
     },
     {
       "path": "QA-CASE-MANIFEST.md",
-      "bytes": 502077,
-      "sha256": "79ea5c831ab8f209fdc94c938ac42d114448286cfe0d980926f23569577eb74e"
+      "bytes": 503258,
+      "sha256": "776d8b43cc906c93640314a83a3e63d8454fdeacff1e93311a82c54f4d792057"
     },
     {
       "path": "EVIDENCE-COVERAGE-MAPPING.md",
-      "bytes": 671748,
-      "sha256": "0f9a23cc8452552493684476c6cb8ffdc3f79f54feaafc58d33ea7848129abb3"
+      "bytes": 672929,
+      "sha256": "3c4a33c0af2e501b85f06edcef4a0f577bc98bf1592fdd50416c75963da62421"
     },
     {
       "path": "ACCESSIBILITY-TRIAGE.md",
-      "bytes": 134307,
-      "sha256": "98ee8832cd6cd770f89d1f451c5468462ebdc8485981c744f8988979cfc572ef"
+      "bytes": 135488,
+      "sha256": "1c47acd93fefdcd0e393be659a8c3f2b72bae76d9b47e78013590de747cb7747"
     },
     {
       "path": "NATIVE-SIGNUP-EXECUTION.md",
-      "bytes": 130297,
-      "sha256": "f47e4dfe3506dcda06b76a1ca4c23c17d9ddd19a50e6f79e5dc16ab522dfa0b1"
+      "bytes": 131478,
+      "sha256": "174afe322cf5a051f703b072396d5c89bd8fef867597232030b8800a49c51f9a"
     },
     {
       "path": "CROSS-ROLE-EXECUTION.md",
-      "bytes": 131539,
-      "sha256": "3656db1a6c1f71701245fd7301a4f962a67b4d187f4dfe814984dd9bd4a1c4bc"
+      "bytes": 132720,
+      "sha256": "a1303a9d7a98b1a61acaef3de53c96322ddfb8fc9a48c10c0965f9a917dd3dd9"
     },
     {
       "path": "README.md",
-      "bytes": 27320,
-      "sha256": "9a2549591b79f87a51bb3742f2680cf87602f585c8b209b9a0efa12b3a4c19a6"
+      "bytes": 28501,
+      "sha256": "4b6a8046006b31581c935db1518efae8c9f8d4b1891367d5f29b43c6efb0ce3e"
     }
   ],
   "readme": {
     "path": "README.md",
-    "bytes": 27320,
-    "sha256": "9a2549591b79f87a51bb3742f2680cf87602f585c8b209b9a0efa12b3a4c19a6"
+    "bytes": 28501,
+    "sha256": "4b6a8046006b31581c935db1518efae8c9f8d4b1891367d5f29b43c6efb0ce3e"
   }
 }
