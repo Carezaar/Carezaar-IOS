@@ -323,10 +323,16 @@
       "artifactCount": 6,
       "bytes": 28130,
       "reviewProvenance": true
+    },
+    {
+      "index": "Proofs/oct12-clean-install-reference-gates-anonymous-proof/index.json",
+      "artifactCount": 10,
+      "bytes": 2740184,
+      "reviewProvenance": "Independently viewed all4 existing-stock-asset Splash/Welcome screenshots and parsed both23line transport ledgers plus all4 anonymous JSONs; all10artifact hashes and both completed native log hashes match. Actual newly created isolated device/preinstall records show no installed app container (exit2) before first test installation; Modern69.383/Small73.878 nativePASS. Parsed both actual newly persisted schema3 caches:22datasets/allIDsunique/server tsCache1791657662/21advertised count matches; cache hashes match anonymous inspections, reasons14 is separately retained unadvertised. Native ledgers each contain exactly base/info+22datasets once; separate root read-only public infoGET verification is not counted as native transport. Loading screenshots show actual Splash; ready screenshots show Welcome/rolecards only, with enabled SignIn proved by AX but no tap/offscreen visual completeness claimed. Existing stock faces are app assets, not personal QA images; no private account/credential/path/profile/camera content found in anonymous proof. Exact original P01-001 clean-install successful bootstrap row is eligible for PASS with explicit shared-anonymous-preauth role rationale: same complete startup inventory before either role selection, not4authenticated allocations. This closes its prior clean-install gap only. P01-011 rapid navigation/lifecycle/cancellation and P01-012 actual immediate FAQ/media UI consumption/no deferred-fetch remain unclosed. Small Splash lower copy partly below viewport is retained under broader open P17; no universal layout/a11y pass. No manifest/status/source/API/UI mutation by reviewer; rootReviewed set per parent completed review authorization."
     }
   ],
-  "proofIndexCount": 52,
-  "indexedArtifactCount": 907,
+  "proofIndexCount": 53,
+  "indexedArtifactCount": 917,
   "originalEvidenceIntact": true,
   "excludedTypes": [
     "raw logs",
@@ -339,67 +345,67 @@
   ],
   "currentOriginalCaseCounts": {
     "total": 374,
-    "PASS": 97,
-    "NOT RUN": 259,
-    "FAIL": 2,
+    "NOT RUN": 251,
+    "PASS": 105,
+    "N/A": 15,
     "BLOCKED": 1,
-    "N/A": 15
+    "FAIL": 2
   },
   "documents": [
     {
       "path": "IOS_TEST_EXECUTION_REPORT.md",
-      "bytes": 65020,
-      "sha256": "298db70a9c6ff4a46c56545e8914062ce0fb4fa07d91745165a47a8515faad98"
+      "bytes": 67410,
+      "sha256": "3c4880f4f3e10fbeb02b2a61a402041a72f31f17fc67e6b8f509cac13561f066"
     },
     {
       "path": "IOS-FUNCTIONAL-PARITY-MATRIX.md",
-      "bytes": 66434,
-      "sha256": "f701c1f97aa02dc76d6e260369ba8c3263376504559c6bfc7786d83373890f19"
+      "bytes": 68824,
+      "sha256": "a2ab047d798ced432b707559a922780df1f67e21808e03ea25326d9df45e7829"
     },
     {
       "path": "IOS-FIGMA-PARITY.md",
-      "bytes": 62475,
-      "sha256": "a5c68fd593cf99e511d5fd3c41b7e7a50d947a87202a1255056a774393c96fed"
+      "bytes": 64865,
+      "sha256": "251c3e510cc64137311e4a79df8c8119e0c96b2484fb63c7af8e2894c342858d"
     },
     {
       "path": "BACKEND-ISSUES-FOR-CLIENT.md",
-      "bytes": 65923,
-      "sha256": "07b1a70f91db07ae43ccadb6f203e72e046dc87dc1b9b564a5a33614c861cabc"
+      "bytes": 68313,
+      "sha256": "f8457e7354881ef6d6924c35a329fc80b3cf66f51acef6e22127baf0e0fa4fe2"
     },
     {
       "path": "QA-CASE-MANIFEST.md",
-      "bytes": 503258,
-      "sha256": "776d8b43cc906c93640314a83a3e63d8454fdeacff1e93311a82c54f4d792057"
+      "bytes": 506316,
+      "sha256": "7f66565b6ea694e36b0a47ca0a83ce478aeb5ad254b32c22a388699806daf238"
     },
     {
       "path": "EVIDENCE-COVERAGE-MAPPING.md",
-      "bytes": 672929,
-      "sha256": "3c4a33c0af2e501b85f06edcef4a0f577bc98bf1592fdd50416c75963da62421"
+      "bytes": 675319,
+      "sha256": "fdc67aa52a5266121719e6c4ca0674460aa67c55ffb800fd20be1e425f383fb9"
     },
     {
       "path": "ACCESSIBILITY-TRIAGE.md",
-      "bytes": 135488,
-      "sha256": "1c47acd93fefdcd0e393be659a8c3f2b72bae76d9b47e78013590de747cb7747"
+      "bytes": 137878,
+      "sha256": "a85a91ccefcbfbfad4c9f21a1e5b8cd0932878e10571d8de8713b8df0539abeb"
     },
     {
       "path": "NATIVE-SIGNUP-EXECUTION.md",
-      "bytes": 131478,
-      "sha256": "174afe322cf5a051f703b072396d5c89bd8fef867597232030b8800a49c51f9a"
+      "bytes": 133868,
+      "sha256": "8dda3a58d386360e79fca9a5895bf0bffe7ab82bbd7be3570f7d51b2e26afc63"
     },
     {
       "path": "CROSS-ROLE-EXECUTION.md",
-      "bytes": 132720,
-      "sha256": "a1303a9d7a98b1a61acaef3de53c96322ddfb8fc9a48c10c0965f9a917dd3dd9"
+      "bytes": 135110,
+      "sha256": "0b8f1d2a166e1760d160eb19642be88435abeea6654fa4e0d174ab2b9de9e51b"
     },
     {
       "path": "README.md",
-      "bytes": 28501,
-      "sha256": "4b6a8046006b31581c935db1518efae8c9f8d4b1891367d5f29b43c6efb0ce3e"
+      "bytes": 30891,
+      "sha256": "fb7e6b8fcbe0161bd7f9d4c5bfeb831f9e29816a98c3ea0c05f325ba97534d0d"
     }
   ],
   "readme": {
     "path": "README.md",
-    "bytes": 28501,
-    "sha256": "4b6a8046006b31581c935db1518efae8c9f8d4b1891367d5f29b43c6efb0ce3e"
+    "bytes": 30891,
+    "sha256": "fb7e6b8fcbe0161bd7f9d4c5bfeb831f9e29816a98c3ea0c05f325ba97534d0d"
   }
 }

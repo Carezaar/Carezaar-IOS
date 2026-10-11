@@ -1,0 +1,9 @@
+{
+  "appNotInstalledBeforeTest": true,
+  "getAppContainerBeforeInstallExitCode": 2,
+  "contentSize": "large",
+  "sourceCommitSHA": "b2797fbd605d3e88e389c9027a205c1c6d76ae2d",
+  "physicalCameraUsed": false,
+  "device": "fresh Modern iPhone17ProMax iOS26.5",
+  "roleScope": "shared anonymous preauth bootstrap; no authenticated role"
+}

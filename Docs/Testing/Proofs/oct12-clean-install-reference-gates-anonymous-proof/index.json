@@ -1,0 +1,103 @@
+{
+  "title": "Actual fresh native installation: complete reference startup on Modern and Small",
+  "case": "P01-001",
+  "sourceCommitSHA": "b2797fbd605d3e88e389c9027a205c1c6d76ae2d",
+  "roleScope": "Shared anonymous preauth startup before either role can be selected; not four authenticated role allocations",
+  "results": [
+    {
+      "size": "modern",
+      "status": "PASS",
+      "durationSeconds": 69.383,
+      "logSHA256": "e5a5bdad6f3a8c71298e3951feb1907364b1d43353b0f997ab3b4713b6293d73"
+    },
+    {
+      "size": "small",
+      "status": "PASS",
+      "durationSeconds": 73.878,
+      "logSHA256": "abe25f004fb8aaebcea92d47cd63fb1bce109617f7d3f94b46871fac86bf2209"
+    }
+  ],
+  "nativeReferenceGETsPerDevice": 23,
+  "datasetsPerDevice": 22,
+  "advertisedCountsVerifiedPerDevice": 21,
+  "injectedRequestDelaySeconds": 5,
+  "backendResponses": "actual deployed backend; no fabricated responses",
+  "scopeLimitations": [
+    "No rapid navigation/lifecycle/cancellation coverage for P01-011",
+    "No immediately visible FAQ/media consumption or deferred-fetch coverage for P01-012",
+    "Enabled Sign In is AX evidence; ready screenshots show initial Welcome viewport, not a visible Sign In tap or all offscreen content",
+    "No physical camera capture or personal profile/media writes"
+  ],
+  "rootReviewed": true,
+  "independentReviewed": true,
+  "artifacts": [
+    {
+      "path": "Artifacts/modern-B76855AB-F458-46F4-85E6-578C0391201C.png",
+      "description": "uncached-reference-ready-welcome_0_7385C699-AE0A-49A9-BB4C-87F914D98020.png",
+      "sha256": "d2e85fdbafb5649071a113019081ec7d7fb1b4ac14154afbb7650adef0c6e295",
+      "packagedSha256": "d2e85fdbafb5649071a113019081ec7d7fb1b4ac14154afbb7650adef0c6e295"
+    },
+    {
+      "path": "Artifacts/modern-6079A087-5DE5-4D82-8A7A-892939B3F060.txt",
+      "description": "uncached-complete-reference-transport-ledger_0_A3B780E3-3F78-4356-9EBA-A8383E19073A.txt",
+      "sha256": "42ccb0a0ed58d2ed6a7f758c38362961ad578e2a9ef7a17742e310b64be93deb",
+      "packagedSha256": "42ccb0a0ed58d2ed6a7f758c38362961ad578e2a9ef7a17742e310b64be93deb"
+    },
+    {
+      "path": "Artifacts/modern-1052ABA3-D588-424D-A07F-28EC6665AE84.png",
+      "description": "uncached-reference-loading-gate_0_36F59030-518D-451B-B941-8FD570AD68B2.png",
+      "sha256": "36753afdd7b4ab62c41158b536060bf1852efe9493337b91e486e86945e5b66f",
+      "packagedSha256": "36753afdd7b4ab62c41158b536060bf1852efe9493337b91e486e86945e5b66f"
+    },
+    {
+      "path": "Artifacts/oct12-clean-modern-reference-cache-inspection-anonymous.json",
+      "description": "Actual new persisted cache counts and independent fresh public server marker/count verification",
+      "sha256": "8af52b21c94f19ea0399d4d427d04389dc52d691c4de1afb0b7e456ba8a86348",
+      "packagedSha256": "8af52b21c94f19ea0399d4d427d04389dc52d691c4de1afb0b7e456ba8a86348"
+    },
+    {
+      "path": "Artifacts/modern-clean-preinstallation-anonymous.json",
+      "description": "Fresh task-created device had no app container before first native test installation",
+      "sha256": "0f33a1d3e93d638acbae2af448598d5203b07eb7f215410da09df6902e092509",
+      "packagedSha256": "0f33a1d3e93d638acbae2af448598d5203b07eb7f215410da09df6902e092509"
+    },
+    {
+      "path": "Artifacts/small-88796DBD-4C2B-4F4F-8EFD-4A1299BECCAD.png",
+      "description": "uncached-reference-ready-welcome_0_41DDFD4D-7C3D-4CBA-A040-CF6A2F684097.png",
+      "sha256": "b629428426ea59ed1cf2a1caa594bf5341c0501939fc9fc134f73778d0c73bc5",
+      "packagedSha256": "b629428426ea59ed1cf2a1caa594bf5341c0501939fc9fc134f73778d0c73bc5"
+    },
+    {
+      "path": "Artifacts/small-BC62B727-EC77-4740-9848-D14CC5BC76D9.txt",
+      "description": "uncached-complete-reference-transport-ledger_0_B18D9E0A-0D42-4674-87AD-106381766BDF.txt",
+      "sha256": "42ccb0a0ed58d2ed6a7f758c38362961ad578e2a9ef7a17742e310b64be93deb",
+      "packagedSha256": "42ccb0a0ed58d2ed6a7f758c38362961ad578e2a9ef7a17742e310b64be93deb"
+    },
+    {
+      "path": "Artifacts/small-AC1F653D-A932-45BF-AA99-38C9524AA938.png",
+      "description": "uncached-reference-loading-gate_0_D69AE6C4-0F7A-4DD9-AAA5-7EF0CD8EFEA8.png",
+      "sha256": "178c1b01f6ffaf057169418f3c90d79d113b55fc496c47e90e16b8e66aa454ab",
+      "packagedSha256": "178c1b01f6ffaf057169418f3c90d79d113b55fc496c47e90e16b8e66aa454ab"
+    },
+    {
+      "path": "Artifacts/oct12-clean-small-reference-cache-inspection-anonymous.json",
+      "description": "Actual new persisted cache counts and independent fresh public server marker/count verification",
+      "sha256": "11a744c2aa36da3d64b8e93cadc9b036b8a17174f079667a2840fa76fe08f4f4",
+      "packagedSha256": "11a744c2aa36da3d64b8e93cadc9b036b8a17174f079667a2840fa76fe08f4f4"
+    },
+    {
+      "path": "Artifacts/small-clean-preinstallation-anonymous.json",
+      "description": "Fresh task-created device had no app container before first native test installation",
+      "sha256": "867c7529fd5bddd780bec9a57bc3a7960a374e3b35ff35ed6f6809d86509d69c",
+      "packagedSha256": "867c7529fd5bddd780bec9a57bc3a7960a374e3b35ff35ed6f6809d86509d69c"
+    }
+  ],
+  "independentReviewScope": "Independently viewed all4 existing-stock-asset Splash/Welcome screenshots and parsed both23line transport ledgers plus all4 anonymous JSONs; all10artifact hashes and both completed native log hashes match. Actual newly created isolated device/preinstall records show no installed app container (exit2) before first test installation; Modern69.383/Small73.878 nativePASS. Parsed both actual newly persisted schema3 caches:22datasets/allIDsunique/server tsCache1791657662/21advertised count matches; cache hashes match anonymous inspections, reasons14 is separately retained unadvertised. Native ledgers each contain exactly base/info+22datasets once; separate root read-only public infoGET verification is not counted as native transport. Loading screenshots show actual Splash; ready screenshots show Welcome/rolecards only, with enabled SignIn proved by AX but no tap/offscreen visual completeness claimed. Existing stock faces are app assets, not personal QA images; no private account/credential/path/profile/camera content found in anonymous proof. Exact original P01-001 clean-install successful bootstrap row is eligible for PASS with explicit shared-anonymous-preauth role rationale: same complete startup inventory before either role selection, not4authenticated allocations. This closes its prior clean-install gap only. P01-011 rapid navigation/lifecycle/cancellation and P01-012 actual immediate FAQ/media UI consumption/no deferred-fetch remain unclosed. Small Splash lower copy partly below viewport is retained under broader open P17; no universal layout/a11y pass. No manifest/status/source/API/UI mutation by reviewer; rootReviewed set per parent completed review authorization.",
+  "independentReview": "Independently viewed all4 existing-stock-asset Splash/Welcome screenshots and parsed both23line transport ledgers plus all4 anonymous JSONs; all10artifact hashes and both completed native log hashes match. Actual newly created isolated device/preinstall records show no installed app container (exit2) before first test installation; Modern69.383/Small73.878 nativePASS. Parsed both actual newly persisted schema3 caches:22datasets/allIDsunique/server tsCache1791657662/21advertised count matches; cache hashes match anonymous inspections, reasons14 is separately retained unadvertised. Native ledgers each contain exactly base/info+22datasets once; separate root read-only public infoGET verification is not counted as native transport. Loading screenshots show actual Splash; ready screenshots show Welcome/rolecards only, with enabled SignIn proved by AX but no tap/offscreen visual completeness claimed. Existing stock faces are app assets, not personal QA images; no private account/credential/path/profile/camera content found in anonymous proof. Exact original P01-001 clean-install successful bootstrap row is eligible for PASS with explicit shared-anonymous-preauth role rationale: same complete startup inventory before either role selection, not4authenticated allocations. This closes its prior clean-install gap only. P01-011 rapid navigation/lifecycle/cancellation and P01-012 actual immediate FAQ/media UI consumption/no deferred-fetch remain unclosed. Small Splash lower copy partly below viewport is retained under broader open P17; no universal layout/a11y pass. No manifest/status/source/API/UI mutation by reviewer; rootReviewed set per parent completed review authorization.",
+  "publicPackage": {
+    "rootReviewed": true,
+    "independentReviewed": true,
+    "originalEvidencePreserved": true,
+    "rawLogsXCResultsFullScreenPhotosPrivateFixturesIncluded": false
+  }
+}
