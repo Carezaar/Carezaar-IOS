@@ -1,0 +1,75 @@
+{
+  "source": "fresh-small-client-original-peer-menu-reply.xcresult",
+  "wholeProcessExit": 0,
+  "nativePassSeconds": 194.633,
+  "rootReviewedCroppedPNGs": 1,
+  "allocation": "small client",
+  "existingOriginalPeerTargetsVerified": true,
+  "wholeMessageAndMenuVisibleBeforeSend": true,
+  "bothOwnedStoredOriginalParentVerified": true,
+  "newerReplyRetained": true,
+  "nativePOSTs": 1,
+  "replyChangeWithinStrictTenSeconds": 7.8214170932769775,
+  "syntheticPeerMessagesSeeded": false,
+  "artifacts": [
+    {
+      "path": "Artifacts/small-client-original-reply-001-61B6585B-59C0-41B4-9DBC-DDC3F89DECD1.json",
+      "description": "owned-reply-race-acknowledged-client_0_D1FA668F-F46A-4195-8B12-8A2C4B8C78DD.json",
+      "sha256": "b24ae2ab59e89287f37401a0661e53e315a5bda17f446ea5372809e6e1090699"
+    },
+    {
+      "path": "Artifacts/small-client-original-reply-002-31767A7B-1F47-40DA-A7D1-E8D33E5A6E63.png",
+      "description": "owned-reply-race-synthetic-acknowledged-message-only-client_0_490FFFEB-F413-4B1D-99D5-8C9FC40C97B8.png",
+      "sha256": "9d673a11a4798d4de45abdd4f1861c7560685cb485b91ab8d73f66f3725ccaf3"
+    },
+    {
+      "path": "Artifacts/small-client-original-reply-003-C385C75F-9EA3-4C2C-88F2-9ED95F615632.json",
+      "description": "owned-reply-race-timing-client_0_812805D1-5CFB-4682-9F66-D863157AB883.json",
+      "sha256": "729a5acdaba11307409d809d2adcce27f399de4c93bcf2cb15ec87dbb07dec60"
+    },
+    {
+      "path": "Artifacts/small-client-original-reply-004-50E6916F-D153-45DE-AD7A-1D9D21DB85F5.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_BCDE5A6E-B13E-4A39-BA8B-C4439AEC99B4.json",
+      "sha256": "442e1d42aa003c08daf3ad296bfe2d64845d91d78d6e7e92cc11ca13815da641"
+    },
+    {
+      "path": "Artifacts/small-client-original-reply-005-5686F119-7432-4F14-8FFB-879E985EA771.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_98C29444-E8F5-4BC1-B718-2C3DEE5ECD96.json",
+      "sha256": "71e6fb7df467ca1a8f5708e5b8b0160d5b3759f5b145deea4097704a4b156b73"
+    }
+  ],
+  "publicPackage": {
+    "status": "REVIEWABLE — not staged or delivered",
+    "originalEvidenceRetainedLocally": true,
+    "rawLogsAndXCResultsIncluded": false,
+    "artifactInventory": [
+      {
+        "path": "Artifacts/small-client-original-reply-001-61B6585B-59C0-41B4-9DBC-DDC3F89DECD1.json",
+        "bytes": 365,
+        "sha256": "1095456479b3a6b561f6aaf671816584f39883cbe94478bb9d3d576877f470a4"
+      },
+      {
+        "path": "Artifacts/small-client-original-reply-002-31767A7B-1F47-40DA-A7D1-E8D33E5A6E63.png",
+        "bytes": 14230,
+        "sha256": "9d673a11a4798d4de45abdd4f1861c7560685cb485b91ab8d73f66f3725ccaf3"
+      },
+      {
+        "path": "Artifacts/small-client-original-reply-003-C385C75F-9EA3-4C2C-88F2-9ED95F615632.json",
+        "bytes": 268,
+        "sha256": "12cde2878943a203786a8711ee5b0e04d322e7ade605ebd68131e02636ae4add"
+      },
+      {
+        "path": "Artifacts/small-client-original-reply-004-50E6916F-D153-45DE-AD7A-1D9D21DB85F5.json",
+        "bytes": 613,
+        "sha256": "484ea0690dd29f4e7ec0367d4367a71e966e32a135fe3d6edcdb28c69979788b"
+      },
+      {
+        "path": "Artifacts/small-client-original-reply-005-5686F119-7432-4F14-8FFB-879E985EA771.json",
+        "bytes": 617,
+        "sha256": "c6dc8352c90ffc705afcb8914ddb66d0d198df11dc16a0288f44802338c8d112"
+      }
+    ],
+    "sourceIndexSHA256": "771db0250832ab8155f06d686f936a0ddcd9475d4fe1467e239a5754ec386e33",
+    "artifactHashNote": "Public JSON/text are sanitized; artifactInventory hashes apply to packaged bytes. Original indexed hashes, where present, refer to preserved original evidence."
+  }
+}

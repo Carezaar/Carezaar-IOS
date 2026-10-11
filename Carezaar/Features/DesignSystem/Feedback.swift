@@ -59,31 +59,83 @@ final class Feedback: ObservableObject {
     /// Server-driven copy lookup, installed by the app once `Localization` exists.
     static var translate: (String, String) -> String = { _, fallback in fallback }
 
-    /// User-facing message for any thrown error. Server copy written for people
-    /// (validation, "Invalid Credentials!") is shown; technical or connection-level
-    /// failures get a plain message instead of PHP notices.
+    /// Inline reset-code presentation is separate from common/global failures.
+    static func otpInlineMessage(_ error: Error) -> String? {
+        guard let api = error as? APIError, !api.isServiceFault else { return nil }
+        let text: String
+        let fieldSpecific: Bool
+        switch api {
+        case .validation(let message, let fields):
+            if let field = fields["otp"]?.first, !field.isEmpty {
+                guard !APIError.unknown(field).isTechnical else { return nil }
+                text = field
+                fieldSpecific = true
+            } else {
+                guard message.localizedCaseInsensitiveContains("otp") else { return nil }
+                text = message
+                fieldSpecific = false
+            }
+        case .unknown(let message):
+            guard message.localizedCaseInsensitiveContains("otp") else { return nil }
+            text = message
+            fieldSpecific = false
+        default:
+            // A service, authorization or transport error mentioning OTP is not
+            // evidence that the user's code was rejected.
+            return nil
+        }
+        if !fieldSpecific {
+            // Match only recognizable code-rejection sentences, not arbitrary
+            // diagnostics that happen to contain "OTP" and "invalid".
+            let patterns = [
+                #"^(?:(?:the|your|provided|the provided) )?(?:otp(?: code)?|code) (?:is |has |was )?(?:invalid|incorrect|wrong|expired|not valid)[.!]*$"#,
+                #"^(?:invalid|incorrect|wrong|expired) (?:otp(?: code)?|code)[.!]*$"#
+            ]
+            let normalized = text.trimmingCharacters(in: .whitespacesAndNewlines)
+                .split(whereSeparator: \.isWhitespace).joined(separator: " ")
+            guard patterns.contains(where: { normalized.range(of: $0, options: [.regularExpression, .caseInsensitive]) != nil }) else { return nil }
+        }
+        // Current CMS contents has no invalid/expired-code row. Keep safe inline
+        // fallback copy; never display arbitrary raw service/error wording here.
+        if text.localizedCaseInsensitiveContains("expired") {
+            return "Your code has expired. Request a new code."
+        }
+        if ["invalid", "incorrect", "wrong", "not valid"].contains(where: { text.localizedCaseInsensitiveContains($0) }) {
+            return "The code is invalid. Check it and try again."
+        }
+        return nil
+    }
+
+    /// Common/global failures use managed general copy. Useful field-specific
+    /// validation remains server authored; technical field text is suppressed.
     static func message(_ error: Error) -> String {
         let serverTrouble = translate("general_network_title", "Cannot communicate with server.")
         guard let api = error as? APIError else {
             return translate("error_unexpected", "Something went wrong. Please try again.")
         }
         switch api {
-        case .validation(let message, let fields):
-            return fields.values.first?.first ?? message
+        case .validation(_, let fields):
+            // Deterministic field order, preserving useful validation without
+            // exposing global/internal server wording as a common failure.
+            // Route/account references are not editable inputs on these screens.
+            let referenceFields: Set<String> = ["id", "partner_id", "chat_id", "match_id", "user_id"]
+            if let value = fields.keys.sorted().filter({ !referenceFields.contains($0) })
+                .flatMap({ fields[$0] ?? [] })
+                .first(where: { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                    && !APIError.unknown($0).isTechnical }) {
+                return value
+            }
+            return translate("error_unavailable", "This isn't working right now. Please try again later.")
         case .network:
             return "\(serverTrouble) \(translate("error_check_connection", "Check your internet connection and try again."))"
         case .timeout:
             return "\(serverTrouble) \(translate("error_timeout", "Please try again."))"
-        case .unauthenticated(let m):
-            // Still holding a session after the refresh attempt: the server refused
-            // this action for this user, which is not an expired session.
-            if TokenStore.shared.hasSession, !m.isEmpty, !api.isTechnical { return m }
+        case .unauthenticated:
             return translate("error_session_expired", "Your session has expired. Please sign in again.")
         case .decoding:
             return translate("error_unexpected", "Something went wrong. Please try again.")
-        default:
-            if api.isServiceFault { return translate("error_unavailable", "This isn't working right now. Please try again later.") }
-            return api.message
+        case .server, .notFound, .unknown:
+            return translate("error_unavailable", "This isn't working right now. Please try again later.")
         }
     }
 

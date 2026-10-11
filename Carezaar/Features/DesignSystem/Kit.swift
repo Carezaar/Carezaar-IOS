@@ -5,6 +5,8 @@ extension Theme.Palette {
     static let primarySoft = Color(hex: 0xE7F1FF)
     static let warning = Color(hex: 0xE39B0B)
     static let danger = Color(hex: 0xD6202D)
+    /// Small destructive labels need stronger contrast on the pale red panel.
+    static let dangerText = Color(hex: 0xB91C28)
     static let dangerSoft = Color(hex: 0xFDECEC)
     static let line = Color(hex: 0xE3E7EE)
 }
@@ -23,9 +25,11 @@ final class Pager<Item: Identifiable>: ObservableObject where Item.ID: Hashable 
     @Published private(set) var error: Error?
     @Published private(set) var loadedOnce = false
     private var page = 0
-    private var lastPage: Int?
+    /// Server totals are informational: rows may be added after the first response.
+    /// Only an empty page or a repeated page with no new ids ends the traversal.
+    private var exhausted = false
 
-    var hasMore: Bool { lastPage.map { page < $0 } ?? true }
+    var hasMore: Bool { !exhausted }
 
     /// Each reload starts a new generation; results from an older, superseded load
     /// (e.g. one whose view disappeared mid-flight) are discarded instead of
@@ -34,35 +38,38 @@ final class Pager<Item: Identifiable>: ObservableObject where Item.ID: Hashable 
 
     func reload(_ fetch: Fetch) async {
         generation += 1
-        page = 0; lastPage = nil; error = nil
+        page = 0; exhausted = false; error = nil
         await next(fetch, replacing: true, generation: generation)
     }
 
     func loadMore(_ fetch: Fetch) async {
-        guard hasMore, !isLoading, error == nil else { return }
-        await next(fetch, replacing: false, generation: generation)
+        guard hasMore, !isLoading else { return }
+        await next(fetch, replacing: page == 0, generation: generation)
     }
 
     private func next(_ fetch: Fetch, replacing: Bool, generation g: Int) async {
         isLoading = true
+        error = nil
+        let requestedPage = page + 1
         defer { if g == generation { isLoading = false } }
         do {
-            let (result, meta) = try await fetch(page + 1)
+            let (result, meta) = try await fetch(requestedPage)
             guard g == generation else { return }
             loadedOnce = true
-            page += 1
-            lastPage = meta?.lastPage ?? (result.count < APIConfiguration.defaultPageSize ? page : nil)
-            total = meta?.total ?? total
+            page = requestedPage
+            total = meta?.total ?? (replacing ? nil : total)
             // The server's order isn't stable for equal sort keys (BE-16), so a later
             // page can repeat someone; duplicate ids would also break `ForEach`.
             var seen = Set(replacing ? [] : items.map(\.id))
             let fresh = result.filter { seen.insert($0.id).inserted }
+            exhausted = result.isEmpty || (!replacing && fresh.isEmpty)
             items = replacing ? fresh : items + fresh
         } catch is CancellationError {
         } catch {
             guard g == generation else { return }
             loadedOnce = true
-            if replacing { items = [] }
+            // Keep a valid loaded list even if an explicit reload fails. A later
+            // page failure also leaves the page number unchanged for its retry.
             self.error = error
         }
     }
@@ -105,6 +112,14 @@ struct PagedContent<Item: Identifiable, Row: View>: View {
                     row(item).onAppear { if item.id == pager.items.last?.id { more() } }
                 }
                 if pager.isLoading && !pager.items.isEmpty { ProgressView().padding() }
+                if let error = pager.error {
+                    VStack(spacing: 10) {
+                        ErrorBanner(message: Feedback.message(error))
+                        OutlineButton(title: loc.t("general_try_again", "Try Again")) { more() }
+                            .accessibilityIdentifier("pagination-retry")
+                    }
+                    .padding(20)
+                }
             }
         }
     }
@@ -162,34 +177,40 @@ struct HeroHeader: View {
     let icon: String
     let title: String
     let subtitle: String
+    @Environment(\.dynamicTypeSize) private var typeSize
+    @ScaledMetric(relativeTo: .largeTitle) private var headerHeight: CGFloat = 196
 
     var body: some View {
-        ZStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .center, spacing: 8) {
+                Text(title).font(Theme.Typography.heading(28))
+                    .fixedSize(horizontal: false, vertical: true)
+                AppIcon(name: icon, size: 28, tint: Theme.Palette.primaryDark)
+                    .fixedSize().layoutPriority(1)
+            }
+            if !subtitle.isEmpty {
+                Text(subtitle).font(Theme.Typography.body(14))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .foregroundStyle(Theme.Palette.textPrimary)
+        .padding(.horizontal, 14).padding(.vertical, 12)
+        .frame(maxWidth: typeSize.isAccessibilitySize ? .infinity : 300, alignment: .leading)
+        .background(.white.opacity(0.75), in: RoundedRectangle(cornerRadius: 14))
+        .padding(.horizontal, 20)
+        // The picture keeps its ordinary height, but wrapped text can make the
+        // header taller. Scaling a fixed height alone still clipped long copy.
+        .frame(maxWidth: .infinity, minHeight: headerHeight, alignment: .leading)
+        .background {
             GeometryReader { geo in
                 if let ui = AppImage.load(image) {
-                    Image(uiImage: ui).resizable().scaledToFill().frame(width: geo.size.width, height: geo.size.height).clipped()
+                    Image(uiImage: ui).resizable().scaledToFill()
+                        .frame(width: geo.size.width, height: geo.size.height).clipped()
                 } else {
                     Theme.Palette.clientPanel
                 }
             }
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(alignment: .center, spacing: 8) {
-                    // Long translations ("Mes correspondances") wrap rather than truncate;
-                    // the icon keeps its own width beside the wrapped title.
-                    Text(title).font(Theme.Typography.heading(28)).lineLimit(2).minimumScaleFactor(0.7)
-                    AppIcon(name: icon, size: 28, tint: Theme.Palette.primaryDark)
-                        .fixedSize().layoutPriority(1)
-                }
-                if !subtitle.isEmpty { Text(subtitle).font(Theme.Typography.body(14)).lineLimit(3).minimumScaleFactor(0.85) }
-            }
-            .padding(.horizontal, 14).padding(.vertical, 12)
-            .background(.white.opacity(0.75), in: RoundedRectangle(cornerRadius: 14))
-            .frame(maxWidth: 300, alignment: .leading)
-            .padding(.horizontal, 20)
         }
-        .frame(height: 196)
-        // Text over a fixed-height picture card: capped, as the system caps its bars.
-        .dynamicTypeSize(...DynamicTypeSize.xxLarge)
         .clipShape(UnevenRoundedRectangle(bottomTrailingRadius: 36))
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(.isHeader)
@@ -232,9 +253,11 @@ struct MenuRow: View {
                     .background(Theme.Palette.clientPanel, in: Circle())
                 VStack(alignment: .leading, spacing: 3) {
                     Text(title).font(Theme.Typography.title(16)).foregroundStyle(titleColor)
+                        .fixedSize(horizontal: false, vertical: true)
                     if !description.isEmpty {
                         Text(description).font(Theme.Typography.caption(13)).foregroundStyle(Theme.Palette.textSecondary)
                             .multilineTextAlignment(.leading)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                 }
                 Spacer(minLength: 8)
@@ -255,11 +278,14 @@ struct MiniButton: View {
     let action: () -> Void
     var body: some View {
         Button(action: action) {
-            Text(title).font(danger ? Theme.Typography.control(13) : Theme.Typography.filledLabel(14)).lineLimit(1)
+            Text(title).font(danger ? Theme.Typography.control(13) : Theme.Typography.filledLabel(14))
+                .multilineTextAlignment(.center)
                 .padding(.horizontal, 12).padding(.vertical, 6)
-                .foregroundStyle(danger ? Theme.Palette.danger : .white)
+                .foregroundStyle(danger ? Theme.Palette.dangerText : .white)
                 .background(danger ? Theme.Palette.dangerSoft : Theme.Palette.primary, in: Capsule())
                 .overlay(Capsule().stroke(danger ? Theme.Palette.danger : .clear))
+                .frame(minHeight: 44)
+                .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
     }
@@ -292,19 +318,45 @@ struct WideButton: View {
             .frame(maxWidth: .infinity, minHeight: 52)
             .background(background, in: RoundedRectangle(cornerRadius: 12))
             .overlay(RoundedRectangle(cornerRadius: 12).stroke(border, lineWidth: 1.5))
-            .opacity(enabled ? 1 : 0.45)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ReadableInactiveStyle())
         .disabled(!enabled)
     }
 
+    /// PlainButtonStyle fades disabled labels even when their colors are opaque.
+    /// Keep its exact enabled appearance while letting the native disabled Button
+    /// display our readable inactive palette without another visual fade.
+    private struct ReadableInactiveStyle: PrimitiveButtonStyle {
+        @Environment(\.isEnabled) private var isEnabled
+
+        @ViewBuilder
+        func makeBody(configuration: Configuration) -> some View {
+            if isEnabled {
+                PlainButtonStyle().makeBody(configuration: configuration)
+            } else {
+                Button(configuration).buttonStyle(InactiveLabelStyle())
+            }
+        }
+
+        /// The primitive adapter keeps native Button activation and inherited
+        /// disabled semantics; only its label presentation bypasses fading.
+        private struct InactiveLabelStyle: ButtonStyle {
+            func makeBody(configuration: Configuration) -> some View {
+                configuration.label
+            }
+        }
+    }
+
     private var foreground: Color {
-        switch style { case .primary: return .white; case .outline: return Theme.Palette.primaryText; case .danger: return Theme.Palette.danger }
+        if !enabled { return Theme.Palette.disabledForeground }
+        switch style { case .primary: return .white; case .outline: return Theme.Palette.primaryText; case .danger: return Theme.Palette.dangerText }
     }
     private var background: Color {
+        if !enabled { return Theme.Palette.disabledBackground }
         switch style { case .primary: return Theme.Palette.primary; case .outline: return .white; case .danger: return Theme.Palette.dangerSoft }
     }
     private var border: Color {
+        if !enabled { return Theme.Palette.disabledBackground }
         switch style { case .primary: return .clear; case .outline: return Theme.Palette.primary; case .danger: return Theme.Palette.danger }
     }
 }

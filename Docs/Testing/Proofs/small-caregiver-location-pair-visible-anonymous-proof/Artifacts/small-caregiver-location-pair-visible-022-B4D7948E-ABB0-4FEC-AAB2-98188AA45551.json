@@ -1,0 +1,10 @@
+{
+  "actualOpeningOwnedProfileGETs": 2,
+  "controlledDebugLocationOnly": true,
+  "mapStaleLabelObserved": true,
+  "OSLocationPermissionVerified": false,
+  "physicalGPSVerified": false,
+  "profileMutationRequests": 0,
+  "role": "caregiver",
+  "wizardStaleLabelObserved": true
+}

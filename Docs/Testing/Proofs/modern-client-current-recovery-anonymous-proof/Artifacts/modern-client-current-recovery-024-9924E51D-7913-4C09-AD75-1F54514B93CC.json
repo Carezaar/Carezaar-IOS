@@ -1,0 +1,13 @@
+{
+  "actualOpeningOwnedProfileGETs": 2,
+  "controlledDebugLocationOnly": true,
+  "manualCount": 29,
+  "nativeConfirmedAndReviewDigestMatchesManualChoice": true,
+  "OSLocationPermissionVerified": false,
+  "physicalGPSVerified": false,
+  "postReturnWizardLaterFixTested": false,
+  "profileMutationRequests": 0,
+  "role": "client",
+  "sameProviderManualThenActualLateDelivery": true,
+  "validSaveAttempted": false
+}

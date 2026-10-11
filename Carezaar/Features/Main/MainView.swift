@@ -7,6 +7,7 @@ struct MainView: View {
     @EnvironmentObject private var router: AppRouter
     @EnvironmentObject private var session: SessionManager
     @EnvironmentObject private var loc: Localization
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     @EnvironmentObject private var poller: NotificationPoller
     private var unread: Int { poller.unread }
@@ -27,20 +28,41 @@ struct MainView: View {
         .background(Color.white)
         .navigationBarBackButtonHidden()
         .toolbar(.hidden, for: .navigationBar)
-        .task(id: router.path.isEmpty) {
-            // Re-read the badge whenever the user comes back to Main.
-            if router.path.isEmpty { await poller.poll() }
-        }
     }
 
     private var topBar: some View {
-        HStack(spacing: 10) {
-            HStack(spacing: 8) {
-                AppIcon(name: "logo", size: 40)
-                Text("Carezaar").font(Theme.Typography.heading(20)).foregroundStyle(Theme.Palette.primaryDark)
+        Group {
+            if typeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 8) {
+                    brand.frame(maxWidth: .infinity, alignment: .leading)
+                    HStack {
+                        Spacer()
+                        topBarActions
+                    }
+                }
+            } else {
+                HStack(spacing: 10) {
+                    brand
+                    Spacer()
+                    topBarActions
+                }
             }
-            .environment(\.layoutDirection, .leftToRight)
-            Spacer()
+        }
+        .padding(.horizontal, 16).padding(.vertical, 6)
+        .background(.white)
+    }
+
+    private var brand: some View {
+        HStack(spacing: 8) {
+            AppIcon(name: "logo", size: 40)
+            Text("Carezaar").font(Theme.Typography.heading(20)).foregroundStyle(Theme.Palette.primaryDark)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .environment(\.layoutDirection, .leftToRight)
+    }
+
+    private var topBarActions: some View {
+        HStack(spacing: 10) {
             Button { router.push(.notifications) } label: {
                 AppIcon(name: unread > 0 ? "ic_notification_on" : "ic_notification_off", size: 26, tint: .black)
                     .frame(width: 44, height: 44)
@@ -55,13 +77,10 @@ struct MainView: View {
             .accessibilityLabel(unread > 0 ? "\(loc.t("general_notifications", "Notifications")), \(unread)" : loc.t("general_notifications", "Notifications"))
             Button { router.selectedTab = .profile } label: {
                 Avatar(url: session.state.user?.photo, size: 38)
+                    .frame(width: 44, height: 44)
             }
             .accessibilityLabel(loc.t("general_profile", "Profile"))
         }
-        .padding(.horizontal, 16).padding(.vertical, 6)
-        .background(.white)
-        // App chrome, like the system's own bars: capped so content keeps the screen.
-        .dynamicTypeSize(...DynamicTypeSize.xxLarge)
     }
 
     private var bottomBar: some View {
@@ -72,9 +91,6 @@ struct MainView: View {
         }
         .background(.white)
         .overlay(alignment: .top) { Rectangle().fill(Theme.Palette.line).frame(height: 1) }
-        // As the system tab bar: the labels don't grow; at accessibility sizes a long
-        // press shows the large content viewer instead.
-        .dynamicTypeSize(...DynamicTypeSize.large)
     }
 
     private func tabButton(_ tab: MainTab, _ slug: String, _ fallback: String, _ icon: String) -> some View {
@@ -84,8 +100,10 @@ struct MainView: View {
                 AppIcon(name: "\(icon)_\(on ? "on" : "off")", size: 26, tint: on ? Theme.Palette.primaryDark : Theme.Palette.textSecondary)
                 Text(loc.t(slug, fallback)).font(on ? Theme.Typography.control(14).bold() : Theme.Typography.body(14))
                     .foregroundStyle(on ? Theme.Palette.primaryDark : Theme.Palette.textSecondary)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            .frame(maxWidth: .infinity).padding(.top, 10).padding(.bottom, 6)
+            .frame(maxWidth: .infinity, minHeight: 44).padding(.top, 10).padding(.bottom, 6)
             .overlay(alignment: .top) { Rectangle().fill(on ? Theme.Palette.primaryDark : .clear).frame(height: 3) }
             .contentShape(Rectangle())
         }
@@ -110,6 +128,7 @@ struct MatchesTab: View {
         let max: Int?
         let distance: Double?
         let clienttypeId: Int?
+        let isMatch: Bool
     }
 
     @EnvironmentObject private var router: AppRouter
@@ -122,6 +141,10 @@ struct MatchesTab: View {
     @State private var sort: MatchSort = .distance
     @State private var choosingSort = false
     @State private var headerImage = "bg_matches"
+    @State private var headerImages: [String] = []
+    @State private var headerIndex = 0
+    @State private var headerVisible = false
+    @Environment(\.scenePhase) private var headerScenePhase
     @Environment(\.dynamicTypeSize) private var typeSize
 
     private var isClient: Bool { session.role != .caregiver }
@@ -162,7 +185,19 @@ struct MatchesTab: View {
                 pager.items[i].user = pager.items[i].user.with(isFavorite: change.on)
             }
         }
-        .task { await loadHeader() }
+        .onAppear { headerVisible = true }
+        .onDisappear { headerVisible = false }
+        .task {
+            await loadHeader()
+            guard headerImages.count > 1 else { return }
+            while !Task.isCancelled {
+                do { try await Task.sleep(for: .seconds(6)) } catch { return }
+                guard !Task.isCancelled, headerImages.count > 1 else { return }
+                guard headerVisible, headerScenePhase == .active else { continue }
+                headerIndex = (headerIndex + 1) % headerImages.count
+                headerImage = headerImages[headerIndex]
+            }
+        }
         .confirmationDialog(loc.t("\(prefix)_matches_sort", "Sort"), isPresented: $choosingSort, titleVisibility: .visible) {
             ForEach(MatchSort.allCases, id: \.self) { s in
                 Button((s == sort ? "✓ " : "") + loc.t("\(prefix)_matches_sort_\(s.rawValue)", s.title)) { sort = s }
@@ -182,7 +217,9 @@ struct MatchesTab: View {
             Button { router.push(isClient ? .clientPreferences : .caregiverSkills) } label: {
                 Text(loc.t("\(prefix)_matches_preferences_button", "Edit preferences"))
                     // Long translations wrap instead of squeezing the text beside it.
-                    .font(Theme.Typography.filledLabel(14)).foregroundStyle(.white).lineLimit(2)
+                    .font(Theme.Typography.filledLabel(14)).foregroundStyle(.white)
+                    .lineLimit(typeSize.isAccessibilitySize ? nil : 2)
+                    .fixedSize(horizontal: false, vertical: true)
                     .multilineTextAlignment(.center).frame(maxWidth: 140)
                     .padding(.horizontal, 14).padding(.vertical, 10)
                     .background(Theme.Palette.primary, in: RoundedRectangle(cornerRadius: 10))
@@ -201,7 +238,7 @@ struct MatchesTab: View {
                 if typeSize.isAccessibilitySize {
                     // Photo and heart on top, the details full width below.
                     VStack(alignment: .leading, spacing: 10) {
-                        HStack(alignment: .top) { PhotoBox(url: c.user.photo); Spacer(); favoriteButton(c) }
+                        HStack(alignment: .top) { PhotoBox(url: c.user.photo); Spacer(); if c.isMatch { matchedIcon }; favoriteButton(c) }
                         cardDetails(c)
                     }
                 } else {
@@ -210,6 +247,7 @@ struct MatchesTab: View {
                         cardDetails(c).padding(.top, 4)
                         VStack {
                             favoriteButton(c)
+                            if c.isMatch { matchedIcon }
                             Spacer()
                             AppIcon(name: "ic_chevron_forward", size: 20, tint: Theme.Palette.textSecondary)
                                 .flipsForRightToLeftLayoutDirection(true)
@@ -220,6 +258,12 @@ struct MatchesTab: View {
             .card(padding: 10)
         }
         .buttonStyle(.plain)
+    }
+
+    private var matchedIcon: some View {
+        AppIcon(name: "ic_match_on", size: 26, tint: Theme.Palette.success)
+            .accessibilityLabel(loc.t("match_tab_matches", "Matched"))
+            .accessibilityIdentifier("active-match-icon")
     }
 
     private func favoriteButton(_ c: Card) -> some View {
@@ -276,10 +320,10 @@ struct MatchesTab: View {
         return { page in
             if isClient {
                 let (list, meta) = try await ClientService().matches(sort: sort, page: page)
-                return (list.map { Card(id: $0.id, user: $0.user, min: $0.salaryMin, max: $0.salaryMax, distance: $0.distance, clienttypeId: nil) }, meta)
+                return (list.map { Card(id: $0.id, user: $0.user, min: $0.salaryMin, max: $0.salaryMax, distance: $0.distance, clienttypeId: nil, isMatch: $0.isMatch) }, meta)
             } else {
                 let (list, meta) = try await CaregiverService().matches(sort: sort, page: page)
-                return (list.map { Card(id: $0.id, user: $0.user, min: $0.salaryMin, max: $0.salaryMax, distance: $0.distance, clienttypeId: $0.clienttypeId) }, meta)
+                return (list.map { Card(id: $0.id, user: $0.user, min: $0.salaryMin, max: $0.salaryMax, distance: $0.distance, clienttypeId: $0.clienttypeId, isMatch: $0.isMatch) }, meta)
             }
         }
     }
@@ -291,12 +335,15 @@ struct MatchesTab: View {
     }
 
     private func loadHeader() async {
-        let typeId: Int?
-        if isClient { typeId = try? await ClientService().profile().clienttypeId }
-        else { typeId = try? await CaregiverService().profile().clienttypeIds.first }
-        if let icon = baseData.items(.clienttypes).first(where: { $0.id == typeId })?.icon {
-            headerImage = icon.replacingOccurrences(of: "client_", with: "header_")
+        let ids: [Int]
+        if isClient { ids = (try? await ClientService().profile().clienttypeId).map { [$0] } ?? [] }
+        else { ids = (try? await CaregiverService().profile().clienttypeIds) ?? [] }
+        headerImages = ids.compactMap { id in
+            baseData.items(.clienttypes).first(where: { $0.id == id })?.icon?
+                .replacingOccurrences(of: "client_", with: "header_")
         }
+        headerIndex = 0
+        headerImage = headerImages.first ?? "bg_matches"
     }
 
     private func toggleFavorite(_ card: Card) async {
@@ -361,7 +408,7 @@ struct MessagesTab: View {
 
     private func row(_ chat: ChatBrief) -> some View {
         let partner = chat.partner(for: session.role ?? .client)
-        let unread = !chat.isSeen || chat.newMessageCount > 0
+        let unread = chat.newMessageCount > 0
         return Button { router.push(.chat(chatId: chat.id)) } label: {
             HStack(spacing: 14) {
                 Avatar(url: partner?.photo, size: 60)
@@ -372,6 +419,9 @@ struct MessagesTab: View {
                         Text(ServerTime.local(chat.updatedAt)).font(Theme.Typography.caption()).foregroundStyle(Theme.Palette.textSecondary)
                     }
                     Text(chat.lastMessage ?? "").font(Theme.Typography.body(14)).foregroundStyle(Theme.Palette.textSecondary).lineLimit(1)
+                        // The visual preview deliberately ends in an ellipsis. The
+                        // conversation button exposes the full message value.
+                        .accessibilityHidden(true)
                 }
                 if unread { Circle().fill(Theme.Palette.primary).frame(width: 10, height: 10).accessibilityLabel("Unread") }
                 AppIcon(name: "ic_chevron_forward", size: 22, tint: Theme.Palette.textSecondary).flipsForRightToLeftLayoutDirection(true)
@@ -381,6 +431,11 @@ struct MessagesTab: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(partner?.fullName ?? loc.t("chat_screen_messages_title", "Chat Messages"))
+        .accessibilityValue([chat.lastMessage ?? "", ServerTime.local(chat.updatedAt),
+                             unread ? loc.t("messages_unread", "Unread") : ""]
+            .filter { !$0.isEmpty }.joined(separator: ". "))
+        .accessibilityHint(loc.t("messages_open_conversation", "Open conversation"))
     }
 
     private let fetch: Pager<ChatBrief>.Fetch = { page in try await UserService().chats(page: page) }
@@ -436,7 +491,7 @@ struct ProfileTab: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text(user.fullName).font(Theme.Typography.title(19))
                 if let gender { infoLine(gender.icon, loc.label(gender)) }
-                infoLine("ic_email", user.email)
+                infoLine("ic_email", user.email, semanticLabel: loc.t("profile_edit_email", "Email Address"))
                 if let dob = user.dateOfBirth, !dob.isEmpty { infoLine("ic_calendar", dob) }
             }
             Spacer(minLength: 0)
@@ -449,12 +504,15 @@ struct ProfileTab: View {
         .card(padding: 16)
     }
 
-    private func infoLine(_ icon: String?, _ text: String) -> some View {
+    private func infoLine(_ icon: String?, _ text: String, semanticLabel: String? = nil) -> some View {
         HStack(spacing: 6) {
             AppIcon(name: icon, size: 18, tint: Theme.Palette.textSecondary)
             // Wraps rather than cutting off a long email address.
             Text(text).font(Theme.Typography.body(13)).foregroundStyle(Theme.Palette.textSecondary)
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(semanticLabel ?? text)
+        .accessibilityValue(semanticLabel == nil ? "" : text)
     }
 
     private var items: [MenuRow] {

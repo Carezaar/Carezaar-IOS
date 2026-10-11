@@ -1,0 +1,322 @@
+{
+  "invocation": "fresh-small-client-readable-disabled-a5-guards-unit-regression",
+  "unit_passes": 92,
+  "chrome_french_arabic_seconds": 211.709,
+  "chrome_default_a5_english_seconds": 101.822,
+  "strict_nine_screen_audit_seconds": 144.887,
+  "strict_audit_findings": 0,
+  "disabled_guards": "2 skipped; separate opaque-ID retest pending",
+  "root_visual_review": "All12 safe brand/tab-caption crops reviewed. English/French/Arabic full caption text remains complete via wrapping; complete Carezaar brand. These crops exclude user/profile identity.",
+  "limits": "Small client only; not original all-screen/modal/all-role accessibility certification.",
+  "attachments": [
+    {
+      "test": "ChromeDynamicTypeUITests/testA5FrenchAndArabicTabCaptionsRemainCompleteAndReachCorrectDestinations()",
+      "attachment": "Artifacts/small-client-completed-a5-00-chrome-native-language-cleanup-result.txt",
+      "failure": false
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testA5FrenchAndArabicTabCaptionsRemainCompleteAndReachCorrectDestinations()",
+      "attachment": "Artifacts/small-client-completed-a5-01-ar-profile_change_language_title-native-menu-before-tap.json",
+      "failure": false
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testA5FrenchAndArabicTabCaptionsRemainCompleteAndReachCorrectDestinations()",
+      "attachment": "Artifacts/small-client-completed-a5-02-ar-native-picker-before-tap-geometry.json",
+      "failure": false
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testA5FrenchAndArabicTabCaptionsRemainCompleteAndReachCorrectDestinations()",
+      "attachment": "Artifacts/small-client-completed-a5-03-ar-profile_change_language_title-native-menu-before-tap.json",
+      "failure": false
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testA5FrenchAndArabicTabCaptionsRemainCompleteAndReachCorrectDestinations()",
+      "attachment": "Artifacts/small-client-completed-a5-04-A5-ar-native-chrome-safe-controls.json",
+      "failure": false
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testA5FrenchAndArabicTabCaptionsRemainCompleteAndReachCorrectDestinations()",
+      "attachment": "Artifacts/small-client-completed-a5-05-ar-profile_help_center_title-native-menu-before-tap.json",
+      "failure": false
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testA5FrenchAndArabicTabCaptionsRemainCompleteAndReachCorrectDestinations()",
+      "attachment": "Artifacts/small-client-completed-a5-06-A5-ar-bottom_navigation_profile-caption.png",
+      "failure": false
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testA5FrenchAndArabicTabCaptionsRemainCompleteAndReachCorrectDestinations()",
+      "attachment": "Artifacts/small-client-completed-a5-07-A5-ar-bottom_navigation_messages-caption.png",
+      "failure": false
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testA5FrenchAndArabicTabCaptionsRemainCompleteAndReachCorrectDestinations()",
+      "attachment": "Artifacts/small-client-completed-a5-08-A5-ar-bottom_navigation_matches-caption.png",
+      "failure": false
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testA5FrenchAndArabicTabCaptionsRemainCompleteAndReachCorrectDestinations()",
+      "attachment": "Artifacts/small-client-completed-a5-09-A5-ar-brand.png",
+      "failure": false
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testA5FrenchAndArabicTabCaptionsRemainCompleteAndReachCorrectDestinations()",
+      "attachment": "Artifacts/small-client-completed-a5-10-ar-native-picker-before-tap-geometry.json",
+      "failure": false
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testA5FrenchAndArabicTabCaptionsRemainCompleteAndReachCorrectDestinations()",
+      "attachment": "Artifacts/small-client-completed-a5-11-fr-profile_change_language_title-native-menu-before-tap.json",
+      "failure": false
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testA5FrenchAndArabicTabCaptionsRemainCompleteAndReachCorrectDestinations()",
+      "attachment": "Artifacts/small-client-completed-a5-12-A5-fr-native-chrome-safe-controls.json",
+      "failure": false
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testA5FrenchAndArabicTabCaptionsRemainCompleteAndReachCorrectDestinations()",
+      "attachment": "Artifacts/small-client-completed-a5-13-fr-profile_help_center_title-native-menu-before-tap.json",
+      "failure": false
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testA5FrenchAndArabicTabCaptionsRemainCompleteAndReachCorrectDestinations()",
+      "attachment": "Artifacts/small-client-completed-a5-14-A5-fr-bottom_navigation_profile-caption.png",
+      "failure": false
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testA5FrenchAndArabicTabCaptionsRemainCompleteAndReachCorrectDestinations()",
+      "attachment": "Artifacts/small-client-completed-a5-15-A5-fr-bottom_navigation_messages-caption.png",
+      "failure": false
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testA5FrenchAndArabicTabCaptionsRemainCompleteAndReachCorrectDestinations()",
+      "attachment": "Artifacts/small-client-completed-a5-16-A5-fr-bottom_navigation_matches-caption.png",
+      "failure": false
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testA5FrenchAndArabicTabCaptionsRemainCompleteAndReachCorrectDestinations()",
+      "attachment": "Artifacts/small-client-completed-a5-17-A5-fr-brand.png",
+      "failure": false
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testA5FrenchAndArabicTabCaptionsRemainCompleteAndReachCorrectDestinations()",
+      "attachment": "Artifacts/small-client-completed-a5-18-fr-native-picker-before-tap-geometry.json",
+      "failure": false
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testA5RenderedBrandAndAllTabCaptionsGrowAndRemainUsable()",
+      "attachment": "Artifacts/small-client-completed-a5-19-chrome-native-language-cleanup-result.txt",
+      "failure": false
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testA5RenderedBrandAndAllTabCaptionsGrowAndRemainUsable()",
+      "attachment": "Artifacts/small-client-completed-a5-20-ar-profile_change_language_title-native-menu-before-tap.json",
+      "failure": false
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testA5RenderedBrandAndAllTabCaptionsGrowAndRemainUsable()",
+      "attachment": "Artifacts/small-client-completed-a5-21-ar-native-picker-before-tap-geometry.json",
+      "failure": false
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testA5RenderedBrandAndAllTabCaptionsGrowAndRemainUsable()",
+      "attachment": "Artifacts/small-client-completed-a5-22-A5-native-chrome-geometry-and-labels.json",
+      "failure": false
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testA5RenderedBrandAndAllTabCaptionsGrowAndRemainUsable()",
+      "attachment": "Artifacts/small-client-completed-a5-23-en-profile_help_center_title-native-menu-before-tap.json",
+      "failure": false
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testA5RenderedBrandAndAllTabCaptionsGrowAndRemainUsable()",
+      "attachment": "Artifacts/small-client-completed-a5-24-A5-en-bottom_navigation_profile-caption.png",
+      "failure": false
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testA5RenderedBrandAndAllTabCaptionsGrowAndRemainUsable()",
+      "attachment": "Artifacts/small-client-completed-a5-25-A5-en-bottom_navigation_messages-caption.png",
+      "failure": false
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testA5RenderedBrandAndAllTabCaptionsGrowAndRemainUsable()",
+      "attachment": "Artifacts/small-client-completed-a5-26-A5-en-bottom_navigation_matches-caption.png",
+      "failure": false
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testA5RenderedBrandAndAllTabCaptionsGrowAndRemainUsable()",
+      "attachment": "Artifacts/small-client-completed-a5-27-A5-en-brand.png",
+      "failure": false
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testA5RenderedBrandAndAllTabCaptionsGrowAndRemainUsable()",
+      "attachment": "Artifacts/small-client-completed-a5-28-en-native-picker-before-tap-geometry.json",
+      "failure": false
+    },
+    {
+      "test": "ScreenSweepTests/testAccessibilityAudit()",
+      "attachment": "Artifacts/small-client-completed-a5-29-small-client-readable-disabled-a5-a11y-audit.txt",
+      "failure": false
+    }
+  ],
+  "publicPackage": {
+    "status": "REVIEWABLE — not staged or delivered",
+    "originalEvidenceRetainedLocally": true,
+    "rawLogsAndXCResultsIncluded": false,
+    "artifactInventory": [
+      {
+        "path": "Artifacts/small-client-completed-a5-00-chrome-native-language-cleanup-result.txt",
+        "bytes": 71,
+        "sha256": "be912a1106b420c2ec5f430f538812d453efb234908586791b8efe5594f5a1d3"
+      },
+      {
+        "path": "Artifacts/small-client-completed-a5-01-ar-profile_change_language_title-native-menu-before-tap.json",
+        "bytes": 1439,
+        "sha256": "a55f197e8207cae0e19cb5e393a7121851ea02a5d5b6b4e43ae32f4a37a0fa8f"
+      },
+      {
+        "path": "Artifacts/small-client-completed-a5-02-ar-native-picker-before-tap-geometry.json",
+        "bytes": 877,
+        "sha256": "35b657169793786e2b7c909cf914bede2384ce8226e32ecfa142441369f88bf7"
+      },
+      {
+        "path": "Artifacts/small-client-completed-a5-03-ar-profile_change_language_title-native-menu-before-tap.json",
+        "bytes": 1438,
+        "sha256": "b3c8cd030438915f740dc60f0a9ce52f252f5fe2775bd1d36f85dca980bf8986"
+      },
+      {
+        "path": "Artifacts/small-client-completed-a5-04-A5-ar-native-chrome-safe-controls.json",
+        "bytes": 1243,
+        "sha256": "1a7a3bed140a84f04879a4afec7ef5b9c8aaf9277867d9b54222aa998ac1a648"
+      },
+      {
+        "path": "Artifacts/small-client-completed-a5-05-ar-profile_help_center_title-native-menu-before-tap.json",
+        "bytes": 1471,
+        "sha256": "44a8c0f046a90d16c60e989ff30fd68a7308e3b864b8710239e890729e016fd8"
+      },
+      {
+        "path": "Artifacts/small-client-completed-a5-06-A5-ar-bottom_navigation_profile-caption.png",
+        "bytes": 15191,
+        "sha256": "82f0cb90263e184164a6f8b9cf51fe77491ebb4845dc944e91ddf71324a58d3f"
+      },
+      {
+        "path": "Artifacts/small-client-completed-a5-07-A5-ar-bottom_navigation_messages-caption.png",
+        "bytes": 8319,
+        "sha256": "7efa3f851571b742099aea5117e393fa8bdb644dc2e5eb1049961380c2c335b1"
+      },
+      {
+        "path": "Artifacts/small-client-completed-a5-08-A5-ar-bottom_navigation_matches-caption.png",
+        "bytes": 11202,
+        "sha256": "fdc09fe45b1b92e417a1a513f762efcfddd9195bdd0037d1cec723a2da3e755c"
+      },
+      {
+        "path": "Artifacts/small-client-completed-a5-09-A5-ar-brand.png",
+        "bytes": 5947,
+        "sha256": "f16cb2eb9c81159c54d94c3bb59942701b39e7cba27e218c5921934d32e70b01"
+      },
+      {
+        "path": "Artifacts/small-client-completed-a5-10-ar-native-picker-before-tap-geometry.json",
+        "bytes": 878,
+        "sha256": "b1e6255e54c052b26d792437b277b2cd284dbc059290c603f43e072eff7c92d3"
+      },
+      {
+        "path": "Artifacts/small-client-completed-a5-11-fr-profile_change_language_title-native-menu-before-tap.json",
+        "bytes": 1451,
+        "sha256": "9b53c951506996c7952d74aa1c02276d9f4cc821674eb0c4dd51bbd7dda4098f"
+      },
+      {
+        "path": "Artifacts/small-client-completed-a5-12-A5-fr-native-chrome-safe-controls.json",
+        "bytes": 1188,
+        "sha256": "23d0ac68b4574b7987d0e2e5beabccc8b2b550201b17e4f7a415b1f869632afa"
+      },
+      {
+        "path": "Artifacts/small-client-completed-a5-13-fr-profile_help_center_title-native-menu-before-tap.json",
+        "bytes": 1433,
+        "sha256": "46f4944aa7077456280bbaa167c534e4fd503c3bac937c73562e14f13c550140"
+      },
+      {
+        "path": "Artifacts/small-client-completed-a5-14-A5-fr-bottom_navigation_profile-caption.png",
+        "bytes": 7189,
+        "sha256": "a68b84a356c00a2f81ef939fa525cb22e4c51558e113e10f67a1b0db4debb9fd"
+      },
+      {
+        "path": "Artifacts/small-client-completed-a5-15-A5-fr-bottom_navigation_messages-caption.png",
+        "bytes": 13828,
+        "sha256": "d04ac68614a3b1590508acbcaef019e055e08e9d28b62fce5781ba96262e8d16"
+      },
+      {
+        "path": "Artifacts/small-client-completed-a5-16-A5-fr-bottom_navigation_matches-caption.png",
+        "bytes": 20003,
+        "sha256": "68f106f8e11a1d3f2ba0b60eab82cde36713aaea7d0e09af272cb91a388bf9f1"
+      },
+      {
+        "path": "Artifacts/small-client-completed-a5-17-A5-fr-brand.png",
+        "bytes": 5947,
+        "sha256": "f16cb2eb9c81159c54d94c3bb59942701b39e7cba27e218c5921934d32e70b01"
+      },
+      {
+        "path": "Artifacts/small-client-completed-a5-18-fr-native-picker-before-tap-geometry.json",
+        "bytes": 881,
+        "sha256": "0d9ff146808e02e70ae963dcfd3a8ee435c0abd9437388f4289a06cdedbe5fc3"
+      },
+      {
+        "path": "Artifacts/small-client-completed-a5-19-chrome-native-language-cleanup-result.txt",
+        "bytes": 71,
+        "sha256": "be912a1106b420c2ec5f430f538812d453efb234908586791b8efe5594f5a1d3"
+      },
+      {
+        "path": "Artifacts/small-client-completed-a5-20-ar-profile_change_language_title-native-menu-before-tap.json",
+        "bytes": 1439,
+        "sha256": "a55f197e8207cae0e19cb5e393a7121851ea02a5d5b6b4e43ae32f4a37a0fa8f"
+      },
+      {
+        "path": "Artifacts/small-client-completed-a5-21-ar-native-picker-before-tap-geometry.json",
+        "bytes": 864,
+        "sha256": "1231e436fa72d4ebfc8a4c9eb76bce5a01b46f3a8606df28a41897024d061e0b"
+      },
+      {
+        "path": "Artifacts/small-client-completed-a5-22-A5-native-chrome-geometry-and-labels.json",
+        "bytes": 1174,
+        "sha256": "2fd3d30acdcebad5dab5c6bf3bbb7e2e79f27103495c6e141fef60f48641dce8"
+      },
+      {
+        "path": "Artifacts/small-client-completed-a5-23-en-profile_help_center_title-native-menu-before-tap.json",
+        "bytes": 1417,
+        "sha256": "a44d57b8f9221ffac3cd48e1d72a3268bbc560913fa863fcbc955bee12bba1ec"
+      },
+      {
+        "path": "Artifacts/small-client-completed-a5-24-A5-en-bottom_navigation_profile-caption.png",
+        "bytes": 8207,
+        "sha256": "776ac4f22d6cf7a745c0e77c43d0789583f6771114a3665d1305ab8f801dfa59"
+      },
+      {
+        "path": "Artifacts/small-client-completed-a5-25-A5-en-bottom_navigation_messages-caption.png",
+        "bytes": 13835,
+        "sha256": "d02a1207ff8c1e5dd6ee7a81bf0197fe0e0a049d12d3752772a271de2db8d9bc"
+      },
+      {
+        "path": "Artifacts/small-client-completed-a5-26-A5-en-bottom_navigation_matches-caption.png",
+        "bytes": 12055,
+        "sha256": "165c8f0f1933bb2ed8cadd126feb07c203abbc919b4e298bd4c42f60011275a4"
+      },
+      {
+        "path": "Artifacts/small-client-completed-a5-27-A5-en-brand.png",
+        "bytes": 5947,
+        "sha256": "f16cb2eb9c81159c54d94c3bb59942701b39e7cba27e218c5921934d32e70b01"
+      },
+      {
+        "path": "Artifacts/small-client-completed-a5-28-en-native-picker-before-tap-geometry.json",
+        "bytes": 875,
+        "sha256": "35f0f9dee5f7bf77b4fb2143370da6d34da9f3a27a0696c56fdbf5178f660135"
+      },
+      {
+        "path": "Artifacts/small-client-completed-a5-29-small-client-readable-disabled-a5-a11y-audit.txt",
+        "bytes": 142,
+        "sha256": "7c523c2f7c4e79504692e0dfbdb4ee055754071f5b38c3391d8898aa42fbde10"
+      }
+    ],
+    "sourceIndexSHA256": "b33ccfe49c7450a1b56603089187da621b76b3442e5ba4e6ec29352c2078f2b6",
+    "artifactHashNote": "Public JSON/text are sanitized; artifactInventory hashes apply to packaged bytes. Original indexed hashes, where present, refer to preserved original evidence."
+  }
+}

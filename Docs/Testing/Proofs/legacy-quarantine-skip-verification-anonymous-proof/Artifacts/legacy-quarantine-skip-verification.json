@@ -1,0 +1,143 @@
+{
+  "selectedMethods": [
+    {
+      "class": "CarezaarUITests",
+      "method": "testChatSendMessage",
+      "status": "SKIPPED",
+      "seconds": 0.044
+    },
+    {
+      "class": "CarezaarUITests",
+      "method": "testFavoriteAndSort",
+      "status": "SKIPPED",
+      "seconds": 0.036
+    },
+    {
+      "class": "CarezaarUITests",
+      "method": "testMatchesListAndHistoryWithoutReview",
+      "status": "SKIPPED",
+      "seconds": 6.571
+    },
+    {
+      "class": "DeviceCameraTests",
+      "method": "testMatchScreensAccessibilityOnDevice",
+      "status": "SKIPPED",
+      "seconds": 0.04
+    },
+    {
+      "class": "MatchLifecycleTests",
+      "method": "testCaregiverSide",
+      "status": "SKIPPED",
+      "seconds": 0.027
+    },
+    {
+      "class": "MatchLifecycleTests",
+      "method": "testClientSide",
+      "status": "SKIPPED",
+      "seconds": 2.585
+    },
+    {
+      "class": "MatchLifecycleTests",
+      "method": "testInconsistentMatchStateOffersNoAction",
+      "status": "SKIPPED",
+      "seconds": 2.567
+    },
+    {
+      "class": "MatchLifecycleTests",
+      "method": "testLifecycleOneDevice",
+      "status": "SKIPPED",
+      "seconds": 2.379
+    },
+    {
+      "class": "MatchLifecycleTests",
+      "method": "testProfilePullDoesNotReloadAndActionChecksState",
+      "status": "SKIPPED",
+      "seconds": 4.228
+    },
+    {
+      "class": "ScreenSweepTests",
+      "method": "testMatchedScrolls",
+      "status": "SKIPPED",
+      "seconds": 2.458
+    },
+    {
+      "class": "ScreenSweepTests",
+      "method": "testReportIssueSubmit",
+      "status": "SKIPPED",
+      "seconds": 0.049
+    },
+    {
+      "class": "ScreenSweepTests",
+      "method": "testSignedInScreens",
+      "status": "SKIPPED",
+      "seconds": 2.614
+    },
+    {
+      "class": "SessionNetworkTests",
+      "method": "testChatOfflineKeepsDraftAndSendsOnce",
+      "status": "SKIPPED",
+      "seconds": 0.046
+    },
+    {
+      "class": "SessionNetworkTests",
+      "method": "testIncomingChatFollowsBottomAndPreservesOlderReadingPosition",
+      "status": "SKIPPED",
+      "seconds": 0.042
+    },
+    {
+      "class": "SessionNetworkTests",
+      "method": "testMessagesPreviewAccessibilityPreservesFullBackendMessage",
+      "status": "SKIPPED",
+      "seconds": 0.039
+    },
+    {
+      "class": "SessionNetworkTests",
+      "method": "testSlowSendShowsProgressAndKeepsNewTyping",
+      "status": "SKIPPED",
+      "seconds": 0.035
+    }
+  ],
+  "selectedCount": 16,
+  "skippedCount": 16,
+  "functionalPassCount": 0,
+  "failureCount": 0,
+  "completedProcessExit": 0,
+  "sourceQuarantineBoundaryCount": 10,
+  "sourceFiles": [
+    {
+      "path": "CarezaarUITests/LiveAPI.swift",
+      "sha256": "0a75e58444651d125776d54b4dc921d87e0dbb473078899ad4a4645bb8b5a443"
+    },
+    {
+      "path": "CarezaarUITests/SessionNetworkTests.swift",
+      "sha256": "ecc31294a6018844e5c67999c2fbfb3e3f6ccc22fec95f6e18d80233fe4b3ea6"
+    },
+    {
+      "path": "CarezaarUITests/MatchLifecycleTests.swift",
+      "sha256": "e816b5b909b6f2fef92f5cb240ff80b60a9f4d9d19d9aa8df05aa8e8c2e59c92"
+    },
+    {
+      "path": "CarezaarUITests/CarezaarUITests.swift",
+      "sha256": "35fd28ecbbda421a9cc1a2761b5849af43a64c019df6edc78f1dfd793cf0e035"
+    },
+    {
+      "path": "CarezaarUITests/ScreenSweepTests.swift",
+      "sha256": "1d06b02c6cf62bc4c38438d123c824d583bb0813707b5f7b598936a0e3b7bb06"
+    },
+    {
+      "path": "CarezaarUITests/DeviceCameraTests.swift",
+      "sha256": "ce17069601e4e711103565773f604062c6d026af51bd6769b14015cb45fe48e4"
+    }
+  ],
+  "originalResultPreserved": true,
+  "completedLogSHA256": "393e32a50f7eea8e2d01399fcf9db385c1c0de226e021c403227dc80891a7c0d",
+  "buildForTestingSucceeded": true,
+  "explicitScreenshotAttachmentsInExecutionTrace": 0,
+  "noRelationshipCleanupOrMessageSupportProfileMutationBeforeSkipVerifiedInSource": true,
+  "injectIncomingBoundaryRuntimeExecuted": false,
+  "deviceCameraEntryGateRuntimeExecuted": false,
+  "deviceCameraSkippedAtSimulatorSetup": true,
+  "physicalCameraTested": false,
+  "coveragePromotedToPASS": false,
+  "tokensCredentialsRawLogsFullScreenIncluded": false
+}

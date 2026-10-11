@@ -43,19 +43,9 @@ struct ClientService: Sendable {
         )
     }
 
-    /// Updates preferences.
-    ///
-    /// The backend expects **`certificationIds`** in camelCase on this endpoint while
-    /// the create endpoint above expects `certification_ids` — an asymmetry carried
-    /// over from the Android client, where sending only snake_case silently drops the
-    /// field.
-    ///
-    /// Both spellings are sent. Today the camelCase one is read and the other is
-    /// ignored; if the backend ever corrects the typo this keeps working instead of
-    /// breaking silently. Flagged to Carezaar either way.
+    /// Uses the current documented snake_case certification field exclusively.
     func updateProfile(_ p: ClientPreferences) async throws -> ClientFull {
         var fields = Self.sharedFields(p)
-        fields["certificationIds"] = .ids(p.certificationIds)
         fields["certification_ids"] = .ids(p.certificationIds)
         return try await client.send(
             Endpoint(method: .put, path: "clients/profile", body: .form(fields))

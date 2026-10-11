@@ -1,0 +1,85 @@
+{
+  "role": "caregiver",
+  "allocation": "modern",
+  "testPassed": true,
+  "durationSeconds": 78.072,
+  "rootViewedAllSix": true,
+  "sourceResult": "fresh-modern-caregiver-match-state-matrix.xcresult",
+  "artifacts": [
+    {
+      "label": "active-icon",
+      "path": "Artifacts/match-state-modern-caregiver-active-icon.png",
+      "bytes": 5568,
+      "sha256": "f4ddfe87ff9c6e2a68bd27171ca0976c61ce70528c4f6c67bfb711e2ce431db1"
+    },
+    {
+      "label": "none-request",
+      "path": "Artifacts/match-state-modern-caregiver-none-request.png",
+      "bytes": 13740,
+      "sha256": "fb82bdeb1c85e834edfb61fac631b7d8ad5900ca550d3a0c86b539d1e9708fe7"
+    },
+    {
+      "label": "sent-cancel",
+      "path": "Artifacts/match-state-modern-caregiver-sent-cancel.png",
+      "bytes": 15159,
+      "sha256": "9907d897c1f85bf92fe80377cb39f3ec88ca45c82b84d49d843f6a44a930b7a4"
+    },
+    {
+      "label": "received-reject",
+      "path": "Artifacts/match-state-modern-caregiver-received-reject.png",
+      "bytes": 10862,
+      "sha256": "15f063f7d6011eae380a20f23b42a827a6f515da9e6cba19fab06008c6bfff8d"
+    },
+    {
+      "label": "received-accept",
+      "path": "Artifacts/match-state-modern-caregiver-received-accept.png",
+      "bytes": 9559,
+      "sha256": "58a30267d8346b268324aa0b10c1b05317d912b2449833b4026fa42b0bb0bf22"
+    },
+    {
+      "label": "active-unmatch",
+      "path": "Artifacts/match-state-modern-caregiver-active-unmatch.png",
+      "bytes": 13557,
+      "sha256": "18f1f64d7fe6cf6c93ec73c310f69dc59443425a700caf58c7dd27e9e8bb4360"
+    }
+  ],
+  "publicPackage": {
+    "status": "REVIEWABLE — not staged or delivered",
+    "originalEvidenceRetainedLocally": true,
+    "rawLogsAndXCResultsIncluded": false,
+    "artifactInventory": [
+      {
+        "path": "Artifacts/match-state-modern-caregiver-active-icon.png",
+        "bytes": 5568,
+        "sha256": "f4ddfe87ff9c6e2a68bd27171ca0976c61ce70528c4f6c67bfb711e2ce431db1"
+      },
+      {
+        "path": "Artifacts/match-state-modern-caregiver-none-request.png",
+        "bytes": 13740,
+        "sha256": "fb82bdeb1c85e834edfb61fac631b7d8ad5900ca550d3a0c86b539d1e9708fe7"
+      },
+      {
+        "path": "Artifacts/match-state-modern-caregiver-sent-cancel.png",
+        "bytes": 15159,
+        "sha256": "9907d897c1f85bf92fe80377cb39f3ec88ca45c82b84d49d843f6a44a930b7a4"
+      },
+      {
+        "path": "Artifacts/match-state-modern-caregiver-received-reject.png",
+        "bytes": 10862,
+        "sha256": "15f063f7d6011eae380a20f23b42a827a6f515da9e6cba19fab06008c6bfff8d"
+      },
+      {
+        "path": "Artifacts/match-state-modern-caregiver-received-accept.png",
+        "bytes": 9559,
+        "sha256": "58a30267d8346b268324aa0b10c1b05317d912b2449833b4026fa42b0bb0bf22"
+      },
+      {
+        "path": "Artifacts/match-state-modern-caregiver-active-unmatch.png",
+        "bytes": 13557,
+        "sha256": "18f1f64d7fe6cf6c93ec73c310f69dc59443425a700caf58c7dd27e9e8bb4360"
+      }
+    ],
+    "sourceIndexSHA256": "03f1d083edbd21f01525e37f81aaa300b38b618b2023ada9bd89ce3f066035d2",
+    "artifactHashNote": "Public JSON/text are sanitized; artifactInventory hashes apply to packaged bytes. Original indexed hashes, where present, refer to preserved original evidence."
+  }
+}

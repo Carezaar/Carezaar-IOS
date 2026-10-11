@@ -1,0 +1,14 @@
+{
+  "activeCardBadgePresent": false,
+  "badgeColorRequiresRasterReview": false,
+  "messagePresent": false,
+  "nativeMutationAttempts": 0,
+  "pendingAcceptancePresent": false,
+  "profileActions": [
+    "match-reject",
+    "match-accept"
+  ],
+  "profileGETs": 1,
+  "publicState": "received",
+  "role": "client"
+}

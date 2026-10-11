@@ -1,0 +1,94 @@
+{
+  "source": "fresh-small-caregiver-save-guidance-units.xcresult",
+  "wholeProcessExit": 0,
+  "nativePassSeconds": 67.414,
+  "publicUnitCount": 104,
+  "publicUnitPassSeconds": 26.913,
+  "rootReviewedCroppedPNGs": 5,
+  "allocation": "small caregiver",
+  "fix": "Visible persistent finalSave map guidance; ordinary reopening resets reason",
+  "profileWrites": 0,
+  "backendPreferencesUnchangedVerified": true,
+  "physicalGPSVerified": false,
+  "artifacts": [
+    {
+      "path": "Artifacts/small-caregiver-save-guidance-001-F935976C-5C68-4B06-BF56-20A3A9BB1C2D.json",
+      "description": "P03-023-024-026-controlled-no-fix-native_0_097A0B36-CF3C-4F06-BE46-A4FE32E48909.json",
+      "sha256": "0a3eb6bcc05746fb7ded3c160d471f011edf1254093e2d00f2ce44152508a258"
+    },
+    {
+      "path": "Artifacts/small-caregiver-save-guidance-002-2933CAAB-B5E6-4C1F-9FCE-13C83668ABBC.png",
+      "description": "P03-024-controlled-ordinary-map-reason-reset-only_0_073BF431-A8F3-4782-8A81-28A785A16256.png",
+      "sha256": "aeecf62e5f1b7d43ad8cbf15c68ceecbd7479048d71f3350b463e41c0d6b2a31"
+    },
+    {
+      "path": "Artifacts/small-caregiver-save-guidance-003-F1562A09-89B4-461D-B708-4DB445D7A3ED.png",
+      "description": "controlled-location-empty-review-value-only_0_45A5331F-E3D8-4517-BDB5-FF864D2EBE75.png",
+      "sha256": "586fc1637fa5663b8ce353f205341688570e83a8d03bd76d8505ac0139d7159a"
+    },
+    {
+      "path": "Artifacts/small-caregiver-save-guidance-004-D609743A-9313-4582-8B44-FD6AC2A70777.png",
+      "description": "P03-024-controlled-no-fix-save-guidance-only_0_346639E2-6D23-40A5-96A4-86A8B3DBCBC0.png",
+      "sha256": "6bbe9a3c12b2c64c490c696746347e0eee99a43d38fb3485fab53493d9e1dda7"
+    },
+    {
+      "path": "Artifacts/small-caregiver-save-guidance-005-A2CC6B03-3767-4093-9C60-5F7B1FCDC686.png",
+      "description": "controlled-location-empty-review-value-only_0_4D349B3E-BC46-4C9C-87FE-F5142014E5EB.png",
+      "sha256": "586fc1637fa5663b8ce353f205341688570e83a8d03bd76d8505ac0139d7159a"
+    },
+    {
+      "path": "Artifacts/small-caregiver-save-guidance-006-25BF8E50-63B2-43F1-BE60-5A82FA3EBBE2.png",
+      "description": "P03-026-controlled-unselected-map-continue-only_0_639B6213-E0F8-4AC0-B648-077E6B5EBC9E.png",
+      "sha256": "40c9ac5decd71b7b646db63db66c3b4df703bb0361810cc7d6ce11c3d27ec7b2"
+    },
+    {
+      "path": "Artifacts/small-caregiver-save-guidance-007-A0754985-9491-4DBE-9C20-F3A29F32D1CD.json",
+      "description": "controlled-location-opening-none-native_0_8FE8546B-DF56-46AE-BF2F-B1519D488F59.json",
+      "sha256": "f4d3fa900a896f2258179c08356df7b26c51ee5683f6514b5831ec556a1c5419"
+    }
+  ],
+  "publicPackage": {
+    "status": "REVIEWABLE — not staged or delivered",
+    "originalEvidenceRetainedLocally": true,
+    "rawLogsAndXCResultsIncluded": false,
+    "artifactInventory": [
+      {
+        "path": "Artifacts/small-caregiver-save-guidance-001-F935976C-5C68-4B06-BF56-20A3A9BB1C2D.json",
+        "bytes": 582,
+        "sha256": "835ae46272b4fcbe978d2f4a92cfe01c758c1eb362e16023d19b0d19b792c6e5"
+      },
+      {
+        "path": "Artifacts/small-caregiver-save-guidance-002-2933CAAB-B5E6-4C1F-9FCE-13C83668ABBC.png",
+        "bytes": 10722,
+        "sha256": "aeecf62e5f1b7d43ad8cbf15c68ceecbd7479048d71f3350b463e41c0d6b2a31"
+      },
+      {
+        "path": "Artifacts/small-caregiver-save-guidance-003-F1562A09-89B4-461D-B708-4DB445D7A3ED.png",
+        "bytes": 1011,
+        "sha256": "586fc1637fa5663b8ce353f205341688570e83a8d03bd76d8505ac0139d7159a"
+      },
+      {
+        "path": "Artifacts/small-caregiver-save-guidance-004-D609743A-9313-4582-8B44-FD6AC2A70777.png",
+        "bytes": 10000,
+        "sha256": "6bbe9a3c12b2c64c490c696746347e0eee99a43d38fb3485fab53493d9e1dda7"
+      },
+      {
+        "path": "Artifacts/small-caregiver-save-guidance-005-A2CC6B03-3767-4093-9C60-5F7B1FCDC686.png",
+        "bytes": 1011,
+        "sha256": "586fc1637fa5663b8ce353f205341688570e83a8d03bd76d8505ac0139d7159a"
+      },
+      {
+        "path": "Artifacts/small-caregiver-save-guidance-006-25BF8E50-63B2-43F1-BE60-5A82FA3EBBE2.png",
+        "bytes": 6063,
+        "sha256": "40c9ac5decd71b7b646db63db66c3b4df703bb0361810cc7d6ce11c3d27ec7b2"
+      },
+      {
+        "path": "Artifacts/small-caregiver-save-guidance-007-A0754985-9491-4DBE-9C20-F3A29F32D1CD.json",
+        "bytes": 325,
+        "sha256": "fd25c3a812b33827f1771080eb1f01dce7e93a35ad38267195cff91c86f6d15d"
+      }
+    ],
+    "sourceIndexSHA256": "a98cce5357de2297e3e765a1199486d822a70d9746a1ffe5a4acaa0d11de63e7",
+    "artifactHashNote": "Public JSON/text are sanitized; artifactInventory hashes apply to packaged bytes. Original indexed hashes, where present, refer to preserved original evidence."
+  }
+}

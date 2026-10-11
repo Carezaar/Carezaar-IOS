@@ -1,15 +1,16 @@
 import SwiftUI
 
-/// `Notifications`: subject label, partner and time. Opening one marks it seen and
-/// routes by subject code — chat_* to the chat, *match to Matches, else the partner.
+/// Tapping marks a notification read and presents its details. Show alone navigates.
 struct NotificationsView: View {
     @EnvironmentObject private var router: AppRouter
     @EnvironmentObject private var baseData: BaseDataStore
     @EnvironmentObject private var loc: Localization
     @EnvironmentObject private var feedback: Feedback
+    @Environment(\.dynamicTypeSize) private var typeSize
     @StateObject private var pager = Pager<AppNotification>()
     @EnvironmentObject private var poller: NotificationPoller
     @State private var seen: Set<Int> = []
+    @State private var selected: AppNotification?
 
     var body: some View {
         ScrollView {
@@ -23,15 +24,19 @@ struct NotificationsView: View {
         .backHeader(loc.t("general_notifications", "Notifications"))
         .task { await reload() }
         .onDisappear { poller.markChecked() }
+        .sheet(item: $selected) { notification in
+            notificationDetails(notification)
+                .presentationDetents([.medium, .large])
+        }
     }
 
     private func row(_ n: AppNotification) -> some View {
         let unseen = !n.isSeen && !seen.contains(n.id)
         let subject = baseData.items(.subjects).first { $0.id == n.subjectId }
         let isChat = subject?.code == "chat_new"
-        let dateParts = ServerTime.local(n.createdAt).split(separator: " ").map(String.init)
+        let timestamp = ServerTime.local(n.createdAt)
         // Figma v2 frame 738:11732: dot, subject icon, name + event, date, chevron.
-        return Button { open(n, code: subject?.code ?? "") } label: {
+        return Button { select(n) } label: {
             AdaptiveStack(alignment: .center, spacing: 12) {
                 Circle().fill(unseen ? Theme.Palette.primary : .clear).frame(width: 7, height: 7)
                     .accessibilityLabel(unseen ? "Unread" : "")
@@ -44,18 +49,21 @@ struct NotificationsView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     if let partner = n.partner {
                         Text(partner.fullName).font(Theme.Typography.title(13)).foregroundStyle(Color(hex: 0x111111))
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                     Text(loc.label(subject)).font(Theme.Typography.body(12)).foregroundStyle(Color(hex: 0x111111))
+                        .fixedSize(horizontal: false, vertical: true)
                 }
+                .frame(maxWidth: typeSize.isAccessibilitySize ? .infinity : nil, alignment: .leading)
                 Spacer(minLength: 8)
-                HStack(spacing: 4) {
+                HStack(alignment: .top, spacing: 4) {
                     AppIcon(name: "ic_clock", size: 12, tint: Theme.Palette.textSecondary)
-                    VStack(alignment: .trailing, spacing: 2) {
-                        ForEach(dateParts, id: \.self) { Text($0) }
-                    }
+                    Text(timestamp)
+                        .multilineTextAlignment(typeSize.isAccessibilitySize ? .leading : .trailing)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 .font(Theme.Typography.caption(9)).foregroundStyle(Theme.Palette.textSecondary)
-                .frame(maxHeight: .infinity, alignment: .top)
+                .frame(maxWidth: typeSize.isAccessibilitySize ? .infinity : nil, alignment: .leading)
             }
             .padding(.leading, 25).padding(.trailing, 36).padding(.vertical, 14)
             .frame(minHeight: 95)
@@ -67,30 +75,62 @@ struct NotificationsView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        #if DEBUG
+        .accessibilityIdentifier("notification-row-\(n.id)")
+        #endif
     }
 
-    private func open(_ n: AppNotification, code: String) {
+    private func select(_ n: AppNotification) {
+        selected = n
         if !n.isSeen && !seen.contains(n.id) {
             seen.insert(n.id)
             Task { _ = try? await UserService().markNotificationSeen(id: n.id) }
         }
-        // `match_accept`: the request was accepted, so "It's a Match!" (which re-checks
-        // that the match is still active). `match`: a new request, so the requester's
-        // profile, where Accept and Reject are.
-        if code.hasPrefix("chat"), let chat = n.chat { router.push(.chat(chatId: chat.id)) }
-        else if code == "match_accept", let partner = n.partner {
-            router.push(.matched(partner: partner.role == .caregiver ? .caregiver(id: partner.id) : .client(id: partner.id)))
-        }
-        else if code == "match" || code == "match_accept" {
-            if let partner = n.partner { router.push(profileRoute(partner)) }
-            else { feedback.toast(loc.t("notification_target_unavailable", "This notification is no longer available.")) }
-        }
-        else if code == "unmatch" { router.push(.manageMatches) }
-        else if let partner = n.partner { router.push(profileRoute(partner)) }
     }
 
-    private func profileRoute(_ partner: User) -> Route {
-        partner.role == .caregiver ? .caregiverDetails(caregiverId: partner.id) : .clientDetails(clientId: partner.id)
+    private func notificationDetails(_ n: AppNotification) -> some View {
+        let subject = baseData.items(.subjects).first { $0.id == n.subjectId }
+        return ScrollView {
+            VStack(alignment: .leading, spacing: 18) {
+                HStack {
+                    Text(loc.t("general_notifications", "Notifications")).font(Theme.Typography.title(20))
+                    Spacer()
+                    Button { selected = nil } label: {
+                        Image(systemName: "xmark").frame(width: 44, height: 44)
+                    }
+                    .accessibilityLabel(loc.t("general_cancel", "Cancel"))
+                }
+                if let partner = n.partner {
+                    HStack(spacing: 12) {
+                        Avatar(url: partner.photo, size: 64)
+                        Text(partner.fullName).font(Theme.Typography.title(17))
+                    }
+                }
+                Text(loc.label(subject)).font(Theme.Typography.body(16))
+                Text(ServerTime.local(n.createdAt)).font(Theme.Typography.caption(13))
+                    .foregroundStyle(Theme.Palette.textSecondary)
+                PrimaryButton(title: loc.t("general_show", "Show")) {
+                    selected = nil
+                    // A missing target simply dismisses the detail. The list remains
+                    // usable; never push an invented id or a broken destination.
+                    if let route = Self.destination(for: n, code: subject?.code ?? "") {
+                        router.push(route)
+                    }
+                }
+                .accessibilityIdentifier("notification-show")
+            }
+            .padding(20)
+        }
+        .accessibilityIdentifier("notification-detail")
+    }
+
+    static func destination(for n: AppNotification, code: String) -> Route? {
+        if code.hasPrefix("chat"), let chat = n.chat { return .chat(chatId: chat.id) }
+        guard let partner = n.partner, !partner.id.isEmpty else { return nil }
+        if code == "match_accept" {
+            return .matched(partner: partner.role == .caregiver ? .caregiver(id: partner.id) : .client(id: partner.id))
+        }
+        return partner.role == .caregiver ? .caregiverDetails(caregiverId: partner.id) : .clientDetails(clientId: partner.id)
     }
 
     private let fetch: Pager<AppNotification>.Fetch = { page in try await UserService().notifications(page: page) }

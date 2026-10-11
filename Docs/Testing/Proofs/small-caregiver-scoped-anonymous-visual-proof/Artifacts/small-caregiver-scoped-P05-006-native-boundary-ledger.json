@@ -1,0 +1,8 @@
+{
+  "firstProfileInactive": true,
+  "noLoopBeyondDelayedReturn": true,
+  "profileGETs": 2,
+  "responseSource": "debug_controlled_real_GET_responses",
+  "returnedToHelpCenter": true,
+  "secondProfileResultNull": true
+}

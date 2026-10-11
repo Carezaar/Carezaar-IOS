@@ -29,6 +29,17 @@ struct CarezaarApp: App {
     }
 }
 
+/// The startup graph is independent of whether reference data can be used yet.
+/// Reference readiness still gates every Welcome continuation.
+enum StartupDestination: Equatable {
+    case splash, welcome, main
+    static func resolve(state: SessionManager.State, referencesReady: Bool, savedSessionRejected: Bool) -> Self {
+        if state == .signedOut && savedSessionRejected { return .welcome }
+        if !referencesReady || state == .loading { return .splash }
+        return state.user == nil ? .welcome : .main
+    }
+}
+
 /// The product root. Swaps between the unauthenticated and authenticated graphs on
 /// session state, the way the Android `Splash` route and `AppNavHost` do.
 struct CarezaarRoot: View {
@@ -39,7 +50,6 @@ struct CarezaarRoot: View {
     @StateObject private var language = AppLanguage.shared
     @StateObject private var feedback = Feedback()
     @StateObject private var poller = NotificationPoller()
-    @Environment(\.scenePhase) private var scenePhase
 
     /// `--qa-route <identifier>` opens a single screen at launch so every route can
     /// be captured for review without driving the UI. Debug builds only.
@@ -63,14 +73,14 @@ struct CarezaarRoot: View {
             if let qaRoute {
                 NavigationStack { destination(qaRoute) }
             } else {
-                switch session.state {
-                case _ where !baseData.isReady, .loading, .unreachable:
+                switch StartupDestination.resolve(state: session.state, referencesReady: baseData.isReady, savedSessionRejected: session.savedSessionRejected) {
+                case .splash:
                     SplashView()
-                case .signedOut:
+                case .welcome:
                     NavigationStack(path: $router.path) {
                         IntroView().navigationDestination(for: Route.self) { destination($0) }
                     }
-                case .signedIn:
+                case .main:
                     // Every signed-in user goes to Main; there is no verification step
                     // (Background Check removed at the client's request, October 2026).
                     NavigationStack(path: $router.path) {
@@ -81,6 +91,9 @@ struct CarezaarRoot: View {
         }
         // Inside the environment objects below: the overlay reads Feedback and Localization.
         .feedbackOverlay()
+        #if DEBUG
+        .overlay(alignment: .topTrailing) { QARequestCountsView() }
+        #endif
         // System controls (sheet toolbar buttons, alerts' tinted actions) use the text
         // shade of the brand blue, which meets WCAG AA as small text.
         .tint(Theme.Palette.primaryText)
@@ -101,9 +114,6 @@ struct CarezaarRoot: View {
             } else {
                 poller.stop()
             }
-        }
-        .onChange(of: scenePhase) { _, phase in
-            if phase == .active, session.state.user != nil { Task { await poller.poll() } }
         }
         .onChange(of: poller.openNotificationsRequested) { _, requested in
             guard requested else { return }

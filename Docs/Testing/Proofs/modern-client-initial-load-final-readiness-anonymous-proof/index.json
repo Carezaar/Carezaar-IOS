@@ -1,0 +1,55 @@
+{
+  "source": "fresh-modern-client-initial-load-final-readiness.xcresult",
+  "rootReviewed": true,
+  "publishable": false,
+  "artifacts": [
+    {
+      "path": "Artifacts/BE954ACE-382E-4CF9-B77A-B086D4E12245.json",
+      "description": "owned-incoming-during-initial-load-completed_0_B41AB529-639F-4E10-8DD3-B3961C4E3E1F.json",
+      "sha256": "d6268d1d45c4ce2671bb231208cba9bd1763ced8667f291bf1276556b0cdb074",
+      "packagedSha256": "d6268d1d45c4ce2671bb231208cba9bd1763ced8667f291bf1276556b0cdb074"
+    },
+    {
+      "path": "Artifacts/A011A680-E68A-4691-87A3-5635A8F60844.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_71D44D15-A55B-4F88-A179-AD8263185CAA.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/6FAA8906-1DF7-4456-A39B-D6EDAA011C46.png",
+      "description": "owned-incoming-during-initial-load-synthetic-message-only-client_0_70B2E93C-62D8-43B1-A6BF-46F49AF65E77.png",
+      "sha256": "e96df114830d7b27bdaaade7e88bdc4f536e201bb73af531dc0bd4c1ca34bfc3",
+      "packagedSha256": "e96df114830d7b27bdaaade7e88bdc4f536e201bb73af531dc0bd4c1ca34bfc3"
+    },
+    {
+      "path": "Artifacts/D80B60C0-A8B4-4D32-AB49-5C56B336991E.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_4FFF3D72-D2B2-4779-A8C8-87BEE2548B3B.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/651E4956-A1CA-4B0C-AE23-36ED6C74B53A.json",
+      "description": "owned-incoming-during-initial-load-pending_0_17AFABCC-489F-4416-932C-A4E2E30459E2.json",
+      "sha256": "b7eda1d5710ef13da8e77aa1e07209db414c2fa55cb58035d20f507cf448c61a",
+      "packagedSha256": "b7eda1d5710ef13da8e77aa1e07209db414c2fa55cb58035d20f507cf448c61a"
+    }
+  ],
+  "scope": "Modern client full initial-loading before transport with controlled 30-second delay; unique applied owned message/footer and ordinary Back/reentry. Dispatched held HTTP response race unverified.",
+  "testResults": [
+    {
+      "method": "testOwnedIncomingDuringInitialChatLoadAppliesLatestAndTimestamp",
+      "status": "PASS",
+      "seconds": 230.078
+    }
+  ],
+  "physicalCamera": "UNTESTED; user explicitly requested simulator continuation",
+  "yahooBackendOnly": "UNVERIFIED",
+  "independentReviewed": true,
+  "independentReview": "final_review independently inspected completed log, retained source gates and all five artifact hashes/privacy; scoped PASS230.078; no dispatched held HTTP response claim.",
+  "publicPackage": {
+    "rootReviewed": true,
+    "independentReviewed": true,
+    "originalEvidencePreserved": true,
+    "rawLogsXCResultsFullScreenPhotosPrivateFixturesIncluded": false
+  }
+}

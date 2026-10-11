@@ -1,0 +1,285 @@
+{
+  "source": "fresh-small-caregiver-controlled-location-nil-review.xcresult",
+  "wholeProcessExit": 65,
+  "allocation": "small caregiver",
+  "passesSeconds": {
+    "cached": 25.885,
+    "invalidThreeVariants": 95.047,
+    "manualLateFix": 30.505,
+    "stale": 26.209
+  },
+  "noFixFailure": {
+    "seconds": 45.753,
+    "line": 385,
+    "guidanceExistsObservedAfterActualSave": true,
+    "guidanceHittabilityAssertionFailed": true,
+    "visibleGuidanceNotVerified": true,
+    "diagnosisPending": false,
+    "diagnosedProductIssue": "Exact final-Save guidance toast is visually hidden under presented full-screen Map; generic map unavailable message remains visible."
+  },
+  "rootReviewedCroppedPNGs": 12,
+  "controlledDebugInputsOnly": true,
+  "physicalGPSVerified": false,
+  "artifacts": [
+    {
+      "path": "Artifacts/small-caregiver-location-pair-visible-001-6A7B2E42-D490-4CC2-A71F-3263B73E4DB2.json",
+      "description": "P03-021-controlled-cached-native_0_ABDE80E2-F4BD-47E7-9352-AE2460EC2B8A.json",
+      "sha256": "df958ae00bc8919114b135188807c981c6eb9fb866072cf4edc90f3ae59ccb5b"
+    },
+    {
+      "path": "Artifacts/small-caregiver-location-pair-visible-002-0759E45A-27B3-4329-9552-253E21CF80CB.png",
+      "description": "P03-021-controlled-review-coordinate-only_0_6DDAEC0B-17A5-4237-84D0-D10F54597F05.png",
+      "sha256": "359acae6703557ef563148e966448b29906a82e8aef8d86659eea962bf240151"
+    },
+    {
+      "path": "Artifacts/small-caregiver-location-pair-visible-003-313A3858-4074-4398-A7BE-2ADA4AD89DFE.png",
+      "description": "P03-021-controlled-cached-coordinate-only_0_F510A689-915F-4714-BCB0-7858FB9FB0DA.png",
+      "sha256": "81856a202772d0f48d2f685601e25d7d90df5c3518d81960d1f45fdcd42d1088"
+    },
+    {
+      "path": "Artifacts/small-caregiver-location-pair-visible-004-040CFC4D-B04A-44DE-8B30-170C1B5EA8C2.json",
+      "description": "controlled-location-opening-available-native_0_9A723505-D8E2-43A8-9DF8-56598839A753.json",
+      "sha256": "f4d3fa900a896f2258179c08356df7b26c51ee5683f6514b5831ec556a1c5419"
+    },
+    {
+      "path": "Artifacts/small-caregiver-location-pair-visible-005-E2B40AF0-D0FD-4F21-B21B-C4941154A776.json",
+      "description": "P03-025-controlled-future-native_0_32C1CE04-E163-4203-B3A9-EB69B392C399.json",
+      "sha256": "43dbbbef392a3878fba8aefbf1ebe688b6fe2ec87adeece41d8db7d4181d4509"
+    },
+    {
+      "path": "Artifacts/small-caregiver-location-pair-visible-006-E96A7D98-30BB-41B6-9A11-AD1B21306B79.png",
+      "description": "controlled-location-empty-review-value-only_0_58533C5C-BF68-4C10-A6AA-655DDDFA42C0.png",
+      "sha256": "586fc1637fa5663b8ce353f205341688570e83a8d03bd76d8505ac0139d7159a"
+    },
+    {
+      "path": "Artifacts/small-caregiver-location-pair-visible-007-F11AB66E-D803-4CFF-8821-D568ECB34F80.json",
+      "description": "controlled-location-opening-future-native_0_D4C1C157-7973-469D-B8D8-AF5FF648C306.json",
+      "sha256": "f4d3fa900a896f2258179c08356df7b26c51ee5683f6514b5831ec556a1c5419"
+    },
+    {
+      "path": "Artifacts/small-caregiver-location-pair-visible-008-AE13B235-E10C-4911-B30F-1347C649BF11.json",
+      "description": "P03-025-controlled-out-of-range-native_0_7C9F29A3-796A-4F0C-BA95-98874C38E444.json",
+      "sha256": "43dbbbef392a3878fba8aefbf1ebe688b6fe2ec87adeece41d8db7d4181d4509"
+    },
+    {
+      "path": "Artifacts/small-caregiver-location-pair-visible-009-0046D010-5161-4B1C-B8D9-5D1EEEC86BD7.png",
+      "description": "controlled-location-empty-review-value-only_0_85774C64-FE40-41F7-BFD6-C0E1BB239548.png",
+      "sha256": "586fc1637fa5663b8ce353f205341688570e83a8d03bd76d8505ac0139d7159a"
+    },
+    {
+      "path": "Artifacts/small-caregiver-location-pair-visible-010-E773831C-B3A5-4CCF-A653-3BD441810B87.json",
+      "description": "controlled-location-opening-out-of-range-native_0_92156D5D-B055-49D9-86E4-5D2B0AD107F0.json",
+      "sha256": "f4d3fa900a896f2258179c08356df7b26c51ee5683f6514b5831ec556a1c5419"
+    },
+    {
+      "path": "Artifacts/small-caregiver-location-pair-visible-011-E16F0069-CE9A-4ADD-903E-70E4BE91BF46.json",
+      "description": "P03-025-controlled-negative-accuracy-native_0_681E6118-D169-4C73-BD48-8D1101FDCD01.json",
+      "sha256": "43dbbbef392a3878fba8aefbf1ebe688b6fe2ec87adeece41d8db7d4181d4509"
+    },
+    {
+      "path": "Artifacts/small-caregiver-location-pair-visible-012-9C787CA1-1628-48AA-937E-FCE1B64CB656.png",
+      "description": "controlled-location-empty-review-value-only_0_730DE016-02E0-4588-BFCE-99B835241433.png",
+      "sha256": "586fc1637fa5663b8ce353f205341688570e83a8d03bd76d8505ac0139d7159a"
+    },
+    {
+      "path": "Artifacts/small-caregiver-location-pair-visible-013-AB34E751-527F-4019-B945-944D3CA4DD71.json",
+      "description": "controlled-location-opening-negative-accuracy-native_0_6A95C1F2-6F60-4799-ABBE-220029D5C200.json",
+      "sha256": "f4d3fa900a896f2258179c08356df7b26c51ee5683f6514b5831ec556a1c5419"
+    },
+    {
+      "path": "Artifacts/small-caregiver-location-pair-visible-014-BC1DD5B3-BE9F-43D9-A8AE-02BABE0A8C8C.json",
+      "description": "P03-027-controlled-map-manual-late-native_0_0CA5DD1C-EF16-46DE-8F05-1AA10EAA31CD.json",
+      "sha256": "7f7b396369e9d9d35959cbdc76e809e545ecc4d18afc3be66676be8ad30b2b91"
+    },
+    {
+      "path": "Artifacts/small-caregiver-location-pair-visible-015-ADEA71D4-4E17-4E73-A818-B92A7C392963.png",
+      "description": "P03-027-controlled-manual-review-coordinate-only_0_EA7DF86A-2948-4C16-9690-A5263A4B03B9.png",
+      "sha256": "9f07a3fe76646dd947b52b232cd0e9e5d6f663ef0df2c46cfbf6de52b0e4b8c2"
+    },
+    {
+      "path": "Artifacts/small-caregiver-location-pair-visible-016-E81B46B9-C4E0-4A68-A72A-56D3FE833D25.png",
+      "description": "P03-027-controlled-manual-coordinate-row-only_0_ED4A8DA9-0C08-424F-9696-016A0D6B7EE1.png",
+      "sha256": "327aff05289648d122d06ff5e884de953852cc964b2b66e0da21801b6a9d0f6c"
+    },
+    {
+      "path": "Artifacts/small-caregiver-location-pair-visible-017-C7DFB640-BAA1-436C-9119-2B42A5629FEE.png",
+      "description": "P03-027-controlled-late-fix-manual-confirm-only_0_B068F3D8-079D-42ED-815F-71A27682E461.png",
+      "sha256": "8021b34feb5152b5d635b0ce50195d09adf509feaf6fa869d2604d484a6b673d"
+    },
+    {
+      "path": "Artifacts/small-caregiver-location-pair-visible-018-99E51BAF-8AFC-4F48-8168-89C731F1B8D1.json",
+      "description": "controlled-location-opening-late-valid-native_0_B5CC3D05-C7C6-4DD2-A47B-9848F3C26B4D.json",
+      "sha256": "f4d3fa900a896f2258179c08356df7b26c51ee5683f6514b5831ec556a1c5419"
+    },
+    {
+      "path": "Artifacts/small-caregiver-location-pair-visible-019-56489019-596B-46A7-AD86-62CF9D1A8F43.png",
+      "description": "controlled-location-empty-review-value-only_0_7C4AC6C9-1ECA-4D35-A00B-9FAFED92D4B8.png",
+      "sha256": "586fc1637fa5663b8ce353f205341688570e83a8d03bd76d8505ac0139d7159a"
+    },
+    {
+      "path": "Artifacts/small-caregiver-location-pair-visible-020-6C76912D-CA7C-4AF9-A901-600C938D06E4.png",
+      "description": "P03-026-controlled-unselected-map-continue-only_0_11E0E4DE-E751-4DE3-AF9B-5FED177FA2F8.png",
+      "sha256": "40c9ac5decd71b7b646db63db66c3b4df703bb0361810cc7d6ce11c3d27ec7b2"
+    },
+    {
+      "path": "Artifacts/small-caregiver-location-pair-visible-021-E6DAD633-8B9D-4C5D-BE30-C59BD0FE7F59.json",
+      "description": "controlled-location-opening-none-native_0_EB12C68F-EC66-4A26-A1AA-F89190361F5A.json",
+      "sha256": "f4d3fa900a896f2258179c08356df7b26c51ee5683f6514b5831ec556a1c5419"
+    },
+    {
+      "path": "Artifacts/small-caregiver-location-pair-visible-022-B4D7948E-ABB0-4FEC-AAB2-98188AA45551.json",
+      "description": "P03-022-controlled-stale-native_0_B734A9AE-D6B7-418B-9143-2C313C093230.json",
+      "sha256": "8e1b4dffa3ec6328eec3445ae05056320d5387b844b4d4d50d7f4a0936d1750c"
+    },
+    {
+      "path": "Artifacts/small-caregiver-location-pair-visible-023-33325B36-8BD5-479C-A205-71E1E4189166.png",
+      "description": "P03-022-controlled-map-last-known-only_0_7758EC99-251A-4ECF-A54A-40F319E3A3B0.png",
+      "sha256": "e82b4d5af95a00f8c9de7d35199be10d60c5029e310e67ce4742e56a418edca0"
+    },
+    {
+      "path": "Artifacts/small-caregiver-location-pair-visible-024-1F9A1EFC-12C8-482F-8A6A-2ABB54090C8A.png",
+      "description": "P03-022-controlled-wizard-last-known-only_0_D5FC5915-C35F-4BB7-A928-52D04C73368F.png",
+      "sha256": "4b2b5910de08d6b6e1917edf920be29bd1bd02ce26577dc9c9d6e0475067c872"
+    },
+    {
+      "path": "Artifacts/small-caregiver-location-pair-visible-025-236C4189-F13D-482B-8CF2-A6D286948F2B.json",
+      "description": "controlled-location-opening-stale-native_0_2636C87B-9C57-4236-8238-C4494C52BF35.json",
+      "sha256": "f4d3fa900a896f2258179c08356df7b26c51ee5683f6514b5831ec556a1c5419"
+    }
+  ],
+  "productionFixRuntimePending": true,
+  "publicPackage": {
+    "status": "REVIEWABLE — not staged or delivered",
+    "originalEvidenceRetainedLocally": true,
+    "rawLogsAndXCResultsIncluded": false,
+    "artifactInventory": [
+      {
+        "path": "Artifacts/small-caregiver-location-pair-visible-001-6A7B2E42-D490-4CC2-A71F-3263B73E4DB2.json",
+        "bytes": 308,
+        "sha256": "6d770e6d8785461556ef87749377bd4d83f3657414cebed609afb1a8f43f52b1"
+      },
+      {
+        "path": "Artifacts/small-caregiver-location-pair-visible-002-0759E45A-27B3-4329-9552-253E21CF80CB.png",
+        "bytes": 5251,
+        "sha256": "359acae6703557ef563148e966448b29906a82e8aef8d86659eea962bf240151"
+      },
+      {
+        "path": "Artifacts/small-caregiver-location-pair-visible-003-313A3858-4074-4398-A7BE-2ADA4AD89DFE.png",
+        "bytes": 24549,
+        "sha256": "81856a202772d0f48d2f685601e25d7d90df5c3518d81960d1f45fdcd42d1088"
+      },
+      {
+        "path": "Artifacts/small-caregiver-location-pair-visible-004-040CFC4D-B04A-44DE-8B30-170C1B5EA8C2.json",
+        "bytes": 325,
+        "sha256": "fd25c3a812b33827f1771080eb1f01dce7e93a35ad38267195cff91c86f6d15d"
+      },
+      {
+        "path": "Artifacts/small-caregiver-location-pair-visible-005-E2B40AF0-D0FD-4F21-B21B-C4941154A776.json",
+        "bytes": 333,
+        "sha256": "c0afae239e6b0a4b21692c232761d58373abdb5151fa2ee51df9a7660da9e30a"
+      },
+      {
+        "path": "Artifacts/small-caregiver-location-pair-visible-006-E96A7D98-30BB-41B6-9A11-AD1B21306B79.png",
+        "bytes": 1011,
+        "sha256": "586fc1637fa5663b8ce353f205341688570e83a8d03bd76d8505ac0139d7159a"
+      },
+      {
+        "path": "Artifacts/small-caregiver-location-pair-visible-007-F11AB66E-D803-4CFF-8821-D568ECB34F80.json",
+        "bytes": 325,
+        "sha256": "fd25c3a812b33827f1771080eb1f01dce7e93a35ad38267195cff91c86f6d15d"
+      },
+      {
+        "path": "Artifacts/small-caregiver-location-pair-visible-008-AE13B235-E10C-4911-B30F-1347C649BF11.json",
+        "bytes": 333,
+        "sha256": "c0afae239e6b0a4b21692c232761d58373abdb5151fa2ee51df9a7660da9e30a"
+      },
+      {
+        "path": "Artifacts/small-caregiver-location-pair-visible-009-0046D010-5161-4B1C-B8D9-5D1EEEC86BD7.png",
+        "bytes": 1011,
+        "sha256": "586fc1637fa5663b8ce353f205341688570e83a8d03bd76d8505ac0139d7159a"
+      },
+      {
+        "path": "Artifacts/small-caregiver-location-pair-visible-010-E773831C-B3A5-4CCF-A653-3BD441810B87.json",
+        "bytes": 325,
+        "sha256": "fd25c3a812b33827f1771080eb1f01dce7e93a35ad38267195cff91c86f6d15d"
+      },
+      {
+        "path": "Artifacts/small-caregiver-location-pair-visible-011-E16F0069-CE9A-4ADD-903E-70E4BE91BF46.json",
+        "bytes": 333,
+        "sha256": "c0afae239e6b0a4b21692c232761d58373abdb5151fa2ee51df9a7660da9e30a"
+      },
+      {
+        "path": "Artifacts/small-caregiver-location-pair-visible-012-9C787CA1-1628-48AA-937E-FCE1B64CB656.png",
+        "bytes": 1011,
+        "sha256": "586fc1637fa5663b8ce353f205341688570e83a8d03bd76d8505ac0139d7159a"
+      },
+      {
+        "path": "Artifacts/small-caregiver-location-pair-visible-013-AB34E751-527F-4019-B945-944D3CA4DD71.json",
+        "bytes": 325,
+        "sha256": "fd25c3a812b33827f1771080eb1f01dce7e93a35ad38267195cff91c86f6d15d"
+      },
+      {
+        "path": "Artifacts/small-caregiver-location-pair-visible-014-BC1DD5B3-BE9F-43D9-A8AE-02BABE0A8C8C.json",
+        "bytes": 416,
+        "sha256": "ba0ed2ae6d5e9618ecc3fff74bb06f2625e204f1381831ff210d0be4f1b0c939"
+      },
+      {
+        "path": "Artifacts/small-caregiver-location-pair-visible-015-ADEA71D4-4E17-4E73-A818-B92A7C392963.png",
+        "bytes": 4555,
+        "sha256": "9f07a3fe76646dd947b52b232cd0e9e5d6f663ef0df2c46cfbf6de52b0e4b8c2"
+      },
+      {
+        "path": "Artifacts/small-caregiver-location-pair-visible-016-E81B46B9-C4E0-4A68-A72A-56D3FE833D25.png",
+        "bytes": 23648,
+        "sha256": "327aff05289648d122d06ff5e884de953852cc964b2b66e0da21801b6a9d0f6c"
+      },
+      {
+        "path": "Artifacts/small-caregiver-location-pair-visible-017-C7DFB640-BAA1-436C-9119-2B42A5629FEE.png",
+        "bytes": 5638,
+        "sha256": "8021b34feb5152b5d635b0ce50195d09adf509feaf6fa869d2604d484a6b673d"
+      },
+      {
+        "path": "Artifacts/small-caregiver-location-pair-visible-018-99E51BAF-8AFC-4F48-8168-89C731F1B8D1.json",
+        "bytes": 325,
+        "sha256": "fd25c3a812b33827f1771080eb1f01dce7e93a35ad38267195cff91c86f6d15d"
+      },
+      {
+        "path": "Artifacts/small-caregiver-location-pair-visible-019-56489019-596B-46A7-AD86-62CF9D1A8F43.png",
+        "bytes": 1011,
+        "sha256": "586fc1637fa5663b8ce353f205341688570e83a8d03bd76d8505ac0139d7159a"
+      },
+      {
+        "path": "Artifacts/small-caregiver-location-pair-visible-020-6C76912D-CA7C-4AF9-A901-600C938D06E4.png",
+        "bytes": 6063,
+        "sha256": "40c9ac5decd71b7b646db63db66c3b4df703bb0361810cc7d6ce11c3d27ec7b2"
+      },
+      {
+        "path": "Artifacts/small-caregiver-location-pair-visible-021-E6DAD633-8B9D-4C5D-BE30-C59BD0FE7F59.json",
+        "bytes": 325,
+        "sha256": "fd25c3a812b33827f1771080eb1f01dce7e93a35ad38267195cff91c86f6d15d"
+      },
+      {
+        "path": "Artifacts/small-caregiver-location-pair-visible-022-B4D7948E-ABB0-4FEC-AAB2-98188AA45551.json",
+        "bytes": 277,
+        "sha256": "b92efedf8d82fd5c891134f95fdd9c8dd1226a5b539f057ffc2687c0a37254e6"
+      },
+      {
+        "path": "Artifacts/small-caregiver-location-pair-visible-023-33325B36-8BD5-479C-A205-71E1E4189166.png",
+        "bytes": 3610,
+        "sha256": "e82b4d5af95a00f8c9de7d35199be10d60c5029e310e67ce4742e56a418edca0"
+      },
+      {
+        "path": "Artifacts/small-caregiver-location-pair-visible-024-1F9A1EFC-12C8-482F-8A6A-2ABB54090C8A.png",
+        "bytes": 3730,
+        "sha256": "4b2b5910de08d6b6e1917edf920be29bd1bd02ce26577dc9c9d6e0475067c872"
+      },
+      {
+        "path": "Artifacts/small-caregiver-location-pair-visible-025-236C4189-F13D-482B-8CF2-A6D286948F2B.json",
+        "bytes": 325,
+        "sha256": "fd25c3a812b33827f1771080eb1f01dce7e93a35ad38267195cff91c86f6d15d"
+      }
+    ],
+    "sourceIndexSHA256": "0ac98d63dd2d8738b729203ecae3acd85081d37fd22942bb2237cb4158f97643",
+    "artifactHashNote": "Public JSON/text are sanitized; artifactInventory hashes apply to packaged bytes. Original indexed hashes, where present, refer to preserved original evidence."
+  }
+}

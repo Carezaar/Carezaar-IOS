@@ -1,0 +1,17 @@
+{
+  "actualBackendCoordinateRequirementTested": false,
+  "actualOpeningOwnedProfileGETs": 2,
+  "automaticMapViewportNeverSelected": true,
+  "controlledDebugLocationOnly": true,
+  "finalSaveGuidanceObserved": true,
+  "manualMapOfferedAfterSave": true,
+  "mapReopenedUnselected": true,
+  "ordinaryMapGenericGuidanceVisible": true,
+  "OSLocationPermissionVerified": false,
+  "physicalGPSVerified": false,
+  "profileMutationRequests": 0,
+  "reviewLocationNil": true,
+  "role": "caregiver",
+  "saveSpecificReasonResetOnOrdinaryReopen": true,
+  "scheduleContinuedWithoutLocation": true
+}

@@ -1,0 +1,325 @@
+{
+  "invocation": "fresh-small-caregiver-phase2-all-languages-default-chrome",
+  "overall": "FAIL",
+  "individualPassSeconds": {
+    "slowSend": 69.879,
+    "defaultChrome": 96.789,
+    "postRejectedWithdrawnEndedMatrix": 137.274,
+    "optionalCancelFullIntroduction": 49.671
+  },
+  "individualFailSeconds": {
+    "offlineExpiredToastCapture": 64.238,
+    "languageFirstHindiTabAndTeardown": 106.622
+  },
+  "rootReviewedSafeCropCount": 15,
+  "visualLimits": "Third inactive-chat error crop caught fade and shows synthetic bubble behind red text; only earlier two crops complete opaque/readable error. Capture moved earlier pendingretest. Main language failure video0bytes during disk exhaustion; cause not established.",
+  "rootReview": "Synthetic message/draft exact and readable; defaultbrand/captions complete; three requestbuttons complete; requestquestion complete; one-lineellipsispreview/messageicon; fullintroClose complete.",
+  "attachments": [
+    {
+      "test": "ChatNetworkBoundaryUITests/testOwnedSlowNativeSendShowsProgressAndPreservesContinuedTyping()",
+      "attachment": "Artifacts/small-caregiver-phase2-00-owned-slow-send-new-typing-caregiver.json"
+    },
+    {
+      "test": "ChatNetworkBoundaryUITests/testOwnedSlowNativeSendShowsProgressAndPreservesContinuedTyping()",
+      "attachment": "Artifacts/small-caregiver-phase2-01-owned-slow-send-retained-synthetic-draft-only-caregiver.png"
+    },
+    {
+      "test": "ChatNetworkBoundaryUITests/testOwnedSlowNativeSendShowsProgressAndPreservesContinuedTyping()",
+      "attachment": "Artifacts/small-caregiver-phase2-02-owned-slow-send-first-synthetic-bubble-only-caregiver.png"
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testRecordDefaultRenderedBrandAndTabCaptionBaseline()",
+      "attachment": "Artifacts/small-caregiver-phase2-03-chrome-native-language-cleanup-result.txt"
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testRecordDefaultRenderedBrandAndTabCaptionBaseline()",
+      "attachment": "Artifacts/small-caregiver-phase2-04-ar-profile_change_language_title-native-menu-before-tap.json"
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testRecordDefaultRenderedBrandAndTabCaptionBaseline()",
+      "attachment": "Artifacts/small-caregiver-phase2-05-ar-native-picker-before-tap-geometry.json"
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testRecordDefaultRenderedBrandAndTabCaptionBaseline()",
+      "attachment": "Artifacts/small-caregiver-phase2-06-default-en-bottom_navigation_profile-caption.png"
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testRecordDefaultRenderedBrandAndTabCaptionBaseline()",
+      "attachment": "Artifacts/small-caregiver-phase2-07-default-en-bottom_navigation_messages-caption.png"
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testRecordDefaultRenderedBrandAndTabCaptionBaseline()",
+      "attachment": "Artifacts/small-caregiver-phase2-08-default-en-bottom_navigation_matches-caption.png"
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testRecordDefaultRenderedBrandAndTabCaptionBaseline()",
+      "attachment": "Artifacts/small-caregiver-phase2-09-default-en-brand.png"
+    },
+    {
+      "test": "ChromeDynamicTypeUITests/testRecordDefaultRenderedBrandAndTabCaptionBaseline()",
+      "attachment": "Artifacts/small-caregiver-phase2-10-en-native-picker-before-tap-geometry.json"
+    },
+    {
+      "test": "ManagedLanguageMatrixUITests/testEverySupportedManagedLanguageRendersNativeSurfacesAndFAQAll()",
+      "attachment": "Artifacts/small-caregiver-phase2-11-ar-native-picker-before_selection_tap-geometry.json"
+    },
+    {
+      "test": "ManagedLanguageMatrixUITests/testEverySupportedManagedLanguageRendersNativeSurfacesAndFAQAll()",
+      "attachment": "Artifacts/small-caregiver-phase2-12-in-native-picker-before_selection_tap-geometry.json"
+    },
+    {
+      "test": "MatchStateMatrixUITests/testOwnedRejectedWithdrawnEndedTransitionsRenderNoneAndRestrictNativeChatSend()",
+      "attachment": "Artifacts/small-caregiver-phase2-13-owned-post-ended-state-and-chat-caregiver.json"
+    },
+    {
+      "test": "MatchStateMatrixUITests/testOwnedRejectedWithdrawnEndedTransitionsRenderNoneAndRestrictNativeChatSend()",
+      "attachment": "Artifacts/small-caregiver-phase2-14-owned-none-native-send-guard-caregiver.json"
+    },
+    {
+      "test": "MatchStateMatrixUITests/testOwnedRejectedWithdrawnEndedTransitionsRenderNoneAndRestrictNativeChatSend()",
+      "attachment": "Artifacts/small-caregiver-phase2-15-owned-none-chat-restriction-only-caregiver.png"
+    },
+    {
+      "test": "MatchStateMatrixUITests/testOwnedRejectedWithdrawnEndedTransitionsRenderNoneAndRestrictNativeChatSend()",
+      "attachment": "Artifacts/small-caregiver-phase2-16-owned-state-render-none-caregiver.json"
+    },
+    {
+      "test": "MatchStateMatrixUITests/testOwnedRejectedWithdrawnEndedTransitionsRenderNoneAndRestrictNativeChatSend()",
+      "attachment": "Artifacts/small-caregiver-phase2-17-owned-none-match-request-control-only-caregiver.png"
+    },
+    {
+      "test": "MatchStateMatrixUITests/testOwnedRejectedWithdrawnEndedTransitionsRenderNoneAndRestrictNativeChatSend()",
+      "attachment": "Artifacts/small-caregiver-phase2-18-owned-post-withdrawn-state-and-chat-caregiver.json"
+    },
+    {
+      "test": "MatchStateMatrixUITests/testOwnedRejectedWithdrawnEndedTransitionsRenderNoneAndRestrictNativeChatSend()",
+      "attachment": "Artifacts/small-caregiver-phase2-19-owned-none-native-send-guard-caregiver.json"
+    },
+    {
+      "test": "MatchStateMatrixUITests/testOwnedRejectedWithdrawnEndedTransitionsRenderNoneAndRestrictNativeChatSend()",
+      "attachment": "Artifacts/small-caregiver-phase2-20-owned-none-chat-restriction-only-caregiver.png"
+    },
+    {
+      "test": "MatchStateMatrixUITests/testOwnedRejectedWithdrawnEndedTransitionsRenderNoneAndRestrictNativeChatSend()",
+      "attachment": "Artifacts/small-caregiver-phase2-21-owned-state-render-none-caregiver.json"
+    },
+    {
+      "test": "MatchStateMatrixUITests/testOwnedRejectedWithdrawnEndedTransitionsRenderNoneAndRestrictNativeChatSend()",
+      "attachment": "Artifacts/small-caregiver-phase2-22-owned-none-match-request-control-only-caregiver.png"
+    },
+    {
+      "test": "MatchStateMatrixUITests/testOwnedRejectedWithdrawnEndedTransitionsRenderNoneAndRestrictNativeChatSend()",
+      "attachment": "Artifacts/small-caregiver-phase2-23-owned-post-rejected-state-and-chat-caregiver.json"
+    },
+    {
+      "test": "MatchStateMatrixUITests/testOwnedRejectedWithdrawnEndedTransitionsRenderNoneAndRestrictNativeChatSend()",
+      "attachment": "Artifacts/small-caregiver-phase2-24-owned-none-native-send-guard-caregiver.json"
+    },
+    {
+      "test": "MatchStateMatrixUITests/testOwnedRejectedWithdrawnEndedTransitionsRenderNoneAndRestrictNativeChatSend()",
+      "attachment": "Artifacts/small-caregiver-phase2-25-owned-none-chat-restriction-only-caregiver.png"
+    },
+    {
+      "test": "MatchStateMatrixUITests/testOwnedRejectedWithdrawnEndedTransitionsRenderNoneAndRestrictNativeChatSend()",
+      "attachment": "Artifacts/small-caregiver-phase2-26-owned-state-render-none-caregiver.json"
+    },
+    {
+      "test": "MatchStateMatrixUITests/testOwnedRejectedWithdrawnEndedTransitionsRenderNoneAndRestrictNativeChatSend()",
+      "attachment": "Artifacts/small-caregiver-phase2-27-owned-none-match-request-control-only-caregiver.png"
+    },
+    {
+      "test": "RequestIntroductionBoundaryUITests/testOwnedRequestOptionalEmptyCancelAndLongFirstLineFullIntroductionModal()",
+      "attachment": "Artifacts/small-caregiver-phase2-28-full-first-line-introduction-modal-caregiver.json"
+    },
+    {
+      "test": "RequestIntroductionBoundaryUITests/testOwnedRequestOptionalEmptyCancelAndLongFirstLineFullIntroductionModal()",
+      "attachment": "Artifacts/small-caregiver-phase2-29-full-introduction-close-control-only.png"
+    },
+    {
+      "test": "RequestIntroductionBoundaryUITests/testOwnedRequestOptionalEmptyCancelAndLongFirstLineFullIntroductionModal()",
+      "attachment": "Artifacts/small-caregiver-phase2-30-long-first-line-preview-raster-review-caregiver.png"
+    },
+    {
+      "test": "RequestIntroductionBoundaryUITests/testOwnedRequestOptionalEmptyCancelAndLongFirstLineFullIntroductionModal()",
+      "attachment": "Artifacts/small-caregiver-phase2-31-optional-empty-request-cancel-caregiver.json"
+    },
+    {
+      "test": "RequestIntroductionBoundaryUITests/testOwnedRequestOptionalEmptyCancelAndLongFirstLineFullIntroductionModal()",
+      "attachment": "Artifacts/small-caregiver-phase2-32-managed-request-question-only.png"
+    }
+  ],
+  "publicPackage": {
+    "status": "REVIEWABLE — not staged or delivered",
+    "originalEvidenceRetainedLocally": true,
+    "rawLogsAndXCResultsIncluded": false,
+    "artifactInventory": [
+      {
+        "path": "Artifacts/small-caregiver-phase2-00-owned-slow-send-new-typing-caregiver.json",
+        "bytes": 363,
+        "sha256": "282b071d530487a404684f545f8ee0cffea7038c8253d1c87fea28d1e7128cb3"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-01-owned-slow-send-retained-synthetic-draft-only-caregiver.png",
+        "bytes": 5046,
+        "sha256": "f734491df654af8974d3f888604d76d87dae07760122c03123acba7f1321decd"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-02-owned-slow-send-first-synthetic-bubble-only-caregiver.png",
+        "bytes": 15834,
+        "sha256": "8e8da38c2ff3999b20dfb0e703abaa8f9b42539d8c8cf30f8753eec51378c460"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-03-chrome-native-language-cleanup-result.txt",
+        "bytes": 71,
+        "sha256": "be912a1106b420c2ec5f430f538812d453efb234908586791b8efe5594f5a1d3"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-04-ar-profile_change_language_title-native-menu-before-tap.json",
+        "bytes": 1433,
+        "sha256": "d3da622d70b47238aa7cfef06fe439602d75353fa769dec84753a12e82dfb463"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-05-ar-native-picker-before-tap-geometry.json",
+        "bytes": 858,
+        "sha256": "00e2053c9eeadd95f4daa83bbd57e5d76a548246ee5b7910bce00637d5bd11a1"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-06-default-en-bottom_navigation_profile-caption.png",
+        "bytes": 5315,
+        "sha256": "5554fac95387a642e5eba712e13a01bd0a7fd6d80fc165bda115e297de14b696"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-07-default-en-bottom_navigation_messages-caption.png",
+        "bytes": 6559,
+        "sha256": "3f7bab3a90a547e49ef2db6fcbb121e09853769ca1f84eb91834ff6f017c43b6"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-08-default-en-bottom_navigation_matches-caption.png",
+        "bytes": 6189,
+        "sha256": "40048a08cda70b389b5d219c9c3ed76c30ad0c32f93d44ab65a2983c12767770"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-09-default-en-brand.png",
+        "bytes": 4308,
+        "sha256": "19f4766e4f80ae25eb50c700b5bf042dbe693011d8b8a32dddea791cc2e963eb"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-10-en-native-picker-before-tap-geometry.json",
+        "bytes": 869,
+        "sha256": "3635b0403a31a6a6e1f438bf7e9d51a9817531d012299f9ab39ffca09fbbad5c"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-11-ar-native-picker-before_selection_tap-geometry.json",
+        "bytes": 917,
+        "sha256": "2eba5087776ce7e3d7fe933d23cfbe0df510f680667d34b8c63b1da9eb79e4ed"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-12-in-native-picker-before_selection_tap-geometry.json",
+        "bytes": 913,
+        "sha256": "bf0f252d5e838f7b6d934d6d7e364cbe77e937d3592b292f9aca55774f06136d"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-13-owned-post-ended-state-and-chat-caregiver.json",
+        "bytes": 496,
+        "sha256": "b2937e193a2d6079d601373b4e56567d2d3bd48c1411fb842c3ba91abc207571"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-14-owned-none-native-send-guard-caregiver.json",
+        "bytes": 296,
+        "sha256": "8e40c0b30d29607ac3e0f4ae69c1f4823645cb1a118ac4cc6b6bb13c5b0342c1"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-15-owned-none-chat-restriction-only-caregiver.png",
+        "bytes": 11412,
+        "sha256": "6a9da1363a9f863bf50d7f429490e7bb6b244350c00aefe85c2d2e94c0be9cd3"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-16-owned-state-render-none-caregiver.json",
+        "bytes": 291,
+        "sha256": "8b93e8358e04d80a586c4285d8ccd32de9dc9a8b7db1896b39fe74752fe1698b"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-17-owned-none-match-request-control-only-caregiver.png",
+        "bytes": 9094,
+        "sha256": "f1a423f165dcbef37de5621169ea8a4193ba8a315d62627e59c2a91124c2472e"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-18-owned-post-withdrawn-state-and-chat-caregiver.json",
+        "bytes": 500,
+        "sha256": "69f672d9d9a8cf12159e9fc7df6982e4a93120e32527ed999eb2d85f77644f04"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-19-owned-none-native-send-guard-caregiver.json",
+        "bytes": 296,
+        "sha256": "8e40c0b30d29607ac3e0f4ae69c1f4823645cb1a118ac4cc6b6bb13c5b0342c1"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-20-owned-none-chat-restriction-only-caregiver.png",
+        "bytes": 12526,
+        "sha256": "72b1ab906aabc2e6afaceeef62844538a8387b2b49d8998bbf7748a519b5acfe"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-21-owned-state-render-none-caregiver.json",
+        "bytes": 291,
+        "sha256": "8b93e8358e04d80a586c4285d8ccd32de9dc9a8b7db1896b39fe74752fe1698b"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-22-owned-none-match-request-control-only-caregiver.png",
+        "bytes": 9093,
+        "sha256": "a8d8216c878afd6096cbfc6283efdd3736d60ef10b27281084f0cdba398e0f83"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-23-owned-post-rejected-state-and-chat-caregiver.json",
+        "bytes": 499,
+        "sha256": "b3492c813f72aaf8b5bf31ca2ce5b81ccc73a90804b66575deaa1e86647aef2e"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-24-owned-none-native-send-guard-caregiver.json",
+        "bytes": 296,
+        "sha256": "8e40c0b30d29607ac3e0f4ae69c1f4823645cb1a118ac4cc6b6bb13c5b0342c1"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-25-owned-none-chat-restriction-only-caregiver.png",
+        "bytes": 16582,
+        "sha256": "63f16de276cf94f08e4785734d48c69a9f735aaa6adb14909c9e3d8c11c601d0"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-26-owned-state-render-none-caregiver.json",
+        "bytes": 291,
+        "sha256": "8b93e8358e04d80a586c4285d8ccd32de9dc9a8b7db1896b39fe74752fe1698b"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-27-owned-none-match-request-control-only-caregiver.png",
+        "bytes": 9093,
+        "sha256": "a8d8216c878afd6096cbfc6283efdd3736d60ef10b27281084f0cdba398e0f83"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-28-full-first-line-introduction-modal-caregiver.json",
+        "bytes": 595,
+        "sha256": "70a70b2b7a964cef34f0bd94747852afa695c590820a79530dfc88c6111b5cb2"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-29-full-introduction-close-control-only.png",
+        "bytes": 1649,
+        "sha256": "8277ffeb6494701e8e2b224399ca32b45f04986a3e3b0c31373071ff93028875"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-30-long-first-line-preview-raster-review-caregiver.png",
+        "bytes": 16067,
+        "sha256": "c3c0c8b8e6a524842e135035c0771bbb3f7bb4393294910180df60a6d85b6876"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-31-optional-empty-request-cancel-caregiver.json",
+        "bytes": 224,
+        "sha256": "51d83b0b1d289cc06d4745ef4956f3089f163e6bf0c5a350f27a382567e65bb4"
+      },
+      {
+        "path": "Artifacts/small-caregiver-phase2-32-managed-request-question-only.png",
+        "bytes": 27680,
+        "sha256": "43fc1b54f95907c2ddf4e4a954ecf46d8fad4b7f8dcd2d4375b693a26374c4b7"
+      }
+    ],
+    "sourceIndexSHA256": "a5b70165abce8a4801777c4c2d16a69981c9cae6f7797a0c669f99610b67105c",
+    "artifactHashNote": "Public JSON/text are sanitized; artifactInventory hashes apply to packaged bytes. Original indexed hashes, where present, refer to preserved original evidence."
+  }
+}

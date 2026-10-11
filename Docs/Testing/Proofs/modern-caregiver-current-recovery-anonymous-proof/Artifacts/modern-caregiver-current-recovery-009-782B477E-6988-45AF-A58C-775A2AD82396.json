@@ -1,0 +1,11 @@
+{
+  "actualPOSTProgressObserved": true,
+  "backendFirstMessageOccurrencesBothOwnedPerspectives": 1,
+  "continuedTypingSent": false,
+  "disabledSendDuringPreflightObserved": true,
+  "exactContinuedTypingRetained": true,
+  "injectedNativeTransportDelaySeconds": 6,
+  "nativeMessagePOSTs": 1,
+  "rapidCardsConfirmSortCoverageClaimed": false,
+  "role": "caregiver"
+}

@@ -1,0 +1,10 @@
+{
+  "directNegativeBackendPOSTPerformed": false,
+  "exactDraftPreserved": true,
+  "managedCurrentMatchesRestrictionObserved": true,
+  "nativeChatSendPOSTs": 0,
+  "nativeCurrentMetadataGETObserved": true,
+  "publicState": "none",
+  "role": "caregiver",
+  "syntheticDraftAbsentFromBackend": true
+}

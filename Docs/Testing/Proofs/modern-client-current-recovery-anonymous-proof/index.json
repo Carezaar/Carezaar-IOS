@@ -1,0 +1,573 @@
+{
+  "source": "fresh-modern-client-current-recovery-location-notification.xcresult",
+  "wholeProcessExit": 0,
+  "allocation": "Modern client",
+  "nativeMethodsPassed": 13,
+  "rootReviewedCroppedPNGs": 30,
+  "publishedCroppedPNGs": 28,
+  "excludedBlankCoordinateReviewCrops": [
+    "BD9818C3-76D6-4971-BC31-4C05D7E1B51E.png",
+    "F657C511-F408-4AD6-8332-9D43167C5333.png"
+  ],
+  "coordinateReviewSupportedByNativeAssertionsNotTheseBlankRasters": true,
+  "replyTimingEvidenceLimitation": "Old helper Date<10 before later AX predicates; final elapsed10.031769990921021 differs fromtrue bool. Corrected strict timing runtime pending.",
+  "locationScope": "controlledDebug provider; no physicalGPS/OSpermission",
+  "notificationScope": "actual owned HTTP200 row targetmetadata removed; not actual deletedserver person",
+  "physicalCamera": "untested userdeferred",
+  "nativePassSeconds": {
+    "offline": 100.284,
+    "reply": 177.785,
+    "slow": 61.482,
+    "cached": 21.516,
+    "invalid": 84.349,
+    "manualLate": 29.298,
+    "noFix": 65.957,
+    "stale": 21.934,
+    "failedPreflight": 210.195,
+    "otherSession": 37.584,
+    "lostAck": 36.442,
+    "missingChat": 23.245,
+    "missingPerson": 23.233
+  },
+  "artifacts": [
+    {
+      "path": "Artifacts/modern-client-current-recovery-001-8555B872-54E3-45B3-83DE-C1D242D0B7B3.json",
+      "description": "owned-offline-preflight-retry-client_0_9A02139F-880D-424F-8371-5E5522F36530.json",
+      "sha256": "a678592cd1ca02aeb402cf84e019c8ac94182580b39748249d3badbd7e693128"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-002-920DB4E4-5D60-460E-B127-535AAC6FC742.png",
+      "description": "owned-offline-retry-synthetic-bubble-only-client_0_1EB33BAD-2A38-4884-9A36-A56B7230CEF1.png",
+      "sha256": "7b9aacf9deaef059fdbe78db4976111978306b1b4d3abb38a5d94cd29a3fe3e3"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-003-C39AA096-7578-4E97-ACC5-8DF26540CA65.png",
+      "description": "owned-offline-managed-network-error-only-client_0_999CE9C0-8A4D-43FC-BE60-94D6EECD0DE0.png",
+      "sha256": "f5b9c44ee2795bf6189c2a481c0fbe8ec29926215123fb389b44c169de511881"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-004-44C6252E-EC81-49DE-959F-2940689ABA07.json",
+      "description": "owned-reply-race-acknowledged-client_0_68C3BF3A-E258-4CBD-9610-FF3FC02C58D1.json",
+      "sha256": "b24ae2ab59e89287f37401a0661e53e315a5bda17f446ea5372809e6e1090699"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-005-2468BE51-5253-4840-9152-C993FBA9C2B6.png",
+      "description": "owned-reply-race-synthetic-acknowledged-message-only-client_0_18A5738D-C77F-4DF2-8F84-8EDDD225D085.png",
+      "sha256": "1eabb1c98cf00b65310784b07eea5463ce47caef224812ec180ca563af6add34"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-006-920A85C1-2777-4AC7-BFEA-A24B49C56EA4.json",
+      "description": "owned-reply-race-timing-client_0_0C210D37-B8B2-499B-A42B-88A15DF6460B.json",
+      "sha256": "8ced7ec9a7c320e21a4043a376b02945ea193d0d4ecad9077e838e8cc4e0c4a5"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-007-FCB2C06A-0E46-4AC5-AAF0-A432EF91A87E.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_E03B126C-0227-42F3-84A6-81E40965510E.json",
+      "sha256": "b01052ecd3d7a0b87ff4d3c16721552c9d473a0010877f03fcbb78b37e568d8b"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-008-56D26AB1-E8CD-4646-8445-E3C03FAC5D71.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_D60B7099-D544-4245-A6CD-568F499340FD.json",
+      "sha256": "5603e9a053a8809555380f43f578850e087fa3ca2df380fc7702338c64da7926"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-009-D0DBACFD-CD2C-42A6-8FB5-932B85013121.json",
+      "description": "owned-slow-send-new-typing-client_0_C7954606-15C6-4DE7-8795-AE598FD9DEE1.json",
+      "sha256": "5f5cc60ec4509e84bf66307890c6423767f3c9c28c613c242c64bc12f115992a"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-010-D34BFBC4-82D2-401C-B28B-FDEF63CDA7BB.png",
+      "description": "owned-slow-send-retained-synthetic-draft-only-client_0_CF95E79A-AE2E-4CCD-8569-4D5634FB4D16.png",
+      "sha256": "02e6ddabd9497e611900c764c9da1046d3846cde5ec3a4541400c7cf78d00f73"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-011-A152BE9B-982F-4299-A491-39659303BE0D.png",
+      "description": "owned-slow-send-first-synthetic-bubble-only-client_0_79D2F5DF-1C4F-4840-BA5E-A10F2F830491.png",
+      "sha256": "b8e697b0e11a6b6dafc30671d0db571b538b5d22e557e7bae5715fa7b501f814"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-012-101A05AD-88B9-41B4-B546-02A8FCED8808.json",
+      "description": "P03-021-controlled-cached-native_0_27C5994B-B623-459F-B68C-2373628AF965.json",
+      "sha256": "51bfaef80f20efb6b8cfba85f59889e3c1b8160124cc63cec76befec49161719"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-013-285A25BD-C0FB-4428-BE24-822D8428D78E.png",
+      "description": "P03-021-controlled-cached-coordinate-only_0_A4214386-BCC4-4238-A032-8EEF377790E4.png",
+      "sha256": "87bf0fb66143904c0facb4ee45801c40213629e73aca78ed145f53912a2b2c41"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-014-93C563AC-D903-4408-83CC-95C23C929C92.json",
+      "description": "controlled-location-opening-available-native_0_E2E1A593-C18B-47C4-B5C1-E2F1042560F5.json",
+      "sha256": "0d14b6b315ab7cd0c4c3149592cd8590463ec9bffbd2ac7db9e82d958bdaae82"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-015-FBA333A6-5E56-43B0-8F63-3FFA87A6F025.json",
+      "description": "P03-025-controlled-future-native_0_1C6C834E-04E1-460E-8A11-E2CFE658B3E3.json",
+      "sha256": "765cbf7ce1ceee88cb134262044f7807d7d1f2eaaa6e17aa704e48aeb3c6a7dd"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-016-53A7E7CE-EC92-4C61-B93F-1C073319412A.png",
+      "description": "controlled-location-empty-review-value-only_0_BB314678-8323-4E3F-84C1-C5FC2FF6B8DA.png",
+      "sha256": "50f83868bdcb8eff850393413bdfc237f241b6fe8d7531c8e5904640e5264ca8"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-017-F36BD9F8-CF20-44BD-87B7-A28D6BDB3410.json",
+      "description": "controlled-location-opening-future-native_0_E33C22B7-D7A0-4803-B361-7E021BFBEBA3.json",
+      "sha256": "0d14b6b315ab7cd0c4c3149592cd8590463ec9bffbd2ac7db9e82d958bdaae82"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-018-755B86EB-BFF4-4FF9-81AA-7C1930693DD7.json",
+      "description": "P03-025-controlled-out-of-range-native_0_C1D26FE6-E143-45B0-B2A7-5E3B86FF0D22.json",
+      "sha256": "765cbf7ce1ceee88cb134262044f7807d7d1f2eaaa6e17aa704e48aeb3c6a7dd"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-019-C9A05F89-CAE0-4F99-9462-40D67BB7D5FF.png",
+      "description": "controlled-location-empty-review-value-only_0_38C7387A-0803-4E46-B44D-A1CA602977AF.png",
+      "sha256": "50f83868bdcb8eff850393413bdfc237f241b6fe8d7531c8e5904640e5264ca8"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-020-99C08BC1-DBFB-40D0-84EA-98B379DA0F2D.json",
+      "description": "controlled-location-opening-out-of-range-native_0_5635282B-D319-4155-AB20-69AEB124C735.json",
+      "sha256": "0d14b6b315ab7cd0c4c3149592cd8590463ec9bffbd2ac7db9e82d958bdaae82"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-021-31802D2A-A3B6-4149-887B-C0C2B3944D8C.json",
+      "description": "P03-025-controlled-negative-accuracy-native_0_85068573-4D1D-4C1D-8957-5BD4351C8454.json",
+      "sha256": "765cbf7ce1ceee88cb134262044f7807d7d1f2eaaa6e17aa704e48aeb3c6a7dd"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-022-DF68F582-8F76-4789-90AD-0A7225321E34.png",
+      "description": "controlled-location-empty-review-value-only_0_9247F30F-73CC-49E3-AA56-795B83AA5A86.png",
+      "sha256": "50f83868bdcb8eff850393413bdfc237f241b6fe8d7531c8e5904640e5264ca8"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-023-98A2C5F6-9CD4-4551-AE0C-813AEF1444D8.json",
+      "description": "controlled-location-opening-negative-accuracy-native_0_83AB424C-D2DC-40C2-B2C7-C239F77374E5.json",
+      "sha256": "0d14b6b315ab7cd0c4c3149592cd8590463ec9bffbd2ac7db9e82d958bdaae82"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-024-9924E51D-7913-4C09-AD75-1F54514B93CC.json",
+      "description": "P03-027-controlled-map-manual-late-native_0_98C9C5DF-C494-4146-A6F9-1475EF20CE26.json",
+      "sha256": "a41d3bb3e9f4f46e98a07b303b0e05a1eb5459665518d3a26a07822b1e2cc80c"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-025-1AFCD3BC-37FB-4B5D-B36E-DD4EB5A2993E.png",
+      "description": "P03-027-controlled-manual-coordinate-row-only_0_1F86476B-BE1B-4E72-8F0B-235D9A79FBD9.png",
+      "sha256": "632746306c74aa311e34f047c740533a99f3f098208d06d49cd72f00feceaac3"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-026-EFB2168E-E930-4747-BB0D-83A4AA9ABC0C.png",
+      "description": "P03-027-controlled-late-fix-manual-confirm-only_0_E86DA678-D197-4584-BACB-A2BA3116330C.png",
+      "sha256": "8459ee7e5170e37930a76e271efab1060320fd142484f14c2c11ee31a9ffc99a"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-027-4DC6E286-091B-4271-B7AD-1FEB844BE17D.json",
+      "description": "controlled-location-opening-late-valid-native_0_D35B2353-836C-4FE0-94DE-C7F8F1C77CFA.json",
+      "sha256": "0d14b6b315ab7cd0c4c3149592cd8590463ec9bffbd2ac7db9e82d958bdaae82"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-028-D9EA91C6-34B7-469B-A71A-4899C88B9F98.json",
+      "description": "P03-023-024-026-controlled-no-fix-native_0_52C91EDB-BE5A-4808-B681-13191E6696E3.json",
+      "sha256": "d57fabe497db9cdaf3ee7215742ad17abc675a097f7250ea9a444a962ca079e7"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-029-BA404BF2-9EBD-4008-A49B-FE191BFEEFCB.png",
+      "description": "P03-024-controlled-ordinary-map-reason-reset-only_0_5F76A5A6-5327-4733-A51B-6BC2C89D1639.png",
+      "sha256": "50b3805879176b5056b87c7641cd0eb1f542272e4bc6c386810bdac225a1a8dd"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-030-62BCC09A-AD49-4349-8906-0256695D3558.png",
+      "description": "controlled-location-empty-review-value-only_0_4E3309AD-323A-4192-ACEC-67B64764A2C3.png",
+      "sha256": "50f83868bdcb8eff850393413bdfc237f241b6fe8d7531c8e5904640e5264ca8"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-031-8C8153B7-F38C-465F-9029-89C93EC2D897.png",
+      "description": "P03-024-controlled-no-fix-save-guidance-only_0_A68CD96A-B238-42EB-B41A-03E12EDCEE56.png",
+      "sha256": "7c21a660cce61cec60255b22d3b3e14da62dd8da91c61a39faefc80e44f58a95"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-032-0875203F-1D55-4C31-8A36-43B82C15BE1A.png",
+      "description": "controlled-location-empty-review-value-only_0_08BA23B3-DF1E-4B87-87A8-FF5DA3E8C948.png",
+      "sha256": "50f83868bdcb8eff850393413bdfc237f241b6fe8d7531c8e5904640e5264ca8"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-033-C68BA6DB-D688-4D9E-A995-0749DC69D2D5.png",
+      "description": "P03-026-controlled-unselected-map-continue-only_0_176C926F-804C-488B-9EFD-63E7B35CC2B8.png",
+      "sha256": "2c832af045504060ef35dd260c1fd4267b651ce1b36bf9b23f28b18de8e31ab1"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-034-7E07BBE2-F84C-4E53-AB32-FAB14583727F.json",
+      "description": "controlled-location-opening-none-native_0_12D12239-E679-4CDE-ADD4-46F2C4A2BC5A.json",
+      "sha256": "0d14b6b315ab7cd0c4c3149592cd8590463ec9bffbd2ac7db9e82d958bdaae82"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-035-CBC43B28-E9E1-4072-820B-F2953A4C559E.json",
+      "description": "P03-022-controlled-stale-native_0_2A2C2001-24D0-4D47-B51B-9E02EBF82967.json",
+      "sha256": "bb10a9acfcfbc04bfd762c8a0583e949866718b14c8bb7f60441467bc7737a8c"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-036-A4F83533-CC3E-4798-B7EF-60FE0301A8F5.png",
+      "description": "P03-022-controlled-map-last-known-only_0_AD0E74DE-FC1C-4B12-8892-67C6D95E3B9A.png",
+      "sha256": "a1e1d64de4028cdffff19cb8e62f676ffec1eaf858e4b2c565e1b905a19be65c"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-037-8DF20B1A-0F4B-451F-A51D-6052544523D7.png",
+      "description": "P03-022-controlled-wizard-last-known-only_0_263D9517-44AD-430E-93B1-1F5179685714.png",
+      "sha256": "4fe8676efb7add0b234e1922252dcc8daf79cfc1d98fa70d2b631fff61f4ff5f"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-038-B923654A-0258-494F-A979-35E7DFD525B7.json",
+      "description": "controlled-location-opening-stale-native_0_43CA8F93-19AF-46C3-B9A9-73A16D877BAF.json",
+      "sha256": "0d14b6b315ab7cd0c4c3149592cd8590463ec9bffbd2ac7db9e82d958bdaae82"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-039-C681917B-5161-491B-8332-C64E1020E92E.json",
+      "description": "P23-018-native-read-only-recovery_0_2C2F485C-9788-4C42-85F7-3E7990DC436D.json",
+      "sha256": "30175396563bd992c3d0141895e5534fd495c90aff566a81ad523896607bab46"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-040-12B0DCF2-B897-476C-B0D5-9B6A771BF4F3.png",
+      "description": "P23-018-managed-retry-control_0_B767AEB7-749C-48B8-ACA3-85A54BFCE08E.png",
+      "sha256": "2e6175d5097693c07eeade837de22271b09d76fcafebe2a0300307cc22a4d297"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-041-58FC5CEB-8959-44DE-8CD2-4A0B333FDAD4.json",
+      "description": "P23-017-real-owned-other-session-action-change_0_0015FD6C-61B8-489E-A05F-2237213ACBB5.json",
+      "sha256": "d63751a8e5798ae7237af4c000bfbc72bc06c016fe1cf5aa102e38ca879fbc76"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-042-5654CF21-F398-4AE6-89B8-BBB59D83EC45.png",
+      "description": "P23-017-other-session-match-reject-only_0_D6762038-52D0-4C94-B853-5CCCEB4A2AA7.png",
+      "sha256": "15f063f7d6011eae380a20f23b42a827a6f515da9e6cba19fab06008c6bfff8d"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-043-5388D8B1-FDC3-42CA-8B7C-9F24098E08DB.png",
+      "description": "P23-017-other-session-match-accept-only_0_28E5A1A7-80AB-4684-99EC-BB4ADF3CBCEB.png",
+      "sha256": "5f7248fb9b1daa905305231d5bceca6929f42e3b1bbda27106993d1a293efdda"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-044-C81542C0-B643-4EF5-AF9B-41D08F25087F.png",
+      "description": "P23-017-other-session-standard-changed-control_0_1A7EE14B-94D4-4E6C-83C0-7BA6AFF26404.png",
+      "sha256": "9bb64410911f46fa2d83b8f988033b87c900b1cc3c3e13482d592016c85836f8"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-045-7C4D7440-B64E-4B9C-ACD1-C856F9402DF3.json",
+      "description": "P23-017-real-owned-request-lost-ack-reconciliation_0_8FCE8E33-2FA4-4DBD-BC24-D71CB4657F09.json",
+      "sha256": "0781c4a3e01278e646ee682e27737724cc82295baea58c58e1031ad6c039c401"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-046-5731552F-E1F9-4CCA-97B4-A6A64F81F356.png",
+      "description": "P23-017-lost-ack-sent-withdraw-control_0_8C916B79-9D9A-4621-8F61-D1041CF75236.png",
+      "sha256": "73da20779b6bc6843975aa2981e4d18950f18d749ab330c91becf3441ed2326a"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-047-46323680-42FF-49E7-960C-542B72068B87.png",
+      "description": "P23-017-lost-ack-managed-changed-control_0_4BF0D31E-C845-4767-A0DC-9A9B891AE125.png",
+      "sha256": "9bb64410911f46fa2d83b8f988033b87c900b1cc3c3e13482d592016c85836f8"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-048-BF2C1C5C-94AC-4A1C-BD76-E65CC220E79D.json",
+      "description": "owned-notification-missing-chat-native-fallback_0_00E31318-23B3-41CB-9F16-8B3A38843EE3.json",
+      "sha256": "bad11a5aba7c7625ab80c311ff608f9c9e98f4f0cbc6ab5e0dc60e3970138c9d"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-049-8A5F9643-FFF4-4964-B9FD-2CD9AC0001F3.png",
+      "description": "notification-missing-chat-show-only_0_BDF89FC3-602C-48F6-8CDD-8533483B58D7.png",
+      "sha256": "f6650cf1b73e7845e8d0335f6e677fb112ab8758f392fc349684c24528f399de"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-050-370704C8-3786-442C-BFB7-DB13611EB00B.png",
+      "description": "notification-missing-chat-cancel-only_0_C1E7A590-9999-4333-B32E-E4E562C1E86B.png",
+      "sha256": "7e29fa03d76cb48d5bfd71195da513c3d0ae15cd4b6f2970384d66329938f0c0"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-051-A1171572-4C10-4EEF-8599-36713BA4DEE9.json",
+      "description": "owned-notification-missing-person-native-fallback_0_12AFE18E-9D23-44ED-8629-8832B6A2FFB7.json",
+      "sha256": "a9f8749b758b2816c7d1f8f1b6fc5952bfc34348a77e76a12fcbdfdc4fa3ca40"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-052-CB07E6B5-25CD-4830-88D5-9C9A5016A664.png",
+      "description": "notification-missing-person-show-only_0_464F1503-FF41-43B1-B227-DC6BCFEDB74C.png",
+      "sha256": "0e70cffeb851fea1bafd2fb2a43cc5ad97ff4df626fe09860d388afbaa26477c"
+    },
+    {
+      "path": "Artifacts/modern-client-current-recovery-053-AD459B71-C5C9-43D0-9BFE-D8D6C4D9460B.png",
+      "description": "notification-missing-person-cancel-only_0_A667132E-940C-40F8-B3D4-9D1D2BAF444B.png",
+      "sha256": "fbcd23e891f9d2d3518d73b1262e1391ce5463f89ce14ac1257982b9279f6388"
+    }
+  ],
+  "publicPackage": {
+    "status": "REVIEWABLE — not staged or delivered",
+    "originalEvidenceRetainedLocally": true,
+    "rawLogsAndXCResultsIncluded": false,
+    "artifactInventory": [
+      {
+        "path": "Artifacts/modern-client-current-recovery-001-8555B872-54E3-45B3-83DE-C1D242D0B7B3.json",
+        "bytes": 392,
+        "sha256": "d25a441ad2908d407b882a03dde21234e36af88131b661eb5fec1327a4b4aefa"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-002-920DB4E4-5D60-460E-B127-535AAC6FC742.png",
+        "bytes": 20757,
+        "sha256": "7b9aacf9deaef059fdbe78db4976111978306b1b4d3abb38a5d94cd29a3fe3e3"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-003-C39AA096-7578-4E97-ACC5-8DF26540CA65.png",
+        "bytes": 23893,
+        "sha256": "f5b9c44ee2795bf6189c2a481c0fbe8ec29926215123fb389b44c169de511881"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-004-44C6252E-EC81-49DE-959F-2940689ABA07.json",
+        "bytes": 365,
+        "sha256": "1095456479b3a6b561f6aaf671816584f39883cbe94478bb9d3d576877f470a4"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-005-2468BE51-5253-4840-9152-C993FBA9C2B6.png",
+        "bytes": 23343,
+        "sha256": "1eabb1c98cf00b65310784b07eea5463ce47caef224812ec180ca563af6add34"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-006-920A85C1-2777-4AC7-BFEA-A24B49C56EA4.json",
+        "bytes": 267,
+        "sha256": "d78e0550857cbe64ca741fc8f0dd9298d9f4302bb19daedba33d36800418485a"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-007-FCB2C06A-0E46-4AC5-AAF0-A432EF91A87E.json",
+        "bytes": 671,
+        "sha256": "9c947a0ef8ed3eb27194f1bf9c47bb4da3f026b31112feb25b95667b6538316c"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-008-56D26AB1-E8CD-4646-8445-E3C03FAC5D71.json",
+        "bytes": 683,
+        "sha256": "542ef1823267e93c5f7d3de4d694c7698a4e9daabe63272c4e3eb685037fc7ed"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-009-D0DBACFD-CD2C-42A6-8FB5-932B85013121.json",
+        "bytes": 360,
+        "sha256": "47fe92d75244cfb6f9b4628d1f4f3a33d6e3340820901c2a88bf211c8aa26744"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-010-D34BFBC4-82D2-401C-B28B-FDEF63CDA7BB.png",
+        "bytes": 7878,
+        "sha256": "02e6ddabd9497e611900c764c9da1046d3846cde5ec3a4541400c7cf78d00f73"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-011-A152BE9B-982F-4299-A491-39659303BE0D.png",
+        "bytes": 22223,
+        "sha256": "b8e697b0e11a6b6dafc30671d0db571b538b5d22e557e7bae5715fa7b501f814"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-012-101A05AD-88B9-41B4-B546-02A8FCED8808.json",
+        "bytes": 305,
+        "sha256": "84669c8bda986576c314ab36d5f43ad661f4312ca2f839f07792141a7b48c9f3"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-013-285A25BD-C0FB-4428-BE24-822D8428D78E.png",
+        "bytes": 44502,
+        "sha256": "87bf0fb66143904c0facb4ee45801c40213629e73aca78ed145f53912a2b2c41"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-014-93C563AC-D903-4408-83CC-95C23C929C92.json",
+        "bytes": 322,
+        "sha256": "9c959596dc3fe5dfaafc127d32396eaf560915c512c6c7f7912335ff81644ef8"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-015-FBA333A6-5E56-43B0-8F63-3FFA87A6F025.json",
+        "bytes": 330,
+        "sha256": "d58ba40431b34559cbcb18986600d0b10fe7a73f88682640472f74290d334db2"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-016-53A7E7CE-EC92-4C61-B93F-1C073319412A.png",
+        "bytes": 1050,
+        "sha256": "50f83868bdcb8eff850393413bdfc237f241b6fe8d7531c8e5904640e5264ca8"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-017-F36BD9F8-CF20-44BD-87B7-A28D6BDB3410.json",
+        "bytes": 322,
+        "sha256": "9c959596dc3fe5dfaafc127d32396eaf560915c512c6c7f7912335ff81644ef8"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-018-755B86EB-BFF4-4FF9-81AA-7C1930693DD7.json",
+        "bytes": 330,
+        "sha256": "d58ba40431b34559cbcb18986600d0b10fe7a73f88682640472f74290d334db2"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-019-C9A05F89-CAE0-4F99-9462-40D67BB7D5FF.png",
+        "bytes": 1050,
+        "sha256": "50f83868bdcb8eff850393413bdfc237f241b6fe8d7531c8e5904640e5264ca8"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-020-99C08BC1-DBFB-40D0-84EA-98B379DA0F2D.json",
+        "bytes": 322,
+        "sha256": "9c959596dc3fe5dfaafc127d32396eaf560915c512c6c7f7912335ff81644ef8"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-021-31802D2A-A3B6-4149-887B-C0C2B3944D8C.json",
+        "bytes": 330,
+        "sha256": "d58ba40431b34559cbcb18986600d0b10fe7a73f88682640472f74290d334db2"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-022-DF68F582-8F76-4789-90AD-0A7225321E34.png",
+        "bytes": 1050,
+        "sha256": "50f83868bdcb8eff850393413bdfc237f241b6fe8d7531c8e5904640e5264ca8"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-023-98A2C5F6-9CD4-4551-AE0C-813AEF1444D8.json",
+        "bytes": 322,
+        "sha256": "9c959596dc3fe5dfaafc127d32396eaf560915c512c6c7f7912335ff81644ef8"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-024-9924E51D-7913-4C09-AD75-1F54514B93CC.json",
+        "bytes": 413,
+        "sha256": "e6a5874abaf18afc14734d2048ff4f60ab1bb52d1ea9122089cefc6fb960d83e"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-025-1AFCD3BC-37FB-4B5D-B36E-DD4EB5A2993E.png",
+        "bytes": 43398,
+        "sha256": "632746306c74aa311e34f047c740533a99f3f098208d06d49cd72f00feceaac3"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-026-EFB2168E-E930-4747-BB0D-83A4AA9ABC0C.png",
+        "bytes": 8938,
+        "sha256": "8459ee7e5170e37930a76e271efab1060320fd142484f14c2c11ee31a9ffc99a"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-027-4DC6E286-091B-4271-B7AD-1FEB844BE17D.json",
+        "bytes": 322,
+        "sha256": "9c959596dc3fe5dfaafc127d32396eaf560915c512c6c7f7912335ff81644ef8"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-028-D9EA91C6-34B7-469B-A71A-4899C88B9F98.json",
+        "bytes": 579,
+        "sha256": "46278f59c44385b146a1231e319d0bfc9acb65efa0e6172af02abf84249dd2b5"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-029-BA404BF2-9EBD-4008-A49B-FE191BFEEFCB.png",
+        "bytes": 10298,
+        "sha256": "50b3805879176b5056b87c7641cd0eb1f542272e4bc6c386810bdac225a1a8dd"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-030-62BCC09A-AD49-4349-8906-0256695D3558.png",
+        "bytes": 1050,
+        "sha256": "50f83868bdcb8eff850393413bdfc237f241b6fe8d7531c8e5904640e5264ca8"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-031-8C8153B7-F38C-465F-9029-89C93EC2D897.png",
+        "bytes": 14243,
+        "sha256": "7c21a660cce61cec60255b22d3b3e14da62dd8da91c61a39faefc80e44f58a95"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-032-0875203F-1D55-4C31-8A36-43B82C15BE1A.png",
+        "bytes": 1050,
+        "sha256": "50f83868bdcb8eff850393413bdfc237f241b6fe8d7531c8e5904640e5264ca8"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-033-C68BA6DB-D688-4D9E-A995-0749DC69D2D5.png",
+        "bytes": 9750,
+        "sha256": "2c832af045504060ef35dd260c1fd4267b651ce1b36bf9b23f28b18de8e31ab1"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-034-7E07BBE2-F84C-4E53-AB32-FAB14583727F.json",
+        "bytes": 322,
+        "sha256": "9c959596dc3fe5dfaafc127d32396eaf560915c512c6c7f7912335ff81644ef8"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-035-CBC43B28-E9E1-4072-820B-F2953A4C559E.json",
+        "bytes": 274,
+        "sha256": "cdfc872fdbc6888791ed24a5cf860fb6f4c08f71838fd3eb401be6261e665e31"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-036-A4F83533-CC3E-4798-B7EF-60FE0301A8F5.png",
+        "bytes": 5673,
+        "sha256": "a1e1d64de4028cdffff19cb8e62f676ffec1eaf858e4b2c565e1b905a19be65c"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-037-8DF20B1A-0F4B-451F-A51D-6052544523D7.png",
+        "bytes": 5401,
+        "sha256": "4fe8676efb7add0b234e1922252dcc8daf79cfc1d98fa70d2b631fff61f4ff5f"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-038-B923654A-0258-494F-A979-35E7DFD525B7.json",
+        "bytes": 322,
+        "sha256": "9c959596dc3fe5dfaafc127d32396eaf560915c512c6c7f7912335ff81644ef8"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-039-C681917B-5161-491B-8332-C64E1020E92E.json",
+        "bytes": 373,
+        "sha256": "ebbd91aedb02894849c6aa8db962f89a3d09d53696a310400ba4095db6f11169"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-040-12B0DCF2-B897-476C-B0D5-9B6A771BF4F3.png",
+        "bytes": 10276,
+        "sha256": "2e6175d5097693c07eeade837de22271b09d76fcafebe2a0300307cc22a4d297"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-041-58FC5CEB-8959-44DE-8CD2-4A0B333FDAD4.json",
+        "bytes": 541,
+        "sha256": "5ca9040ec53f50ac4b8a8eddc53d48c486ed9614d81d67e981b53ad41703abd5"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-042-5654CF21-F398-4AE6-89B8-BBB59D83EC45.png",
+        "bytes": 10862,
+        "sha256": "15f063f7d6011eae380a20f23b42a827a6f515da9e6cba19fab06008c6bfff8d"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-043-5388D8B1-FDC3-42CA-8B7C-9F24098E08DB.png",
+        "bytes": 9566,
+        "sha256": "5f7248fb9b1daa905305231d5bceca6929f42e3b1bbda27106993d1a293efdda"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-044-C81542C0-B643-4EF5-AF9B-41D08F25087F.png",
+        "bytes": 6920,
+        "sha256": "9bb64410911f46fa2d83b8f988033b87c900b1cc3c3e13482d592016c85836f8"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-045-7C4D7440-B64E-4B9C-ACD1-C856F9402DF3.json",
+        "bytes": 524,
+        "sha256": "9d9c94a4b4fe1e61285bdfc16ffd99395c477f8140c46cdef138aacc784c4ba2"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-046-5731552F-E1F9-4CCA-97B4-A6A64F81F356.png",
+        "bytes": 15156,
+        "sha256": "73da20779b6bc6843975aa2981e4d18950f18d749ab330c91becf3441ed2326a"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-047-46323680-42FF-49E7-960C-542B72068B87.png",
+        "bytes": 6920,
+        "sha256": "9bb64410911f46fa2d83b8f988033b87c900b1cc3c3e13482d592016c85836f8"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-048-BF2C1C5C-94AC-4A1C-BD76-E65CC220E79D.json",
+        "bytes": 308,
+        "sha256": "f6e0ef97c36dde881a6725a1340ebaadcf5df0b8834da410366b17917b87e60c"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-049-8A5F9643-FFF4-4964-B9FD-2CD9AC0001F3.png",
+        "bytes": 9591,
+        "sha256": "f6650cf1b73e7845e8d0335f6e677fb112ab8758f392fc349684c24528f399de"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-050-370704C8-3786-442C-BFB7-DB13611EB00B.png",
+        "bytes": 5315,
+        "sha256": "7e29fa03d76cb48d5bfd71195da513c3d0ae15cd4b6f2970384d66329938f0c0"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-051-A1171572-4C10-4EEF-8599-36713BA4DEE9.json",
+        "bytes": 310,
+        "sha256": "4159c52047cf1e4d1526f31358fdfc9281fcdd0e0ef136b93f3ee8997abecf45"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-052-CB07E6B5-25CD-4830-88D5-9C9A5016A664.png",
+        "bytes": 9592,
+        "sha256": "0e70cffeb851fea1bafd2fb2a43cc5ad97ff4df626fe09860d388afbaa26477c"
+      },
+      {
+        "path": "Artifacts/modern-client-current-recovery-053-AD459B71-C5C9-43D0-9BFE-D8D6C4D9460B.png",
+        "bytes": 5537,
+        "sha256": "fbcd23e891f9d2d3518d73b1262e1391ce5463f89ce14ac1257982b9279f6388"
+      }
+    ],
+    "sourceIndexSHA256": "6dad4976cfa8789b9d717b6f60dcb1493f33bad458f8a78c3f0fddeb4e2ba5a3",
+    "artifactHashNote": "Public JSON/text are sanitized; artifactInventory hashes apply to packaged bytes. Original indexed hashes, where present, refer to preserved original evidence."
+  }
+}

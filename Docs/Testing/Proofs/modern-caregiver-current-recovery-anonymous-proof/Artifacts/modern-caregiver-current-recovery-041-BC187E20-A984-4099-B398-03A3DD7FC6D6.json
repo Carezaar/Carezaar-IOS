@@ -1,0 +1,15 @@
+{
+  "actualNativeProfileReadsBeforeRevisit": 2,
+  "backendReceivedSentSameMarkedOwnedEdge": true,
+  "caseID": "P23-017",
+  "changeOccurredBeforeNativeConfirmPreflight": true,
+  "concurrentPendingPreflightClaimed": false,
+  "managedChangedFeedbackObserved": true,
+  "nativeReceivedActionSetObserved": true,
+  "nativeRelationshipWrites": 0,
+  "nativeRequestPOSTs": 0,
+  "otherSessionChangedWhileNativeDialogOpen": true,
+  "revisitMutationRequests": 0,
+  "scenarioLostAcknowledgement": false,
+  "scenarioOtherSessionRelationshipChange": true
+}

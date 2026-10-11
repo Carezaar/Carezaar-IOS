@@ -1,0 +1,11 @@
+{
+  "actualHTTP200ScopedTargetRemoval": true,
+  "cancelStayedOnNotifications": true,
+  "destinationGETs": 0,
+  "exactOwnedPreflight": true,
+  "existingFirstPageNotification": true,
+  "kind": "chat",
+  "physicalNetworkOrDeletedBackendPerson": false,
+  "role": "client",
+  "showDismissedMissingTarget": true
+}

@@ -1,0 +1,73 @@
+{
+  "actualBottomTabFrames": [
+    {
+      "height": 168,
+      "width": 125,
+      "x": 250,
+      "y": 468.5
+    },
+    {
+      "height": 107,
+      "width": 125,
+      "x": 125,
+      "y": 499
+    },
+    {
+      "height": 229,
+      "width": 125,
+      "x": 0,
+      "y": 438
+    }
+  ],
+  "boundedNativeBothDirectionReveal": true,
+  "contentViewport": {
+    "height": 300.5,
+    "width": 375,
+    "x": 0,
+    "y": 137.5
+  },
+  "controlIdentifier": "profile_change_language_title",
+  "exists": true,
+  "expectedAXLabelPrefix": "تغيير اللغة",
+  "isHittable": true,
+  "languageCode": "ar",
+  "observedAXLabel": "تغيير اللغة, اختر لغتك المفضلة",
+  "revealDirections": [
+    {
+      "afterExists": true,
+      "afterRowFrame": {
+        "height": 215,
+        "width": 335,
+        "x": 20,
+        "y": 363
+      },
+      "beforeExists": true,
+      "beforeRowFrame": {
+        "height": 215,
+        "width": 335,
+        "x": 20,
+        "y": 2611
+      },
+      "boundExhausted": false,
+      "direction": "upward",
+      "gestureCount": 16,
+      "maximumGestures": 32,
+      "netRowMovementY": -2248,
+      "observedRowMovement": true,
+      "safeVisibleTapRegionFound": true
+    }
+  ],
+  "rowFrame": {
+    "height": 215,
+    "width": 335,
+    "x": 20,
+    "y": 363
+  },
+  "safeVisibleTapRegionFound": true,
+  "visibleTapRegion": {
+    "height": 67,
+    "width": 335,
+    "x": 20,
+    "y": 363
+  }
+}

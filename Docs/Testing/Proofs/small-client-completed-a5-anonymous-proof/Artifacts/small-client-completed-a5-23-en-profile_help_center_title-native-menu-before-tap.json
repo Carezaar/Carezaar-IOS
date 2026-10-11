@@ -1,0 +1,73 @@
+{
+  "actualBottomTabFrames": [
+    {
+      "height": 168,
+      "width": 125,
+      "x": 0,
+      "y": 499
+    },
+    {
+      "height": 168,
+      "width": 125,
+      "x": 125,
+      "y": 499
+    },
+    {
+      "height": 107,
+      "width": 125,
+      "x": 250,
+      "y": 529.5
+    }
+  ],
+  "boundedNativeBothDirectionReveal": true,
+  "contentViewport": {
+    "height": 361.5,
+    "width": 375,
+    "x": 0,
+    "y": 137.5
+  },
+  "controlIdentifier": "profile_help_center_title",
+  "exists": true,
+  "expectedAXLabelPrefix": "Help Center",
+  "isHittable": true,
+  "languageCode": "en",
+  "observedAXLabel": "Help Center, Get help and support",
+  "revealDirections": [
+    {
+      "afterExists": true,
+      "afterRowFrame": {
+        "height": 338.5,
+        "width": 335,
+        "x": 20,
+        "y": 427.5
+      },
+      "beforeExists": true,
+      "beforeRowFrame": {
+        "height": 338.5,
+        "width": 335,
+        "x": 20,
+        "y": 1280
+      },
+      "boundExhausted": false,
+      "direction": "upward",
+      "gestureCount": 5,
+      "maximumGestures": 32,
+      "netRowMovementY": -852.5,
+      "observedRowMovement": true,
+      "safeVisibleTapRegionFound": true
+    }
+  ],
+  "rowFrame": {
+    "height": 338.5,
+    "width": 335,
+    "x": 20,
+    "y": 427.5
+  },
+  "safeVisibleTapRegionFound": true,
+  "visibleTapRegion": {
+    "height": 63.5,
+    "width": 335,
+    "x": 20,
+    "y": 427.5
+  }
+}

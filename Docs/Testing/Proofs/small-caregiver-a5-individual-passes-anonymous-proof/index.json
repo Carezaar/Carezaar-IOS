@@ -1,0 +1,170 @@
+{
+  "role": "caregiver",
+  "device": "iPhone SE (3rd generation)",
+  "iOS": "26.5",
+  "actualOSContentSize": "accessibility-extra-extra-extra-large",
+  "invocation": "fresh-small-caregiver-a5-nine-screen-guards-chrome",
+  "wholeInvocationExit": 65,
+  "individualPasses": {
+    "englishDefaultToA5ChromeSeconds": 102.519,
+    "FrenchArabicChromeSeconds": 221.449,
+    "emptyPasswordGuardSeconds": 28.363,
+    "emptyDeleteGuardSeconds": 24.734
+  },
+  "nativeStrictAudit": {
+    "seconds": 144.164,
+    "allNineScreensCompleted": true,
+    "findings": 0,
+    "caseStatus": "FAIL: report-file write failed; root omitted private destination directory",
+    "cleanRerun": "fresh-small-caregiver-a5-completed-nine-screen-audit PASS143.790s whole0, nine screens/zero findings"
+  },
+  "rootReviewedControlCrops": 14,
+  "sourceScope": "current MainView/disabled styles; older pre-new-Debug-hooks binary",
+  "broaderAccessibilityCasesPromoted": false,
+  "artifacts": [
+    {
+      "name": "small-caregiver-a5-000-chrome-native-language-cleanup-result.txt",
+      "sha256": "be912a1106b420c2ec5f430f538812d453efb234908586791b8efe5594f5a1d3"
+    },
+    {
+      "name": "small-caregiver-a5-001-ar-profile_change_language_title-native-menu-before-tap.json",
+      "sha256": "cb61f7474a4f4761d371d5750a5805feae178d18b14a542f2c15603e721bbcdb"
+    },
+    {
+      "name": "small-caregiver-a5-002-ar-native-picker-before-tap-geometry.json",
+      "sha256": "4cfbd3b8e86819eb02f706f6c9488c676698b42b30b075426e46a196c96cc1d2"
+    },
+    {
+      "name": "small-caregiver-a5-003-ar-profile_change_language_title-native-menu-before-tap.json",
+      "sha256": "c911f04aae0fd5ad9369def3e7b19098e15fcc666932c559d44b6d11af951b00"
+    },
+    {
+      "name": "small-caregiver-a5-004-A5-ar-native-chrome-safe-controls.json",
+      "sha256": "572512135309440352753031dc8f196170a53aabb6a4f48c4323008676cea16e"
+    },
+    {
+      "name": "small-caregiver-a5-005-ar-profile_help_center_title-native-menu-before-tap.json",
+      "sha256": "dec68be75379b008b2ca0139fc5ca34ddbbf87d97b87bb8f17563bdeae1bf22b"
+    },
+    {
+      "name": "small-caregiver-a5-006-A5-ar-bottom_navigation_profile-caption.png",
+      "sha256": "82f0cb90263e184164a6f8b9cf51fe77491ebb4845dc944e91ddf71324a58d3f"
+    },
+    {
+      "name": "small-caregiver-a5-007-A5-ar-bottom_navigation_messages-caption.png",
+      "sha256": "7efa3f851571b742099aea5117e393fa8bdb644dc2e5eb1049961380c2c335b1"
+    },
+    {
+      "name": "small-caregiver-a5-008-A5-ar-bottom_navigation_matches-caption.png",
+      "sha256": "fdc09fe45b1b92e417a1a513f762efcfddd9195bdd0037d1cec723a2da3e755c"
+    },
+    {
+      "name": "small-caregiver-a5-009-A5-ar-brand.png",
+      "sha256": "f16cb2eb9c81159c54d94c3bb59942701b39e7cba27e218c5921934d32e70b01"
+    },
+    {
+      "name": "small-caregiver-a5-010-ar-native-picker-before-tap-geometry.json",
+      "sha256": "2aab2f1f09ce6836c4282267b38230d3b18e2dc665dc2201cdfd9afa7ab16126"
+    },
+    {
+      "name": "small-caregiver-a5-011-fr-profile_change_language_title-native-menu-before-tap.json",
+      "sha256": "501b9894441c8943cb07b4491c71212193b1d7cf4fcbbe2953a06689ef1f14b3"
+    },
+    {
+      "name": "small-caregiver-a5-012-A5-fr-native-chrome-safe-controls.json",
+      "sha256": "626229b0c76b9c22bd39b6c384c750ea0c6ad6b6bf4312851deac55975551777"
+    },
+    {
+      "name": "small-caregiver-a5-013-fr-profile_help_center_title-native-menu-before-tap.json",
+      "sha256": "2dc0911c6a28cd4ad37904c7c61584f505b99964c5604975a3a4062d263bb90b"
+    },
+    {
+      "name": "small-caregiver-a5-014-A5-fr-bottom_navigation_profile-caption.png",
+      "sha256": "a68b84a356c00a2f81ef939fa525cb22e4c51558e113e10f67a1b0db4debb9fd"
+    },
+    {
+      "name": "small-caregiver-a5-015-A5-fr-bottom_navigation_messages-caption.png",
+      "sha256": "d04ac68614a3b1590508acbcaef019e055e08e9d28b62fce5781ba96262e8d16"
+    },
+    {
+      "name": "small-caregiver-a5-016-A5-fr-bottom_navigation_matches-caption.png",
+      "sha256": "68f106f8e11a1d3f2ba0b60eab82cde36713aaea7d0e09af272cb91a388bf9f1"
+    },
+    {
+      "name": "small-caregiver-a5-017-A5-fr-brand.png",
+      "sha256": "f16cb2eb9c81159c54d94c3bb59942701b39e7cba27e218c5921934d32e70b01"
+    },
+    {
+      "name": "small-caregiver-a5-018-fr-native-picker-before-tap-geometry.json",
+      "sha256": "9f9ddee50b1fcabf4f8a822b7b7e961061acc459103b187bc6b9079a918eb611"
+    },
+    {
+      "name": "small-caregiver-a5-019-chrome-native-language-cleanup-result.txt",
+      "sha256": "be912a1106b420c2ec5f430f538812d453efb234908586791b8efe5594f5a1d3"
+    },
+    {
+      "name": "small-caregiver-a5-020-ar-profile_change_language_title-native-menu-before-tap.json",
+      "sha256": "cb61f7474a4f4761d371d5750a5805feae178d18b14a542f2c15603e721bbcdb"
+    },
+    {
+      "name": "small-caregiver-a5-021-ar-native-picker-before-tap-geometry.json",
+      "sha256": "de33314b82241f77b5c95700d1179eaf26e13d4c5c7dae47275101d8d2ac90b1"
+    },
+    {
+      "name": "small-caregiver-a5-022-A5-native-chrome-geometry-and-labels.json",
+      "sha256": "a1d12c81e9cf1d4af4eec4022bb511893ecaa8c7c706a669611b9c5c21539975"
+    },
+    {
+      "name": "small-caregiver-a5-023-en-profile_help_center_title-native-menu-before-tap.json",
+      "sha256": "8bf12692c5bdf0dab5637599712454953bc71a36b57d46ad8ea8985a0b3350e5"
+    },
+    {
+      "name": "small-caregiver-a5-024-A5-en-bottom_navigation_profile-caption.png",
+      "sha256": "776ac4f22d6cf7a745c0e77c43d0789583f6771114a3665d1305ab8f801dfa59"
+    },
+    {
+      "name": "small-caregiver-a5-025-A5-en-bottom_navigation_messages-caption.png",
+      "sha256": "d02a1207ff8c1e5dd6ee7a81bf0197fe0e0a049d12d3752772a271de2db8d9bc"
+    },
+    {
+      "name": "small-caregiver-a5-026-A5-en-bottom_navigation_matches-caption.png",
+      "sha256": "165c8f0f1933bb2ed8cadd126feb07c203abbc919b4e298bd4c42f60011275a4"
+    },
+    {
+      "name": "small-caregiver-a5-027-A5-en-brand.png",
+      "sha256": "f16cb2eb9c81159c54d94c3bb59942701b39e7cba27e218c5921934d32e70b01"
+    },
+    {
+      "name": "small-caregiver-a5-028-en-native-picker-before-tap-geometry.json",
+      "sha256": "4526845ffe432aa9f8328988d1ec75e9ac278c6ef5fa139027eb7919f25062bf"
+    },
+    {
+      "name": "small-caregiver-a5-029-small-caregiver-a5-a11y-audit.txt",
+      "sha256": "7c523c2f7c4e79504692e0dfbdb4ee055754071f5b38c3391d8898aa42fbde10"
+    },
+    {
+      "name": "small-caregiver-a5-030-empty-password-native-disabled-guard.json",
+      "sha256": "f3f95379acd76a75b62f607fb411d176b65ff33db2aced128ac7b99e0b678d24"
+    },
+    {
+      "name": "small-caregiver-a5-031-empty-password-native-disabled-guard-button-only.png",
+      "sha256": "94728ed681423f030f82c3ab9bfcc4bbd9f54cd8a85bd89c8106b9dd3943f200"
+    },
+    {
+      "name": "small-caregiver-a5-032-empty-delete-native-disabled-guard.json",
+      "sha256": "264e0d3395a9d3d45c8f235826becf9d85b14b79c86564529f39b8a32438c6ba"
+    },
+    {
+      "name": "small-caregiver-a5-033-empty-delete-native-disabled-guard-button-only.png",
+      "sha256": "1616f7b5d5a2cff40cc84a47f4b43c668f9804b80c63346ddbfd9a6a1d6feb80"
+    }
+  ],
+  "publicPackage": {
+    "status": "REVIEWABLE — not staged or delivered",
+    "originalEvidenceRetainedLocally": true,
+    "rawLogsAndXCResultsIncluded": false,
+    "artifactInventory": [],
+    "sourceIndexSHA256": "400fe835c9faaa262415f124d3c60d6b150e977ac64518b371f6a512cf28a490",
+    "artifactHashNote": "Public JSON/text are sanitized; artifactInventory hashes apply to packaged bytes. Original indexed hashes, where present, refer to preserved original evidence."
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "source": "fresh-small-client-save-guidance.xcresult",
+  "wholeProcessExit": 0,
+  "nativePassSeconds": 69.045,
+  "rootReviewedCroppedPNGs": 5,
+  "allocation": "small client",
+  "fix": "Visible persistent finalSave map guidance; ordinary reopening resets reason",
+  "profileWrites": 0,
+  "backendPreferencesUnchangedVerified": true,
+  "physicalGPSVerified": false,
+  "artifacts": [
+    {
+      "path": "Artifacts/small-client-save-guidance-001-FB9D33E8-90D9-46EB-8485-97D8814B252E.json",
+      "description": "P03-023-024-026-controlled-no-fix-native_0_DE169441-E244-442C-8BEE-FBB387A3D957.json",
+      "sha256": "d57fabe497db9cdaf3ee7215742ad17abc675a097f7250ea9a444a962ca079e7"
+    },
+    {
+      "path": "Artifacts/small-client-save-guidance-002-26E22CE9-DC49-45D9-8C7C-FBFB9443BED2.png",
+      "description": "P03-024-controlled-ordinary-map-reason-reset-only_0_C98EF7B4-71AF-409B-A4CF-A892E44582D2.png",
+      "sha256": "aeecf62e5f1b7d43ad8cbf15c68ceecbd7479048d71f3350b463e41c0d6b2a31"
+    },
+    {
+      "path": "Artifacts/small-client-save-guidance-003-BDDC874F-5D00-4E03-8142-99D9F39EE851.png",
+      "description": "controlled-location-empty-review-value-only_0_B73A5EE8-8250-47EE-A10F-B787E7A2D29B.png",
+      "sha256": "586fc1637fa5663b8ce353f205341688570e83a8d03bd76d8505ac0139d7159a"
+    },
+    {
+      "path": "Artifacts/small-client-save-guidance-004-DB2C21C2-5472-4E26-B81E-36BBAA409D38.png",
+      "description": "P03-024-controlled-no-fix-save-guidance-only_0_B68F3C74-CB76-4149-8E0E-6BE375EECB90.png",
+      "sha256": "6bbe9a3c12b2c64c490c696746347e0eee99a43d38fb3485fab53493d9e1dda7"
+    },
+    {
+      "path": "Artifacts/small-client-save-guidance-005-1E4350DC-AB95-4193-BB79-DEB106F1CA93.png",
+      "description": "controlled-location-empty-review-value-only_0_7101CA8C-2D21-4266-B9E2-E50FC517EBF3.png",
+      "sha256": "586fc1637fa5663b8ce353f205341688570e83a8d03bd76d8505ac0139d7159a"
+    },
+    {
+      "path": "Artifacts/small-client-save-guidance-006-C88643AF-FE58-4EBF-849B-418EC5696403.png",
+      "description": "P03-026-controlled-unselected-map-continue-only_0_A3B4EE08-E406-4AAF-B491-AEA6B932C670.png",
+      "sha256": "40c9ac5decd71b7b646db63db66c3b4df703bb0361810cc7d6ce11c3d27ec7b2"
+    },
+    {
+      "path": "Artifacts/small-client-save-guidance-007-CC496E03-7DAD-40C4-93CC-D41FE6326DB8.json",
+      "description": "controlled-location-opening-none-native_0_D24FB460-3FE6-4D63-B301-36E6E99BCF50.json",
+      "sha256": "0d14b6b315ab7cd0c4c3149592cd8590463ec9bffbd2ac7db9e82d958bdaae82"
+    }
+  ],
+  "publicPackage": {
+    "status": "REVIEWABLE — not staged or delivered",
+    "originalEvidenceRetainedLocally": true,
+    "rawLogsAndXCResultsIncluded": false,
+    "artifactInventory": [
+      {
+        "path": "Artifacts/small-client-save-guidance-001-FB9D33E8-90D9-46EB-8485-97D8814B252E.json",
+        "bytes": 579,
+        "sha256": "46278f59c44385b146a1231e319d0bfc9acb65efa0e6172af02abf84249dd2b5"
+      },
+      {
+        "path": "Artifacts/small-client-save-guidance-002-26E22CE9-DC49-45D9-8C7C-FBFB9443BED2.png",
+        "bytes": 10722,
+        "sha256": "aeecf62e5f1b7d43ad8cbf15c68ceecbd7479048d71f3350b463e41c0d6b2a31"
+      },
+      {
+        "path": "Artifacts/small-client-save-guidance-003-BDDC874F-5D00-4E03-8142-99D9F39EE851.png",
+        "bytes": 1011,
+        "sha256": "586fc1637fa5663b8ce353f205341688570e83a8d03bd76d8505ac0139d7159a"
+      },
+      {
+        "path": "Artifacts/small-client-save-guidance-004-DB2C21C2-5472-4E26-B81E-36BBAA409D38.png",
+        "bytes": 10000,
+        "sha256": "6bbe9a3c12b2c64c490c696746347e0eee99a43d38fb3485fab53493d9e1dda7"
+      },
+      {
+        "path": "Artifacts/small-client-save-guidance-005-1E4350DC-AB95-4193-BB79-DEB106F1CA93.png",
+        "bytes": 1011,
+        "sha256": "586fc1637fa5663b8ce353f205341688570e83a8d03bd76d8505ac0139d7159a"
+      },
+      {
+        "path": "Artifacts/small-client-save-guidance-006-C88643AF-FE58-4EBF-849B-418EC5696403.png",
+        "bytes": 6063,
+        "sha256": "40c9ac5decd71b7b646db63db66c3b4df703bb0361810cc7d6ce11c3d27ec7b2"
+      },
+      {
+        "path": "Artifacts/small-client-save-guidance-007-CC496E03-7DAD-40C4-93CC-D41FE6326DB8.json",
+        "bytes": 322,
+        "sha256": "9c959596dc3fe5dfaafc127d32396eaf560915c512c6c7f7912335ff81644ef8"
+      }
+    ],
+    "sourceIndexSHA256": "436b9a32c4b88f14d2e197702ef67b73c1bf7b19d05c00d9db196cbecf7b6da0",
+    "artifactHashNote": "Public JSON/text are sanitized; artifactInventory hashes apply to packaged bytes. Original indexed hashes, where present, refer to preserved original evidence."
+  }
+}

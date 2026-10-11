@@ -1,0 +1,222 @@
+{
+  "source": "fresh-modern-caregiver-final-current-chat-units.xcresult",
+  "rootReviewed": true,
+  "publishable": false,
+  "artifacts": [
+    {
+      "path": "Artifacts/F9887F9D-A27C-4CF2-8CCC-7F4C93750B8C.json",
+      "description": "owned-incoming-bottom-older-position-timestamps-caregiver_0_1958ADB2-C9D9-4491-A196-701F1C0D8278.json",
+      "sha256": "b94a588da51c413344de5391d227a640cb1ffd15a5398ab66f50fc6e787c6dd9",
+      "packagedSha256": "b94a588da51c413344de5391d227a640cb1ffd15a5398ab66f50fc6e787c6dd9"
+    },
+    {
+      "path": "Artifacts/9D6FC530-6FD2-4DFB-8201-90780ED5D141.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_4FAB871F-AE96-4BF6-BECC-FCB01D6AD842.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/A72BC647-AFFE-414D-AA6D-224D3781C1AE.png",
+      "description": "owned-incoming-reading-stored-timestamp-only-caregiver_0_3A8696D4-073B-476F-A7FB-5077549EA14F.png",
+      "sha256": "b9f48e7b52a542aa6052d80d8820cdfb84e19ae875a34d3c09bc1e55fae3fce4",
+      "packagedSha256": "b9f48e7b52a542aa6052d80d8820cdfb84e19ae875a34d3c09bc1e55fae3fce4"
+    },
+    {
+      "path": "Artifacts/E7192118-9DAB-4B94-ACA6-E42F4A30C3CF.png",
+      "description": "owned-incoming-after-manual-return-synthetic-message-only-caregiver_0_6DF6F6CE-6C99-452E-AE38-CD1BED964BD1.png",
+      "sha256": "ee011efa26c1afae0db666026a64d3dd8a5d27480b66a1cfb9f0d4848cd46779",
+      "packagedSha256": "ee011efa26c1afae0db666026a64d3dd8a5d27480b66a1cfb9f0d4848cd46779"
+    },
+    {
+      "path": "Artifacts/C5E6944F-7444-4B9F-B802-C5FE5B340700.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_9AFF454C-5A53-4321-A8B2-03F639075CBD.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/9CD64206-221D-4DEA-B47C-2FF1A759F195.png",
+      "description": "owned-incoming-preserved-older-synthetic-message-only-caregiver_0_BD34051A-AE0F-4147-ADDB-B16EAC596446.png",
+      "sha256": "c780087bd881bbe1fbd4ef8ec1385c4067efe2930ee6b4b21eaa5624452f8398",
+      "packagedSha256": "c780087bd881bbe1fbd4ef8ec1385c4067efe2930ee6b4b21eaa5624452f8398"
+    },
+    {
+      "path": "Artifacts/FAF36BAC-C53B-4458-A454-FCAD66F86E1A.png",
+      "description": "owned-incoming-bottom-stored-timestamp-only-caregiver_0_C1995A4F-54CC-44A7-84FF-672F2B0C4EC0.png",
+      "sha256": "3924cad7468d2e4186cc57e5205afd25f832262f78026e24750f26717d759acf",
+      "packagedSha256": "3924cad7468d2e4186cc57e5205afd25f832262f78026e24750f26717d759acf"
+    },
+    {
+      "path": "Artifacts/874FA615-EC44-46E3-B6C1-51FD69396BEA.png",
+      "description": "owned-incoming-bottom-synthetic-message-only-caregiver_0_CC2A7473-76AA-414D-8EF5-EBBD4E311154.png",
+      "sha256": "a9bed49af54f61798c0a233d902690bdc4b692eb623ecb38e5810d5b0e59bc25",
+      "packagedSha256": "a9bed49af54f61798c0a233d902690bdc4b692eb623ecb38e5810d5b0e59bc25"
+    },
+    {
+      "path": "Artifacts/89BC598A-ECAF-4F9C-AB9D-B554D6E034B9.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_AB0F2AEB-7F06-4062-8381-D79CF876F110.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/D1C349A4-52E2-44A4-BB14-E19C4E4A8D44.json",
+      "description": "owned-incoming-during-initial-load-completed_0_3A83118D-C4DB-4720-969F-BF74BAF0737F.json",
+      "sha256": "d6268d1d45c4ce2671bb231208cba9bd1763ced8667f291bf1276556b0cdb074",
+      "packagedSha256": "d6268d1d45c4ce2671bb231208cba9bd1763ced8667f291bf1276556b0cdb074"
+    },
+    {
+      "path": "Artifacts/C017A5FB-9D31-4FF1-A415-D382BC452196.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_6AAF1163-32B3-4131-8AB8-A51F8A105738.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/84466786-9BC7-4C3B-BF04-0ED3818F30AD.png",
+      "description": "owned-incoming-during-initial-load-synthetic-message-only-caregiver_0_CB6F9A6A-8707-4815-92C1-4C5E4F04144D.png",
+      "sha256": "c6e23ffcba3bba872ecc8c47f81428e8bd849b581c12c00e5498dae8a0cd4a24",
+      "packagedSha256": "c6e23ffcba3bba872ecc8c47f81428e8bd849b581c12c00e5498dae8a0cd4a24"
+    },
+    {
+      "path": "Artifacts/47722B88-CB41-4C66-AFA5-6AC7673937A5.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_954F322F-19C1-48A9-B6A4-ABCB46C97AD0.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/D0ED5323-B386-4F94-B551-B8ABB91B250E.json",
+      "description": "owned-incoming-during-initial-load-pending_0_4BB61E7C-5036-42D0-8EC4-AF09985E53F7.json",
+      "sha256": "b7eda1d5710ef13da8e77aa1e07209db414c2fa55cb58035d20f507cf448c61a",
+      "packagedSha256": "b7eda1d5710ef13da8e77aa1e07209db414c2fa55cb58035d20f507cf448c61a"
+    },
+    {
+      "path": "Artifacts/D80C32F9-7EA1-4873-87E3-DF18951D4B06.json",
+      "description": "owned-keyboard-visible-incoming-boundaries-caregiver_0_C2CB68CD-DC62-4D02-A3C6-31056B3BAC29.json",
+      "sha256": "789ff0c4b344b668fc249f11ab06e0ee313c6ac239133b1301be7877dd48a249",
+      "packagedSha256": "789ff0c4b344b668fc249f11ab06e0ee313c6ac239133b1301be7877dd48a249"
+    },
+    {
+      "path": "Artifacts/3FF73FBD-ADF9-443C-AE03-2203CF3E4567.png",
+      "description": "owned-keyboard-incoming-latest-reachable-synthetic-message-only-caregiver_0_45E9CEB8-CD98-4AFF-A1E2-5707BABD674D.png",
+      "sha256": "d6bdc2940c5fe3e8cf211a5547a84bf2ade8c9df13aaaa956fb5cab540937bee",
+      "packagedSha256": "d6bdc2940c5fe3e8cf211a5547a84bf2ade8c9df13aaaa956fb5cab540937bee"
+    },
+    {
+      "path": "Artifacts/0BAD5DA6-2086-42B4-9F2E-56B423C92CAB.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_64E9CD06-02C2-472E-A93A-030F3A0436FA.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/859424A8-3237-4329-8165-6066CB822B47.png",
+      "description": "owned-keyboard-incoming-anchored-older-synthetic-message-only-caregiver_0_E5DD340E-2DA6-4999-A624-7C14FD73F8FF.png",
+      "sha256": "78a03d7bb1cad8a78d8b24f4efa8cccb90a2c75bdd2f71fca0e9dea493130466",
+      "packagedSha256": "78a03d7bb1cad8a78d8b24f4efa8cccb90a2c75bdd2f71fca0e9dea493130466"
+    },
+    {
+      "path": "Artifacts/EEACC8A8-A4F4-4364-9AA6-0E71DB0158F0.png",
+      "description": "owned-keyboard-incoming-bottom-synthetic-message-only-caregiver_0_B3EFE7A2-C5A4-481F-80BB-20C9EF24A1E4.png",
+      "sha256": "e1e588fea105cfd96f59d1cc8c172ece5705658bb6fe6916fb3f11cb65a102cf",
+      "packagedSha256": "e1e588fea105cfd96f59d1cc8c172ece5705658bb6fe6916fb3f11cb65a102cf"
+    },
+    {
+      "path": "Artifacts/B0B011A6-64B0-4B23-A107-4D3704AEDA4F.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_1B9B4FB9-DA1F-47AA-AC54-220D9BEE27BF.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/195F449A-CC5A-4EFB-B354-587A4DE9CE8C.png",
+      "description": "owned-keyboard-incoming-unsent-synthetic-draft-only-caregiver_0_85629E15-59CE-4956-B068-4FF097D5B280.png",
+      "sha256": "77ae2ca43a8ee9e431aa935e250ed6fbdefda5a374829c016d545e8896a7e23f",
+      "packagedSha256": "77ae2ca43a8ee9e431aa935e250ed6fbdefda5a374829c016d545e8896a7e23f"
+    },
+    {
+      "path": "Artifacts/2043DE59-4504-4866-831F-024706190C15.json",
+      "description": "owned-keyboard-older-focus-geometry_0_20F91123-1F74-4ACB-BC9C-EE9FF3ED14C0.json",
+      "sha256": "af3ac0ae3e18b648d61f0dffc05e234d206884d064921f4296163a1868b04332",
+      "packagedSha256": "af3ac0ae3e18b648d61f0dffc05e234d206884d064921f4296163a1868b04332"
+    },
+    {
+      "path": "Artifacts/B92CF9CF-D436-4F63-BB07-6F5C8AD2EABE.json",
+      "description": "owned-reply-race-timing-caregiver_0_34A9BE54-7BC3-4667-9648-EE95738759C5.json",
+      "sha256": "efe4b8aad06516785641e07f9b6d60ed1afb87b2b1376be8c5701da576aa4f5e",
+      "packagedSha256": "efe4b8aad06516785641e07f9b6d60ed1afb87b2b1376be8c5701da576aa4f5e"
+    },
+    {
+      "path": "Artifacts/1BBCCE1B-6E8B-4009-A388-39A5F67FE7CB.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_9AC66973-C1FE-44B4-BE80-B66CF31A66B8.json",
+      "sha256": "42aaddbeb2dfb7c1708de86ae9d4d1e058c761f5755cfccda50770a425d8382b",
+      "packagedSha256": "42aaddbeb2dfb7c1708de86ae9d4d1e058c761f5755cfccda50770a425d8382b"
+    },
+    {
+      "path": "Artifacts/8DD4BFA6-D40D-4123-ACCB-733892F741FD.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_AF39C2FD-7376-4D0D-AB8A-AF0F2D20A536.json",
+      "sha256": "1b3d2abce402024eea6b0541892d781eeb05bf39111cfe55778508b7f23f4fb8",
+      "packagedSha256": "1b3d2abce402024eea6b0541892d781eeb05bf39111cfe55778508b7f23f4fb8"
+    },
+    {
+      "path": "Artifacts/2F09587B-ECEB-448E-B774-ED83A0C25E41.json",
+      "description": "owned-slow-send-new-typing-caregiver_0_DEE7AC25-545C-4341-81F2-B35C0CBD8EB7.json",
+      "sha256": "dd28804b4e08f78c3082d55a147b75501f350205643f339d09d7132bf0918abb",
+      "packagedSha256": "dd28804b4e08f78c3082d55a147b75501f350205643f339d09d7132bf0918abb"
+    },
+    {
+      "path": "Artifacts/AC9F4881-4462-4982-AFF0-ACB27869831B.png",
+      "description": "owned-slow-send-retained-synthetic-draft-only-caregiver_0_5AB9A9E1-D771-49B8-B874-81CF08706B5A.png",
+      "sha256": "1fd3faba619f61186a499f7c25f0dc946cbd66b683cab347ec0c1c01992a3794",
+      "packagedSha256": "1fd3faba619f61186a499f7c25f0dc946cbd66b683cab347ec0c1c01992a3794"
+    },
+    {
+      "path": "Artifacts/686CC867-B47C-462D-9EEC-CE25C9247A6C.png",
+      "description": "owned-slow-send-first-synthetic-bubble-only-caregiver_0_172464B2-850B-49E8-81F5-565D2C467C6F.png",
+      "sha256": "22e8bc5b08f53af8c8b3d37c8c5d1c5896b328d9267709ed98eab32cff6ddc40",
+      "packagedSha256": "22e8bc5b08f53af8c8b3d37c8c5d1c5896b328d9267709ed98eab32cff6ddc40"
+    }
+  ],
+  "independentReviewed": true,
+  "scope": "Current black-text/44-point-target Modern caregiver build: 107 units and four Chat methods passed; strict Reply failed unchanged ten-second gate after successful native system banner dismissal. Entire invocation exit65 retained.",
+  "testResults": [
+    {
+      "method": "CarezaarTests",
+      "status": "PASS",
+      "count": 107,
+      "seconds": 26.986
+    },
+    {
+      "method": "incoming-bottom-older-timestamp",
+      "status": "PASS",
+      "seconds": 95.395
+    },
+    {
+      "method": "initial-load-before-transport-and-reentry",
+      "status": "PASS",
+      "seconds": 231.163
+    },
+    {
+      "method": "keyboard-bottom-older-stored-footer",
+      "status": "PASS",
+      "seconds": 93.177
+    },
+    {
+      "method": "immutable-reply",
+      "status": "FAIL",
+      "seconds": 132.078
+    },
+    {
+      "method": "slow-send-continued-typing",
+      "status": "PASS",
+      "seconds": 67.459
+    }
+  ],
+  "strictReplyCheckpointSeconds": 11.450127959251404,
+  "strictReplyLimitSeconds": 10,
+  "normalNativeBannerDismissals": 1,
+  "physicalCamera": "UNTESTED user deferred",
+  "yahooBackendOnly": "UNVERIFIED",
+  "independentReview": "final_review independently verified all28 artifact hashes/privacy and all12PNG via2sheets; four UI passes/107unitpasses; strictReply11.450127959FAIL before ack/parent assertions; entire batch exit65 retained.",
+  "publicPackage": {
+    "rootReviewed": true,
+    "independentReviewed": true,
+    "originalEvidencePreserved": true,
+    "rawLogsXCResultsFullScreenPhotosPrivateFixturesIncluded": false
+  }
+}

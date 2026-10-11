@@ -1,0 +1,680 @@
+{
+  "source": "fresh-modern-caregiver-final-default-required-branches.xcresult",
+  "wholeProcessExit": 65,
+  "allocation": "Modern caregiver",
+  "nativeMethodsPassed": 5,
+  "nativeMethodsFailed": 2,
+  "rootReviewedCroppedPNGs": 66,
+  "textRecordsReviewedThroughParsedFieldChecksAndNativeRecords": 41,
+  "rootReviewedAllEightUnscaledLanguageSheets": true,
+  "nativePassSeconds": {
+    "reply": 212.523,
+    "defaultChrome": 57.054,
+    "allEightLanguages": 394.899,
+    "realInstant": 152.737,
+    "introductions": 44.733
+  },
+  "failedMethods": {
+    "banner": {
+      "seconds": 16.624,
+      "failure": "strict crop-containment guard before timed images; one-point horizontal inset source-only repair pending runtime"
+    },
+    "postTransitions": {
+      "seconds": 210.942,
+      "failure": "native chat snapshot timeout after composer tap; task app CPU100 and SwiftUI layout sample retained privately; graceful exact-app termination; root cause not confirmed"
+    }
+  },
+  "replyCompletedObservationSeconds": 6.809871077537537,
+  "replyTimingAllObservationsPrecedeSingleCheckpoint": true,
+  "instantMatch": "actual backend ACTIVE both accepted; native matched screen; one Request POST, zero Accept PATCH; peer committed during held POST",
+  "managedLanguageScope": "seven sampled controls per supported language; Messages crop shows tab caption; all app surfaces and exact current-language Save text unverified",
+  "introductionScope": "exact full text/scroll/Close; one-line rendered preview with icon and ellipsis; modal photo raster and live VoiceOver unverified",
+  "postTransitionScope": "incomplete failed native method; only initial NONE profile evidence retained, no rejected/withdrawn/ended closure",
+  "physicalCamera": "UNTESTED user deferred",
+  "YahooBackendOnly": "UNVERIFIED",
+  "privateFixtureTextScanMatches": 0,
+  "artifacts": [
+    {
+      "path": "Artifacts/modern-caregiver-final-default-001-9730123D-1785-46E8-95DC-72A991E26E9F.json",
+      "description": "owned-caregiver-hero-1-types-anonymous-geometry_0_CAD701E9-137A-4E6D-ACAD-9667C6E19506.json",
+      "sha256": "3c33b06d3b6b8529d3f8b375deecbcac2e252ff1227bb0c8a948a7fb9ad0c29e",
+      "packagedSha256": "3c33b06d3b6b8529d3f8b375deecbcac2e252ff1227bb0c8a948a7fb9ad0c29e"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-002-E08C0BE7-F757-426B-8894-7C2CEBFA8FC3.json",
+      "description": "owned-reply-race-acknowledged-caregiver_0_14FB4CF2-8116-4E11-AB54-89DE21398ECF.json",
+      "sha256": "3229ee5ae66d95f574287552ba542e259fa6b77f16fdabf10db9097da699d97c",
+      "packagedSha256": "3229ee5ae66d95f574287552ba542e259fa6b77f16fdabf10db9097da699d97c"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-003-71719D8E-BD7A-453F-A06B-D5A2E07CA4C3.png",
+      "description": "owned-reply-race-synthetic-acknowledged-message-only-caregiver_0_DFAA7649-460F-416C-AA82-EEF2A2938532.png",
+      "sha256": "1f3ba3d3387f96b7348096aa6597bfe1939f98dcf49b714798d6e4d93f63d644",
+      "packagedSha256": "1f3ba3d3387f96b7348096aa6597bfe1939f98dcf49b714798d6e4d93f63d644"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-004-65E04769-5117-4078-A65D-291B7F642812.json",
+      "description": "owned-reply-race-timing-caregiver_0_CE78EDA5-A602-43E3-8693-4C400BD4A723.json",
+      "sha256": "6fdf393eef0b701491373f3241301c8b20ff1dd494243cc10180ce10fad24586",
+      "packagedSha256": "6fdf393eef0b701491373f3241301c8b20ff1dd494243cc10180ce10fad24586"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-005-6F2DAF7C-0ECF-4B74-BAB2-836FACEB1EF9.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_08A3884E-9012-48F4-A17F-C5406A2F1A2C.json",
+      "sha256": "afc7ddd90c6ba7ee966233cd5a8044ee559e0dd8f6056e9a61c99cbc579684bf",
+      "packagedSha256": "afc7ddd90c6ba7ee966233cd5a8044ee559e0dd8f6056e9a61c99cbc579684bf"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-006-48C12070-0319-4B48-9F73-26EA0D5C9991.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_DCBEFFD2-A201-4064-B2D7-7E8675C79DBE.json",
+      "sha256": "0883290a526297446978dcc6e7f76bd14afec4a5db2b40cca3e3a85d7c3494d3",
+      "packagedSha256": "0883290a526297446978dcc6e7f76bd14afec4a5db2b40cca3e3a85d7c3494d3"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-007-A7658755-A5E4-4D5C-A251-24D36E8EBFFF.json",
+      "description": "en-native-picker-before-tap-geometry_0_6966C740-4F1A-41A8-BE22-4485189EE4FA.json",
+      "sha256": "62eb410123d7e9535d7303e685738895b14ba96ffd34a5eac3de7ce51c6016b2",
+      "packagedSha256": "62eb410123d7e9535d7303e685738895b14ba96ffd34a5eac3de7ce51c6016b2"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-008-8CDE8C80-5834-4A66-82A0-4024DB05B409.png",
+      "description": "default-en-bottom_navigation_profile-caption_0_1FEF27CC-D37F-4C3F-B6B2-0325CF169B99.png",
+      "sha256": "e815fef3df22e69768560ffd281fb2f583d8776932eddd4bf8a825294a277a19",
+      "packagedSha256": "e815fef3df22e69768560ffd281fb2f583d8776932eddd4bf8a825294a277a19"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-009-A6E45910-95A3-4F30-AAF3-BA4A73722967.png",
+      "description": "default-en-bottom_navigation_messages-caption_0_7E80FE0E-159C-446B-A054-426444E9A626.png",
+      "sha256": "a89582ae124b49301cfd891a4292ef61301753a5708f0d8fffae7a89ae4e99cf",
+      "packagedSha256": "a89582ae124b49301cfd891a4292ef61301753a5708f0d8fffae7a89ae4e99cf"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-010-E004D408-1D85-40D7-855B-E7D5198BCA7E.png",
+      "description": "default-en-bottom_navigation_matches-caption_0_199ACAAE-1BEF-4BE4-960E-B4465F05DCCD.png",
+      "sha256": "b607fcd089feaa022456cf05a8a3eb4ba874b2ce8070bf93a0d5c23e77cfcd0c",
+      "packagedSha256": "b607fcd089feaa022456cf05a8a3eb4ba874b2ce8070bf93a0d5c23e77cfcd0c"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-011-577B5A7E-6302-42C0-AC4C-3A5474E19466.png",
+      "description": "default-en-brand_0_DE0710CA-3595-47FC-A259-7F4B87E39947.png",
+      "sha256": "c08dd0df7dd160a1d7cb4fe9cddc4fb8c3fedd54f625ad40b2660522b1cebee2",
+      "packagedSha256": "c08dd0df7dd160a1d7cb4fe9cddc4fb8c3fedd54f625ad40b2660522b1cebee2"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-012-58161851-FCA5-4513-A62E-D16B80DE7810.json",
+      "description": "en-native-picker-before-tap-geometry_0_300F1F01-6D3D-4782-B1EE-515D28C1B0F5.json",
+      "sha256": "62eb410123d7e9535d7303e685738895b14ba96ffd34a5eac3de7ce51c6016b2",
+      "packagedSha256": "62eb410123d7e9535d7303e685738895b14ba96ffd34a5eac3de7ce51c6016b2"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-013-E1134D66-ABDE-45FF-8880-49F9FAE9F033.txt",
+      "description": "P17-008-native-language-cleanup-result_0_9D3769D4-DAF4-4857-8F28-B6D8D822A4B2.txt",
+      "sha256": "be912a1106b420c2ec5f430f538812d453efb234908586791b8efe5594f5a1d3",
+      "packagedSha256": "be912a1106b420c2ec5f430f538812d453efb234908586791b8efe5594f5a1d3"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-014-ECA725F8-1764-4D0E-9500-C41136C25989.json",
+      "description": "en-native-picker-restored_row_check-geometry_0_C2D909CB-D9D6-4FA8-8608-1C48AB5C5C49.json",
+      "sha256": "777439a6ab57e2ed151f7027f3f2f82017b99d80fe06be2b901f6e70df26cce5",
+      "packagedSha256": "777439a6ab57e2ed151f7027f3f2f82017b99d80fe06be2b901f6e70df26cce5"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-015-AACC103A-DB19-4EAE-8B75-A09D3F292618.json",
+      "description": "P17-008-en-post-save-before-terminate-native-readiness_0_9F383D6F-208B-408C-8B5E-E11804E08636.json",
+      "sha256": "3872c3ce1623c63efed0b2ae687d768961bcb86b5ba66dffa1bd2c4f9dae7cc9",
+      "packagedSha256": "3872c3ce1623c63efed0b2ae687d768961bcb86b5ba66dffa1bd2c4f9dae7cc9"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-016-DFE0329E-1542-4B9B-B7CB-6BD8978A1C48.json",
+      "description": "en-native-picker-before_selection_tap-geometry_0_E6F9C7BE-A111-45E1-BB69-5C7DA56A7BA4.json",
+      "sha256": "9412cc103616ee1e475f379401e4d61b9197333bb14a733686239403fa7b859e",
+      "packagedSha256": "9412cc103616ee1e475f379401e4d61b9197333bb14a733686239403fa7b859e"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-017-597825FB-2D18-4813-A41F-6387591160D0.json",
+      "description": "P17-008-all-supported-managed-language-native-surfaces_0_A3693C7C-541D-4174-A0A2-BB41E62D58B7.json",
+      "sha256": "9ace04232e3c6927fc0a46e8f9769def2698d4f62cd77eca4778e4967236d318",
+      "packagedSha256": "9ace04232e3c6927fc0a46e8f9769def2698d4f62cd77eca4778e4967236d318"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-018-DF0EBFFE-1AF7-42A1-B162-BEAF9646C812.png",
+      "description": "P17-008-fa-selected_language_option-control-crop_0_41D13851-6E27-42EE-B568-771D77B0C7B4.png",
+      "sha256": "694cd9c2eca0a73557970384458f23630944546ea428dd5262c51fd84972a477",
+      "packagedSha256": "694cd9c2eca0a73557970384458f23630944546ea428dd5262c51fd84972a477"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-019-986338FC-D9AF-47A9-9383-4E95AD6B3C85.json",
+      "description": "fa-native-picker-selected_row_crop-geometry_0_BAC91055-449F-4452-B1DE-A428E970D7FF.json",
+      "sha256": "d8f07b6ac5afb9206b70491a69dad162accc9ac771712261c6c54f57a6968e9b",
+      "packagedSha256": "d8f07b6ac5afb9206b70491a69dad162accc9ac771712261c6c54f57a6968e9b"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-020-1CE54586-5FD4-4BD2-8738-E97521189949.png",
+      "description": "P17-008-fa-settings_change_language_app_title-control-crop_0_7F189F41-166E-43B6-9D88-C3F511618BC6.png",
+      "sha256": "e0b4b71d9aee460d27da188ea95db0cab0a0a958528710db781d36f8c76f95a8",
+      "packagedSha256": "e0b4b71d9aee460d27da188ea95db0cab0a0a958528710db781d36f8c76f95a8"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-021-53E8E03E-A39C-4CC4-8F85-087135B8E648.png",
+      "description": "P17-008-fa-general_all-control-crop_0_69FA780F-DC8B-47FC-86CA-1CFD110AC0D1.png",
+      "sha256": "d238029ae8b5569fbbebf225c1b9e8446ebed3b40b70ae2198f465b2c9e945c1",
+      "packagedSha256": "d238029ae8b5569fbbebf225c1b9e8446ebed3b40b70ae2198f465b2c9e945c1"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-022-82BD1F0F-DF26-4E6D-8E24-204B124AA22E.png",
+      "description": "P17-008-fa-contact_support_subtitle-control-crop_0_78145AB2-CCD2-43F8-BAF4-1053404EA1A6.png",
+      "sha256": "92e66421fc23ab998d6b6150297c495855d8d778f7c03952d2ded9c92dfdbc8d",
+      "packagedSha256": "92e66421fc23ab998d6b6150297c495855d8d778f7c03952d2ded9c92dfdbc8d"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-023-B9D66544-5BCB-4D79-9963-E2AFE7279C41.png",
+      "description": "P17-008-fa-profile_description-control-crop_0_BB8EBC4E-5482-40A2-AEE6-CB7F5DA2ED80.png",
+      "sha256": "94b5eccf6829765f5506cb5918975324e6768392e677c2183089c5467effdbe0",
+      "packagedSha256": "94b5eccf6829765f5506cb5918975324e6768392e677c2183089c5467effdbe0"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-024-369D91A1-04AA-48CD-920F-E8E5E5A4B1E5.png",
+      "description": "P17-008-fa-messages_title-control-crop_0_FB10A2DE-9F1C-490A-88A4-D8B1F8433C5C.png",
+      "sha256": "3633159c902d9fd32254c42d4e96c0246cc549f4dc1446566b6590366508e49b",
+      "packagedSha256": "3633159c902d9fd32254c42d4e96c0246cc549f4dc1446566b6590366508e49b"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-025-886E5DF3-8F20-49D9-8AAB-A9570341CB58.png",
+      "description": "P17-008-fa-caregiver_matches_page_title-control-crop_0_D604265A-A02C-41C6-BE83-2AFB3263E1C7.png",
+      "sha256": "58880460ebdaaf7dc7de1cbe3cdfc91d9223ae04ff4fd6473a1ac100e93a21d0",
+      "packagedSha256": "58880460ebdaaf7dc7de1cbe3cdfc91d9223ae04ff4fd6473a1ac100e93a21d0"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-026-92A9A6EE-10D9-425F-835B-283164D46ED8.json",
+      "description": "P17-008-fa-post-save-before-terminate-native-readiness_0_BF8BCAF1-9F31-4E31-A1E3-86A996EF5FC1.json",
+      "sha256": "c44169f7c2b9b34213db1ff8326d2e35847eda9a1d4457e6529ceccbd531db1c",
+      "packagedSha256": "c44169f7c2b9b34213db1ff8326d2e35847eda9a1d4457e6529ceccbd531db1c"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-027-0988C84E-7AD0-4A26-9224-A49539C4D163.json",
+      "description": "fa-native-picker-before_selection_tap-geometry_0_A38D4FE0-C293-4AE9-A1A6-BBD527D1E9D9.json",
+      "sha256": "39d221fc3e7ceaa0b8bd552fc7923cd8a84d8694638654691e71cceee20b56c4",
+      "packagedSha256": "39d221fc3e7ceaa0b8bd552fc7923cd8a84d8694638654691e71cceee20b56c4"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-028-41C50B3C-CCDD-4A07-9D5B-2FDAA1B0464F.png",
+      "description": "P17-008-ar-selected_language_option-control-crop_0_338DBD59-DDEE-434C-A7FB-D4610F576F3D.png",
+      "sha256": "202b7a24d26c05bac7980aa3e0d815996db53d19d5ea132b406155e8144995d1",
+      "packagedSha256": "202b7a24d26c05bac7980aa3e0d815996db53d19d5ea132b406155e8144995d1"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-029-4930B471-3510-4B5A-A63A-F65A58AFD33C.json",
+      "description": "ar-native-picker-selected_row_crop-geometry_0_6E8C6C3A-966F-403E-900D-AF156D0771D8.json",
+      "sha256": "0729cde00f4ac1bc63a25afb0c82a2aeb7f3c073ac934e7929218802310b45c4",
+      "packagedSha256": "0729cde00f4ac1bc63a25afb0c82a2aeb7f3c073ac934e7929218802310b45c4"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-030-BD6825CB-DDB1-455F-BC82-DD29CEF8279E.png",
+      "description": "P17-008-ar-settings_change_language_app_title-control-crop_0_CBC05F78-54F1-4882-916B-7C1EA66A69B8.png",
+      "sha256": "18e8ff14222eab5caed9b26dfdb977abf90cb676b39eaa954ededea61c89e1dc",
+      "packagedSha256": "18e8ff14222eab5caed9b26dfdb977abf90cb676b39eaa954ededea61c89e1dc"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-031-FA8652A4-4C8D-42F0-88BC-A76F93128C9C.png",
+      "description": "P17-008-ar-general_all-control-crop_0_01D7E786-6500-4D75-A6BF-224043DD2318.png",
+      "sha256": "4fb7c7f3b7e7ea7e67ccf2992dc60cb37064ff6c20e7cd13b83532580717b8c9",
+      "packagedSha256": "4fb7c7f3b7e7ea7e67ccf2992dc60cb37064ff6c20e7cd13b83532580717b8c9"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-032-C790C5E2-20C0-4718-865B-E3A6A8C4518B.png",
+      "description": "P17-008-ar-contact_support_subtitle-control-crop_0_CE351700-4B5B-46D6-8CC5-D9248A408F5F.png",
+      "sha256": "8b9a36224caac63b6f749227b82df65144ef2cbdf2899ca0cfb225a264e03db8",
+      "packagedSha256": "8b9a36224caac63b6f749227b82df65144ef2cbdf2899ca0cfb225a264e03db8"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-033-F9ADEBEE-42F7-4240-A37F-06AA387AA416.png",
+      "description": "P17-008-ar-profile_description-control-crop_0_E4326FA1-5DBE-401D-AE65-9851C45F8470.png",
+      "sha256": "14cd28f5d402d38d85b2b92930d2bbd5e389abf0f1e30255e4bec02b475c2a67",
+      "packagedSha256": "14cd28f5d402d38d85b2b92930d2bbd5e389abf0f1e30255e4bec02b475c2a67"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-034-FB60C7AF-11D0-4429-932B-53B6F008E981.png",
+      "description": "P17-008-ar-messages_title-control-crop_0_4158DE73-6030-425A-9748-27EEF7ED8C52.png",
+      "sha256": "d90bdc92ec9bbac03f6c3d267df8415ae26a82656366e61ac90f8514feabf4fa",
+      "packagedSha256": "d90bdc92ec9bbac03f6c3d267df8415ae26a82656366e61ac90f8514feabf4fa"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-035-5ADFBD28-0407-4C22-A9A3-325B9D5F0E8C.png",
+      "description": "P17-008-ar-caregiver_matches_page_title-control-crop_0_DB8A74E2-0AA5-4D3A-A3E5-715284C245B6.png",
+      "sha256": "8e8c11e57761987a6b83ec11a0418e1e8c413450372ad893f1ec261e9b8e7390",
+      "packagedSha256": "8e8c11e57761987a6b83ec11a0418e1e8c413450372ad893f1ec261e9b8e7390"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-036-F05A367C-2F3B-4D0A-8E86-4B915305D6BF.json",
+      "description": "P17-008-ar-post-save-before-terminate-native-readiness_0_C6BD0724-4E5E-4BC9-BC2E-1F7B19E86DD8.json",
+      "sha256": "7cd6a48e3ff31c582c2323e58a960820af59d89b20ff72ad36c748e161457936",
+      "packagedSha256": "7cd6a48e3ff31c582c2323e58a960820af59d89b20ff72ad36c748e161457936"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-037-7B3BD405-0835-4FCE-B1F3-BC042BFA0A71.json",
+      "description": "ar-native-picker-before_selection_tap-geometry_0_6E384D33-CE32-44F4-A9DA-2DED1A2C1514.json",
+      "sha256": "bf2166a172f8e9f10ce5d6c9e3b9ade1e5cf02b7dcdb115e6c8331d21c69601e",
+      "packagedSha256": "bf2166a172f8e9f10ce5d6c9e3b9ade1e5cf02b7dcdb115e6c8331d21c69601e"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-038-7C0AF3E0-3CAA-46FC-8D7A-28C45976306B.png",
+      "description": "P17-008-ru-selected_language_option-control-crop_0_9A2685CD-5139-4B80-B3B1-85FBF844CC45.png",
+      "sha256": "183b92fe6113fd0ef004d0b1216fac2a0ffccb8054ebb1daa187f9375672be35",
+      "packagedSha256": "183b92fe6113fd0ef004d0b1216fac2a0ffccb8054ebb1daa187f9375672be35"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-039-0D5C4B6B-125C-463E-B887-D055268D0A07.json",
+      "description": "ru-native-picker-selected_row_crop-geometry_0_960DAB7D-3038-45D0-947C-BE9F5B3E7B8F.json",
+      "sha256": "15d8065eecf2ecf3018f5fe75cdfbe3bfc7c3071d3e9b12ee8524ee466f80484",
+      "packagedSha256": "15d8065eecf2ecf3018f5fe75cdfbe3bfc7c3071d3e9b12ee8524ee466f80484"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-040-43D00E1D-6C80-44D5-B4E9-969FF0F541DC.png",
+      "description": "P17-008-ru-settings_change_language_app_title-control-crop_0_9A16395B-34C1-45B6-B69A-66DB48C51510.png",
+      "sha256": "6d3438ec9fffc51bc2c13ba5ddfa4add0374a59581f2565c37a2ee400a61549d",
+      "packagedSha256": "6d3438ec9fffc51bc2c13ba5ddfa4add0374a59581f2565c37a2ee400a61549d"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-041-38F05D50-A8AA-4762-B834-7D7786CD862A.png",
+      "description": "P17-008-ru-general_all-control-crop_0_E98D695B-B39C-42C3-823C-093371B65AF6.png",
+      "sha256": "e29e15b45e0790c98f4bdcd90d86d401d7778bd594d7f5569551279f7e81440a",
+      "packagedSha256": "e29e15b45e0790c98f4bdcd90d86d401d7778bd594d7f5569551279f7e81440a"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-042-CD1F3D22-FA6D-4759-99E7-4A5244ABAFD0.png",
+      "description": "P17-008-ru-contact_support_subtitle-control-crop_0_5FBB8073-A8B4-4692-9146-38946ED8ACEA.png",
+      "sha256": "27b20531b8c9ec1ad3aa1803b4fd31a19b5cda3c6affa781c042fb8d0e70dcda",
+      "packagedSha256": "27b20531b8c9ec1ad3aa1803b4fd31a19b5cda3c6affa781c042fb8d0e70dcda"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-043-8235AD51-A6E8-4EE3-984A-4CE7EF7BA912.png",
+      "description": "P17-008-ru-profile_description-control-crop_0_362D7C02-3404-4D5C-A2CE-134278EC0655.png",
+      "sha256": "4479ec7a01a69a24cb6c039f4fd34ddd587948e25c22f23ab389166d3972ab47",
+      "packagedSha256": "4479ec7a01a69a24cb6c039f4fd34ddd587948e25c22f23ab389166d3972ab47"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-044-25DAC580-6329-4666-9442-5404235F54BA.png",
+      "description": "P17-008-ru-messages_title-control-crop_0_65B2B1FC-1FB4-4078-9BC7-3509374D2A45.png",
+      "sha256": "9c17bcb0e146e5a692a03ccec4f256df452948f2305fbdeee595068b5b864140",
+      "packagedSha256": "9c17bcb0e146e5a692a03ccec4f256df452948f2305fbdeee595068b5b864140"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-045-07CBEE7A-9A2A-4C36-8B9A-40204EB745D0.png",
+      "description": "P17-008-ru-caregiver_matches_page_title-control-crop_0_C220981F-1E03-4EC1-B158-BF4872F14807.png",
+      "sha256": "99f75eaec93cb415099f869c3eccf6132ac26fdc0b9c6e6d996ecae269395123",
+      "packagedSha256": "99f75eaec93cb415099f869c3eccf6132ac26fdc0b9c6e6d996ecae269395123"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-046-9643F2D1-FF82-4DFA-B1B5-FEBB406CD9BC.json",
+      "description": "P17-008-ru-post-save-before-terminate-native-readiness_0_D558787B-0B5D-4360-995D-968E92376ACE.json",
+      "sha256": "ccdf664efb7b368e94c3e2930a0a95821a27bc4bd0c4f3be56c5368bbfaaeead",
+      "packagedSha256": "ccdf664efb7b368e94c3e2930a0a95821a27bc4bd0c4f3be56c5368bbfaaeead"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-047-3D6BDF38-8576-4716-8EA5-B1ED4D705202.json",
+      "description": "ru-native-picker-before_selection_tap-geometry_0_84FFC01C-AD77-4443-A07F-C8023AAD89C6.json",
+      "sha256": "1e0f293fa65bbffac7ebd4d5e5963e27d93c9817679bbcc3187082543b239293",
+      "packagedSha256": "1e0f293fa65bbffac7ebd4d5e5963e27d93c9817679bbcc3187082543b239293"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-048-CF43A4CA-26C3-464B-B62C-6339249E3242.png",
+      "description": "P17-008-fr-selected_language_option-control-crop_0_E690BC18-F57C-4433-8B3A-05FA05D2D4A6.png",
+      "sha256": "81f289e519ce9e467d646a5f8c2b338d0dec7b3ca480fc9e86617c139f8d4f21",
+      "packagedSha256": "81f289e519ce9e467d646a5f8c2b338d0dec7b3ca480fc9e86617c139f8d4f21"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-049-1523329D-F125-4AF1-9A45-C131AA6160CA.json",
+      "description": "fr-native-picker-selected_row_crop-geometry_0_EC6F8344-65BD-4590-80E1-F500DA0EDF04.json",
+      "sha256": "8bd0fde61afde10527a368760ba4af03aa87cabf09ed0eefab6f6854b62fa5cc",
+      "packagedSha256": "8bd0fde61afde10527a368760ba4af03aa87cabf09ed0eefab6f6854b62fa5cc"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-050-DBBB2091-DA6B-445C-B07B-86D25FF3A66A.png",
+      "description": "P17-008-fr-settings_change_language_app_title-control-crop_0_BAA06B4D-CBE8-44B8-BF42-26595AFC4EEE.png",
+      "sha256": "3fcc8645e9ab55a341e1ff06dc2ecc1ebd99d14c9e50f28f9d5f395b847b025a",
+      "packagedSha256": "3fcc8645e9ab55a341e1ff06dc2ecc1ebd99d14c9e50f28f9d5f395b847b025a"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-051-8E84C09E-2AAE-4E33-A0D7-F1A3B85FAE46.png",
+      "description": "P17-008-fr-general_all-control-crop_0_1BF346DF-5B62-4CB9-BED0-8662D138517D.png",
+      "sha256": "3ebeea8b4f28fb608ef5cc8594b4ff694737a0fc8295b28337b32983d3eec97f",
+      "packagedSha256": "3ebeea8b4f28fb608ef5cc8594b4ff694737a0fc8295b28337b32983d3eec97f"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-052-75BC5513-E1F2-48FA-9179-2009C342EC63.png",
+      "description": "P17-008-fr-contact_support_subtitle-control-crop_0_B8FE0B4B-DA27-47E1-82B9-65DD231ECA94.png",
+      "sha256": "ad2c3f3c55b78afaeb455b811b8752c53e6505762d15e96bd802af61c23b8448",
+      "packagedSha256": "ad2c3f3c55b78afaeb455b811b8752c53e6505762d15e96bd802af61c23b8448"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-053-91D80816-5B2B-4DFA-889E-0393311983FE.png",
+      "description": "P17-008-fr-profile_description-control-crop_0_44481521-A056-45E3-BAC1-6B3CAB64B614.png",
+      "sha256": "cf345ff4987f59b4073d922687764ed3ea4d31bb9219c4ded7ce02f8fc552146",
+      "packagedSha256": "cf345ff4987f59b4073d922687764ed3ea4d31bb9219c4ded7ce02f8fc552146"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-054-C747B513-2782-4602-B01A-BF27251524C7.png",
+      "description": "P17-008-fr-messages_title-control-crop_0_78658E96-7EE2-40D3-9AB7-4C4A53157D42.png",
+      "sha256": "a89582ae124b49301cfd891a4292ef61301753a5708f0d8fffae7a89ae4e99cf",
+      "packagedSha256": "a89582ae124b49301cfd891a4292ef61301753a5708f0d8fffae7a89ae4e99cf"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-055-0083DB11-BB70-4606-A8D2-6AD9A65E4D86.png",
+      "description": "P17-008-fr-caregiver_matches_page_title-control-crop_0_9C1A7DB6-49AC-4622-913C-43542031DBDC.png",
+      "sha256": "a8f4ba9b2939e0849389bb3f5fecdb899c0a19f4f4b061726fa8290917ea8259",
+      "packagedSha256": "a8f4ba9b2939e0849389bb3f5fecdb899c0a19f4f4b061726fa8290917ea8259"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-056-A47EB18E-840E-4834-AC41-AB63486469E0.json",
+      "description": "P17-008-fr-post-save-before-terminate-native-readiness_0_FE87A08B-7042-4446-8C17-EF1DE6939EFD.json",
+      "sha256": "0ab082be125833190a507ee59aae560bf95b74870c09244c8495c2e187920495",
+      "packagedSha256": "0ab082be125833190a507ee59aae560bf95b74870c09244c8495c2e187920495"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-057-A2C1985F-D208-4987-917C-680B4491D093.json",
+      "description": "fr-native-picker-before_selection_tap-geometry_0_B99E177A-4C65-4628-818E-CA29DF92C287.json",
+      "sha256": "90723e565232c3da728b8157be2aa355ff216144c1bf5bc6d73d23a9913b7982",
+      "packagedSha256": "90723e565232c3da728b8157be2aa355ff216144c1bf5bc6d73d23a9913b7982"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-058-3357E923-A1DB-4497-85C8-D15185A12424.png",
+      "description": "P17-008-sp-selected_language_option-control-crop_0_77F81120-6C12-4316-9911-00B835FB4BDE.png",
+      "sha256": "4c43bb4632202eab81910ef54655f777f469729d61eb6bc5248bcd8a7e00d486",
+      "packagedSha256": "4c43bb4632202eab81910ef54655f777f469729d61eb6bc5248bcd8a7e00d486"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-059-EA2CE68E-949C-427B-84D6-1965A6494A44.json",
+      "description": "sp-native-picker-selected_row_crop-geometry_0_07F97901-01F0-4B01-BF44-D682896B1971.json",
+      "sha256": "6fd880fe6e652d976dd21ac991a52297e7a42dd2a8683a1f12cd59555b9a4cda",
+      "packagedSha256": "6fd880fe6e652d976dd21ac991a52297e7a42dd2a8683a1f12cd59555b9a4cda"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-060-09F8A67D-013F-4E48-909F-CD21372481ED.png",
+      "description": "P17-008-sp-settings_change_language_app_title-control-crop_0_D86647B7-64D6-4D0E-A416-0EDB8F1D1AD5.png",
+      "sha256": "db73168dbfade0f1a65454b69f7e0b60d7c28fde57613391decb2fc705194696",
+      "packagedSha256": "db73168dbfade0f1a65454b69f7e0b60d7c28fde57613391decb2fc705194696"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-061-BBB76B00-FBA0-455D-B5A5-ABB695631484.png",
+      "description": "P17-008-sp-general_all-control-crop_0_A3B82C78-A7C5-42B4-B7FA-98F396399856.png",
+      "sha256": "a8f02c1a6e9cd2cf74657c9ccc5cd5c9728a676f4bf5cb82e5dbed26164057df",
+      "packagedSha256": "a8f02c1a6e9cd2cf74657c9ccc5cd5c9728a676f4bf5cb82e5dbed26164057df"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-062-CC8A7A3A-87D8-4719-B0EB-6B621C7CE042.png",
+      "description": "P17-008-sp-contact_support_subtitle-control-crop_0_B5125BEF-9EAD-48F4-BBA8-4EC1D014794B.png",
+      "sha256": "b528cdd296742f32fd796246d835db7f2cbc01bb299af7986ee47e05ef3ac0da",
+      "packagedSha256": "b528cdd296742f32fd796246d835db7f2cbc01bb299af7986ee47e05ef3ac0da"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-063-39359A67-8A51-45C8-9EA8-722314DBE1AB.png",
+      "description": "P17-008-sp-profile_description-control-crop_0_91B3F01B-2D40-4470-9207-35679B4A30F0.png",
+      "sha256": "6e7857d27bccebecbfc7ed3a947255efafe7b1e7213aa9dd4060c97e3284fb35",
+      "packagedSha256": "6e7857d27bccebecbfc7ed3a947255efafe7b1e7213aa9dd4060c97e3284fb35"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-064-90574EB5-B589-4AA5-A116-E7458E65B900.png",
+      "description": "P17-008-sp-messages_title-control-crop_0_970D0621-4D68-4B20-9505-8B749E203FA1.png",
+      "sha256": "788838fb5c663f36692356772701e29147f400f49a28f8f4785a77bddf1628c8",
+      "packagedSha256": "788838fb5c663f36692356772701e29147f400f49a28f8f4785a77bddf1628c8"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-065-E576B622-B87B-4053-BCE9-12B34A949A32.png",
+      "description": "P17-008-sp-caregiver_matches_page_title-control-crop_0_061F001D-A1F2-4B56-9202-EADD41D79F14.png",
+      "sha256": "785a2b2a7588c677f551791417f898ca63d02ce423721ba871b08d9f9009a2c3",
+      "packagedSha256": "785a2b2a7588c677f551791417f898ca63d02ce423721ba871b08d9f9009a2c3"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-066-94BD3273-EDBC-4166-ABD4-729034C833B2.json",
+      "description": "P17-008-sp-post-save-before-terminate-native-readiness_0_79715BA4-F17D-4B82-9FCD-469A0E187D78.json",
+      "sha256": "082ae0366364d48f7df10f727a2483fbe77ae24d204536c03822ba9fe9d511e5",
+      "packagedSha256": "082ae0366364d48f7df10f727a2483fbe77ae24d204536c03822ba9fe9d511e5"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-067-647BDD0A-0D04-4D53-8607-A82AE74AC3AE.json",
+      "description": "sp-native-picker-before_selection_tap-geometry_0_2E25D25F-05B5-49D4-B31E-F04E9E73299A.json",
+      "sha256": "2588187d16b5fdd6fcc0b6a39c60c634554e530b69ac19fbae09bbba24e4bbbb",
+      "packagedSha256": "2588187d16b5fdd6fcc0b6a39c60c634554e530b69ac19fbae09bbba24e4bbbb"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-068-6C63A2BE-68C9-4B73-B765-8D2AC429B665.png",
+      "description": "P17-008-en-selected_language_option-control-crop_0_00771613-E8E0-466A-9596-EECEC10123CE.png",
+      "sha256": "aeb2962a54f0c54bfb15dbcde40ad9830402c90f50b027417f4030f1c5280b35",
+      "packagedSha256": "aeb2962a54f0c54bfb15dbcde40ad9830402c90f50b027417f4030f1c5280b35"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-069-5AA9ED93-6A9F-48A4-9A85-65CE50F25DF8.json",
+      "description": "en-native-picker-selected_row_crop-geometry_0_0C756F8F-D3FD-4698-B2B6-29568F9D92F2.json",
+      "sha256": "bc8cbd284cc44e61e238be4e80068812324962ac69c55e5e9fad3b3edc25f909",
+      "packagedSha256": "bc8cbd284cc44e61e238be4e80068812324962ac69c55e5e9fad3b3edc25f909"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-070-FAD0C025-8BDF-41B1-ABD8-D4232A9C2A2B.png",
+      "description": "P17-008-en-settings_change_language_app_title-control-crop_0_9CDB6A79-634B-458E-B522-05D3437BCAA9.png",
+      "sha256": "d22555ce8cff96afcad394e55d19c36d5d707323b98d1a92cbb9eac42a3edf41",
+      "packagedSha256": "d22555ce8cff96afcad394e55d19c36d5d707323b98d1a92cbb9eac42a3edf41"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-071-33F8D1D9-958D-4923-8366-1B86EEB58DDC.png",
+      "description": "P17-008-en-general_all-control-crop_0_D5A2E1DC-F5F8-4DFB-8765-835E6B303DC6.png",
+      "sha256": "24bb0d842bf3a09cfe2fec7c6be800783351b71ee2e5dac2490915ad805c4cbf",
+      "packagedSha256": "24bb0d842bf3a09cfe2fec7c6be800783351b71ee2e5dac2490915ad805c4cbf"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-072-2737EC74-D25A-4837-AB06-701E4E1E714D.png",
+      "description": "P17-008-en-contact_support_subtitle-control-crop_0_D09B5943-5273-4F96-A6A8-96B2ED8811D1.png",
+      "sha256": "4851e222ce571bd350ad491d0c5e086e6e8052206fd72ca5291698842fec3a12",
+      "packagedSha256": "4851e222ce571bd350ad491d0c5e086e6e8052206fd72ca5291698842fec3a12"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-073-50AC4ACE-F7B3-49D0-A8BA-BF485E8BA5DA.png",
+      "description": "P17-008-en-profile_description-control-crop_0_7EECA688-6686-4A9C-8B8D-C5FA8B17B17D.png",
+      "sha256": "7f5e6aa8c3041bf0d64bdfae0da5ad1d123d01fb97bba18ec8d4ace46eba0f40",
+      "packagedSha256": "7f5e6aa8c3041bf0d64bdfae0da5ad1d123d01fb97bba18ec8d4ace46eba0f40"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-074-2E9C5366-F567-4891-BE3D-9E2119C94442.png",
+      "description": "P17-008-en-messages_title-control-crop_0_B6A1E05C-5936-4EAD-8CBB-52D9F1A2EAFE.png",
+      "sha256": "a89582ae124b49301cfd891a4292ef61301753a5708f0d8fffae7a89ae4e99cf",
+      "packagedSha256": "a89582ae124b49301cfd891a4292ef61301753a5708f0d8fffae7a89ae4e99cf"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-075-F71CBB6F-5092-40AA-92C2-CD4B571A5F84.png",
+      "description": "P17-008-en-caregiver_matches_page_title-control-crop_0_E346ABAC-59F5-409C-88FD-B611072FC5D6.png",
+      "sha256": "efbd6130713178cf4a22150d3abf8b5a007cbf8f971c89274dc8cb425b2576ac",
+      "packagedSha256": "efbd6130713178cf4a22150d3abf8b5a007cbf8f971c89274dc8cb425b2576ac"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-076-EECEB07E-AF7C-4933-8FD9-78DBF0C55ED2.json",
+      "description": "P17-008-en-post-save-before-terminate-native-readiness_0_A39953CF-B1FD-4D04-B23C-50D34CDD3C89.json",
+      "sha256": "3872c3ce1623c63efed0b2ae687d768961bcb86b5ba66dffa1bd2c4f9dae7cc9",
+      "packagedSha256": "3872c3ce1623c63efed0b2ae687d768961bcb86b5ba66dffa1bd2c4f9dae7cc9"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-077-48750164-6594-4347-A583-5682C58C493E.json",
+      "description": "en-native-picker-before_selection_tap-geometry_0_B907BD52-9603-4C52-8321-3BB349D2046C.json",
+      "sha256": "e67e1385fe1617cdc664bff800540fab7331be5dbb151e2f11e529f0b53ee795",
+      "packagedSha256": "e67e1385fe1617cdc664bff800540fab7331be5dbb151e2f11e529f0b53ee795"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-078-A76145EF-61C9-4A65-84AB-79FA05A65DB3.png",
+      "description": "P17-008-cn-selected_language_option-control-crop_0_21F69B3A-578A-4882-95B9-EEDB03FF14EF.png",
+      "sha256": "9699cd45e5477dd618bc4abdf289053a2144a5ecf6fecaa263964c03d86108cc",
+      "packagedSha256": "9699cd45e5477dd618bc4abdf289053a2144a5ecf6fecaa263964c03d86108cc"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-079-437EA954-3A2D-450E-902C-86F5362704FC.json",
+      "description": "cn-native-picker-selected_row_crop-geometry_0_535A96DD-B170-4C3A-9680-2029A2A35AFD.json",
+      "sha256": "f3253c40a424014bf1a619076e19cde30ca57b0961088590aa5e381e3a2054ad",
+      "packagedSha256": "f3253c40a424014bf1a619076e19cde30ca57b0961088590aa5e381e3a2054ad"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-080-1E0E23BE-E9F2-4D72-B1E3-0B2933A0DA1C.png",
+      "description": "P17-008-cn-settings_change_language_app_title-control-crop_0_0DB68593-EA86-425A-BBB8-B81CE54265C8.png",
+      "sha256": "fb0d12eb521003d1b8e4172860afd8fead49af1f93ae0ceafca1f9116e4cd01a",
+      "packagedSha256": "fb0d12eb521003d1b8e4172860afd8fead49af1f93ae0ceafca1f9116e4cd01a"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-081-BFF964C3-2465-486A-AD6F-DB4369F73E29.png",
+      "description": "P17-008-cn-general_all-control-crop_0_0632D806-1CF4-4A8A-B1CB-5EDB5468E3FC.png",
+      "sha256": "b75353caba86d7f4f7f5ebae3f4170238edd9ecabc67bc786c9ebafee6ed134a",
+      "packagedSha256": "b75353caba86d7f4f7f5ebae3f4170238edd9ecabc67bc786c9ebafee6ed134a"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-082-19BED497-F3F0-4601-B43D-ECCF79D310AC.png",
+      "description": "P17-008-cn-contact_support_subtitle-control-crop_0_55B945C5-CC3F-4AEE-83EE-AA0C78E19572.png",
+      "sha256": "920e3b9ea3d2391a1c0a53e6d399b539786e4f898c5559bd4728098e740364dd",
+      "packagedSha256": "920e3b9ea3d2391a1c0a53e6d399b539786e4f898c5559bd4728098e740364dd"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-083-24DDDD7C-AC55-4E3B-A68D-F0C068A1F7BA.png",
+      "description": "P17-008-cn-profile_description-control-crop_0_5E3DEF08-B767-4ECC-9D9C-761C2A908B72.png",
+      "sha256": "c70d8d62069db6f96f342610db68cd82ff860bb74470e1e334206353d6eab913",
+      "packagedSha256": "c70d8d62069db6f96f342610db68cd82ff860bb74470e1e334206353d6eab913"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-084-E78B7709-BCB1-4DFB-AC1E-FC06E0178FD4.png",
+      "description": "P17-008-cn-messages_title-control-crop_0_B64C0781-D305-4F37-B4E1-33CCC7F781F3.png",
+      "sha256": "15f365c75095705ecb05fd67b4a1abeb5dbe8f5f0746c379b334826d51222fc6",
+      "packagedSha256": "15f365c75095705ecb05fd67b4a1abeb5dbe8f5f0746c379b334826d51222fc6"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-085-3FFC8D5B-B228-479B-B176-A837BF08ECB0.png",
+      "description": "P17-008-cn-caregiver_matches_page_title-control-crop_0_5C1740D5-4AC6-45CF-BE1B-691F0ADF15AF.png",
+      "sha256": "b7268566b83d158fd6ff38a76609dda0eaf346f0f8891a02d1639058b43b19f8",
+      "packagedSha256": "b7268566b83d158fd6ff38a76609dda0eaf346f0f8891a02d1639058b43b19f8"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-086-8DE53A18-29F1-4A41-9888-0629A5B90D6D.json",
+      "description": "P17-008-cn-post-save-before-terminate-native-readiness_0_FAD74105-009B-4E63-980E-2AE35A8C2AC3.json",
+      "sha256": "977e8db1cd154fe0016c1fa4ffa26531279bfb3771e200d167333420ee52668c",
+      "packagedSha256": "977e8db1cd154fe0016c1fa4ffa26531279bfb3771e200d167333420ee52668c"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-087-9DBC827D-0C47-40C9-AD04-9572F0A07071.json",
+      "description": "cn-native-picker-before_selection_tap-geometry_0_1B5F3040-C125-4697-B207-20B76D2C567A.json",
+      "sha256": "8c08ec68a1e1a1b6dfad401d34034045aee0b81fdd6b6f3f38d69c37787d15b8",
+      "packagedSha256": "8c08ec68a1e1a1b6dfad401d34034045aee0b81fdd6b6f3f38d69c37787d15b8"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-088-D0A6F883-8046-4ADB-96F9-7AF1B752E128.png",
+      "description": "P17-008-in-selected_language_option-control-crop_0_6917B08A-8BC6-4018-86C8-C7AD61BF2509.png",
+      "sha256": "a14bb8249d041fabcb8115ad343f7d7f705406a96c4b4acc566c2608080ccbdd",
+      "packagedSha256": "a14bb8249d041fabcb8115ad343f7d7f705406a96c4b4acc566c2608080ccbdd"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-089-00BE750F-A3BE-440A-B811-63C025083C77.json",
+      "description": "in-native-picker-selected_row_crop-geometry_0_CDF21273-2053-4FC6-9A0B-A00E569203E8.json",
+      "sha256": "bba8c064d1fc6aea4362f9d0bce48f658ea152a8c34c4a72187199becd1a2313",
+      "packagedSha256": "bba8c064d1fc6aea4362f9d0bce48f658ea152a8c34c4a72187199becd1a2313"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-090-5FC4DD84-C77E-48B6-9B51-90633BA83071.png",
+      "description": "P17-008-in-settings_change_language_app_title-control-crop_0_AAB7AB99-5F50-4A1E-9B63-54A766AA15EC.png",
+      "sha256": "0521c2f739fd4872bc0ca43357df0f348a05ba65948ebf26cb4fabd996c512a6",
+      "packagedSha256": "0521c2f739fd4872bc0ca43357df0f348a05ba65948ebf26cb4fabd996c512a6"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-091-44787557-822F-4747-B034-5F049558BB77.png",
+      "description": "P17-008-in-general_all-control-crop_0_006CA681-9992-4145-97C9-E9CD4A158C37.png",
+      "sha256": "0beea061bc3635196a05718fc124106a05f9aac5a49aae3a70833f4d7501f1c1",
+      "packagedSha256": "0beea061bc3635196a05718fc124106a05f9aac5a49aae3a70833f4d7501f1c1"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-092-6EE88731-559A-4DB2-8434-535F615D788E.png",
+      "description": "P17-008-in-contact_support_subtitle-control-crop_0_BCA9C3F5-3F3D-48D0-B9F9-6A350B731B10.png",
+      "sha256": "97607ca40ac0c5e87b9110019c84b6080f42c9b89732bf9334558022867ebe19",
+      "packagedSha256": "97607ca40ac0c5e87b9110019c84b6080f42c9b89732bf9334558022867ebe19"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-093-B912B86C-3FAE-465C-A463-E84669674CEC.png",
+      "description": "P17-008-in-profile_description-control-crop_0_9A23AD7B-E9D4-4C1A-82C4-B789C6498D41.png",
+      "sha256": "defeb3faf1b0b2aef4edd8fedab0ea2b89e5b473e48a9e7cacb857e243108f4f",
+      "packagedSha256": "defeb3faf1b0b2aef4edd8fedab0ea2b89e5b473e48a9e7cacb857e243108f4f"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-094-66AA2CFF-16FC-46DA-8C2D-E5CD94AFFF8B.png",
+      "description": "P17-008-in-messages_title-control-crop_0_A64B1C58-F683-4E44-B718-AF07D1FDF77E.png",
+      "sha256": "46f03ac552758c5883d9b62e59c3b20ba43ea92e1ca1ef135a530fd17c2f25cc",
+      "packagedSha256": "46f03ac552758c5883d9b62e59c3b20ba43ea92e1ca1ef135a530fd17c2f25cc"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-095-12AA5D05-C61D-4961-9C35-D0A2D634AAAD.png",
+      "description": "P17-008-in-caregiver_matches_page_title-control-crop_0_79CEBA4E-E4A7-4FB5-BBBC-8F1DC04C68BB.png",
+      "sha256": "339aff5a76b69a16685d0c6bfbadd6e3d8da74d83f1bfff01aaa1c35add0a617",
+      "packagedSha256": "339aff5a76b69a16685d0c6bfbadd6e3d8da74d83f1bfff01aaa1c35add0a617"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-096-43BBC253-0BA0-45E6-9FAD-EE0B8ACEC389.json",
+      "description": "P17-008-in-post-save-before-terminate-native-readiness_0_55F71AA9-4563-4DF8-9815-06639CBADF63.json",
+      "sha256": "a7279c1035f03e38a80ef8c3740688686d1b7e4a1f4920cd3702d9e48d1dab2c",
+      "packagedSha256": "a7279c1035f03e38a80ef8c3740688686d1b7e4a1f4920cd3702d9e48d1dab2c"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-097-D488B955-112C-4434-87DA-BE7609135BFB.json",
+      "description": "in-native-picker-before_selection_tap-geometry_0_C48E8767-504B-43DC-9F79-3CD1147E369E.json",
+      "sha256": "25cf3e0478c6499c78f1dea34fc574f3dea6f5b88453be1c4cac65f6e0c62bed",
+      "packagedSha256": "25cf3e0478c6499c78f1dea34fc574f3dea6f5b88453be1c4cac65f6e0c62bed"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-098-2FAF2B35-8A7B-447C-BE1B-3ACCD540E829.json",
+      "description": "P17-008-initial-selection-and-observed-save_0_C878E4F5-708B-4E43-ACDC-6FB491949469.json",
+      "sha256": "1f569967f176f6bccd04fc0d93548608f90a45b8f374febbbd8d1069f2081415",
+      "packagedSha256": "1f569967f176f6bccd04fc0d93548608f90a45b8f374febbbd8d1069f2081415"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-099-C50C0F8D-C3B4-41CB-8E62-A7232828F6EF.json",
+      "description": "owned-state-render-none-caregiver_0_42716A2F-934A-47EF-9E77-6C411E6FB25E.json",
+      "sha256": "8c09c008f16b990c738712c7c406660518a269ce44fd8aaddd93f08340ff61a8",
+      "packagedSha256": "8c09c008f16b990c738712c7c406660518a269ce44fd8aaddd93f08340ff61a8"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-100-B6CE92BD-20EA-4DEA-9B62-F34AEF5B61C0.png",
+      "description": "owned-none-match-request-control-only-caregiver_0_553CC761-A443-4E43-8F3E-639CE5833565.png",
+      "sha256": "fb82bdeb1c85e834edfb61fac631b7d8ad5900ca550d3a0c86b539d1e9708fe7",
+      "packagedSha256": "fb82bdeb1c85e834edfb61fac631b7d8ad5900ca550d3a0c86b539d1e9708fe7"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-101-212A9CDD-1072-49E0-A3D8-097E3176C0BE.json",
+      "description": "real-native-instant-reciprocal-proof_0_140C0A3F-66F7-4EE8-983F-42CC44C38486.json",
+      "sha256": "694629279865450aae25a5b1128c8b3f458bd9a62720895dcc5d5dea939fcda3",
+      "packagedSha256": "694629279865450aae25a5b1128c8b3f458bd9a62720895dcc5d5dea939fcda3"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-102-BC0AEAFB-A721-4C3D-AD13-1B48423C849A.png",
+      "description": "real-instant-matched-profile-control_0_21F2D865-EBB6-4605-A408-23469573FECC.png",
+      "sha256": "69e3965042253ccfa3353b314b345186e8e8ed56f13dd0e1f3d2a18c55435214",
+      "packagedSha256": "69e3965042253ccfa3353b314b345186e8e8ed56f13dd0e1f3d2a18c55435214"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-103-AEC98D9F-D580-473A-BBB2-B23092A753FF.json",
+      "description": "full-first-line-introduction-modal-caregiver_0_4D1D7731-F692-4A83-B792-CB1F9FA62585.json",
+      "sha256": "4d12d27b9b8f2bd25e22a326d80d93ea75dba3ff6dab36be605a766919a49932",
+      "packagedSha256": "4d12d27b9b8f2bd25e22a326d80d93ea75dba3ff6dab36be605a766919a49932"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-104-705F4C04-4DD5-4268-9BAF-AFE17E2BBECF.png",
+      "description": "full-introduction-close-control-only_0_448D7372-DED1-46C8-8FDF-BEEDF6C73A65.png",
+      "sha256": "839b768cb122ae168f7d9f18af84d3ecb462e804d59028e69144cc53e12636a2",
+      "packagedSha256": "839b768cb122ae168f7d9f18af84d3ecb462e804d59028e69144cc53e12636a2"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-105-10551B56-76DF-4DFC-8246-009180792E57.png",
+      "description": "long-first-line-preview-raster-review-caregiver_0_E82D29F0-1C91-4BA5-9928-FF4D4339BB1A.png",
+      "sha256": "2591320dd4db0c7a98d0f3aacdc4301ec7dcd37f275e5a2ddc924f75e8f43a95",
+      "packagedSha256": "2591320dd4db0c7a98d0f3aacdc4301ec7dcd37f275e5a2ddc924f75e8f43a95"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-106-DC7BB559-27C2-4825-844E-5AC31BD2BF15.json",
+      "description": "optional-empty-request-cancel-caregiver_0_1DB57B14-BD9F-4D1E-93EF-6EB878F1CC5F.json",
+      "sha256": "140f71b21b80ad5f1b78b678c51cfccbe9a596ccf5f2c10da2527403df92ae4c",
+      "packagedSha256": "140f71b21b80ad5f1b78b678c51cfccbe9a596ccf5f2c10da2527403df92ae4c"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-final-default-107-D246E5ED-D227-459E-A5F2-6B2F639307CE.png",
+      "description": "managed-request-question-only_0_D8CCB15A-8841-4CCA-86F5-21B63A75AF17.png",
+      "sha256": "f4e26133d77e81f22b1de2b0a3b75c86c54573e76f7b360375048324c73fb0e3",
+      "packagedSha256": "f4e26133d77e81f22b1de2b0a3b75c86c54573e76f7b360375048324c73fb0e3"
+    }
+  ]
+}

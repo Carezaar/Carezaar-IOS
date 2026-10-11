@@ -1,0 +1,23 @@
+[
+  {
+    "languageCode": "en",
+    "matchesMessagesProfileHelpFAQSettings": true,
+    "nativeSelected": true,
+    "ordinaryTerminateRelaunch": true,
+    "repeatedLoginPOSTs": 0
+  },
+  {
+    "languageCode": "fr",
+    "matchesMessagesProfileHelpFAQSettings": true,
+    "nativeSelected": true,
+    "ordinaryTerminateRelaunch": true,
+    "repeatedLoginPOSTs": 0
+  },
+  {
+    "languageCode": "ar",
+    "matchesMessagesProfileHelpFAQSettings": true,
+    "nativeSelected": true,
+    "ordinaryTerminateRelaunch": true,
+    "repeatedLoginPOSTs": 0
+  }
+]

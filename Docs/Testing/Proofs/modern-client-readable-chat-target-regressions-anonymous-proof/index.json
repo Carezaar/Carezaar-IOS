@@ -1,0 +1,162 @@
+{
+  "source": "fresh-modern-client-readable-chat-target-regressions.xcresult",
+  "rootReviewed": true,
+  "publishable": false,
+  "artifacts": [
+    {
+      "path": "Artifacts/43306EF9-7F6F-4B78-80EF-39DC7765E063.json",
+      "description": "owned-incoming-bottom-older-position-timestamps-client_0_16EF892C-3DB8-4C69-8A9B-B0D18DC4CABF.json",
+      "sha256": "c36a7cf78bf0d5cf0128d8e4c41e68d99f2d0f51749d95fa80d9d77e2b36fe1c",
+      "packagedSha256": "c36a7cf78bf0d5cf0128d8e4c41e68d99f2d0f51749d95fa80d9d77e2b36fe1c"
+    },
+    {
+      "path": "Artifacts/4A797723-D626-4533-8D44-17BE62DAE1E5.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_615BB989-44C7-4572-AA2E-EEE391446D37.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/37210148-3E5E-40B9-827D-654DFC37CC76.png",
+      "description": "owned-incoming-reading-stored-timestamp-only-client_0_69D3B78C-D3B9-49D6-9C93-A8B27C341454.png",
+      "sha256": "6963b2e3969c63e69c81cc159457f5c7dc19c5f76522cecf4ac883835046498f",
+      "packagedSha256": "6963b2e3969c63e69c81cc159457f5c7dc19c5f76522cecf4ac883835046498f"
+    },
+    {
+      "path": "Artifacts/D22F4FA9-0472-490E-9E3C-C609BB5CF432.png",
+      "description": "owned-incoming-after-manual-return-synthetic-message-only-client_0_45860821-9055-4699-BA72-8320EE39B3FE.png",
+      "sha256": "cecc8ffaa58c4fdc019933a85d2bc293368a0a1574f56fd2c70ae6aa9f2180d3",
+      "packagedSha256": "cecc8ffaa58c4fdc019933a85d2bc293368a0a1574f56fd2c70ae6aa9f2180d3"
+    },
+    {
+      "path": "Artifacts/AFDBC210-CD3B-4D42-AAB0-DBEC496CCB53.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_C8372AF7-1AB1-46B8-8168-EE8D8C932FB3.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/9CC22D3D-A073-4EB6-9EA1-3E76DACAD5A0.png",
+      "description": "owned-incoming-preserved-older-synthetic-message-only-client_0_CF148C53-7814-4C80-A013-C583DC070A80.png",
+      "sha256": "1be92c524568bc01d5262506d09713cb9e1e74cad2791b9eb94155240c91a52b",
+      "packagedSha256": "1be92c524568bc01d5262506d09713cb9e1e74cad2791b9eb94155240c91a52b"
+    },
+    {
+      "path": "Artifacts/B04929BC-095E-4D91-B80C-95970551393C.png",
+      "description": "owned-incoming-bottom-stored-timestamp-only-client_0_2AB5E9E1-533D-4183-B8D3-B0EC589F73FE.png",
+      "sha256": "6963b2e3969c63e69c81cc159457f5c7dc19c5f76522cecf4ac883835046498f",
+      "packagedSha256": "6963b2e3969c63e69c81cc159457f5c7dc19c5f76522cecf4ac883835046498f"
+    },
+    {
+      "path": "Artifacts/54B15F5E-D41B-4B91-AF2E-159DBAECCE98.png",
+      "description": "owned-incoming-bottom-synthetic-message-only-client_0_FD2CB6C5-50B1-472B-A2CE-E86ABD5B3D2B.png",
+      "sha256": "404db534d00ac68c1e7a89a06b06fabf5a0fd3e67f4627c4a01cda88e4e693ab",
+      "packagedSha256": "404db534d00ac68c1e7a89a06b06fabf5a0fd3e67f4627c4a01cda88e4e693ab"
+    },
+    {
+      "path": "Artifacts/E4413556-83A2-475E-8C84-CEAC3BE52879.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_B2435A36-7E73-4B13-9217-828F46F34B95.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/7C44CD29-92D0-4383-BE9D-C8FA4C2A200C.json",
+      "description": "owned-keyboard-visible-incoming-boundaries-client_0_2C0568D9-0002-406E-98AE-36110E109842.json",
+      "sha256": "c685761379d58eb3e1d300ce538966b923e57cdfcd950cee35671de9c8e79a48",
+      "packagedSha256": "c685761379d58eb3e1d300ce538966b923e57cdfcd950cee35671de9c8e79a48"
+    },
+    {
+      "path": "Artifacts/B7C6D6CD-6D7D-4731-94EA-52688AE83532.png",
+      "description": "owned-keyboard-incoming-latest-reachable-synthetic-message-only-client_0_3DCC81D5-1144-4079-AB04-139097BF117B.png",
+      "sha256": "5a03a6e65cc16f27315103c88f9a74d6692161e7b915def198a0a90e88aef4a9",
+      "packagedSha256": "5a03a6e65cc16f27315103c88f9a74d6692161e7b915def198a0a90e88aef4a9"
+    },
+    {
+      "path": "Artifacts/1A0FBAFD-4D8E-40F0-AB04-4B7470A2E3D5.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_57F9644E-71C3-4529-AED5-B85007CBAC82.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/6BADE1C1-9A04-4576-BB85-C5B6E04DC608.png",
+      "description": "owned-keyboard-incoming-anchored-older-synthetic-message-only-client_0_7B0BCCC4-8CE9-4354-9CF4-36122C962410.png",
+      "sha256": "d49b07455f546c50a7143d2cd27b7b3e034ac9492194f7330e0b7be849216c9f",
+      "packagedSha256": "d49b07455f546c50a7143d2cd27b7b3e034ac9492194f7330e0b7be849216c9f"
+    },
+    {
+      "path": "Artifacts/A0838633-AF3C-4CD1-95B5-0E59C3129C67.png",
+      "description": "owned-keyboard-incoming-bottom-synthetic-message-only-client_0_02E24D50-9A3E-473D-9F80-8AF61602D977.png",
+      "sha256": "57f9248ebb29dd7b0b675bdbb7e76b294d31da30c2c991145995d9d5ea56c74a",
+      "packagedSha256": "57f9248ebb29dd7b0b675bdbb7e76b294d31da30c2c991145995d9d5ea56c74a"
+    },
+    {
+      "path": "Artifacts/F0C3E4D8-8D29-4D2F-BD9A-7D7AA6CFBDEB.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_6C81A96E-961D-4B29-B07E-F31CF072B0A0.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/1CDFB085-7517-4905-821B-191396969F6A.png",
+      "description": "owned-keyboard-incoming-unsent-synthetic-draft-only-client_0_D0290A18-CB28-4840-BEC9-B41EF868260B.png",
+      "sha256": "246f86548dff4644d3e7a0a5ac4bf437015e88d127a81f6779245b9db0b6f10c",
+      "packagedSha256": "246f86548dff4644d3e7a0a5ac4bf437015e88d127a81f6779245b9db0b6f10c"
+    },
+    {
+      "path": "Artifacts/97DD2FCA-0E31-45E6-AFC6-E9A690A87E0A.json",
+      "description": "owned-keyboard-older-focus-geometry_0_8C4EACF7-1568-426A-81ED-E240CC18F9E0.json",
+      "sha256": "fcfdd7448fd0d90441115fc7154a22f6b3bcc224b7ced355845e9e7fadb94198",
+      "packagedSha256": "fcfdd7448fd0d90441115fc7154a22f6b3bcc224b7ced355845e9e7fadb94198"
+    },
+    {
+      "path": "Artifacts/973AFA98-4666-424C-AE18-F7288DD31FFC.json",
+      "description": "owned-reply-race-timing-client_0_D3ED1C1E-C542-4146-BF2C-3DD0BC0CC3B2.json",
+      "sha256": "3ebd731196e7d782a52ae6dcb87782d30b7bf885ccb8a56029c067d6d2fb6e68",
+      "packagedSha256": "3ebd731196e7d782a52ae6dcb87782d30b7bf885ccb8a56029c067d6d2fb6e68"
+    },
+    {
+      "path": "Artifacts/78FFE8C0-21D2-43DF-8508-9BD8F39CF38A.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_9AE4FBD8-8F94-4598-B765-AC8EE2BCEE55.json",
+      "sha256": "ac3cc85bd3994c71a92954502b0647aedbf4c4f06f7ba93c75854e8f81bf8757",
+      "packagedSha256": "ac3cc85bd3994c71a92954502b0647aedbf4c4f06f7ba93c75854e8f81bf8757"
+    },
+    {
+      "path": "Artifacts/4792E8DE-7E99-4F6E-A02B-F10501B9534C.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_5614C0B8-5B04-4054-81E1-97C91187EA81.json",
+      "sha256": "f8f83fab0a8885c260e7712bf377d0b973cf22718974c75cae5dff7e00f1d776",
+      "packagedSha256": "f8f83fab0a8885c260e7712bf377d0b973cf22718974c75cae5dff7e00f1d776"
+    },
+    {
+      "path": "Artifacts/8C285AD2-BF16-4B00-9AD0-ADC57B3B7790.json",
+      "description": "owned-slow-send-new-typing-client_0_35473FB1-7B3C-4680-B370-D8F5711306C7.json",
+      "sha256": "5f5cc60ec4509e84bf66307890c6423767f3c9c28c613c242c64bc12f115992a",
+      "packagedSha256": "5f5cc60ec4509e84bf66307890c6423767f3c9c28c613c242c64bc12f115992a"
+    },
+    {
+      "path": "Artifacts/B4DA0C1D-92F6-4294-BFB1-92AFAF37CB82.png",
+      "description": "owned-slow-send-retained-synthetic-draft-only-client_0_1593B5BF-ECCB-4BD7-938D-4E4651000714.png",
+      "sha256": "1eeb21c34b6063bd80056625d00d5e2895e82d39cc2f266e1365ce601cda6907",
+      "packagedSha256": "1eeb21c34b6063bd80056625d00d5e2895e82d39cc2f266e1365ce601cda6907"
+    },
+    {
+      "path": "Artifacts/03702453-4374-4331-84DB-88BE53D778B5.png",
+      "description": "owned-slow-send-first-synthetic-bubble-only-client_0_AC774371-A28D-4541-A9F2-04564138B69A.png",
+      "sha256": "b7be9e824a4afaf96bc1af0264467b71e8f2ee3d2c65a49f2e689cc27a3788b4",
+      "packagedSha256": "b7be9e824a4afaf96bc1af0264467b71e8f2ee3d2c65a49f2e689cc27a3788b4"
+    }
+  ],
+  "wholeProcessExit": 65,
+  "tests": {
+    "incoming": "PASS95.053",
+    "keyboardOlder": "PASS78.388",
+    "strictReply": "FAIL130.228; actualcheckpoint16.6556149721>=10",
+    "slowSend": "PASS63.560",
+    "ContactExternal": "SKIP10.946 no externalMailhandler"
+  },
+  "rootReview": "Viewed11 bounded syntheticPNG/read12anonymousJSON, two unscaled sheets; actual44x44Menu verified; blacktext on retainedblue nativecrop.",
+  "publicPackage": {
+    "rootReviewed": true,
+    "independentReviewed": true,
+    "originalEvidencePreserved": true,
+    "rawLogsXCResultsFullScreenPhotosPrivateFixturesIncluded": false
+  },
+  "independentReviewed": true,
+  "independentReview": "final_review checked all31 hashes and13 bounded synthetic PNGs across both batches; no privacy/hash blocker; mixedfailures and unexercisedbannerbranch retained."
+}

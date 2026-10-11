@@ -1,0 +1,56 @@
+{
+  "source": "fresh-modern-caregiver-strict-reply-direct-readiness-final.xcresult",
+  "rootReviewed": true,
+  "publishable": false,
+  "artifacts": [
+    {
+      "path": "Artifacts/90284994-F7DA-46F6-AD2D-2FD51A94E71C.json",
+      "description": "owned-reply-race-acknowledged-caregiver_0_D6C6D476-333D-4662-B6D8-5E70D3A6C9CC.json",
+      "sha256": "3229ee5ae66d95f574287552ba542e259fa6b77f16fdabf10db9097da699d97c",
+      "packagedSha256": "3229ee5ae66d95f574287552ba542e259fa6b77f16fdabf10db9097da699d97c"
+    },
+    {
+      "path": "Artifacts/C229C395-9805-4A8D-A259-EB317B5938CE.png",
+      "description": "owned-reply-race-synthetic-acknowledged-message-only-caregiver_0_9C587B87-A3AF-4B92-929B-1F4CFC79221B.png",
+      "sha256": "19b83edc0d5f817e8cf5abc3e8dc510a70b5a42fec4d33da98eb3630da72a9a2",
+      "packagedSha256": "19b83edc0d5f817e8cf5abc3e8dc510a70b5a42fec4d33da98eb3630da72a9a2"
+    },
+    {
+      "path": "Artifacts/B852A8AA-403C-4B48-AFCE-749C2CEE0569.json",
+      "description": "owned-reply-race-timing-caregiver_0_C5A7BD6B-A580-420E-A7FA-6484F1FFC6A1.json",
+      "sha256": "78324523b528adbe5adb2a3ca36718d9faeac7e4fb0702e5c9bafe1297c7462d",
+      "packagedSha256": "78324523b528adbe5adb2a3ca36718d9faeac7e4fb0702e5c9bafe1297c7462d"
+    },
+    {
+      "path": "Artifacts/9821E5E8-8D0F-4C69-B6B7-6A6C2C8AEDBE.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_7AB34816-BF0C-42D0-ADC0-A0CD94E3EBB0.json",
+      "sha256": "32dfc8a20b0e84aeb589aa3678140dcc580e1b5ae83b8647083345bc359c6508",
+      "packagedSha256": "32dfc8a20b0e84aeb589aa3678140dcc580e1b5ae83b8647083345bc359c6508"
+    },
+    {
+      "path": "Artifacts/36DCBA59-76DF-4E73-8EB6-8261B64035D2.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_FAF20D10-966A-48DB-930C-5AF54FFF328A.json",
+      "sha256": "9b92ac78a8ec80aac4acf1842b9a464270d4f0753cd739e873615decfb5d926e",
+      "packagedSha256": "9b92ac78a8ec80aac4acf1842b9a464270d4f0753cd739e873615decfb5d926e"
+    }
+  ],
+  "rootReviewScope": "Directactual1PNG/4JSONreview/hashverified/noPII. FullModernCGstrictReplyPASS169.719 checkpoint9.061739921 includes1normalnativebannerdismissal/allpendingobs. Native1ack/originalparentboth/newReplyretained, exact44AXprecision8ULP.",
+  "independentlyReviewed": true,
+  "independentReviewScope": "Directly inspected the complete synthetic bounded bubble and read all four anonymous JSON artifacts; all five hashes match and no private fixture data, tokens, absolute paths, unindexed files, or symlinks were found. Supports full Modern caregiver strict Reply completion: 9.061739921-second checkpoint including all observations and one native banner dismissal, zero native POSTs before change, one acknowledged POST, original parent verified from both owned perspectives, and newer reply retained. Observed 43.999999999999972-point AX menu height is within the source eight-ULP numerical allowance for the declared 44-point target; no physical-size relaxation claimed. Does not establish other allocations.",
+  "independentReviewed": true,
+  "independentReview": "Directly inspected the complete synthetic bounded bubble and read all four anonymous JSON artifacts; all five hashes match and no private fixture data, tokens, absolute paths, unindexed files, or symlinks were found. Supports full Modern caregiver strict Reply completion: 9.061739921-second checkpoint including all observations and one native banner dismissal, zero native POSTs before change, one acknowledged POST, original parent verified from both owned perspectives, and newer reply retained. Observed 43.999999999999972-point AX menu height is within the source eight-ULP numerical allowance for the declared 44-point target; no physical-size relaxation claimed. Does not establish other allocations.",
+  "scope": "Full Modern caregiver strictReply PASS169.719; actualcheckpoint9.061739921 includes1normalnativebannerdismissal/allobservations/noexclusions. Native0POSTbeforechange/1POSTack/originalparentbothperspectives/newReplyretained/exact44targetswith8ULPAXprecision. Other allocations separately required.",
+  "testResults": [
+    {
+      "method": "testOwnedReplySendKeepsSubmittedParentAndNewerReplyAfterAcknowledgement",
+      "status": "PASS",
+      "seconds": 169.719
+    }
+  ],
+  "publicPackage": {
+    "rootReviewed": true,
+    "independentReviewed": true,
+    "originalEvidencePreserved": true,
+    "rawLogsXCResultsFullScreenPhotosPrivateFixturesIncluded": false
+  }
+}

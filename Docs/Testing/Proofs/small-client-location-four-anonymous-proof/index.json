@@ -1,0 +1,247 @@
+{
+  "source": "fresh-small-client-controlled-location-four.xcresult",
+  "wholeProcessExit": 0,
+  "allocation": "small client",
+  "passesSeconds": {
+    "cached": 31.309,
+    "invalidThreeVariants": 99.056,
+    "manualLateFix": 33.543,
+    "stale": 27.617
+  },
+  "rootReviewedCroppedPNGs": 10,
+  "noFixSaveTested": false,
+  "preSaveGuidanceRepairBinary": true,
+  "physicalGPSVerified": false,
+  "controlledInputsOnly": true,
+  "artifacts": [
+    {
+      "path": "Artifacts/small-client-location-four-001-323DD894-83D5-4CAC-A8CE-CF872E9C697A.json",
+      "description": "P03-021-controlled-cached-native_0_D5F6491E-F4C1-4844-8D3F-FC7A79DD89C2.json",
+      "sha256": "51bfaef80f20efb6b8cfba85f59889e3c1b8160124cc63cec76befec49161719"
+    },
+    {
+      "path": "Artifacts/small-client-location-four-002-1FC5236E-CE3A-49A1-916E-5BD073E5CF3B.png",
+      "description": "P03-021-controlled-review-coordinate-only_0_8EB430BB-95AF-4142-AAEA-C36FC4EE2CA5.png",
+      "sha256": "359acae6703557ef563148e966448b29906a82e8aef8d86659eea962bf240151"
+    },
+    {
+      "path": "Artifacts/small-client-location-four-003-A0D670F2-F76C-4B7A-BA63-EAAA49C806B4.png",
+      "description": "P03-021-controlled-cached-coordinate-only_0_B113BF2D-0748-40D6-BB48-B1FFD8DA8C34.png",
+      "sha256": "81856a202772d0f48d2f685601e25d7d90df5c3518d81960d1f45fdcd42d1088"
+    },
+    {
+      "path": "Artifacts/small-client-location-four-004-D57F931F-726B-4E0B-9E9D-1E07975A6543.json",
+      "description": "controlled-location-opening-available-native_0_6DA86FD4-4003-45DC-AB73-504B2BC54A7B.json",
+      "sha256": "0d14b6b315ab7cd0c4c3149592cd8590463ec9bffbd2ac7db9e82d958bdaae82"
+    },
+    {
+      "path": "Artifacts/small-client-location-four-005-41969A77-29AE-4DA5-AF82-A2D3FCA37B6C.json",
+      "description": "P03-025-controlled-future-native_0_91671326-E46E-4657-BEA0-A69B78009E0E.json",
+      "sha256": "765cbf7ce1ceee88cb134262044f7807d7d1f2eaaa6e17aa704e48aeb3c6a7dd"
+    },
+    {
+      "path": "Artifacts/small-client-location-four-006-A0B1E3E7-85A4-4609-B237-E7C509180A7A.png",
+      "description": "controlled-location-empty-review-value-only_0_0FC589FE-42F5-4E79-9A8B-3D24AE68F640.png",
+      "sha256": "586fc1637fa5663b8ce353f205341688570e83a8d03bd76d8505ac0139d7159a"
+    },
+    {
+      "path": "Artifacts/small-client-location-four-007-D2A0AD66-FF3C-424E-92C3-4F3D75B99886.json",
+      "description": "controlled-location-opening-future-native_0_9E91AB6E-8A15-4432-B2D6-6592766A3719.json",
+      "sha256": "0d14b6b315ab7cd0c4c3149592cd8590463ec9bffbd2ac7db9e82d958bdaae82"
+    },
+    {
+      "path": "Artifacts/small-client-location-four-008-59901BDA-8A25-4C2B-B22B-02AF38D99652.json",
+      "description": "P03-025-controlled-out-of-range-native_0_E2FAFD4D-6034-4A17-815E-CDACD337189E.json",
+      "sha256": "765cbf7ce1ceee88cb134262044f7807d7d1f2eaaa6e17aa704e48aeb3c6a7dd"
+    },
+    {
+      "path": "Artifacts/small-client-location-four-009-F026C0B8-AE48-4688-A76E-42C7017D8233.png",
+      "description": "controlled-location-empty-review-value-only_0_EAF6B753-987D-4FB2-89B8-CE6ABCBF3859.png",
+      "sha256": "586fc1637fa5663b8ce353f205341688570e83a8d03bd76d8505ac0139d7159a"
+    },
+    {
+      "path": "Artifacts/small-client-location-four-010-879D9187-7FFE-4ACA-840F-D65BB1E8BDDC.json",
+      "description": "controlled-location-opening-out-of-range-native_0_AEA08F04-7784-4550-AB38-2952B1883BDD.json",
+      "sha256": "0d14b6b315ab7cd0c4c3149592cd8590463ec9bffbd2ac7db9e82d958bdaae82"
+    },
+    {
+      "path": "Artifacts/small-client-location-four-011-29A71F9C-309C-46B5-8D54-58E3A90809BA.json",
+      "description": "P03-025-controlled-negative-accuracy-native_0_A075F732-829D-4323-AB5E-8DE9AB532AB9.json",
+      "sha256": "765cbf7ce1ceee88cb134262044f7807d7d1f2eaaa6e17aa704e48aeb3c6a7dd"
+    },
+    {
+      "path": "Artifacts/small-client-location-four-012-2ADE44CF-A9E4-4B4C-84E8-FCA374FC9FDA.png",
+      "description": "controlled-location-empty-review-value-only_0_3EDD0FFD-8009-41FA-8709-A3486E08D944.png",
+      "sha256": "586fc1637fa5663b8ce353f205341688570e83a8d03bd76d8505ac0139d7159a"
+    },
+    {
+      "path": "Artifacts/small-client-location-four-013-1A8ECFE4-1DF6-4043-AFB5-2616891A46E1.json",
+      "description": "controlled-location-opening-negative-accuracy-native_0_ED714175-6ED6-4C42-BA89-7C795A38C169.json",
+      "sha256": "0d14b6b315ab7cd0c4c3149592cd8590463ec9bffbd2ac7db9e82d958bdaae82"
+    },
+    {
+      "path": "Artifacts/small-client-location-four-014-81C97ECA-1BB9-442E-BD30-E286A1F9E1AE.json",
+      "description": "P03-027-controlled-map-manual-late-native_0_FBC51BD1-D14C-4262-819C-9B67B89888A9.json",
+      "sha256": "2d55bf3cb2674a67bef7aaafe27c0374a7e6fa2dae58800bc7a9a5074c72e87e"
+    },
+    {
+      "path": "Artifacts/small-client-location-four-015-476CDB0A-289F-4638-8EAE-74E645BC97C1.png",
+      "description": "P03-027-controlled-manual-review-coordinate-only_0_F58518A5-6D63-4802-9E91-7325B26FC766.png",
+      "sha256": "9f07a3fe76646dd947b52b232cd0e9e5d6f663ef0df2c46cfbf6de52b0e4b8c2"
+    },
+    {
+      "path": "Artifacts/small-client-location-four-016-45BD30DB-C370-484D-AFC6-B4F277E1B4EC.png",
+      "description": "P03-027-controlled-manual-coordinate-row-only_0_0149FEEB-0965-4CD1-A5DC-DCE283427377.png",
+      "sha256": "327aff05289648d122d06ff5e884de953852cc964b2b66e0da21801b6a9d0f6c"
+    },
+    {
+      "path": "Artifacts/small-client-location-four-017-CD657890-DC28-4898-A58E-EA89752CCD7F.png",
+      "description": "P03-027-controlled-late-fix-manual-confirm-only_0_84FCAF80-B3E5-418C-842E-3DD2562363ED.png",
+      "sha256": "8021b34feb5152b5d635b0ce50195d09adf509feaf6fa869d2604d484a6b673d"
+    },
+    {
+      "path": "Artifacts/small-client-location-four-018-65F71229-96F9-446B-9385-F98134878DB9.json",
+      "description": "controlled-location-opening-late-valid-native_0_ED6E9800-A289-4A6E-9740-28AC1394399C.json",
+      "sha256": "0d14b6b315ab7cd0c4c3149592cd8590463ec9bffbd2ac7db9e82d958bdaae82"
+    },
+    {
+      "path": "Artifacts/small-client-location-four-019-85C73C74-CE38-45D9-9D92-FC0A4662F94A.json",
+      "description": "P03-022-controlled-stale-native_0_4D77E2BA-22E1-4DC9-9506-00A5D0A5C7BC.json",
+      "sha256": "bb10a9acfcfbc04bfd762c8a0583e949866718b14c8bb7f60441467bc7737a8c"
+    },
+    {
+      "path": "Artifacts/small-client-location-four-020-C6A8BF8E-8725-4780-8714-62078064958D.png",
+      "description": "P03-022-controlled-map-last-known-only_0_E2F7052F-06DF-4A79-8EAD-2CE505FD3011.png",
+      "sha256": "e82b4d5af95a00f8c9de7d35199be10d60c5029e310e67ce4742e56a418edca0"
+    },
+    {
+      "path": "Artifacts/small-client-location-four-021-49ECBE71-E350-458D-B349-D79F43AC2957.png",
+      "description": "P03-022-controlled-wizard-last-known-only_0_2C997B8E-A464-4AFB-8EF3-25CA3DD246D5.png",
+      "sha256": "4b2b5910de08d6b6e1917edf920be29bd1bd02ce26577dc9c9d6e0475067c872"
+    },
+    {
+      "path": "Artifacts/small-client-location-four-022-A1A0B7D9-00F5-46D9-8DF0-39F44A4C9E47.json",
+      "description": "controlled-location-opening-stale-native_0_55ECC226-13BA-41CC-B9F7-BCA355FA434A.json",
+      "sha256": "0d14b6b315ab7cd0c4c3149592cd8590463ec9bffbd2ac7db9e82d958bdaae82"
+    }
+  ],
+  "publicPackage": {
+    "status": "REVIEWABLE — not staged or delivered",
+    "originalEvidenceRetainedLocally": true,
+    "rawLogsAndXCResultsIncluded": false,
+    "artifactInventory": [
+      {
+        "path": "Artifacts/small-client-location-four-001-323DD894-83D5-4CAC-A8CE-CF872E9C697A.json",
+        "bytes": 305,
+        "sha256": "84669c8bda986576c314ab36d5f43ad661f4312ca2f839f07792141a7b48c9f3"
+      },
+      {
+        "path": "Artifacts/small-client-location-four-002-1FC5236E-CE3A-49A1-916E-5BD073E5CF3B.png",
+        "bytes": 5251,
+        "sha256": "359acae6703557ef563148e966448b29906a82e8aef8d86659eea962bf240151"
+      },
+      {
+        "path": "Artifacts/small-client-location-four-003-A0D670F2-F76C-4B7A-BA63-EAAA49C806B4.png",
+        "bytes": 24549,
+        "sha256": "81856a202772d0f48d2f685601e25d7d90df5c3518d81960d1f45fdcd42d1088"
+      },
+      {
+        "path": "Artifacts/small-client-location-four-004-D57F931F-726B-4E0B-9E9D-1E07975A6543.json",
+        "bytes": 322,
+        "sha256": "9c959596dc3fe5dfaafc127d32396eaf560915c512c6c7f7912335ff81644ef8"
+      },
+      {
+        "path": "Artifacts/small-client-location-four-005-41969A77-29AE-4DA5-AF82-A2D3FCA37B6C.json",
+        "bytes": 330,
+        "sha256": "d58ba40431b34559cbcb18986600d0b10fe7a73f88682640472f74290d334db2"
+      },
+      {
+        "path": "Artifacts/small-client-location-four-006-A0B1E3E7-85A4-4609-B237-E7C509180A7A.png",
+        "bytes": 1011,
+        "sha256": "586fc1637fa5663b8ce353f205341688570e83a8d03bd76d8505ac0139d7159a"
+      },
+      {
+        "path": "Artifacts/small-client-location-four-007-D2A0AD66-FF3C-424E-92C3-4F3D75B99886.json",
+        "bytes": 322,
+        "sha256": "9c959596dc3fe5dfaafc127d32396eaf560915c512c6c7f7912335ff81644ef8"
+      },
+      {
+        "path": "Artifacts/small-client-location-four-008-59901BDA-8A25-4C2B-B22B-02AF38D99652.json",
+        "bytes": 330,
+        "sha256": "d58ba40431b34559cbcb18986600d0b10fe7a73f88682640472f74290d334db2"
+      },
+      {
+        "path": "Artifacts/small-client-location-four-009-F026C0B8-AE48-4688-A76E-42C7017D8233.png",
+        "bytes": 1011,
+        "sha256": "586fc1637fa5663b8ce353f205341688570e83a8d03bd76d8505ac0139d7159a"
+      },
+      {
+        "path": "Artifacts/small-client-location-four-010-879D9187-7FFE-4ACA-840F-D65BB1E8BDDC.json",
+        "bytes": 322,
+        "sha256": "9c959596dc3fe5dfaafc127d32396eaf560915c512c6c7f7912335ff81644ef8"
+      },
+      {
+        "path": "Artifacts/small-client-location-four-011-29A71F9C-309C-46B5-8D54-58E3A90809BA.json",
+        "bytes": 330,
+        "sha256": "d58ba40431b34559cbcb18986600d0b10fe7a73f88682640472f74290d334db2"
+      },
+      {
+        "path": "Artifacts/small-client-location-four-012-2ADE44CF-A9E4-4B4C-84E8-FCA374FC9FDA.png",
+        "bytes": 1011,
+        "sha256": "586fc1637fa5663b8ce353f205341688570e83a8d03bd76d8505ac0139d7159a"
+      },
+      {
+        "path": "Artifacts/small-client-location-four-013-1A8ECFE4-1DF6-4043-AFB5-2616891A46E1.json",
+        "bytes": 322,
+        "sha256": "9c959596dc3fe5dfaafc127d32396eaf560915c512c6c7f7912335ff81644ef8"
+      },
+      {
+        "path": "Artifacts/small-client-location-four-014-81C97ECA-1BB9-442E-BD30-E286A1F9E1AE.json",
+        "bytes": 413,
+        "sha256": "f15869e5e13d36a07b3867437662869fca27b6d7017019aa1bb7bef25e5d8006"
+      },
+      {
+        "path": "Artifacts/small-client-location-four-015-476CDB0A-289F-4638-8EAE-74E645BC97C1.png",
+        "bytes": 4555,
+        "sha256": "9f07a3fe76646dd947b52b232cd0e9e5d6f663ef0df2c46cfbf6de52b0e4b8c2"
+      },
+      {
+        "path": "Artifacts/small-client-location-four-016-45BD30DB-C370-484D-AFC6-B4F277E1B4EC.png",
+        "bytes": 23648,
+        "sha256": "327aff05289648d122d06ff5e884de953852cc964b2b66e0da21801b6a9d0f6c"
+      },
+      {
+        "path": "Artifacts/small-client-location-four-017-CD657890-DC28-4898-A58E-EA89752CCD7F.png",
+        "bytes": 5638,
+        "sha256": "8021b34feb5152b5d635b0ce50195d09adf509feaf6fa869d2604d484a6b673d"
+      },
+      {
+        "path": "Artifacts/small-client-location-four-018-65F71229-96F9-446B-9385-F98134878DB9.json",
+        "bytes": 322,
+        "sha256": "9c959596dc3fe5dfaafc127d32396eaf560915c512c6c7f7912335ff81644ef8"
+      },
+      {
+        "path": "Artifacts/small-client-location-four-019-85C73C74-CE38-45D9-9D92-FC0A4662F94A.json",
+        "bytes": 274,
+        "sha256": "cdfc872fdbc6888791ed24a5cf860fb6f4c08f71838fd3eb401be6261e665e31"
+      },
+      {
+        "path": "Artifacts/small-client-location-four-020-C6A8BF8E-8725-4780-8714-62078064958D.png",
+        "bytes": 3610,
+        "sha256": "e82b4d5af95a00f8c9de7d35199be10d60c5029e310e67ce4742e56a418edca0"
+      },
+      {
+        "path": "Artifacts/small-client-location-four-021-49ECBE71-E350-458D-B349-D79F43AC2957.png",
+        "bytes": 3730,
+        "sha256": "4b2b5910de08d6b6e1917edf920be29bd1bd02ce26577dc9c9d6e0475067c872"
+      },
+      {
+        "path": "Artifacts/small-client-location-four-022-A1A0B7D9-00F5-46D9-8DF0-39F44A4C9E47.json",
+        "bytes": 322,
+        "sha256": "9c959596dc3fe5dfaafc127d32396eaf560915c512c6c7f7912335ff81644ef8"
+      }
+    ],
+    "sourceIndexSHA256": "28c207f415913b017b0a3b0b4702042c6b28206dc0f58c2d1a15b7cff674d93b",
+    "artifactHashNote": "Public JSON/text are sanitized; artifactInventory hashes apply to packaged bytes. Original indexed hashes, where present, refer to preserved original evidence."
+  }
+}

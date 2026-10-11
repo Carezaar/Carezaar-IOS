@@ -1,0 +1,39 @@
+{
+  "controlIdentifier": "language_picker_option_before_tap",
+  "exists": true,
+  "expectedOptionLabel": "عربي",
+  "expectedSaveLabels": [
+    "Save Changes",
+    "Guardar cambios",
+    "Enregistrer les modifications",
+    "Сохранить изменения",
+    "حفظ التغييرات",
+    "ذخیره تغییرات",
+    "परिवर्तन सहेजें",
+    "保存更改"
+  ],
+  "fullyVisibleAboveSave": true,
+  "isHittable": true,
+  "languageCode": "ar",
+  "observedOptionLabel": "عربي",
+  "observedSaveLabel": "Save Changes",
+  "optionFrame": {
+    "height": 91.5,
+    "width": 335,
+    "x": 20,
+    "y": 451
+  },
+  "pickerFrame": {
+    "height": 667,
+    "width": 375,
+    "x": 0,
+    "y": 0
+  },
+  "saveFrame": {
+    "height": 70.5,
+    "width": 335,
+    "x": 20,
+    "y": 586.5
+  },
+  "scopedBothDirectionsBounded": true
+}

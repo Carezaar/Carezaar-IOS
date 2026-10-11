@@ -1,0 +1,51 @@
+{
+  "source": "fresh-modern-caregiver-a5-visible-diagnostics.xcresult",
+  "rootReviewed": true,
+  "publishable": false,
+  "artifacts": [
+    {
+      "path": "Artifacts/07754B27-BCF6-4373-A5B3-78A7EE9B5F38.png",
+      "description": "A5-fully-exposed-empty-password-rule-gray-on-gray_0_51091DDA-F2A0-4750-A3FC-B84AA87F706C.png",
+      "sha256": "14954f213ada00a2eb3b959968a4da0405485bbbcd706950814de613d0418dad",
+      "packagedSha256": "14954f213ada00a2eb3b959968a4da0405485bbbcd706950814de613d0418dad"
+    },
+    {
+      "path": "Artifacts/0363AABD-B992-4851-BC73-2E734620B633.png",
+      "description": "A5-fully-exposed-delete-warning-black-on-pink_0_1BBB5197-63DF-4266-8951-31BD36B626B2.png",
+      "sha256": "ceaa686c5f58bf687f3b1c9bee169312b75e61925f729ee093252153713eaaa4",
+      "packagedSha256": "ceaa686c5f58bf687f3b1c9bee169312b75e61925f729ee093252153713eaaa4"
+    }
+  ],
+  "independentReviewed": true,
+  "scope": "Current dark-green build107unitsPASS26.947 and correctedCaregiverLargestReachPASS124.284. ContrastdiagnosticFAIL41.015 after two fullyexposed rasters at passwordfieldfocusunderheader; latergreen/help/matches captures NOTreached. New fullfieldexpose helper build3674PASS/runtimepending.",
+  "testResults": [
+    {
+      "method": "CarezaarTests",
+      "status": "PASS",
+      "count": 107,
+      "seconds": 26.947
+    },
+    {
+      "method": "testLargestDynamicTypeScreensRemainReachable",
+      "status": "PASS",
+      "seconds": 124.284
+    },
+    {
+      "method": "testA5ReportedContrastTextRenderedAboveFooter",
+      "status": "FAIL",
+      "seconds": 41.015
+    }
+  ],
+  "fullyExposedRasterContrasts": {
+    "deleteWarningBlackOnPink": 18.385936176909585,
+    "emptyPasswordRuleGrayOnGray": 6.364955577890367
+  },
+  "originalStrictAuditReclassifiedAsPass": false,
+  "independentReview": "final_review checkedbothPNGhash/privacy/fullyexposedtext and independently recalculated6.36496/18.38594 corecontrast. DiagnosticFAIL41.015 retained; laterstatesnotreached; 107units andLargestReach separatepasses.",
+  "publicPackage": {
+    "rootReviewed": true,
+    "independentReviewed": true,
+    "originalEvidencePreserved": true,
+    "rawLogsXCResultsFullScreenPhotosPrivateFixturesIncluded": false
+  }
+}

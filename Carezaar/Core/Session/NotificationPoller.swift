@@ -15,9 +15,33 @@ final class NotificationPoller: NSObject, ObservableObject, UNUserNotificationCe
     private static let lastCountKey = "carezaar.notificationCount"
     private static let interval: Duration = .seconds(30)
     private var loop: Task<Void, Never>?
+    private var generation = 0
+    private var checkedRevision = 0
+    private var polling = false
+    private var requestedPermission = false
+    private let service: UserService
+    private let tokens: any SessionTokenStorage
+    private let defaults: UserDefaults
+    private let sleep: (Duration) async throws -> Void
+    private let requestPermission: () -> Void
+    private let deliver: (UNNotificationRequest) async throws -> Void
     private var translate: (String, String) -> String = { _, fallback in fallback }
 
-    override init() {
+    init(service: UserService = UserService(), tokens: any SessionTokenStorage = TokenStore.shared,
+         defaults: UserDefaults = .standard,
+         sleep: @escaping (Duration) async throws -> Void = { try await Task.sleep(for: $0) },
+         requestPermission: @escaping () -> Void = {
+             UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { _, _ in }
+         },
+         deliver: @escaping (UNNotificationRequest) async throws -> Void = {
+             try await UNUserNotificationCenter.current().add($0)
+         }) {
+        self.service = service
+        self.tokens = tokens
+        self.defaults = defaults
+        self.sleep = sleep
+        self.requestPermission = requestPermission
+        self.deliver = deliver
         super.init()
         UNUserNotificationCenter.current().delegate = self
     }
@@ -25,35 +49,54 @@ final class NotificationPoller: NSObject, ObservableObject, UNUserNotificationCe
     func start(translate: @escaping (String, String) -> String) {
         self.translate = translate
         guard loop == nil else { return }
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { _, _ in }
+        if !requestedPermission {
+            requestedPermission = true
+            // Permission is optional on iOS. Refusal never blocks the timer or app.
+            requestPermission()
+        }
+        generation += 1
+        let started = generation
+        let sleep = self.sleep
         loop = Task { [weak self] in
             while !Task.isCancelled {
-                await self?.poll()
-                try? await Task.sleep(for: Self.interval)
+                do { try await sleep(Self.interval) }
+                catch { return }
+                guard !Task.isCancelled, let self, self.generation == started else { return }
+                await self.poll()
             }
         }
     }
 
     func stop() {
+        generation += 1
         loop?.cancel()
         loop = nil
         unread = 0
+        openNotificationsRequested = false
+        defaults.set(0, forKey: Self.lastCountKey)
     }
 
     /// Opening Notifications: everything up to now counts as seen.
     func markChecked() {
+        checkedRevision += 1
         NotificationsBadge.markChecked()
-        UserDefaults.standard.set(0, forKey: Self.lastCountKey)
+        defaults.set(0, forKey: Self.lastCountKey)
         unread = 0
     }
 
     func poll() async {
-        guard TokenStore.shared.hasSession,
-              let count = try? await UserService().notificationCount(checkedAt: NotificationsBadge.checkedAt) else { return }
+        guard loop != nil, tokens.hasSession, !polling, !Task.isCancelled else { return }
+        let started = generation
+        let checked = checkedRevision
+        polling = true
+        defer { polling = false }
+        guard let count = try? await service.notificationCount(checkedAt: NotificationsBadge.checkedAt),
+              !Task.isCancelled, loop != nil, generation == started,
+              checkedRevision == checked, tokens.hasSession else { return }
         unread = count
-        let previous = UserDefaults.standard.integer(forKey: Self.lastCountKey)
+        let previous = defaults.integer(forKey: Self.lastCountKey)
         guard count != previous else { return }
-        UserDefaults.standard.set(count, forKey: Self.lastCountKey)
+        defaults.set(count, forKey: Self.lastCountKey)
         guard count > previous else { return }
         let content = UNMutableNotificationContent()
         content.title = translate("general_notification_title", "New Notification(s)")
@@ -61,7 +104,7 @@ final class NotificationPoller: NSObject, ObservableObject, UNUserNotificationCe
             .replacingOccurrences(of: "???", with: String(count - previous))
         content.sound = .default
         let request = UNNotificationRequest(identifier: "carezaar.notifications", content: content, trigger: nil)
-        try? await UNUserNotificationCenter.current().add(request)
+        try? await deliver(request)
     }
 
     // Android shows the notification even while the app is open.

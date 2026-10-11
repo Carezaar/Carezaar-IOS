@@ -16,7 +16,6 @@ struct AuthService: Sendable {
         let session: Session = try await client.send(
             Endpoint(method: .post, path: "auth/login", body: .form(fields), requiresAuth: false)
         )
-        TokenStore.shared.save(session)
         return session
     }
 
@@ -39,10 +38,8 @@ struct AuthService: Sendable {
         try await client.send(Endpoint(method: .get, path: "auth/info"))
     }
 
-    /// Clears the local session even when the network call fails, so the user is
-    /// never stuck signed in on a dead token.
-    func logout() async {
-        _ = try? await client.sendIgnoringResult(Endpoint(method: .delete, path: "auth/logout"))
-        TokenStore.shared.clear()
+    /// Local state is cleared synchronously by SessionManager before revocation.
+    func logout(accessToken: String?) async {
+        await client.revoke(accessToken: accessToken)
     }
 }

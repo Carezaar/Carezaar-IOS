@@ -1,0 +1,41 @@
+{
+  "source": "fresh-modern-caregiver-real-unread-banner-units.xcresult",
+  "wholeProcessExit": 65,
+  "individualUnreadNativeResult": "PASS",
+  "individualUnreadSeconds": 57.651,
+  "unitCount": 104,
+  "unitFailures": 0,
+  "unitSeconds": 26.952,
+  "separateBannerResult": "FAIL14.117 at crop-safety guard before rotation; harness geometry under investigation",
+  "role": "caregiver",
+  "rootReviewedOneUnreadIndicatorCropAndTwoAnonymousJSON": true,
+  "scope": "Existing exact owned conversation backend unread0 -> one actual owned peer synthetic message -> native unread marker -> native read -> backend0/native marker absent; no outgoing native message POST",
+  "neverOpenedEmptyConversationVerified": false,
+  "wholeConversationRowPublished": false,
+  "physicalCamera": "UNTESTED user deferred",
+  "artifacts": [
+    {
+      "path": "Artifacts/modern-caregiver-unread-001-505C18F3-F537-41BF-B12A-DC78F06EB657.json",
+      "description": "owned-unread-zero-incoming-native-read-clear-caregiver_0_76E6691F-747D-4168-9B2C-D7D6A693044A.json",
+      "sha256": "578598b248294c8256000f12ecb974eb7d989315af7bee85351bc7a2d0bf0d72",
+      "packagedSha256": "578598b248294c8256000f12ecb974eb7d989315af7bee85351bc7a2d0bf0d72"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-unread-002-9FC95781-EDB0-4DC3-90CD-E48AD8F2CADD.json",
+      "description": "owned-unread-native-row-geometry-caregiver_0_044AE733-A41D-4A3F-8881-4971D41D5580.json",
+      "sha256": "a67354deaf7a1c9222b196f555c34d0ebb740e43c78ce212c02c68e2dbc0de45",
+      "packagedSha256": "a67354deaf7a1c9222b196f555c34d0ebb740e43c78ce212c02c68e2dbc0de45"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-unread-003-371289F6-5987-48F3-86EE-8316C7919629.png",
+      "description": "owned-unread-indicator-control-only-caregiver_0_F1A91394-55F9-4249-9F50-CA5855605EAF.png",
+      "sha256": "368e5f71ff0856bf134baf87f38b973f7207fec1f4aa5913335ef3b52261dc25",
+      "packagedSha256": "368e5f71ff0856bf134baf87f38b973f7207fec1f4aa5913335ef3b52261dc25"
+    }
+  ],
+  "publicPackage": {
+    "originalEvidencePreserved": true,
+    "rootReviewed": true,
+    "rawLogsXCResultsFullScreenPhotosPrivateFixturesIncluded": false
+  }
+}

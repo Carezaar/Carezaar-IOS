@@ -1,0 +1,52 @@
+{
+  "individualResult": "PASS",
+  "durationSeconds": 51.841,
+  "wholeRunExitCode": 65,
+  "otherMethodFailure": "Chrome default baseline before loaded brand crop",
+  "rootReviewedThreeSafeCrops": true,
+  "previewRaster": "single literal line, message icon, trailing ellipsis",
+  "exactFullModalBodyAXAndScrollEndClose": true,
+  "bothOwnedProfilesRestoredNone": true,
+  "originalCaseCrossAllocationClosure": false,
+  "files": [
+    "Artifacts/small-client-introduction-full-first-line-introduction-modal-client.json",
+    "Artifacts/small-client-introduction-full-introduction-close-control-only.png",
+    "Artifacts/small-client-introduction-long-first-line-preview-raster-review-client.png",
+    "Artifacts/small-client-introduction-optional-empty-request-cancel-client.json",
+    "Artifacts/small-client-introduction-managed-request-question-only.png"
+  ],
+  "publicPackage": {
+    "status": "REVIEWABLE — not staged or delivered",
+    "originalEvidenceRetainedLocally": true,
+    "rawLogsAndXCResultsIncluded": false,
+    "artifactInventory": [
+      {
+        "path": "Artifacts/small-client-introduction-full-first-line-introduction-modal-client.json",
+        "bytes": 592,
+        "sha256": "7a03980225e9cf2190d48d3a743a4c8e9566b6027b979a49e346be70a1143c9a"
+      },
+      {
+        "path": "Artifacts/small-client-introduction-full-introduction-close-control-only.png",
+        "bytes": 1649,
+        "sha256": "8277ffeb6494701e8e2b224399ca32b45f04986a3e3b0c31373071ff93028875"
+      },
+      {
+        "path": "Artifacts/small-client-introduction-long-first-line-preview-raster-review-client.png",
+        "bytes": 15849,
+        "sha256": "69176f3562f8aa9b6b34c9779781a99b92ab409a159858acd0dae6539f4ca41e"
+      },
+      {
+        "path": "Artifacts/small-client-introduction-optional-empty-request-cancel-client.json",
+        "bytes": 221,
+        "sha256": "4cd904495e3d389e0c7d69fc8550d786b365334238e68dcb4c9a48692b636639"
+      },
+      {
+        "path": "Artifacts/small-client-introduction-managed-request-question-only.png",
+        "bytes": 26292,
+        "sha256": "0587178547bfae4b7fabf4bf45f60d0d41a1e2342e9ad80c7475e06b73faf5cc"
+      }
+    ],
+    "sourceIndexSHA256": "e8705c70222152dc7e2863bee65cfb38bfccbc8a45d4b9e514d5b9383bebbbb6",
+    "artifactHashNote": "Public JSON/text are sanitized; artifactInventory hashes apply to packaged bytes. Original indexed hashes, where present, refer to preserved original evidence."
+  }
+}

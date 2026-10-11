@@ -1,0 +1,66 @@
+{
+  "bottom_navigation_matches": {
+    "captionFrame": {
+      "height": 168,
+      "width": 125,
+      "x": 0,
+      "y": 499
+    },
+    "expectedAXLabel": "Matches",
+    "observedAXLabel": "Matches",
+    "selected": true,
+    "targetFrame": {
+      "height": 168,
+      "width": 125,
+      "x": 0,
+      "y": 499
+    }
+  },
+  "bottom_navigation_messages": {
+    "captionFrame": {
+      "height": 168,
+      "width": 125,
+      "x": 125,
+      "y": 499
+    },
+    "expectedAXLabel": "Messages",
+    "observedAXLabel": "Messages",
+    "selected": true,
+    "targetFrame": {
+      "height": 168,
+      "width": 125,
+      "x": 125,
+      "y": 499
+    }
+  },
+  "bottom_navigation_profile": {
+    "captionFrame": {
+      "height": 107,
+      "width": 125,
+      "x": 250,
+      "y": 529.5
+    },
+    "expectedAXLabel": "Profile",
+    "observedAXLabel": "Profile",
+    "selected": true,
+    "targetFrame": {
+      "height": 107,
+      "width": 125,
+      "x": 250,
+      "y": 529.5
+    }
+  },
+  "brand": {
+    "height": 53.5,
+    "width": 137.5,
+    "x": 64,
+    "y": 26
+  },
+  "role": "client",
+  "viewport": {
+    "height": 667,
+    "width": 375,
+    "x": 0,
+    "y": 0
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "elapsedSinceNativeSendTap": 11.653099060058594,
+  "injectedGlobalDelaySeconds": 20,
+  "manualRefreshDisabledObserved": true,
+  "nativePOSTsBeforeReplyChange": 0,
+  "noExtraGETClaimed": false,
+  "POSTProgressAbsent": true,
+  "replyChangedWithinTenSeconds": true
+}

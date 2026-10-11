@@ -12,6 +12,7 @@ struct IntroView: View {
     @EnvironmentObject private var language: AppLanguage
     @EnvironmentObject private var loc: Localization
     @Environment(\.layoutDirection) private var direction
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
         FigmaScreen(key: "v2-16-14997", binder: binder, overlays: [
@@ -27,25 +28,49 @@ struct IntroView: View {
                     .font(Theme.Typography.control(14)).foregroundStyle(Theme.Palette.primaryText)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
-            },
-            SceneOverlay(x: 262, y: 16, width: 134, height: 36) {
-                Menu {
-                    ForEach(baseData.languages) { item in
-                        Button(item.name) { language.select(item); loc.languageId = item.id }
-                    }
-                } label: {
-                    HStack(spacing: 8) {
-                        AppIcon(name: "ic_intl", size: 22, tint: .black)
-                        Text(baseData.languages.first { $0.id == language.id }?.name ?? "English")
-                            .font(Theme.Typography.control(16)).foregroundStyle(.black).lineLimit(1).minimumScaleFactor(0.7)
-                        AppIcon(name: "ic_chevron_down", size: 16, tint: .black)
-                    }
-                    .padding(.horizontal, 12).frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(.white.opacity(0.88), in: Capsule())
-                }
-                .accessibilityLabel("Language")
             }
         ])
+        // A live control needs native text geometry: the scene's fixed overlay
+        // height and whole-frame scaling cannot accommodate Dynamic Type.
+        .overlay(alignment: .topTrailing) {
+            Menu {
+                ForEach(baseData.languages) { item in
+                    Button(item.name) { language.select(item); loc.languageId = item.id }
+                }
+            } label: {
+                HStack(spacing: 8) {
+                    AppIcon(name: "ic_intl", size: 22, tint: .black)
+                    Text(baseData.languages.first { $0.id == language.id }?.name ?? "English")
+                        .font(Theme.Typography.control(16)).foregroundStyle(.black)
+                        .fixedSize(horizontal: false, vertical: true)
+                    AppIcon(name: "ic_chevron_down", size: 16, tint: .black)
+                }
+                .padding(.horizontal, 12).padding(.vertical, 8)
+                .frame(maxWidth: .infinity, minHeight: 44)
+                .background(.white.opacity(0.88), in: Capsule())
+            }
+            .frame(maxWidth: typeSize.isAccessibilitySize ? .infinity : 174)
+            .accessibilityLabel("Language")
+            .accessibilityValue(baseData.languages.first { $0.id == language.id }?.name ?? "English")
+            .padding(.horizontal, 16).padding(.top, 16)
+        }
+        .disabled(!baseData.isReady)
+        .safeAreaInset(edge: .bottom) {
+            if !baseData.isReady {
+                VStack(spacing: 12) {
+                    Text(loc.t("general_network_title", "Cannot communicate with server."))
+                        .font(Theme.Typography.body()).multilineTextAlignment(.center)
+                    if baseData.failed {
+                        PrimaryButton(title: loc.t("general_try_again", "Try Again")) {
+                            Task { await baseData.bootstrap() }
+                        }
+                    } else { ProgressView() }
+                }
+                .padding(16).background(.white)
+                .accessibilityIdentifier("welcome-reference-gate")
+            }
+        }
+        .task { if !baseData.isReady { await baseData.bootstrap() } }
         .navigationBarBackButtonHidden()
         .toolbar(.hidden, for: .navigationBar)
     }
@@ -67,6 +92,7 @@ struct IntroView: View {
     }
 
     private func start(_ role: UserRole) {
+        guard baseData.isReady else { return }
         signUp.role = role
         signUp.isPasswordRecovery = false
         router.push(.signUpCredentials(role: role))
@@ -137,11 +163,11 @@ struct SignInView: View {
     }
 
     private func submit() {
-        if let problem = FieldValidator.email(email) { feedback.toast(problem); return }
+        guard canSubmit else { return }
         Task {
             do {
                 try await feedback.run(loc.t("loading_auth_login", "Signing in")) {
-                    try await session.signIn(email: email.trimmingCharacters(in: .whitespaces), password: password)
+                    try await session.signIn(email: email, password: password)
                 }
             } catch {
                 feedback.toast(Feedback.message(error))
@@ -166,6 +192,7 @@ struct SignUpCredentialsView: View {
     @State private var email = ""
     @State private var password = ""
     @State private var confirmation = ""
+    @State private var revealPassword = false
     @State private var revealConfirmation = false
     @State private var accepted = false
     @State private var confirming = false
@@ -184,6 +211,12 @@ struct SignUpCredentialsView: View {
 
     var body: some View {
         FigmaScreen(key: "v2-56-84378", binder: binder, overlays: [
+            // Activate the existing scene eye beside the main password input.
+            SceneOverlay(x: 344, y: 336, width: 40, height: 40) {
+                Button { revealPassword.toggle() } label: { Color.clear }
+                    .accessibilityLabel(revealPassword ? "Hide password" : "Show password")
+                    .hiddenWhile(confirming)
+            },
             // Overlays sit above the frame; keep the chips out of the confirmation dialog.
             // The client removed Country from this step (location is collected in the
             // preferences), so the frame's fields sit 104 pt higher than in Figma.
@@ -247,6 +280,7 @@ struct SignUpCredentialsView: View {
                 default: return nil
                 }
             },
+            isPasswordRevealed: { node in node.inputType == "password" && revealPassword },
             handle: { node in
                 let label = node.semanticLabel
                 if node.isBackButton { router.pop(); return true }
@@ -554,13 +588,14 @@ struct SetupPasswordView: View {
                 }
                 signUp.reset()
                 router.reset(to: .signIn)
-            } catch let error as APIError where error.serverMessage.localizedCaseInsensitiveContains("otp") {
-                // Wrong or expired code: the server's own message, under the boxes.
-                codeError = error.serverMessage
-                codeFocused = true
-            } catch let error as APIError where error.isServiceFault {
-                feedback.toast(Feedback.unavailable(loc.t("signup_forgot_password_title", "Forgot Password")))
-            } catch { feedback.toast(Feedback.message(error)) }
+            } catch {
+                if let message = Feedback.otpInlineMessage(error) {
+                    codeError = message
+                    codeFocused = true
+                } else if let api = error as? APIError, api.isServiceFault {
+                    feedback.toast(Feedback.unavailable(loc.t("signup_forgot_password_title", "Forgot Password")))
+                } else { feedback.toast(Feedback.message(error)) }
+            }
         }
     }
 

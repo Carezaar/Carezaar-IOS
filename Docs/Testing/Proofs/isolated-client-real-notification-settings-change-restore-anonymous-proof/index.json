@@ -1,0 +1,105 @@
+{
+  "source": "isolated-native-notification-actual-toggle-change-restore.xcresult",
+  "wholeProcessExit": 0,
+  "nativeTestResult": "PASS",
+  "nativeTestSeconds": 67.595,
+  "role": "client",
+  "device": "Task-owned isolated iPhoneSE3 iOS26.5",
+  "rootReviewedAllSixBoundedCropsAndSixAnonymousJSON": true,
+  "scope": "Already-decided actual notificationpermission enabled ->nativeSettingsdisabled ->authenticatedMainusable ->ordinarypersistedrelaunchusable/no repeatedprompt ->nativeSettingsrestored enabled.",
+  "initialOSPromptObservedInThisMethod": false,
+  "remoteNotificationDeliveryVerified": false,
+  "physicalCamera": "UNTESTED user deferred",
+  "artifacts": [
+    {
+      "path": "Artifacts/isolated-client-notification-settings-001-92068B15-A90D-46DC-8F8F-20E8FF173F37.json",
+      "description": "decided-notification-settings-only_0_AF28068E-FEAC-4C8C-A501-590B4BBE6389.json",
+      "sha256": "767c947aa714ae765e1d90c146343827935bb5ba5870e9fb0e8b9db47d9b5136",
+      "test": "PermissionSettingsBoundaryUITests/testOwnedDecidedNotificationSettingsChangeAndRestore()",
+      "packagedSha256": "767c947aa714ae765e1d90c146343827935bb5ba5870e9fb0e8b9db47d9b5136"
+    },
+    {
+      "path": "Artifacts/isolated-client-notification-settings-002-47E12908-3650-4469-ADAD-C6383EA15333.png",
+      "description": "notification-settings-restored-switch-only_0_FAC15739-9D8A-4EC4-813A-917E8E43CA51.png",
+      "sha256": "45ac0825d8fc1a064299209bfbe296859bba94d19407feb72823f2b2419c6085",
+      "test": "PermissionSettingsBoundaryUITests/testOwnedDecidedNotificationSettingsChangeAndRestore()",
+      "packagedSha256": "45ac0825d8fc1a064299209bfbe296859bba94d19407feb72823f2b2419c6085"
+    },
+    {
+      "path": "Artifacts/isolated-client-notification-settings-003-4605567E-7F80-4D79-916E-31DF58635EB1.json",
+      "description": "native-notification-toggle-target_0_98B7EB5C-B855-4AD2-B773-B8CEA3418EE2.json",
+      "sha256": "f4c3b9d79cecb3b871aa8cc78bc5bdb26e5259a4ab63142cad55d064f117f3bf",
+      "test": "PermissionSettingsBoundaryUITests/testOwnedDecidedNotificationSettingsChangeAndRestore()",
+      "packagedSha256": "f4c3b9d79cecb3b871aa8cc78bc5bdb26e5259a4ab63142cad55d064f117f3bf"
+    },
+    {
+      "path": "Artifacts/isolated-client-notification-settings-004-E02694A3-6A93-42CC-A5EF-7E8659280A58.png",
+      "description": "permission-authenticated-matches-tab-only_0_CCC9DCF1-1FF1-4D0D-88DA-ECD09CFD59E8.png",
+      "sha256": "6d32c081d8626dbffc706c8a4614b6f0d62560138baba092c5d93e251c2c1bec",
+      "test": "PermissionSettingsBoundaryUITests/testOwnedDecidedNotificationSettingsChangeAndRestore()",
+      "packagedSha256": "6d32c081d8626dbffc706c8a4614b6f0d62560138baba092c5d93e251c2c1bec"
+    },
+    {
+      "path": "Artifacts/isolated-client-notification-settings-005-D8FC0C69-1108-400B-A9ED-703A55892E1D.png",
+      "description": "permission-authenticated-matches-tab-only_0_8992629D-BEE4-4A82-BF3C-81D4DD57FF1E.png",
+      "sha256": "bc33c958b90806975aabd80df678b485786b31c19f6d63ee8c6900df90aa27a6",
+      "test": "PermissionSettingsBoundaryUITests/testOwnedDecidedNotificationSettingsChangeAndRestore()",
+      "packagedSha256": "bc33c958b90806975aabd80df678b485786b31c19f6d63ee8c6900df90aa27a6"
+    },
+    {
+      "path": "Artifacts/isolated-client-notification-settings-006-76AA8279-7D83-462D-B3C6-536D92560CE1.png",
+      "description": "notification-settings-changed-switch-only_0_1469FD8B-56B9-45F5-B7E3-CC1492B99D99.png",
+      "sha256": "0f2ab56c96e5b0c20335018d2ecb1002fee72bd15f16e5a5fabfc333bc487c9d",
+      "test": "PermissionSettingsBoundaryUITests/testOwnedDecidedNotificationSettingsChangeAndRestore()",
+      "packagedSha256": "0f2ab56c96e5b0c20335018d2ecb1002fee72bd15f16e5a5fabfc333bc487c9d"
+    },
+    {
+      "path": "Artifacts/isolated-client-notification-settings-007-BEE3BCEB-1345-4AC8-B6F6-F86EB0B8ABA5.json",
+      "description": "native-notification-toggle-target_0_655FDBC5-1DAB-4512-AC59-853EB23B27A8.json",
+      "sha256": "f4c3b9d79cecb3b871aa8cc78bc5bdb26e5259a4ab63142cad55d064f117f3bf",
+      "test": "PermissionSettingsBoundaryUITests/testOwnedDecidedNotificationSettingsChangeAndRestore()",
+      "packagedSha256": "f4c3b9d79cecb3b871aa8cc78bc5bdb26e5259a4ab63142cad55d064f117f3bf"
+    },
+    {
+      "path": "Artifacts/isolated-client-notification-settings-008-E6AB72D0-43B2-421A-8329-10A2267E5CB5.png",
+      "description": "notification-settings-original-switch-only_0_C8CF1BA8-2AB6-45E3-A5CB-75F94A2AB314.png",
+      "sha256": "20b0737e238577031adc529bfd173936db2309f5a2d6be88cfcd610eb6dab20c",
+      "test": "PermissionSettingsBoundaryUITests/testOwnedDecidedNotificationSettingsChangeAndRestore()",
+      "packagedSha256": "20b0737e238577031adc529bfd173936db2309f5a2d6be88cfcd610eb6dab20c"
+    },
+    {
+      "path": "Artifacts/isolated-client-notification-settings-009-5D95E9F9-70F6-4E42-8C77-503B33EFD76D.json",
+      "description": "native-settings-navigation-notifications_0_4ADF63C4-3827-4A72-9616-8463126B25A0.json",
+      "sha256": "1e5caedd4d096a736b2418d3c3fdb9cef0b4b0ae49eb4c2e30fe1c19575e124b",
+      "test": "PermissionSettingsBoundaryUITests/testOwnedDecidedNotificationSettingsChangeAndRestore()",
+      "packagedSha256": "1e5caedd4d096a736b2418d3c3fdb9cef0b4b0ae49eb4c2e30fe1c19575e124b"
+    },
+    {
+      "path": "Artifacts/isolated-client-notification-settings-010-2D636A32-37F4-44CA-9255-BE5F14F872D6.json",
+      "description": "native-settings-navigation-carezaar_0_6C12BA80-E536-4BA5-B10C-23E18243D4B9.json",
+      "sha256": "6cba7a7c6c2258e0698f3a47fa956b4c10fd7ec0759d9af11a8cfaaa36e0a245",
+      "test": "PermissionSettingsBoundaryUITests/testOwnedDecidedNotificationSettingsChangeAndRestore()",
+      "packagedSha256": "6cba7a7c6c2258e0698f3a47fa956b4c10fd7ec0759d9af11a8cfaaa36e0a245"
+    },
+    {
+      "path": "Artifacts/isolated-client-notification-settings-011-C13FBB3B-2691-4D8B-96D1-71A68B3904C5.json",
+      "description": "native-settings-navigation-apps_0_9316EA13-B229-492E-921F-0870E7026DAD.json",
+      "sha256": "b39a919b63ad7e0dc3067ed1414e133e17664e4e15ee99d5788f41312750652c",
+      "test": "PermissionSettingsBoundaryUITests/testOwnedDecidedNotificationSettingsChangeAndRestore()",
+      "packagedSha256": "b39a919b63ad7e0dc3067ed1414e133e17664e4e15ee99d5788f41312750652c"
+    },
+    {
+      "path": "Artifacts/isolated-client-notification-settings-012-619A1469-7F3D-41CA-9A4D-C215343CD3F4.png",
+      "description": "permission-authenticated-matches-tab-only_0_4063450C-9642-4A09-8647-EDFAF95A3323.png",
+      "sha256": "6d32c081d8626dbffc706c8a4614b6f0d62560138baba092c5d93e251c2c1bec",
+      "test": "PermissionSettingsBoundaryUITests/testOwnedDecidedNotificationSettingsChangeAndRestore()",
+      "packagedSha256": "6d32c081d8626dbffc706c8a4614b6f0d62560138baba092c5d93e251c2c1bec"
+    }
+  ],
+  "publicPackage": {
+    "originalEvidenceRetainedLocally": true,
+    "rawLogsAndXCResultsIncluded": false,
+    "privateSettingsAXAndFullScreenshotsIncluded": false,
+    "allBoundedArtifactsRootReviewed": true
+  }
+}

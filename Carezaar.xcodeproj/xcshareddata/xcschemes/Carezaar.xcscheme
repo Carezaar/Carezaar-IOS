@@ -36,6 +36,28 @@
             ReferencedContainer = "container:Carezaar.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
+      <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "881FAF998C6CFB7517C2633E"
+               BuildableName = "CarezaarTests.xctest"
+               BlueprintName = "CarezaarTests"
+               ReferencedContainer = "container:Carezaar.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "5D04529B5E6614BEC1E84A86"
+               BuildableName = "CarezaarUITests.xctest"
+               BlueprintName = "CarezaarUITests"
+               ReferencedContainer = "container:Carezaar.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+      </Testables>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"

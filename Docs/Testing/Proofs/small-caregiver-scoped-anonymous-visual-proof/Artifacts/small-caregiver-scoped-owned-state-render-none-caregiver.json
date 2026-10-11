@@ -1,0 +1,13 @@
+{
+  "activeCardBadgePresent": false,
+  "badgeColorRequiresRasterReview": false,
+  "messagePresent": false,
+  "nativeMutationAttempts": 0,
+  "pendingAcceptancePresent": false,
+  "profileActions": [
+    "match-request"
+  ],
+  "profileGETs": 1,
+  "publicState": "none",
+  "role": "caregiver"
+}

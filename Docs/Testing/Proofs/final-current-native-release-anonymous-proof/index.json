@@ -1,0 +1,25 @@
+{
+  "source": "fresh-final-current-native-release-build-analyze.log",
+  "rootReviewed": true,
+  "rootReviewScope": "Verified completedbuild+analyze/exit0, actualReleasebinarySHA32literalmarkerabsence rawbytesandstrings plusDebugAPIoverrideabsence; all57 productionSwift sources identical to107-unit PASS snapshot. SimulatorRelease only; physical signing/distribution/Release runtime/full374 coverage unverified. No compiler source warnings; AppIntents metadata notice noframeworkdependency. Anonymous relative sourcepaths/nofixtures/tokens/rawlog included.",
+  "publishable": false,
+  "artifacts": [
+    {
+      "path": "Artifacts/final-current-native-release-exclusions.json",
+      "description": "Final Simulator Release build and analysis with32 QA-marker exclusions and57-file source binding",
+      "sha256": "c17209e7ac1d51da5ffef6f40a3be9ae998e1df78d5db161627748b4a2789cfd",
+      "packagedSha256": "c17209e7ac1d51da5ffef6f40a3be9ae998e1df78d5db161627748b4a2789cfd"
+    }
+  ],
+  "independentlyReviewed": true,
+  "independentReviewScope": "Independently verified the sole anonymous artifact hash and completed BUILD SUCCEEDED/ANALYZE SUCCEEDED log hash. Read actual16051976byte SimulatorRelease Mach-O and verified SHA2560190da8906a78191b24d5dca7be8596e768f7837bb393d8e239972ef6b3c6d37; all32 required Debug markers absent from raw bytes and /usr/bin/strings output, CAREZAAR_API_BASE_URL absent. All57 current productionSwift hashes match the release record. Independently compared all57 path/SHA pairs in oct11-post-a5-current-production-source-inventory.json productionSwiftFiles with release productionSourceInventory and actual current files: identical, zero changed. Associated actual107-unit PASS26.947 is fresh-modern-caregiver-a5-visible-diagnostics.log lines372\u2013375; its separate UI diagnostic failure remains retained. The supplied fresh-modern-caregiver-a5-full-raster.log has UI-only failure and is not the107-unit log. Only log warning is AppIntents metadata skipped because no framework dependency; no compiler source warning identified. Anonymous artifact contains relative sourcepaths/hashes and QA marker names, no credential values/fixture identifiers/private absolute paths/rawlog. SimulatorRelease build/static analysis only with CODE_SIGNING_ALLOWED=NO: no Release runtime, physical signing/distribution, all374 QA coverage or production readiness asserted.",
+  "independentReviewed": true,
+  "independentReview": "Independently verified the sole anonymous artifact hash and completed BUILD SUCCEEDED/ANALYZE SUCCEEDED log hash. Read actual16051976byte SimulatorRelease Mach-O and verified SHA2560190da8906a78191b24d5dca7be8596e768f7837bb393d8e239972ef6b3c6d37; all32 required Debug markers absent from raw bytes and /usr/bin/strings output, CAREZAAR_API_BASE_URL absent. All57 current productionSwift hashes match the release record. Independently compared all57 path/SHA pairs in oct11-post-a5-current-production-source-inventory.json productionSwiftFiles with release productionSourceInventory and actual current files: identical, zero changed. Associated actual107-unit PASS26.947 is fresh-modern-caregiver-a5-visible-diagnostics.log lines372\u2013375; its separate UI diagnostic failure remains retained. The supplied fresh-modern-caregiver-a5-full-raster.log has UI-only failure and is not the107-unit log. Only log warning is AppIntents metadata skipped because no framework dependency; no compiler source warning identified. Anonymous artifact contains relative sourcepaths/hashes and QA marker names, no credential values/fixture identifiers/private absolute paths/rawlog. SimulatorRelease build/static analysis only with CODE_SIGNING_ALLOWED=NO: no Release runtime, physical signing/distribution, all374 QA coverage or production readiness asserted.",
+  "scope": "Current iOS Simulator Release build+analysis PASS; actualbinary0190da8906a78191b24d5dca7be8596e768f7837bb393d8e239972ef6b3c6d37/all32requiredQAmarkers andDebugAPIoverride absent frombytes+strings. Independent57file equality current/preserved107unit source snapshot verified. Actualunit107PASS26.947 in visible-diagnostics mixedfailedUI log; no wholemixedPASSclaimed. Physicalsigning/distribution/Release runtime/fullQA notverified.",
+  "publicPackage": {
+    "rootReviewed": true,
+    "independentReviewed": true,
+    "originalEvidencePreserved": true,
+    "rawLogsXCResultsFullScreenPhotosPrivateFixturesIncluded": false
+  }
+}

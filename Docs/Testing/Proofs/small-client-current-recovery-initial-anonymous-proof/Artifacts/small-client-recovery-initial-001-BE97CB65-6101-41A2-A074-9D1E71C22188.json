@@ -1,0 +1,11 @@
+{
+  "backendExactMessageOccurrencesBothOwnedPerspectives": 1,
+  "deviceWiFiOrCellularChanged": false,
+  "emptyDraftRepeatedSendTapsExtraPOSTs": 0,
+  "exactDraftPreserved": true,
+  "explicitNativeRetryPOSTs": 1,
+  "failedPreflightMessagePOSTs": 0,
+  "offlineInjection": "Debug native transport closed-local-port 30-to-60-seconds",
+  "role": "client",
+  "uncertainPOSTRecoveryCovered": false
+}

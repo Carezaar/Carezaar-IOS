@@ -1,6 +1,28 @@
 import SwiftUI
 import MapKit
 
+/// Shared wizard validation keeps UI messages managed and makes role rules testable.
+enum PreferenceValidation {
+    static func payProblem(minimum: Int?, maximum: Int?, role: UserRole) -> String? {
+        if role == .caregiver, minimum == nil || maximum == nil { return "general_required" }
+        if let minimum, let maximum, minimum >= maximum { return "general_salary_min_max" }
+        return nil
+    }
+
+    static func skillsProblem(role: UserRole, conditions: [Int], specials: [Int], experiences: [Int], roles: [Int], certifications: [Int], languages: [Int]) -> String? {
+        let client = role == .client
+        let required: [([Int], String)] = [
+            (conditions, client ? "signup_form_client_services" : "signup_form_caregiver_carecondition"),
+            (specials, client ? "signup_form_client_caregiver_qualities" : "signup_form_caregiver_carespecial"),
+            (experiences, client ? "signup_form_client_minimum_experience" : "signup_form_caregiver_experience"),
+            (roles, client ? "signup_form_client_preferred_caregiver_role" : "signup_form_caregiver_role")
+        ]
+        if let missing = required.first(where: { $0.0.isEmpty }) { return missing.1 }
+        if languages.isEmpty { return client ? "signup_form_client_preferred_language" : "signup_form_caregiver_languageskill" }
+        return nil
+    }
+}
+
 /// Client care preferences and caregiver skills: the Android 4-step wizard.
 ///
 /// Signup: v2 "Match Prefs - Step 0" intro → steps → Review → Save, which creates the
@@ -22,6 +44,10 @@ struct PreferencesWizard: View {
     @State private var started = false
     @State private var step = 0
     @State private var picking = false
+    @State private var locationPickerGuidance: String?
+    @StateObject private var location = LocationProvider()
+    @State private var coordinateFromPhone = false
+    @State private var didInitialize = false
     // Shared selections (client multi-selects everything; caregiver single-selects some).
     @State private var careTypes: [Int] = []
     @State private var conditions: [Int] = []
@@ -48,14 +74,26 @@ struct PreferencesWizard: View {
                 intro
             } else {
                 wizard
-                    .fullScreenCover(isPresented: $picking) {
-                        MapLocationPicker(initial: coordinate) { picked in
-                            coordinate = picked; picking = false
-                        } onCancel: { picking = false }
+                    .fullScreenCover(isPresented: $picking, onDismiss: { locationPickerGuidance = nil }) {
+                        MapLocationPicker(initial: coordinate, unavailableGuidance: locationPickerGuidance) { picked in
+                            coordinate = picked; coordinateFromPhone = false
+                            locationPickerGuidance = nil; picking = false
+                        } onCancel: { locationPickerGuidance = nil; picking = false }
                     }
             }
         }
-        .task { await prefill() }
+        .task {
+            guard !didInitialize else { return }
+            didInitialize = true
+            await prefill()
+            location.request()
+        }
+        .onReceive(location.$coordinate) { phone in
+            guard let phone, coordinate == nil || coordinateFromPhone else { return }
+            coordinate = phone
+            coordinateFromPhone = true
+        }
+        .onDisappear { location.cancel() }
     }
 
     // MARK: intro (v2 "Match Prefs - Step 0")
@@ -179,7 +217,17 @@ struct PreferencesWizard: View {
             ChipSection(title: loc.t(isClient ? "signup_form_client_required_certifications" : "signup_form_caregiver_certification", ""),
                         hint: hint, items: baseData.items(.certifications), selection: $certifications)
         case 2:
-            LocationRow(coordinate: coordinate, hint: loc.t("signup_form_client_location_hint", "Tap to select location")) { picking = true }
+            LocationRow(coordinate: coordinate, hint: loc.t("signup_form_client_location_hint", "Tap to select location")) {
+                locationPickerGuidance = nil
+                picking = true
+            }
+            if coordinateFromPhone, location.lastKnownIsStale {
+                Text("Last known location").font(Theme.Typography.caption()).foregroundStyle(Theme.Palette.textSecondary)
+            }
+            if coordinate == nil {
+                Text("Location is unavailable. You can continue and choose a location before saving.")
+                    .font(Theme.Typography.caption()).foregroundStyle(Theme.Palette.textSecondary)
+            }
             ChipSection(title: loc.t(isClient ? "signup_form_client_max_commute" : "signup_form_caregiver_commute", ""),
                         hint: isClient ? hint : nil, items: baseData.items(.commutes), selection: $commutes, single: !isClient)
             ChipSection(title: loc.t(isClient ? "signup_form_client_preferred_shifts" : "signup_form_caregiver_shift", ""),
@@ -251,22 +299,19 @@ struct PreferencesWizard: View {
         switch step {
         case 0: return need(careTypes, "client_details_client_type")
         case 1:
-            return need(conditions, isClient ? "signup_form_client_services" : "signup_form_caregiver_carecondition")
-                ?? need(specials, isClient ? "signup_form_client_caregiver_qualities" : "signup_form_caregiver_carespecial")
-                ?? need(experiences, isClient ? "signup_form_client_minimum_experience" : "signup_form_caregiver_experience")
-                ?? need(roles, isClient ? "signup_form_client_preferred_caregiver_role" : "signup_form_caregiver_role")
-                ?? (isClient ? need(certifications, "signup_form_client_required_certifications") : nil)
-                ?? need(languages, isClient ? "signup_form_client_preferred_language" : "signup_form_caregiver_languageskill")
+            if let slug = PreferenceValidation.skillsProblem(role: role, conditions: conditions, specials: specials, experiences: experiences, roles: roles, certifications: certifications, languages: languages) {
+                return need([], slug)
+            }
+            return nil
         case 2:
-            if coordinate == nil { return loc.t("signup_form_client_location_hint", "Select a location") }
             if let p = need(commutes, isClient ? "signup_form_client_max_commute" : "signup_form_caregiver_commute")
                 ?? need(shifts, isClient ? "signup_form_client_preferred_shifts" : "signup_form_caregiver_shift")
                 ?? need(days, isClient ? "signup_form_client_care_days" : "signup_form_caregiver_careday")
                 ?? need(worktypes, isClient ? "signup_form_client_work_type" : "signup_form_caregiver_worktype")
                 ?? (isClient ? need(genders, "signup_form_client_gender_preference") : nil) { return p }
-            if !isClient, salaryMin == nil || salaryMax == nil { return loc.t("general_required", "This field is required.") }
-            if let min = salaryMin, let max = salaryMax, min > max {
-                return "\(loc.t("signup_form_client_minimum", "Minimum")) > \(loc.t("signup_form_client_maximum", "Maximum"))"
+            if let slug = PreferenceValidation.payProblem(minimum: salaryMin, maximum: salaryMax, role: role) {
+                if slug == "general_required" { return loc.t(slug, "This field is required.") }
+                return loc.t(slug, "The minimum pay rate must be lower than the maximum.")
             }
             return nil
         default: return nil
@@ -289,7 +334,11 @@ struct PreferencesWizard: View {
                 experiences = p.experienceIds; roles = p.roleIds; certifications = p.certificationIds; languages = p.languageskillIds
                 commutes = p.commuteIds; shifts = p.shiftIds; days = p.caredayIds; worktypes = p.worktypeIds; genders = p.genderIds
                 salaryMin = p.salaryMin; salaryMax = p.salaryMax
-                if let lat = p.lat, let lng = p.lng { coordinate = .init(latitude: lat, longitude: lng) }
+                if let lat = p.lat, let lng = p.lng,
+                   let saved = LocationProvider.initialMapCoordinate(.init(latitude: lat, longitude: lng)) {
+                    coordinate = saved
+                    coordinateFromPhone = false
+                }
             } else {
                 let p = try await feedback.run(loc.t("loading_profile_get", "Getting profile")) { try await CaregiverService().profile() }
                 careTypes = p.clienttypeIds; conditions = p.careconditionIds; specials = p.carespecialIds
@@ -297,13 +346,21 @@ struct PreferencesWizard: View {
                 certifications = p.certificationIds; languages = p.languageskillIds
                 commutes = p.commuteId.map { [$0] } ?? []; shifts = p.shiftIds; days = p.caredayIds
                 worktypes = p.worktypeId.map { [$0] } ?? []; salaryMin = p.salaryMin; salaryMax = p.salaryMax
-                if let lat = p.lat, let lng = p.lng { coordinate = .init(latitude: lat, longitude: lng) }
+                if let lat = p.lat, let lng = p.lng,
+                   let saved = LocationProvider.initialMapCoordinate(.init(latitude: lat, longitude: lng)) {
+                    coordinate = saved
+                    coordinateFromPhone = false
+                }
             }
         } catch { feedback.toast(Feedback.message(error)) }
     }
 
     private func save() {
-        guard let coordinate else { return }
+        guard let coordinate = LocationProvider.initialMapCoordinate(coordinate) else {
+            locationPickerGuidance = MapLocationPicker.saveLocationGuidance
+            picking = true
+            return
+        }
         Task {
             do {
                 if isClient {
@@ -536,26 +593,43 @@ private struct LocationRow: View {
 /// Full-screen map with a fixed centre crosshair, a my-location button and Confirm,
 /// matching the Android location picker.
 struct MapLocationPicker: View {
+    static let saveLocationGuidance = "Location is unavailable. Enable location access or choose a point on the map to save."
     let initial: CLLocationCoordinate2D?
+    let unavailableGuidance: String?
     let onConfirm: (CLLocationCoordinate2D) -> Void
     let onCancel: () -> Void
 
     @EnvironmentObject private var loc: Localization
     @StateObject private var location = LocationProvider()
     @State private var position: MapCameraPosition
-    @State private var center: CLLocationCoordinate2D
+    @State private var center: CLLocationCoordinate2D?
+    @State private var manuallyPositioned = false
+    @State private var requestedPhoneLocation = false
 
-    init(initial: CLLocationCoordinate2D?, onConfirm: @escaping (CLLocationCoordinate2D) -> Void, onCancel: @escaping () -> Void) {
-        self.initial = initial; self.onConfirm = onConfirm; self.onCancel = onCancel
-        let start = initial ?? CLLocationCoordinate2D(latitude: 39.8283, longitude: -98.5795)
+    init(initial: CLLocationCoordinate2D?, unavailableGuidance: String? = nil,
+         onConfirm: @escaping (CLLocationCoordinate2D) -> Void, onCancel: @escaping () -> Void) {
+        self.initial = initial; self.unavailableGuidance = unavailableGuidance
+        self.onConfirm = onConfirm; self.onCancel = onCancel
+        let start = LocationProvider.initialMapCoordinate(initial)
         _center = State(initialValue: start)
-        _position = State(initialValue: .region(MKCoordinateRegion(center: start, latitudinalMeters: initial == nil ? 4_000_000 : 3_000, longitudinalMeters: initial == nil ? 4_000_000 : 3_000)))
+        _position = State(initialValue: start.map {
+            .region(MKCoordinateRegion(center: $0, latitudinalMeters: 3_000, longitudinalMeters: 3_000))
+        } ?? .automatic)
     }
 
     var body: some View {
         ZStack {
             Map(position: $position)
-                .onMapCameraChange(frequency: .continuous) { center = $0.region.center }
+                .onMapCameraChange(frequency: .continuous) { context in
+                    // MapKit's automatic framing is not a selected location.
+                    if position.positionedByUser {
+                        center = LocationProvider.initialMapCoordinate(context.region.center)
+                        manuallyPositioned = true
+                        #if DEBUG
+                        location.qaManualMapSelectionOccurred(context.region.center)
+                        #endif
+                    }
+                }
                 .ignoresSafeArea()
             Image(systemName: "plus").font(.system(size: 36, weight: .ultraLight)).allowsHitTesting(false)
             VStack {
@@ -572,20 +646,37 @@ struct MapLocationPicker: View {
                 Spacer()
                 HStack {
                     Spacer()
-                    Button { location.request() } label: { AppIcon(name: "ic_my_location", size: 26, tint: Theme.Palette.primary) }
+                    Button {
+                        requestedPhoneLocation = true
+                        manuallyPositioned = false
+                        location.request()
+                    } label: { AppIcon(name: "ic_my_location", size: 26, tint: Theme.Palette.primary) }
                         .frame(width: 56, height: 56).background(.white, in: Circle()).shadow(radius: 4)
                         .accessibilityLabel("My location")
                 }
                 .padding(.horizontal, 20)
-                PrimaryButton(title: loc.t("general_confirm", "Confirm")) { onConfirm(center) }
+                if location.lastKnownIsStale, !manuallyPositioned {
+                    Text("Last known location").font(Theme.Typography.caption())
+                        .padding(8).background(.white, in: Capsule())
+                }
+                if center == nil {
+                    Text(unavailableGuidance ?? (location.isResolving ? "Finding your location…" : "Location is unavailable. You can continue without selecting a point."))
+                        .font(Theme.Typography.caption()).multilineTextAlignment(.center)
+                        .padding(12).background(.white, in: RoundedRectangle(cornerRadius: 12))
+                        .padding(.horizontal, 20)
+                }
+                PrimaryButton(title: center == nil ? loc.t("general_continue", "Continue") : loc.t("general_confirm", "Confirm")) {
+                    if let center { onConfirm(center) } else { onCancel() }
+                }
                     .padding(.horizontal, 20).padding(.bottom, 24)
             }
         }
-        .onChange(of: location.coordinate?.latitude) { _, _ in
-            if let c = location.coordinate {
-                position = .region(MKCoordinateRegion(center: c, latitudinalMeters: 2_000, longitudinalMeters: 2_000))
-            }
+        .onReceive(location.$coordinate) { coordinate in
+            guard let coordinate, !manuallyPositioned, initial == nil || requestedPhoneLocation else { return }
+            center = coordinate
+            position = .region(MKCoordinateRegion(center: coordinate, latitudinalMeters: 2_000, longitudinalMeters: 2_000))
         }
         .task { if initial == nil { location.request() } }
+        .onDisappear { location.cancel() }
     }
 }

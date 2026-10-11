@@ -1,0 +1,87 @@
+{
+  "source": "fresh-modern-client-initial-load-reply-banner-regressions.xcresult",
+  "rootReviewed": true,
+  "publishable": false,
+  "artifacts": [
+    {
+      "path": "Artifacts/A10D5E90-60B3-4803-9449-99E19BE5C1B9.png",
+      "description": "owned-incoming-during-initial-load-synthetic-message-only-client_0_513DF8CA-533E-433F-B94A-2DA6305CDF5C.png",
+      "sha256": "91edcd127facb98d026cbb4b3b16e4a1e6b5d7e25aa88941de1b997c4eda1d60",
+      "packagedSha256": "91edcd127facb98d026cbb4b3b16e4a1e6b5d7e25aa88941de1b997c4eda1d60"
+    },
+    {
+      "path": "Artifacts/2EEA97D3-45CF-463F-BBD7-B17829BF1A92.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_252B7536-3845-4AE3-BD0E-DB3D384472B4.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/ABE75BC3-8F8C-45DA-AF62-3758EE8C61FB.json",
+      "description": "owned-incoming-during-initial-load-pending_0_9E0234D8-47D3-4357-800D-E6F19596706C.json",
+      "sha256": "b7eda1d5710ef13da8e77aa1e07209db414c2fa55cb58035d20f507cf448c61a",
+      "packagedSha256": "b7eda1d5710ef13da8e77aa1e07209db414c2fa55cb58035d20f507cf448c61a"
+    },
+    {
+      "path": "Artifacts/640E48F7-CF14-4733-B912-7B8B5230A548.json",
+      "description": "owned-reply-race-acknowledged-client_0_B9E1B788-DC9C-48F9-87DF-437DBC949A84.json",
+      "sha256": "b24ae2ab59e89287f37401a0661e53e315a5bda17f446ea5372809e6e1090699",
+      "packagedSha256": "b24ae2ab59e89287f37401a0661e53e315a5bda17f446ea5372809e6e1090699"
+    },
+    {
+      "path": "Artifacts/1BA984AB-BB34-4BA4-B93C-84821EA91302.png",
+      "description": "owned-reply-race-synthetic-acknowledged-message-only-client_0_9DC15216-01AD-449E-B301-866CCE620EBF.png",
+      "sha256": "4ae2e28bdb5a04f983622637cfe391c47f57c99736235a6d8c69757dd8267a96",
+      "packagedSha256": "4ae2e28bdb5a04f983622637cfe391c47f57c99736235a6d8c69757dd8267a96"
+    },
+    {
+      "path": "Artifacts/F27548EC-E430-4D5C-B91F-F16B96421254.json",
+      "description": "owned-reply-race-timing-client_0_6128AA6E-2FB2-4EBD-B053-DBC9611F7105.json",
+      "sha256": "f25c5269c66cf981fa96379ff5d9593b034fd5076bfdd4efd76929a276c1a514",
+      "packagedSha256": "f25c5269c66cf981fa96379ff5d9593b034fd5076bfdd4efd76929a276c1a514"
+    },
+    {
+      "path": "Artifacts/D0F48C99-DB2F-4777-A2A2-A0482A6E2F9E.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_094F6EBD-3ADC-4D17-BC80-43158DB78DA8.json",
+      "sha256": "5d3efed81affb00c7a718655ed989b8a2d9cbdcf68e3ad98f42d63cb857a87f4",
+      "packagedSha256": "5d3efed81affb00c7a718655ed989b8a2d9cbdcf68e3ad98f42d63cb857a87f4"
+    },
+    {
+      "path": "Artifacts/CEB8ED41-9B8F-4D5E-B9F9-1E6C5ED02F92.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_2A43B332-8718-42D7-8D4B-72FF441B6B0F.json",
+      "sha256": "fb47ec5412ae81b2d5f0ad6a9e88c916514b3188ffeb1c020d9b109a608f538c",
+      "packagedSha256": "fb47ec5412ae81b2d5f0ad6a9e88c916514b3188ffeb1c020d9b109a608f538c"
+    }
+  ],
+  "wholeProcessExit": 65,
+  "publicPackage": {
+    "rootReviewed": true,
+    "independentReviewed": true,
+    "originalEvidencePreserved": true,
+    "rawLogsXCResultsFullScreenPhotosPrivateFixturesIncluded": false
+  },
+  "rootReview": "2bounded syntheticPNG and6anonymousJSON reviewed; originalfailuresretained.",
+  "initialLoading": {
+    "status": "FAIL",
+    "seconds": 126.821,
+    "scopePassed": "Managedinitialdetailpending before/afterpeerPOST; appliedinitialGET1 uniqueownedrow/footer fullyvisible",
+    "failure": "Old helper waited only for Messages existence, then prematurely asserted hittability; proper predicate readiness fix is limited to this30s latency testcase."
+  },
+  "strictReply": {
+    "status": "PASS",
+    "seconds": 165.656,
+    "allObservationsSeconds": 8.326467990875244,
+    "nativePOSTs": 1,
+    "originalParentBothPerspectives": true,
+    "newerReplyRetained": true,
+    "nativeSystemBannersDismissed": 0,
+    "bannerDismissalBranchVerified": false
+  },
+  "limitations": [
+    "PhysicalcameraUNTESTED",
+    "NativekeyboarddismissalUNVERIFIED",
+    "LargerhistoryperformanceUNVERIFIED",
+    "Initialloadingfullreentryscopepending"
+  ],
+  "independentReviewed": true,
+  "independentReview": "final_review checked all31 hashes and13 bounded synthetic PNGs across both batches; no privacy/hash blocker; mixedfailures and unexercisedbannerbranch retained."
+}

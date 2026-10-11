@@ -1,0 +1,76 @@
+{
+  "role": "client",
+  "allocation": "small",
+  "wholeInvocationPassed": true,
+  "draftDurationSeconds": 25.862,
+  "replyDraftDurationSeconds": 32.557,
+  "rootViewedAllFourSyntheticFieldCrops": true,
+  "sendPOSTs": 0,
+  "preTypingLoadingFailurePreserved": "fresh-small-client-scoped-state-settings-drafts.log",
+  "androidResetReference": "Recovered APK static source, not runtime",
+  "artifacts": [
+    {
+      "path": "Artifacts/small-client-draft-P08-007-synthetic-draft-after-revisit.png",
+      "sha256": "67f4cabc076c1bcbf4c52f85d8a29100e5cc59e071b7fa7246612cb52fec257a"
+    },
+    {
+      "path": "Artifacts/small-client-draft-P08-007-unsent-draft-revisit-client.json",
+      "sha256": "c824736160d9a2fb37161e3162bd132fd366f1f475ed5244b2bf2c05428f39ec"
+    },
+    {
+      "path": "Artifacts/small-client-draft-P08-007-synthetic-draft-before-back.png",
+      "sha256": "e1eabb27e1f2559d0535f74b286dca1801c63d457ad208b77b32d5ec63c43b67"
+    },
+    {
+      "path": "Artifacts/small-client-reply-draft-P08-007-synthetic-draft-after-revisit.png",
+      "sha256": "67f4cabc076c1bcbf4c52f85d8a29100e5cc59e071b7fa7246612cb52fec257a"
+    },
+    {
+      "path": "Artifacts/small-client-reply-draft-P08-007-unsent-draft-revisit-client.json",
+      "sha256": "4e18b324a72880dc8173da52252d7f9ab6691248bc8be1639c825a525b0a8975"
+    },
+    {
+      "path": "Artifacts/small-client-reply-draft-P08-007-synthetic-draft-before-back.png",
+      "sha256": "f66e524496974f426ec77f02f95b1ae4834a77f586a429b8f87262549ed445f9"
+    }
+  ],
+  "publicPackage": {
+    "status": "REVIEWABLE — not staged or delivered",
+    "originalEvidenceRetainedLocally": true,
+    "rawLogsAndXCResultsIncluded": false,
+    "artifactInventory": [
+      {
+        "path": "Artifacts/small-client-draft-P08-007-synthetic-draft-after-revisit.png",
+        "bytes": 5247,
+        "sha256": "67f4cabc076c1bcbf4c52f85d8a29100e5cc59e071b7fa7246612cb52fec257a"
+      },
+      {
+        "path": "Artifacts/small-client-draft-P08-007-unsent-draft-revisit-client.json",
+        "bytes": 680,
+        "sha256": "fb4a57465334b109dd368abb182b8bfb5ab5ff9443af2b9fc36a2e34fd8a139a"
+      },
+      {
+        "path": "Artifacts/small-client-draft-P08-007-synthetic-draft-before-back.png",
+        "bytes": 13561,
+        "sha256": "e1eabb27e1f2559d0535f74b286dca1801c63d457ad208b77b32d5ec63c43b67"
+      },
+      {
+        "path": "Artifacts/small-client-reply-draft-P08-007-synthetic-draft-after-revisit.png",
+        "bytes": 5247,
+        "sha256": "67f4cabc076c1bcbf4c52f85d8a29100e5cc59e071b7fa7246612cb52fec257a"
+      },
+      {
+        "path": "Artifacts/small-client-reply-draft-P08-007-unsent-draft-revisit-client.json",
+        "bytes": 679,
+        "sha256": "b4d414d988f19471a32019385aac600c4c9c11fc6a88ff361e84f3d4832ae3ad"
+      },
+      {
+        "path": "Artifacts/small-client-reply-draft-P08-007-synthetic-draft-before-back.png",
+        "bytes": 13967,
+        "sha256": "f66e524496974f426ec77f02f95b1ae4834a77f586a429b8f87262549ed445f9"
+      }
+    ],
+    "sourceIndexSHA256": "478712b95aff009703ff53cf17d41423dad9b8bfd73706a6f947eb5bd82bff74",
+    "artifactHashNote": "Public JSON/text are sanitized; artifactInventory hashes apply to packaged bytes. Original indexed hashes, where present, refer to preserved original evidence."
+  }
+}

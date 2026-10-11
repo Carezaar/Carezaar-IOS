@@ -1,0 +1,253 @@
+{
+  "source": "fresh-small-client-current-chat-final.xcresult",
+  "rootReviewed": true,
+  "publishable": false,
+  "artifacts": [
+    {
+      "path": "Artifacts/BA73A8B8-46C4-4CE1-B114-93A404F4DD6B.json",
+      "description": "owned-unread-zero-incoming-native-read-clear-client_0_13D2F42C-EADE-4971-B319-13A3A1079854.json",
+      "sha256": "41464b207df72feb1592fc2e4fd309bc7c7fac434a3a5cffe124efceb634a9a1",
+      "packagedSha256": "41464b207df72feb1592fc2e4fd309bc7c7fac434a3a5cffe124efceb634a9a1"
+    },
+    {
+      "path": "Artifacts/CC972AFE-D6D9-42F2-A6C2-AD3635AD02A7.json",
+      "description": "owned-unread-native-row-geometry-client_0_D5DB9AF0-3397-464B-9D26-45E6B54FACE8.json",
+      "sha256": "3956c944f4266fd515b2dc89ce21c85e793ebee2199b7a0a7ed2554f0b06638a",
+      "packagedSha256": "3956c944f4266fd515b2dc89ce21c85e793ebee2199b7a0a7ed2554f0b06638a"
+    },
+    {
+      "path": "Artifacts/5A1F7349-ED24-450E-B160-B2FD6973297F.png",
+      "description": "owned-unread-indicator-control-only-client_0_463077EA-B73E-4CD2-9979-AB5F82639741.png",
+      "sha256": "74e1cb09dbff0b1396fa01c92822e7dcf1e2d47b735436e540f661375339e12e",
+      "packagedSha256": "74e1cb09dbff0b1396fa01c92822e7dcf1e2d47b735436e540f661375339e12e"
+    },
+    {
+      "path": "Artifacts/70AD23D9-2976-462E-ACDD-EC1CFF0045F9.json",
+      "description": "owned-incoming-bottom-older-position-timestamps-client_0_56B11D0E-187D-442B-B4BC-95A6126071CB.json",
+      "sha256": "8f666b04ea0992dceed755d5edc1609db027276ba4a8ee6268614cc4ceb03dca",
+      "packagedSha256": "8f666b04ea0992dceed755d5edc1609db027276ba4a8ee6268614cc4ceb03dca"
+    },
+    {
+      "path": "Artifacts/0B23A475-21F4-460A-9A11-98B07C405CC3.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_9A23F74E-0CFB-4DFC-8310-10A5F4801813.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/95E72E04-5F03-4796-9669-3E9F32E95CB3.png",
+      "description": "owned-incoming-reading-stored-timestamp-only-client_0_52E5C48C-9F97-4D36-BEC7-AF8B6C84FDB9.png",
+      "sha256": "3fade928ae6ab9fdcde29af78c4a68ba6af8258892c45e5e61169165ea2e3ad9",
+      "packagedSha256": "3fade928ae6ab9fdcde29af78c4a68ba6af8258892c45e5e61169165ea2e3ad9"
+    },
+    {
+      "path": "Artifacts/07FC741A-D644-4F9B-9BC5-182F3F839D92.png",
+      "description": "owned-incoming-after-manual-return-synthetic-message-only-client_0_6B876E80-702B-472C-BCD5-1DA68C1C4727.png",
+      "sha256": "965dfffcb81e0752a0cf860b1977969f1c0cc7a1b5958cb7af1a7bfa25ebcf4c",
+      "packagedSha256": "965dfffcb81e0752a0cf860b1977969f1c0cc7a1b5958cb7af1a7bfa25ebcf4c"
+    },
+    {
+      "path": "Artifacts/4DAD2756-59B1-4065-9EBD-BFF9F69DEF88.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_DD1320E8-E2F8-4931-A4E4-171023ECFF2A.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/CC9E291C-C1F2-4D95-A183-5BBF3E669787.png",
+      "description": "owned-incoming-preserved-older-synthetic-message-only-client_0_5D04D134-ADE2-4639-A321-80478BB046E2.png",
+      "sha256": "91a492b03a9aac8cc8deb75807461d55232e0ae092fad629728bbdf34a506bb7",
+      "packagedSha256": "91a492b03a9aac8cc8deb75807461d55232e0ae092fad629728bbdf34a506bb7"
+    },
+    {
+      "path": "Artifacts/E6A376E1-EFB3-4FA0-AF9F-5239F81DE5C5.png",
+      "description": "owned-incoming-bottom-stored-timestamp-only-client_0_330C28C7-C1FA-4186-963E-E78D989D4280.png",
+      "sha256": "e0c3ec57dd17ce5a842d9dd234f0a79ddfd4d69eff3494ada7b2738ec2d0b208",
+      "packagedSha256": "e0c3ec57dd17ce5a842d9dd234f0a79ddfd4d69eff3494ada7b2738ec2d0b208"
+    },
+    {
+      "path": "Artifacts/15D84A24-9089-496B-BE44-423EA8A923D9.png",
+      "description": "owned-incoming-bottom-synthetic-message-only-client_0_66008A37-7B63-487C-BB66-2FAEA77599F9.png",
+      "sha256": "4e291f7cb131fd792a85666151d6cbd877b5a1292af6dce59774ff7d67eab6e4",
+      "packagedSha256": "4e291f7cb131fd792a85666151d6cbd877b5a1292af6dce59774ff7d67eab6e4"
+    },
+    {
+      "path": "Artifacts/6E322DD7-F255-46E7-B24A-A7C33FC1D0B4.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_C7268082-0286-4E24-92A5-D5A4312E1F0B.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/BF82CB43-42CC-4A18-A1D0-0F6269F632D0.json",
+      "description": "owned-incoming-during-initial-load-completed_0_75BD63B4-4CF9-4A92-B683-5795DED44A27.json",
+      "sha256": "d6268d1d45c4ce2671bb231208cba9bd1763ced8667f291bf1276556b0cdb074",
+      "packagedSha256": "d6268d1d45c4ce2671bb231208cba9bd1763ced8667f291bf1276556b0cdb074"
+    },
+    {
+      "path": "Artifacts/479D5882-9C6A-4049-A3B0-CF566ED176F2.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_4700D58B-77BB-400C-975E-ADEC502561B7.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/CC07A11D-7F27-4C5E-9481-AC74B5CCAD97.png",
+      "description": "owned-incoming-during-initial-load-synthetic-message-only-client_0_3F8C96B8-DF3B-471A-B8DF-D7829D9EA3E2.png",
+      "sha256": "ea1acf2385f970dcd41c4a0e266004a2c02492d6fb34365bb7e93d26551978d6",
+      "packagedSha256": "ea1acf2385f970dcd41c4a0e266004a2c02492d6fb34365bb7e93d26551978d6"
+    },
+    {
+      "path": "Artifacts/B0EFA845-EF31-49B1-8AAF-F910EF8C7753.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_6EFEEC13-5C06-46F9-95FB-0C460754791F.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/1DEECF41-DFB5-4E33-B285-EDA3DD596297.json",
+      "description": "owned-incoming-during-initial-load-pending_0_4F0D0284-44D8-4F2A-A84A-F5C6537BD8B0.json",
+      "sha256": "b7eda1d5710ef13da8e77aa1e07209db414c2fa55cb58035d20f507cf448c61a",
+      "packagedSha256": "b7eda1d5710ef13da8e77aa1e07209db414c2fa55cb58035d20f507cf448c61a"
+    },
+    {
+      "path": "Artifacts/FB795893-61FE-4A6E-BBDF-36FE04CB58E4.json",
+      "description": "owned-keyboard-visible-incoming-boundaries-client_0_DB0E50A2-2B4A-49F2-8A30-B706E9B4834D.json",
+      "sha256": "c685761379d58eb3e1d300ce538966b923e57cdfcd950cee35671de9c8e79a48",
+      "packagedSha256": "c685761379d58eb3e1d300ce538966b923e57cdfcd950cee35671de9c8e79a48"
+    },
+    {
+      "path": "Artifacts/3C7521CB-C655-4478-B15B-64367DFB5EA3.png",
+      "description": "owned-keyboard-incoming-latest-reachable-synthetic-message-only-client_0_54627A2B-9718-40ED-9CC1-EAC6964CF675.png",
+      "sha256": "c844cced5d87e45333204207436f8bff24b171bb04397e29b103d016c66f1e15",
+      "packagedSha256": "c844cced5d87e45333204207436f8bff24b171bb04397e29b103d016c66f1e15"
+    },
+    {
+      "path": "Artifacts/2E7642DB-03A9-41F4-849A-9346ECD88A34.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_F466BDF7-3872-4ACD-92FB-8E19CFCEB3C9.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/CD660656-C301-4A6D-8080-AF42FED9E108.png",
+      "description": "owned-keyboard-incoming-anchored-older-synthetic-message-only-client_0_8D587C71-968C-48B7-AC5F-AF13E0E2C901.png",
+      "sha256": "8364e320c78d3dff49b087bba0daf8716d425e45965974aa7100b409e4488415",
+      "packagedSha256": "8364e320c78d3dff49b087bba0daf8716d425e45965974aa7100b409e4488415"
+    },
+    {
+      "path": "Artifacts/F9EC691A-05D2-4861-BF41-EF28DBE019FF.png",
+      "description": "owned-keyboard-incoming-bottom-synthetic-message-only-client_0_3DB4B97B-37D0-4A87-98DB-792A3DD765BE.png",
+      "sha256": "1d395eb2660fd2fd36cb0d26031e6e328427d6e54fea6060628c3ba1c589fc3d",
+      "packagedSha256": "1d395eb2660fd2fd36cb0d26031e6e328427d6e54fea6060628c3ba1c589fc3d"
+    },
+    {
+      "path": "Artifacts/44F026E1-8E3C-4193-B8E5-5F623A6A9038.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_D348A5AC-3984-42CB-BD64-3EF5A47BCB04.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/C914090D-AAAB-45AD-81F7-FA01ED6C5924.png",
+      "description": "owned-keyboard-incoming-unsent-synthetic-draft-only-client_0_4F8015EE-7E0A-416D-8488-1059355C4C93.png",
+      "sha256": "0fa8dbeb1c285760c5a357d05b1af8b8259225bb5aef1ddef25a8e5535456abb",
+      "packagedSha256": "0fa8dbeb1c285760c5a357d05b1af8b8259225bb5aef1ddef25a8e5535456abb"
+    },
+    {
+      "path": "Artifacts/1F5BECE3-020E-4AD0-A8AC-38827B22EC0C.json",
+      "description": "owned-keyboard-older-focus-geometry_0_E676E44C-43A6-449A-90BA-A607C3598366.json",
+      "sha256": "38148062e01f19668b2fe90ed59033520a443056dc63a25e1161915db2d69a6b",
+      "packagedSha256": "38148062e01f19668b2fe90ed59033520a443056dc63a25e1161915db2d69a6b"
+    },
+    {
+      "path": "Artifacts/C72BD6BD-465F-4714-8CC1-1DA08400F32E.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_C8D27521-8618-4579-A4EC-DCC3504BD847.json",
+      "sha256": "79a7a56f9939a4f673432d2dedf80c5cc06f6b89d0cf541d4ca8f3770ce367f1",
+      "packagedSha256": "79a7a56f9939a4f673432d2dedf80c5cc06f6b89d0cf541d4ca8f3770ce367f1"
+    },
+    {
+      "path": "Artifacts/040CB7A1-6798-431A-BDEC-99480C8AD00C.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_19CC9CEF-112B-4C6F-B3DF-B1E1044A12E1.json",
+      "sha256": "706a2e07e8c67d7a86caea038fd0c0533b96828daf48e6bcb98b2a16bedd9e4c",
+      "packagedSha256": "706a2e07e8c67d7a86caea038fd0c0533b96828daf48e6bcb98b2a16bedd9e4c"
+    },
+    {
+      "path": "Artifacts/14E20057-8859-4BA4-9584-00382E31B0CF.json",
+      "description": "owned-slow-send-new-typing-client_0_32263A33-F3C9-4A4D-B1E8-74D1CBB90F5D.json",
+      "sha256": "5f5cc60ec4509e84bf66307890c6423767f3c9c28c613c242c64bc12f115992a",
+      "packagedSha256": "5f5cc60ec4509e84bf66307890c6423767f3c9c28c613c242c64bc12f115992a"
+    },
+    {
+      "path": "Artifacts/580B6370-4810-4E83-9D19-E5FE48403B5A.png",
+      "description": "owned-slow-send-retained-synthetic-draft-only-client_0_4C8B4586-59B4-4DBD-BB32-54EF0A9FB653.png",
+      "sha256": "3f8dd1203f5f2fd25ff5a52ab18baa73a574f2cdf8cced1376951d664fa7f7eb",
+      "packagedSha256": "3f8dd1203f5f2fd25ff5a52ab18baa73a574f2cdf8cced1376951d664fa7f7eb"
+    },
+    {
+      "path": "Artifacts/7FA94450-BFB3-49AC-A6D3-06EB0DBA8D2C.png",
+      "description": "owned-slow-send-first-synthetic-bubble-only-client_0_307B6B41-E4D0-4F8D-82F5-C14D78B5D1B9.png",
+      "sha256": "7973dc9e90c117f1663e8f8118331cfd0f0a8109ae18aa96800b1ab0647931de",
+      "packagedSha256": "7973dc9e90c117f1663e8f8118331cfd0f0a8109ae18aa96800b1ab0647931de"
+    },
+    {
+      "path": "Artifacts/789E392C-E428-4554-8ED3-4782C2AA8198.json",
+      "description": "real-native-instant-reciprocal-proof_0_E4D14BEB-7F45-43D5-948F-95F6D8314215.json",
+      "sha256": "44ebe8b7e7e151c03b0b5c150cf327dcf646088b0e4ad6d50ee45c3aaba2f28f",
+      "packagedSha256": "44ebe8b7e7e151c03b0b5c150cf327dcf646088b0e4ad6d50ee45c3aaba2f28f"
+    },
+    {
+      "path": "Artifacts/BC816342-1CF2-4686-A53C-586C3F4E8C85.png",
+      "description": "real-instant-matched-profile-control_0_BF32E292-275B-46F6-8B78-409A6744633F.png",
+      "sha256": "ac4b954ef326dd84cf15f45aaaf2f71578ab62af93eef2d66a3ec48f42899efd",
+      "packagedSha256": "ac4b954ef326dd84cf15f45aaaf2f71578ab62af93eef2d66a3ec48f42899efd"
+    }
+  ],
+  "rootReviewScope": "Viewed14 boundedPNGs via3unscaledprivate review sheets; read18anonymousJSON/all32hashesverified. Six full methodsPASS; ReplyFAIL195.209 beforetiming fullbody/menu exposure andContactSKIP10.631 retained. Existing chat/initial pretransport scope, keyboard-dismissal absent-native-control unverified, genuine reciprocal actualACTIVE/native1Request0Accept peerwindow2.658235 both verified. Draft crops show local synthetic text, exactdraft preservation usesAX/JSON; no whole-transcript/privatefixture screenshots.",
+  "independentlyReviewed": true,
+  "independentReviewScope": "Read all 18 anonymous JSON artifacts and directly inspected all 14 bounded PNGs via three review sheets; all 32 hashes match, no private fixture data or tokens/absolute paths detected, and no unindexed files or symlinks present. Supports six completed Small client tests (unread existing history, incoming/older position/timestamps, pre-transport initial loading and reentry, keyboard incoming/older reading, slow send, and genuine reciprocal instant match). Preserves Reply failure before the timing interval because body/menu union is above the transcript after 48 gestures, Contact skip without a mail handler, absent native keyboard-dismissal control, and whole mixed-batch failure. Does not establish a Reply timing/acknowledgement pass, native keyboard dismissal, held HTTP response, or never-opened empty-chat unread coverage.",
+  "independentReviewed": true,
+  "independentReview": "Read all 18 anonymous JSON artifacts and directly inspected all 14 bounded PNGs via three review sheets; all 32 hashes match, no private fixture data or tokens/absolute paths detected, and no unindexed files or symlinks present. Supports six completed Small client tests (unread existing history, incoming/older position/timestamps, pre-transport initial loading and reentry, keyboard incoming/older reading, slow send, and genuine reciprocal instant match). Preserves Reply failure before the timing interval because body/menu union is above the transcript after 48 gestures, Contact skip without a mail handler, absent native keyboard-dismissal control, and whole mixed-batch failure. Does not establish a Reply timing/acknowledgement pass, native keyboard dismissal, held HTTP response, or never-opened empty-chat unread coverage.",
+  "scope": "Six completed Small client tests pass. Strict Reply failed before the timed send sequence because the full peer text and menu remained above the viewport. Contact skipped without a mail handler. Keyboard dismissal remains unverified. Whole batch failed.",
+  "testResults": [
+    {
+      "method": "Unread",
+      "status": "PASS",
+      "seconds": 105.48
+    },
+    {
+      "method": "Incoming",
+      "status": "PASS",
+      "seconds": 108.589
+    },
+    {
+      "method": "Initial loading and reentry",
+      "status": "PASS",
+      "seconds": 226.923
+    },
+    {
+      "method": "Keyboard incoming and older reading",
+      "status": "PASS",
+      "seconds": 95.003
+    },
+    {
+      "method": "Strict Reply",
+      "status": "FAIL",
+      "seconds": 195.209
+    },
+    {
+      "method": "Slow send",
+      "status": "PASS",
+      "seconds": 62.357
+    },
+    {
+      "method": "Contact Email",
+      "status": "SKIP",
+      "seconds": 10.631
+    },
+    {
+      "method": "Genuine reciprocal instant match",
+      "status": "PASS",
+      "seconds": 164.829
+    }
+  ],
+  "publicPackage": {
+    "rootReviewed": true,
+    "independentReviewed": true,
+    "originalEvidencePreserved": true,
+    "rawLogsXCResultsFullScreenPhotosPrivateFixturesIncluded": false
+  }
+}

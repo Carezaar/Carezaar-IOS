@@ -44,25 +44,20 @@ typealias ContactSupportView = HelpCenterView
 // MARK: - FAQ
 
 struct FAQView: View {
-    /// Android hardcodes "All"; the content table has no slug for it.
-    static let allLabel = ["en": "All", "fr": "Tous", "sp": "Todos", "ar": "الكل", "fa": "همه",
-                           "ru": "Все", "cn": "全部", "in": "सभी"]
+    @EnvironmentObject private var baseData: BaseDataStore
     @EnvironmentObject private var loc: Localization
-    @State private var faqs: [Faq]?
-    @State private var categories: [FaqCategory] = []
+    private var faqs: [Faq] { baseData.faqs }
+    private var categories: [FaqCategory] { baseData.faqCategories }
     @State private var active: Int?
     @State private var expanded: Set<Int> = []
-    @State private var error: Error?
 
     var body: some View {
         ScrollView {
-            if let error {
-                ErrorState(message: Feedback.message(error)) { Task { await load() } }
-            } else if let faqs {
+            if baseData.isReady {
                 VStack(alignment: .leading, spacing: 12) {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 8) {
-                            chip(Self.allLabel[AppLanguage.currentCode] ?? "All", on: active == nil) { active = nil }
+                            chip(loc.t("general_all", "All"), on: active == nil) { active = nil }
                             ForEach(categories) { c in
                                 chip(pick(c.translations.map { ($0.languageId, $0.title) }) ?? "", on: active == c.id) { active = c.id }
                             }
@@ -97,7 +92,6 @@ struct FAQView: View {
             }
         }
         .backHeader(loc.t("profile_faq_title", "FAQ"))
-        .task { await load() }
     }
 
     private func chip(_ title: String, on: Bool, action: @escaping () -> Void) -> some View {
@@ -128,14 +122,7 @@ struct FAQView: View {
             .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
-    private func load() async {
-        error = nil
-        do {
-            async let f = BaseService().faqs()
-            async let c = BaseService().faqCategories()
-            (faqs, categories) = try await (f, c)
-        } catch { self.error = error }
-    }
+
 }
 
 // MARK: - Report an issue
@@ -352,6 +339,7 @@ struct ChangePasswordView: View {
     @State private var updated = ""
     @State private var confirmation = ""
     @State private var confirming = false
+    @State private var submitting = false
 
     private var valid: Bool { !current.isEmpty && PasswordValidator.isValid(updated) && updated == confirmation }
 
@@ -376,22 +364,28 @@ struct ChangePasswordView: View {
         // puts the keyboard away.
         .scrollDismissesKeyboard(.interactively)
         .bottomAction {
-            PrimaryButton(title: loc.t("settings_change_password_change_password", "Change Password"), isEnabled: valid) { confirming = true }
+            PrimaryButton(title: loc.t("settings_change_password_change_password", "Change Password"), isEnabled: valid && !submitting) { confirming = true }
                 .padding(.horizontal, 20).padding(.vertical, 10).background(.white)
         }
         .backHeader(loc.t("settings_change_password_title", "Change Password"))
         .alert(loc.t("settings_change_password_dialog_title", "Are you sure?"), isPresented: $confirming) {
             Button(loc.t("settings_change_password_dialog_deny", "Cancel"), role: .cancel) {}
             Button(loc.t("settings_change_password_dialog_confirm", "Confirm")) { Task { await submit() } }
-        } message: { Text(loc.t("settings_change_password_dialog_message", "")) }
+        }
     }
 
     private func submit() async {
+        guard valid, !submitting else { return }
+        submitting = true
+        defer { submitting = false }
         do {
             try await feedback.run(loc.t("loading_user_password_change", "Changing password")) {
-                try await UserService().changePassword(oldPassword: current, newPassword: updated)
+                try await session.changePassword(current: current, new: updated)
             }
-            await session.signOut()
+            current = ""
+            updated = ""
+            confirmation = ""
+            feedback.toast("Password changed successfully.")
         } catch let error as APIError where error.isServiceFault {
             feedback.toast(Feedback.unavailable(loc.t("settings_change_password_title", "Change Password")))
         } catch { feedback.toast(Feedback.message(error)) }

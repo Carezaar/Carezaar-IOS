@@ -19,11 +19,14 @@ struct ChatView: View {
     @State private var error: Error?
     @State private var replyTo: ChatMessage?
     @State private var focusRequest = 0
-    /// Bumped by every load or send; a background check that started before one of
-    /// them must not overwrite its newer result.
-    @State private var revision = 0
+    @State private var operations = ChatOperationOwnership()
+    @State private var replyOwnership = ChatReplyOwnership()
     @State private var sending = false
+    @StateObject private var delivery = ChatSendCoordinator()
+    @State private var confirmingRetry = false
     @State private var visible = false
+    @State private var scrollPosition = ChatViewportPosition()
+    @State private var followIncoming = true
     @Environment(\.scenePhase) private var scenePhase
 
     private static let pollInterval: Duration = .seconds(10)
@@ -47,13 +50,21 @@ struct ChatView: View {
             } else {
                 transcript
             }
+            if delivery.uncertain { uncertainSendNotice }
             // The draft lives in its own view: typing re-renders only the composer, not
             // the transcript (a long message there made every keystroke re-lay it out).
-            ChatComposer(replyTo: $replyTo, focusRequest: focusRequest, send: send)
+            ChatComposer(replyTo: Binding(get: { replyTo }, set: selectReply), focusRequest: focusRequest,
+                         isEnabled: !delivery.uncertain && !sending, send: send)
         }
         .backHeader(loc.t("chat_screen_messages_title", "Chat Messages"))
+        .alert("Allow another send attempt?", isPresented: $confirmingRetry) {
+            Button(loc.t("general_cancel", "Cancel"), role: .cancel) {}
+            Button("Allow retry") { delivery.allowExplicitRetry() }
+        } message: {
+            Text("Your previous message may already be in the chat. Sending it again could create a duplicate. Check the messages before allowing another attempt.")
+        }
         .onAppear { visible = true }
-        .onDisappear { visible = false }
+        .onDisappear { visible = false; operations.invalidate(); scrollPosition = ChatViewportPosition() }
         .task {
             await load()
             while !Task.isCancelled {
@@ -66,6 +77,25 @@ struct ChatView: View {
         }
     }
 
+    private var uncertainSendNotice: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Couldn't confirm whether your message was sent. Your draft is still here.")
+                .font(Theme.Typography.body(13))
+            AdaptiveStack(alignment: .center, spacing: 12) {
+                Button { Task { await load() } } label: {
+                    Text("Check messages").frame(minHeight: 44).contentShape(Rectangle())
+                }
+                Button { confirmingRetry = true } label: {
+                    Text("Allow retry").frame(minHeight: 44).contentShape(Rectangle())
+                }
+            }
+            .font(Theme.Typography.control(13))
+        }
+        .padding(12).frame(maxWidth: .infinity, alignment: .leading)
+        .background(Theme.Palette.primarySoft)
+        .accessibilityIdentifier("chat-send-uncertain")
+    }
+
     private var partnerBar: some View {
         let partner = chat?.partner(for: role)
         return HStack(spacing: 12) {
@@ -76,23 +106,41 @@ struct ChatView: View {
                 AppIcon(name: "ic_refresh", size: 24, tint: Theme.Palette.primary).frame(width: 44, height: 44)
             }
             .accessibilityLabel(loc.t("chat_screen_refresh", "Refresh"))
+            .disabled(sending)
         }
         .padding(.horizontal, 16).padding(.vertical, 8)
     }
 
     private var transcript: some View {
-        ScrollViewReader { proxy in
-            ScrollView {
-                LazyVStack(spacing: 10) {
-                    ForEach(messages) { bubble($0).id($0.id) }
+        GeometryReader { viewport in
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(spacing: 10) {
+                        ForEach(messages) { bubble($0).id($0.id) }
+                        Color.clear.frame(height: 1)
+                            .id("chat-bottom")
+                    }
+                    .padding(16)
+                    .background(GeometryReader { content in
+                        Color.clear.preference(key: ChatViewportPreference.self,
+                            value: ChatViewportMetrics(contentBottom: content.frame(in: .named("chat-viewport")).maxY,
+                                                       viewportHeight: viewport.size.height))
+                    })
                 }
-                .padding(16)
-            }
-            // Open at the newest message, as Android does.
-            .defaultScrollAnchor(.bottom)
-            .onAppear { proxy.scrollTo(messages.last?.id, anchor: .bottom) }
-            .onChange(of: messages.count) { _, _ in
-                withAnimation { proxy.scrollTo(messages.last?.id, anchor: .bottom) }
+                .coordinateSpace(name: "chat-viewport")
+                .onPreferenceChange(ChatViewportPreference.self) { metrics in
+                    guard let metrics else { return }
+                    let followResize = scrollPosition.observe(contentBottom: metrics.contentBottom, viewportHeight: metrics.viewportHeight)
+                    if followResize {
+                        proxy.scrollTo("chat-bottom", anchor: .bottom)
+                    }
+                }
+                .simultaneousGesture(DragGesture().onChanged { _ in scrollPosition.beganUserScroll() })
+                .onAppear { proxy.scrollTo("chat-bottom", anchor: .bottom) }
+                .onChange(of: messages.last?.id) { _, _ in
+                    guard followIncoming else { return }
+                    withAnimation { proxy.scrollTo("chat-bottom", anchor: .bottom) }
+                }
             }
         }
     }
@@ -117,9 +165,10 @@ struct ChatView: View {
                             .accessibilityLabel(m.seenAt.map { "\(loc.t("chat_screen_seen_at", "Seen at")) \(ServerTime.local($0))" } ?? "Sent")
                     }
                 }
-                .opacity(0.85)
             }
-            .foregroundStyle(mine ? .white : .black)
+            // Black remains readable on the unchanged brand-blue fill, including
+            // small server-time and quoted-message text.
+            .foregroundStyle(.black)
             .padding(.horizontal, 14).padding(.vertical, 10)
             .background(mine ? Theme.Palette.primary : Color(hex: 0xF1F3F6),
                         in: UnevenRoundedRectangle(topLeadingRadius: 16, bottomLeadingRadius: mine ? 16 : 4,
@@ -128,63 +177,92 @@ struct ChatView: View {
             if !mine { menu(m) }
             if !mine { Spacer(minLength: 48) }
         }
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("chat-message-\(m.id)")
     }
 
     private func menu(_ m: ChatMessage) -> some View {
         Menu { menuItems(m) } label: {
-            AppIcon(name: "ic_more", size: 20, tint: Theme.Palette.textSecondary).frame(width: 28, height: 36)
+            AppIcon(name: "ic_more", size: 20, tint: Theme.Palette.textSecondary).frame(width: 44, height: 44)
         }
         .accessibilityLabel("Message options")
+        .accessibilityIdentifier("chat-message-options-\(m.id)")
     }
 
     @ViewBuilder private func menuItems(_ m: ChatMessage) -> some View {
-        Button(loc.t("chat_screen_reply", "Reply")) { replyTo = m; focusRequest += 1 }
+        Button(loc.t("chat_screen_reply", "Reply")) { selectReply(m); focusRequest += 1 }
         Button(loc.t("chat_screen_copy", "Copy")) { UIPasteboard.general.string = m.message }
     }
 
+    private func selectReply(_ message: ChatMessage?) {
+        replyOwnership.selectionChanged()
+        replyTo = message
+    }
+
     private func load() async {
+        guard visible, !sending, !Task.isCancelled else { return }
+        let owner = operations.beginExplicitRead()
         error = nil
+        defer { operations.finishExplicitRead(owner) }
         do {
             let full = try await feedback.run(loc.t("loading_chat_get_one", "Getting chat details")) {
                 try await UserService().chat(id: chatId)
             }
+            guard visible, !sending, !Task.isCancelled, operations.canCommit(owner) else { return }
             apply(full)
-        } catch { self.error = error }
+        } catch is CancellationError { return }
+        catch {
+            guard visible, !sending, !Task.isCancelled, operations.canCommit(owner) else { return }
+            self.error = error
+        }
     }
 
-    /// New messages from the partner, without the busy card.
+    /// Quiet checks never supersede an explicit read or a send.
     private func refreshQuietly() async {
-        guard chat != nil, !sending else { return }
-        let started = revision
-        guard let full = try? await UserService().chat(id: chatId), started == revision, !sending else { return }
+        guard visible, chat != nil, !sending, !Task.isCancelled,
+              let owner = operations.beginQuietRead() else { return }
+        guard let full = try? await UserService().chat(id: chatId),
+              visible, !Task.isCancelled, !sending, operations.canCommit(owner) else { return }
         if full != chat { apply(full) }
     }
 
-    private func apply(_ full: ChatFull) {
-        revision += 1
+    private func apply(_ full: ChatFull, revealAcknowledgedSend: Bool = false) {
+        followIncoming = revealAcknowledgedSend || chat == nil || scrollPosition.isAtBottom
         chat = full
         messages = full.chronologicalMessages
     }
 
     /// Returns true when sent, so the composer clears its draft.
     private func send(_ text: String) async -> Bool {
-        // Android checks the partner's is_match before sending; the server itself
-        // accepts messages to an ended match.
-        let partnerIsMatch = role == .client ? chat?.caregiver?.isMatch : chat?.client?.isMatch
-        if partnerIsMatch == false {
-            feedback.toast(loc.t("chat_screen_match_check", "You can only send messages to your current matches."))
-            return false
-        }
+        guard visible, !Task.isCancelled, !sending, !delivery.uncertain else { return false }
+        let submittedReply = replyOwnership.capture(parentId: replyTo?.id)
+        let owner = operations.beginSend()
         sending = true
         defer { sending = false }
         do {
-            let updated = try await feedback.run(loc.t("loading_chat_send", "Sending a new message")) {
-                try await UserService().sendMessage(chatId: chatId, message: text, parentId: replyTo?.id)
+            // An already-open chat can outlive its relationship. Resolve current
+            // chat metadata before sending because this backend may accept ended
+            // match messages. This is not an extra Matched-screen navigation check.
+            let current = try await UserService().chat(id: chatId)
+            guard visible, !Task.isCancelled, operations.canCommit(owner) else { return false }
+            apply(current)
+            let partnerIsMatch = role == .client ? current.caregiver?.isMatch : current.client?.isMatch
+            guard partnerIsMatch == true else {
+                feedback.toast(loc.t("chat_screen_match_check", "You can only send messages to your current matches."))
+                return false
             }
-            apply(updated)
-            replyTo = nil
+            let updated = try await feedback.run(loc.t("loading_chat_send", "Sending a new message")) {
+                try await delivery.submit(chatId: chatId, text: text, parentId: submittedReply.parentId)
+            }
+            // A deliberate, acknowledged send should reveal the new bubble even
+            // when the keyboard reduced the viewport or the user was reading above.
+            guard visible, !Task.isCancelled, operations.canCommit(owner) else { return false }
+            apply(updated, revealAcknowledgedSend: true)
+            if replyOwnership.canClear(submittedReply, currentParentId: replyTo?.id) { selectReply(nil) }
             return true
-        } catch {
+        } catch is CancellationError { return false }
+        catch {
+            guard visible, !Task.isCancelled, operations.canCommit(owner) else { return false }
             feedback.toast(Self.message(error, loc: loc))
             return false
         }
@@ -204,6 +282,7 @@ struct ChatView: View {
 private struct ChatComposer: View {
     @Binding var replyTo: ChatMessage?
     let focusRequest: Int
+    let isEnabled: Bool
     let send: (String) async -> Bool
     @EnvironmentObject private var loc: Localization
     @State private var draft = ""
@@ -218,7 +297,10 @@ private struct ChatComposer: View {
                     AppIcon(name: "ic_reply", size: 18, tint: Theme.Palette.primary)
                     Text(replyTo.message).font(Theme.Typography.caption(13)).lineLimit(1)
                     Spacer()
-                    Button { self.replyTo = nil } label: { AppIcon(name: "ic_clear", size: 16, tint: Theme.Palette.textSecondary) }
+                    Button { self.replyTo = nil } label: {
+                        AppIcon(name: "ic_clear", size: 16, tint: Theme.Palette.textSecondary)
+                            .frame(width: 44, height: 44)
+                    }
                         .accessibilityLabel(loc.t("chat_screen_cancel", "Cancel"))
                 }
                 .padding(10).background(Theme.Palette.clientPanel, in: RoundedRectangle(cornerRadius: 10))
@@ -236,15 +318,15 @@ private struct ChatComposer: View {
                         guard await send(text) else { return }
                         // The keyboard stays usable behind the busy card: keep anything
                         // typed while this message was sending.
-                        draft = draft.hasPrefix(sent) ? String(draft.dropFirst(sent.count)).trimmingLeadingWhitespace : ""
+                        draft = ChatDraftReconciliation.afterAcknowledgedSend(current: draft, submitted: sent)
                     }
                 } label: {
                     AppIcon(name: "ic_send", size: 22, tint: .white)
                         .flipsForRightToLeftLayoutDirection(true)
                         .frame(width: 46, height: 46).background(Theme.Palette.primary, in: Circle())
                 }
-                .disabled(trimmed.isEmpty)
-                .opacity(trimmed.isEmpty ? 0.45 : 1)
+                .disabled(trimmed.isEmpty || !isEnabled)
+                .opacity(trimmed.isEmpty || !isEnabled ? 0.45 : 1)
                 .accessibilityLabel("Send")
             }
         }
@@ -262,10 +344,10 @@ private extension String {
 // MARK: - Manage matches
 
 /// Profile → Matches: the user's own match records in three tabs, with the
-/// Accept / Reject / Cancel / Unmatch / Review actions each stage allows.
+/// relationship records; actions remain on the partner profile.
 /// Matches / Requests / History. Cards carry no match actions (client specification,
 /// October 2026): tapping a card opens the person's profile, where the actions live.
-/// History keeps Review, which is not a match action.
+/// Finished matches expose no review controls.
 struct ManageMatchesView: View {
 
     @EnvironmentObject private var router: AppRouter
@@ -275,7 +357,7 @@ struct ManageMatchesView: View {
 
     @StateObject private var pager = Pager<Match>()
     @State private var tab: MatchListType = .matches
-    @State private var reviewing: Match?
+    @State private var introduction: Match?
 
     private var role: UserRole { session.role ?? .client }
 
@@ -292,20 +374,22 @@ struct ManageMatchesView: View {
         .refreshable { await pager.reload(fetch) }
         .backHeader(loc.t("profile_matches_title", "Matches"))
         .task(id: tab) { await reload() }
-        .sheet(item: $reviewing) { match in
-            ReviewSheet(match: match) { reviewing = nil; Task { await reload() } }
+        .sheet(item: $introduction) { match in
+            IntroductionSheet(match: match, role: role)
                 .presentationDetents([.medium, .large])
         }
     }
 
     private var segmented: some View {
-        HStack(spacing: 4) {
+        AdaptiveStack(alignment: .center, spacing: 4) {
             ForEach([MatchListType.matches, .requests, .histories], id: \.self) { x in
                 let on = tab == x
                 Button { tab = x } label: {
                     Text(loc.t(x == .histories ? "match_tab_history" : "match_tab_\(x.rawValue)", x.rawValue.capitalized))
                         .font(on ? Theme.Typography.filledLabel(15) : Theme.Typography.control(15)).foregroundStyle(on ? .white : Theme.Palette.primaryDark)
-                        .frame(maxWidth: .infinity, minHeight: 40)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.vertical, 6)
+                        .frame(maxWidth: .infinity, minHeight: 44)
                         .background(on ? Theme.Palette.primary : .clear, in: RoundedRectangle(cornerRadius: 10))
                 }
                 .buttonStyle(.plain)
@@ -317,19 +401,17 @@ struct ManageMatchesView: View {
         }
         .padding(4).background(Theme.Palette.clientPanel, in: RoundedRectangle(cornerRadius: 12))
         .padding(20)
-        // A segmented control: capped like the system's, with the large content viewer.
-        .dynamicTypeSize(...DynamicTypeSize.xxLarge)
     }
 
     private func row(_ m: Match) -> some View {
         let partner = role == .client ? m.caregiver?.user : m.client?.user
         let partnerId = role == .client ? m.caregiver?.id : m.client?.id
         let preview = Self.preview(m.introduction)
-        return Button {
-            guard let partnerId else { return }
-            router.push(role == .client ? .caregiverDetails(caregiverId: partnerId) : .clientDetails(clientId: partnerId))
-        } label: {
-            VStack(alignment: .leading, spacing: 10) {
+        return VStack(alignment: .leading, spacing: 10) {
+            Button {
+                guard let partnerId else { return }
+                router.push(role == .client ? .caregiverDetails(caregiverId: partnerId) : .clientDetails(clientId: partnerId))
+            } label: {
                 AdaptiveStack(alignment: .center, spacing: 12) {
                     Avatar(url: partner?.photo, size: 72)
                     VStack(alignment: .leading, spacing: 4) {
@@ -339,44 +421,41 @@ struct ManageMatchesView: View {
                             Text("\(loc.t("match_end", "End")): \(ServerTime.local(end))").font(Theme.Typography.caption(13)).foregroundStyle(Theme.Palette.textSecondary)
                         }
                         if m.awaitsPartner(for: role) {
-                            Text(loc.t("match_pending_review", "Pending Review")).font(Theme.Typography.control(12)).foregroundStyle(Theme.Palette.warning)
+                            Text(loc.t("match_pending_acceptance", "Pending Acceptance")).font(Theme.Typography.control(12)).foregroundStyle(Theme.Palette.warning)
                         }
                     }
                     Spacer(minLength: 4)
-                    VStack(alignment: .trailing, spacing: 8) {
-                        // Green only for a real match; ended ones are red; requests have none.
-                        if m.stage != .pending {
-                            AppIcon(name: m.stage == .history ? "ic_match_off" : "ic_match_on", size: 32,
-                                    tint: m.stage == .history ? Theme.Palette.danger : Theme.Palette.success)
-                                .accessibilityHidden(true)
-                        }
-                        if m.stage == .history, m.review(by: role) == nil {
-                            MiniButton(title: loc.t("match_review_button", "Review")) { reviewing = m }
-                        }
+                    if m.stage != .pending {
+                        AppIcon(name: m.stage == .history ? "ic_match_off" : "ic_match_on", size: 32,
+                                tint: m.stage == .history ? Theme.Palette.danger : Theme.Palette.success)
+                            .accessibilityHidden(true)
                     }
                 }
-                if m.stage == .pending, let preview {
-                    Text("💬 " + preview).font(Theme.Typography.body(13)).foregroundStyle(Theme.Palette.textSecondary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .accessibilityLabel("\(loc.t("match_introduction_title", "Introduction")): \(preview)")
-                }
+                .contentShape(Rectangle())
             }
-            .card(padding: 12)
-            .contentShape(Rectangle())
+            .buttonStyle(.plain)
+            if m.stage == .pending, let preview {
+                Button { introduction = m } label: {
+                    HStack(spacing: 6) {
+                        AppIcon(name: "ic_message", size: 16, tint: Theme.Palette.textSecondary)
+                        Text(preview).lineLimit(1)
+                    }
+                    .font(Theme.Typography.body(13)).foregroundStyle(Theme.Palette.textSecondary)
+                    .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("\(loc.t("match_introduction_title", "Introduction")): \(preview)")
+                .accessibilityIdentifier("match-introduction-\(m.id)")
+            }
         }
-        .buttonStyle(.plain)
+        .card(padding: 12)
     }
 
-    /// The introduction's first sentence, at most 80 characters, on one card line.
+    /// Preserve the first literal line; visual truncation belongs to the card only.
     static func preview(_ message: String?) -> String? {
-        let text = (message ?? "").split(whereSeparator: \.isWhitespace).joined(separator: " ")
-        guard !text.isEmpty else { return nil }
-        var beginning = text
-        if let end = text.firstIndex(where: { ".!?".contains($0) }), text.index(after: end) < text.endIndex {
-            beginning = String(text[..<end])
-        }
-        let clipped = beginning.count > 80 || beginning != text
-        return String(beginning.prefix(80)).trimmingCharacters(in: .whitespaces) + (clipped ? "..." : "")
+        guard let message, !message.isEmpty else { return nil }
+        return String(message.prefix { !$0.isNewline })
     }
 
     private var fetch: Pager<Match>.Fetch {
@@ -390,53 +469,163 @@ struct ManageMatchesView: View {
     }
 }
 
-/// "Submit your review": 1–5 stars and a comment. Android treats the comment as
-/// optional, but the server answers 400 `Undefined array key "comment"` without one
-/// (BE-07), so it is required until that is fixed.
-struct ReviewSheet: View {
+/// Full introduction stays separate from profile navigation and match mutations.
+private struct IntroductionSheet: View {
     let match: Match
-    let onDone: () -> Void
+    let role: UserRole
+    @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var loc: Localization
-    @EnvironmentObject private var feedback: Feedback
-    @State private var score = 5
-    @State private var comment = ""
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text(loc.t("match_review_title", "Submit your review")).font(Theme.Typography.title(20))
-            let hint = loc.t("match_review_message", "")
-            if !hint.isEmpty { Text(hint).font(Theme.Typography.body(13)).foregroundStyle(Theme.Palette.textSecondary) }
-            Text(loc.t("match_review_score", "Score")).font(Theme.Typography.title(15))
-            HStack(spacing: 8) {
-                ForEach(1...5, id: \.self) { n in
-                    Button { score = n } label: {
-                        Image(systemName: n <= score ? "star.fill" : "star").font(.system(size: 30))
-                            .foregroundStyle(n <= score ? Color(hex: 0xF5B301) : Theme.Palette.textSecondary)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                HStack {
+                    Text(loc.t("match_introduction_title", "Introduction")).font(Theme.Typography.title(20))
+                    Spacer()
+                    Button { dismiss() } label: {
+                        Image(systemName: "xmark").frame(width: 44, height: 44)
                     }
-                    .accessibilityLabel("\(n)")
-                    .accessibilityAddTraits(score == n ? [.isSelected] : [])
+                    .accessibilityLabel(loc.t("general_cancel", "Cancel"))
                 }
+                let partner = role == .client ? match.caregiver?.user : match.client?.user
+                HStack(spacing: 12) {
+                    Avatar(url: partner?.photo, size: 72)
+                    Text(partner?.fullName ?? "").font(Theme.Typography.title(17))
+                }
+                Text(match.introduction ?? "").font(Theme.Typography.body(15))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .textSelection(.enabled)
             }
-            (Text(loc.t("match_review_comment", "Comment")) + Text(" *").foregroundColor(Theme.Palette.error))
-                .font(Theme.Typography.title(15))
-            TextField("", text: $comment, axis: .vertical).lineLimit(3...6).padding(12)
-                .accessibilityLabel(loc.t("match_review_comment", "Comment"))
-                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Theme.Palette.line))
-            PrimaryButton(title: loc.t("match_submit_button", "Submit"), isEnabled: !trimmedComment.isEmpty) { Task { await submit() } }
-            Spacer()
+            .padding(20)
         }
-        .padding(20)
+        .accessibilityIdentifier("match-introduction-detail")
+    }
+}
+
+/// The sentinel is visible at the bottom (including short transcripts). This is
+/// measured before applying a received chat, so new content cannot change the decision.
+enum ChatScrollPosition {
+    static func isAtBottom(contentBottom: CGFloat, viewportHeight: CGFloat) -> Bool {
+        contentBottom.isFinite && viewportHeight > 0 && contentBottom <= viewportHeight + 24
+    }
+}
+
+/// A keyboard resize must retain the reader's prior bottom intent until its
+/// requested scroll has settled. New content alone never starts a resize scroll.
+struct ChatViewportPosition {
+    private(set) var isAtBottom = true
+    private var previousHeight: CGFloat?
+    private var awaitingBottomAfterResize = false
+
+    mutating func observe(contentBottom: CGFloat, viewportHeight: CGFloat) -> Bool {
+        guard contentBottom.isFinite, viewportHeight.isFinite, viewportHeight > 0 else { return false }
+        let resized = previousHeight.map { $0 != viewportHeight } ?? false
+        let followResize = resized && (isAtBottom || awaitingBottomAfterResize)
+        previousHeight = viewportHeight
+        if followResize { awaitingBottomAfterResize = true }
+        let reachedBottom = ChatScrollPosition.isAtBottom(contentBottom: contentBottom, viewportHeight: viewportHeight)
+        if reachedBottom { awaitingBottomAfterResize = false }
+        isAtBottom = reachedBottom || awaitingBottomAfterResize
+        return followResize
     }
 
-    private var trimmedComment: String { comment.trimmingCharacters(in: .whitespacesAndNewlines) }
+    mutating func beganUserScroll() {
+        awaitingBottomAfterResize = false
+        isAtBottom = false
+    }
+}
 
-    private func submit() async {
-        guard !trimmedComment.isEmpty else { return }
+struct ChatViewportMetrics: Equatable {
+    let contentBottom: CGFloat
+    let viewportHeight: CGFloat
+}
+
+struct ChatViewportPreference: PreferenceKey {
+    static let defaultValue: ChatViewportMetrics? = nil
+    static func reduce(value: inout ChatViewportMetrics?, nextValue: () -> ChatViewportMetrics?) {
+        if let measured = nextValue() { value = measured }
+    }
+}
+
+/// Owns the boundary between a submitted message and its server acknowledgement.
+/// Kept separate from the composer so a failed response cannot silently repeat POST.
+@MainActor
+final class ChatSendCoordinator: ObservableObject {
+    @Published private(set) var uncertain = false
+    private let service: UserService
+    init(service: UserService = UserService()) { self.service = service }
+
+    private var submitting = false
+
+    func submit(chatId: Int, text: String, parentId: Int?) async throws -> ChatFull {
+        guard !uncertain else { throw ChatSubmissionError.awaitingVerification }
+        guard !submitting else { throw ChatSubmissionError.busy }
+        submitting = true
+        defer { submitting = false }
         do {
-            _ = try await feedback.run(loc.t("loading_review_submit", "Submitting your review")) {
-                try await UserService().submitReview(matchId: match.id, score: score, comment: trimmedComment)
-            }
-            onDone()
-        } catch { feedback.toast(Feedback.message(error)) }
+            return try await service.sendMessage(chatId: chatId, message: text, parentId: parentId)
+        } catch {
+            // No idempotency key or request id is supported. A transport failure,
+            // malformed acknowledgement or server error cannot prove non-delivery.
+            // A matching text found later is also not proof of this particular POST.
+            if Self.deliveryMayHaveOccurred(error) { uncertain = true }
+            throw error
+        }
+    }
+
+    static func deliveryMayHaveOccurred(_ error: Error) -> Bool {
+        guard let api = error as? APIError else { return true }
+        switch api {
+        case .validation, .notFound, .unauthenticated: return false
+        case .network, .timeout, .decoding, .server, .unknown: return true
+        }
+    }
+
+    func allowExplicitRetry() { uncertain = false }
+}
+
+private enum ChatSubmissionError: Error {
+    case awaitingVerification
+    case busy
+}
+
+/// Reconciles only the submitted prefix after acknowledgement; new typing belongs
+/// to the next message and must not be erased by an older request completing.
+enum ChatDraftReconciliation {
+    static func afterAcknowledgedSend(current: String, submitted: String) -> String {
+        current.hasPrefix(submitted) ? String(current.dropFirst(submitted.count)).trimmingLeadingWhitespace : current
+    }
+}
+
+/// Each explicit read or send supersedes older reads, including their failures.
+/// Quiet polls are subordinate to an in-flight explicit read.
+struct ChatOperationOwnership {
+    private var revision = 0
+    private var explicitRead: Int?
+    mutating func beginExplicitRead() -> Int {
+        revision += 1; explicitRead = revision; return revision
+    }
+    mutating func beginQuietRead() -> Int? {
+        guard explicitRead == nil else { return nil }
+        revision += 1; return revision
+    }
+    mutating func beginSend() -> Int {
+        revision += 1; explicitRead = nil; return revision
+    }
+    mutating func finishExplicitRead(_ owner: Int) {
+        if explicitRead == owner { explicitRead = nil }
+    }
+    mutating func invalidate() { revision += 1; explicitRead = nil }
+    func canCommit(_ owner: Int) -> Bool { revision == owner }
+}
+
+/// Identity alone cannot distinguish cancelling then selecting the same reply again.
+struct ChatReplyOwnership {
+    struct Submission { let parentId: Int?; fileprivate let revision: Int }
+    private var revision = 0
+    mutating func selectionChanged() { revision += 1 }
+    func capture(parentId: Int?) -> Submission { Submission(parentId: parentId, revision: revision) }
+    func canClear(_ submission: Submission, currentParentId: Int?) -> Bool {
+        revision == submission.revision && currentParentId == submission.parentId
     }
 }

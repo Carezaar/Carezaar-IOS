@@ -11,6 +11,8 @@ struct PasswordRule: Identifiable, Hashable, Sendable {
 
 enum PasswordValidator {
     static let minimumLength = 8
+    /// The client-defined complete set; other symbols do not satisfy this rule.
+    static let specialCharacters = Set("!@#$%^&*()_+[]{}|-;:,.<>?")
 
     static func rules(for password: String) -> [PasswordRule] {
         [PasswordRule(id: "8_letters", label: "At least 8 characters",
@@ -22,7 +24,7 @@ enum PasswordValidator {
          PasswordRule(id: "1_number", label: "At least 1 number",
                       isSatisfied: password.contains { $0.isNumber }),
          PasswordRule(id: "1_special_symbol", label: "At least 1 special symbol",
-                      isSatisfied: password.contains { !$0.isLetter && !$0.isNumber && !$0.isWhitespace })]
+                      isSatisfied: password.contains { specialCharacters.contains($0) })]
     }
 
     static func isValid(_ password: String) -> Bool {

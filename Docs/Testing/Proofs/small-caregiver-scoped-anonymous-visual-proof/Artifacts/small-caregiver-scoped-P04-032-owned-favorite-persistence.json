@@ -1,0 +1,12 @@
+{
+  "case": "P04-032",
+  "correctPartnerReopened": true,
+  "favoriteBackendVerified": true,
+  "initialFavorite": false,
+  "nativeAddRequests": 1,
+  "nativeRemoveRequests": 1,
+  "originalStateRestoration": "defer_verified_separately",
+  "ownedPairIdentityVerified": true,
+  "profileOpenGETs": 2,
+  "removedCardAbsent": true
+}

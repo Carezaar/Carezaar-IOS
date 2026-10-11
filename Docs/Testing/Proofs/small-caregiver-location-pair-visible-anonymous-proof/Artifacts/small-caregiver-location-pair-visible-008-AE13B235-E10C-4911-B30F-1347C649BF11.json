@@ -1,0 +1,12 @@
+{
+  "actualOpeningOwnedProfileGETs": 2,
+  "controlledDebugLocationOnly": true,
+  "invalidFixRejectedByRealFilter": true,
+  "mapUnselected": true,
+  "OSLocationPermissionVerified": false,
+  "physicalGPSVerified": false,
+  "profileMutationRequests": 0,
+  "reviewLocationNil": true,
+  "role": "caregiver",
+  "wizardLocationNil": true
+}

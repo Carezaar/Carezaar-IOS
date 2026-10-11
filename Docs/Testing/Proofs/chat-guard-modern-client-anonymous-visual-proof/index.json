@@ -1,0 +1,93 @@
+{
+  "role": "client",
+  "allocation": "modern",
+  "testPassed": true,
+  "durationSeconds": 89.068,
+  "rootViewedFourCrops": true,
+  "inactiveSendPOSTs": 0,
+  "activeDraftSent": false,
+  "finalPairState": "none",
+  "artifacts": [
+    {
+      "path": "Artifacts/chat-guard-modern-active-owned-existing-chat-entry-client.json",
+      "sha256": "ea582060726fd027a9ccf5456adf9ad688644d957e823b8a59cdd442c77cd521"
+    },
+    {
+      "path": "Artifacts/chat-guard-modern-active-chat-send-enabled-control-only-client.png",
+      "sha256": "9da861333e3be92dc4b2421035261ffa16b30937bd31e614ef938fcafa18211d"
+    },
+    {
+      "path": "Artifacts/chat-guard-modern-owned-received-native-send-guard-client.json",
+      "sha256": "d4d578a39837650a4a16cc35d2f2ee8662ac326246b975f3bb31e4b70a4f1b0f"
+    },
+    {
+      "path": "Artifacts/chat-guard-modern-owned-received-chat-restriction-only-client.png",
+      "sha256": "a873304d00079784e3e0782f37d2eead4cf559070b01b55ab53b73a03a9cd633"
+    },
+    {
+      "path": "Artifacts/chat-guard-modern-owned-sent-native-send-guard-client.json",
+      "sha256": "a77366ded964cd98942d9726b8bb1fa502c548838481b477a962b539228fcb5d"
+    },
+    {
+      "path": "Artifacts/chat-guard-modern-owned-sent-chat-restriction-only-client.png",
+      "sha256": "a873304d00079784e3e0782f37d2eead4cf559070b01b55ab53b73a03a9cd633"
+    },
+    {
+      "path": "Artifacts/chat-guard-modern-owned-none-native-send-guard-client.json",
+      "sha256": "9b64bb66510f192717f86b48a3574cc8b32ae26e7ae4910aa8b10832a103b24e"
+    },
+    {
+      "path": "Artifacts/chat-guard-modern-owned-none-chat-restriction-only-client.png",
+      "sha256": "3f09c494178761748431f61c57f34ec57e305957cd7cbf3dab7cf31d66318f0a"
+    }
+  ],
+  "publicPackage": {
+    "status": "REVIEWABLE — not staged or delivered",
+    "originalEvidenceRetainedLocally": true,
+    "rawLogsAndXCResultsIncluded": false,
+    "artifactInventory": [
+      {
+        "path": "Artifacts/chat-guard-modern-active-owned-existing-chat-entry-client.json",
+        "bytes": 321,
+        "sha256": "6ed7e9a8a4050b87766940fbb033c910f28d521adc629de3649a294d37aadcd0"
+      },
+      {
+        "path": "Artifacts/chat-guard-modern-active-chat-send-enabled-control-only-client.png",
+        "bytes": 4680,
+        "sha256": "9da861333e3be92dc4b2421035261ffa16b30937bd31e614ef938fcafa18211d"
+      },
+      {
+        "path": "Artifacts/chat-guard-modern-owned-received-native-send-guard-client.json",
+        "bytes": 297,
+        "sha256": "19d9ef284d8600c7872583fc9651418313d99ef1b171d53e97762db256be2672"
+      },
+      {
+        "path": "Artifacts/chat-guard-modern-owned-received-chat-restriction-only-client.png",
+        "bytes": 16604,
+        "sha256": "a873304d00079784e3e0782f37d2eead4cf559070b01b55ab53b73a03a9cd633"
+      },
+      {
+        "path": "Artifacts/chat-guard-modern-owned-sent-native-send-guard-client.json",
+        "bytes": 293,
+        "sha256": "f336abcfd2bd27302adb62bb510625f55f2d465832984a442125f58b2353e488"
+      },
+      {
+        "path": "Artifacts/chat-guard-modern-owned-sent-chat-restriction-only-client.png",
+        "bytes": 16604,
+        "sha256": "a873304d00079784e3e0782f37d2eead4cf559070b01b55ab53b73a03a9cd633"
+      },
+      {
+        "path": "Artifacts/chat-guard-modern-owned-none-native-send-guard-client.json",
+        "bytes": 293,
+        "sha256": "bd13578f7c0576831526ecd0c2387fa66663e3b73761134be3f3505704a5e739"
+      },
+      {
+        "path": "Artifacts/chat-guard-modern-owned-none-chat-restriction-only-client.png",
+        "bytes": 16354,
+        "sha256": "3f09c494178761748431f61c57f34ec57e305957cd7cbf3dab7cf31d66318f0a"
+      }
+    ],
+    "sourceIndexSHA256": "c8d5a552a2d584b141a694a6c3c13dcc1e9cac8e7831d3ed457ca2c380a4e82a",
+    "artifactHashNote": "Public JSON/text are sanitized; artifactInventory hashes apply to packaged bytes. Original indexed hashes, where present, refer to preserved original evidence."
+  }
+}

@@ -1,5 +1,11 @@
 import Foundation
 
+struct BaseMedia: Codable, Identifiable, Hashable, Sendable {
+    let id: Int
+    let slug: String
+    let path: String
+}
+
 /// Per-item localisation. The parent foreign key varies by table
 /// (`carecondition_id`, `careday_id`, …) and is not needed for display, so only the
 /// shared fields are decoded.

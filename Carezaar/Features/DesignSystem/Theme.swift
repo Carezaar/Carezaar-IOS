@@ -10,15 +10,22 @@ enum Theme {
         /// keep the brand blue (Aariz's decision, 2026-10-10).
         static let primaryText = Color(hex: 0x0066D6)
         static let textPrimary = Color.black
-        // Figma's #7F7F7F is 3.95:1 on white; #6B6B6B is 5.3:1, and stays above 4.5:1
-        // on the tinted panels (WCAG AA for text).
-        static let textSecondary = Color(hex: 0x6B6B6B)
+        // Stronger small-text contrast: #595959 is 7.0:1 on white and
+        // 6.3:1 or better on both role panels, including thin custom-font glyphs.
+        static let textSecondary = Color(hex: 0x595959)
+        /// Opaque inactive controls keep their labels readable without fading
+        /// the whole view. This pair has calculated sRGB contrast 5.65:1.
+        static let disabledForeground = Color(hex: 0x595959)
+        static let disabledBackground = Color(hex: 0xE3E7EE)
         static let surface = Color.white
         /// Client/care panels.
         static let clientPanel = Color(hex: 0xEDF4FC)
         /// Caregiver panels.
         static let caregiverPanel = Color(hex: 0xEFF9F7)
         static let success = Color(hex: 0x01BB8A)
+        /// Satisfied password-rule text: 4.874:1 on the #E9F8F3 rule-card fill.
+        /// Keep the brighter success token for its existing icon treatments.
+        static let successText = Color(hex: 0x047A5A)
         // Pure red is 4.0:1 on white; #E00000 is 5.0:1, for error text people must read.
         static let error = Color(hex: 0xE00000)
         static let privacy = Color(hex: 0x9247F5)
@@ -48,17 +55,17 @@ enum Theme {
     /// Vazirmatn is bundled and registered at launch; `custom` falls back to the
     /// system face automatically if registration failed.
     enum Typography {
-        static func heading(_ size: CGFloat = 28) -> Font { font(size, weight: .bold) }
-        static func title(_ size: CGFloat = 20) -> Font { font(size, weight: .semibold) }
-        static func control(_ size: CGFloat = 16) -> Font { font(size, weight: .medium) }
+        static func heading(_ size: CGFloat = 28) -> Font { font(size, weight: .bold, relativeTo: .largeTitle) }
+        static func title(_ size: CGFloat = 20) -> Font { font(size, weight: .semibold, relativeTo: .title2) }
+        static func control(_ size: CGFloat = 16) -> Font { font(size, weight: .medium, relativeTo: .body) }
         /// Labels on brand-blue fills: bold at 14 pt or more is WCAG "large text" (3:1),
         /// which white on #007AFE (4.03:1) meets.
-        static func filledLabel(_ size: CGFloat = 16) -> Font { font(max(size, 14), weight: .bold) }
-        static func body(_ size: CGFloat = 14) -> Font { font(size, weight: .regular) }
-        static func caption(_ size: CGFloat = 12) -> Font { font(size, weight: .regular) }
+        static func filledLabel(_ size: CGFloat = 16) -> Font { font(max(size, 14), weight: .bold, relativeTo: .body) }
+        static func body(_ size: CGFloat = 14) -> Font { font(size, weight: .regular, relativeTo: .body) }
+        static func caption(_ size: CGFloat = 12) -> Font { font(max(size, 12), weight: .regular, relativeTo: .caption) }
 
-        private static func font(_ size: CGFloat, weight: Font.Weight) -> Font {
-            .custom("Vazirmatn", size: size).weight(weight)
+        private static func font(_ size: CGFloat, weight: Font.Weight, relativeTo style: Font.TextStyle) -> Font {
+            .custom("Vazirmatn", size: size, relativeTo: style).weight(weight)
         }
     }
 }

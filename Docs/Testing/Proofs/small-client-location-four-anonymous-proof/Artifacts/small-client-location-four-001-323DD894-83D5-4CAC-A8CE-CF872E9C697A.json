@@ -1,0 +1,11 @@
+{
+  "actualOpeningOwnedProfileGETs": 2,
+  "cachedPublisherAttested": true,
+  "controlledDebugLocationOnly": true,
+  "mapOpened": false,
+  "OSLocationPermissionVerified": false,
+  "physicalGPSVerified": false,
+  "profileMutationRequests": 0,
+  "reviewRetainsExactControlledFix": true,
+  "role": "client"
+}

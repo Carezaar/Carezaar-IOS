@@ -1,0 +1,119 @@
+{
+  "source": "fresh-isolated-native-notification-deny-settings-allow.xcresult",
+  "wholeProcessExit": 0,
+  "nativeTestResult": "PASS",
+  "nativeTestSeconds": 115.525,
+  "role": "caregiver",
+  "device": "Fresh task-owned isolated iPhoneSE3 iOS26.5",
+  "rootReviewedAllEightBoundedCropsAndSixAnonymousJSON": true,
+  "scope": "Real notDetermined prompt\u2192Don\u2019tAllow\u2192authenticatedappusable\u2192ordinarypersistedrelaunch/no repeatedprompt\u2192actualSettingsenable\u2192appusable/relaunch\u2192restoreoriginaldeniedstate.",
+  "initialOSPromptObservedInThisMethod": true,
+  "remoteNotificationDeliveryVerified": false,
+  "physicalCamera": "UNTESTED user deferred",
+  "artifacts": [
+    {
+      "path": "Artifacts/isolated-caregiver-fresh-denial-001-E60EE97F-C60B-4639-B937-D42614AECD6F.json",
+      "description": "real-notification-permission-and-settings_0_B83F36C5-9ACA-4C1E-8F5A-0D632617AB6F.json",
+      "sha256": "4b958ac7ea14c3e880247b2b512cdf332fd7b79c2cdebfa1d6fb4c3aa3e2ea93",
+      "test": "PermissionSettingsBoundaryUITests/testFreshNotificationDenyThenSettingsAllowKeepsOwnedSessionUsable()",
+      "packagedSha256": "4b958ac7ea14c3e880247b2b512cdf332fd7b79c2cdebfa1d6fb4c3aa3e2ea93"
+    },
+    {
+      "path": "Artifacts/isolated-caregiver-fresh-denial-002-B3A60365-CB50-48F9-A104-06077408857C.png",
+      "description": "notification-settings-restored-switch-only_0_B6532791-86C6-47D5-A431-5B2835C6B0D4.png",
+      "sha256": "0f2ab56c96e5b0c20335018d2ecb1002fee72bd15f16e5a5fabfc333bc487c9d",
+      "test": "PermissionSettingsBoundaryUITests/testFreshNotificationDenyThenSettingsAllowKeepsOwnedSessionUsable()",
+      "packagedSha256": "0f2ab56c96e5b0c20335018d2ecb1002fee72bd15f16e5a5fabfc333bc487c9d"
+    },
+    {
+      "path": "Artifacts/isolated-caregiver-fresh-denial-003-87586965-CBC2-4D2A-A654-F8DBD870DA39.json",
+      "description": "native-notification-toggle-target_0_BD317DE3-8398-4D46-AD19-A04F7F106D83.json",
+      "sha256": "f4c3b9d79cecb3b871aa8cc78bc5bdb26e5259a4ab63142cad55d064f117f3bf",
+      "test": "PermissionSettingsBoundaryUITests/testFreshNotificationDenyThenSettingsAllowKeepsOwnedSessionUsable()",
+      "packagedSha256": "f4c3b9d79cecb3b871aa8cc78bc5bdb26e5259a4ab63142cad55d064f117f3bf"
+    },
+    {
+      "path": "Artifacts/isolated-caregiver-fresh-denial-004-6DB453D2-582F-4703-AABA-7DAA3615C761.png",
+      "description": "permission-authenticated-matches-tab-only_0_82DBDF9A-C4C1-436C-AB7D-B44A1A918EE2.png",
+      "sha256": "978b18fbdb99e9459be23ce6b502a3e7146bddf3acb49a5b439e568ce50c19bd",
+      "test": "PermissionSettingsBoundaryUITests/testFreshNotificationDenyThenSettingsAllowKeepsOwnedSessionUsable()",
+      "packagedSha256": "978b18fbdb99e9459be23ce6b502a3e7146bddf3acb49a5b439e568ce50c19bd"
+    },
+    {
+      "path": "Artifacts/isolated-caregiver-fresh-denial-005-3F573BE4-C6CF-4224-AF4A-36D038281F49.png",
+      "description": "permission-authenticated-matches-tab-only_0_01CAEB04-783A-4DF6-BD19-AEDDE5EC3E98.png",
+      "sha256": "b1e46714b76cba47113f19b525d2e0eca67bc5142eced9742470d05d2d1be216",
+      "test": "PermissionSettingsBoundaryUITests/testFreshNotificationDenyThenSettingsAllowKeepsOwnedSessionUsable()",
+      "packagedSha256": "b1e46714b76cba47113f19b525d2e0eca67bc5142eced9742470d05d2d1be216"
+    },
+    {
+      "path": "Artifacts/isolated-caregiver-fresh-denial-006-CD2DF4EA-55FC-43BC-B8C7-8CF18FAE962E.png",
+      "description": "notification-settings-changed-switch-only_0_6211AB35-8F2B-4956-9567-10CDC78C1794.png",
+      "sha256": "45ac0825d8fc1a064299209bfbe296859bba94d19407feb72823f2b2419c6085",
+      "test": "PermissionSettingsBoundaryUITests/testFreshNotificationDenyThenSettingsAllowKeepsOwnedSessionUsable()",
+      "packagedSha256": "45ac0825d8fc1a064299209bfbe296859bba94d19407feb72823f2b2419c6085"
+    },
+    {
+      "path": "Artifacts/isolated-caregiver-fresh-denial-007-17E1161F-B9B0-4441-8424-D9CF2F5404F0.json",
+      "description": "native-notification-toggle-target_0_E611CD46-046A-47DF-9866-880910DD09E0.json",
+      "sha256": "f4c3b9d79cecb3b871aa8cc78bc5bdb26e5259a4ab63142cad55d064f117f3bf",
+      "test": "PermissionSettingsBoundaryUITests/testFreshNotificationDenyThenSettingsAllowKeepsOwnedSessionUsable()",
+      "packagedSha256": "f4c3b9d79cecb3b871aa8cc78bc5bdb26e5259a4ab63142cad55d064f117f3bf"
+    },
+    {
+      "path": "Artifacts/isolated-caregiver-fresh-denial-008-E381BBD8-E6F8-454E-8A7C-4A49CD78D956.png",
+      "description": "notification-settings-original-switch-only_0_940C65A9-0E7D-4A45-B921-3A8EE3E02F4E.png",
+      "sha256": "0f2ab56c96e5b0c20335018d2ecb1002fee72bd15f16e5a5fabfc333bc487c9d",
+      "test": "PermissionSettingsBoundaryUITests/testFreshNotificationDenyThenSettingsAllowKeepsOwnedSessionUsable()",
+      "packagedSha256": "0f2ab56c96e5b0c20335018d2ecb1002fee72bd15f16e5a5fabfc333bc487c9d"
+    },
+    {
+      "path": "Artifacts/isolated-caregiver-fresh-denial-009-EDCAB94C-C32A-4D14-B985-22D9BF34E7CC.json",
+      "description": "native-settings-navigation-notifications_0_9B587754-F463-4529-9C73-778E35CC0351.json",
+      "sha256": "563233a5a008b3906d5814b3864820876708e05a173667f61c5891f1fec85153",
+      "test": "PermissionSettingsBoundaryUITests/testFreshNotificationDenyThenSettingsAllowKeepsOwnedSessionUsable()",
+      "packagedSha256": "563233a5a008b3906d5814b3864820876708e05a173667f61c5891f1fec85153"
+    },
+    {
+      "path": "Artifacts/isolated-caregiver-fresh-denial-010-735DE861-C751-4826-82D0-DF8FD4794929.json",
+      "description": "native-settings-navigation-carezaar_0_6885310E-06DD-4D49-A7AD-19F2A9C50E90.json",
+      "sha256": "6cba7a7c6c2258e0698f3a47fa956b4c10fd7ec0759d9af11a8cfaaa36e0a245",
+      "test": "PermissionSettingsBoundaryUITests/testFreshNotificationDenyThenSettingsAllowKeepsOwnedSessionUsable()",
+      "packagedSha256": "6cba7a7c6c2258e0698f3a47fa956b4c10fd7ec0759d9af11a8cfaaa36e0a245"
+    },
+    {
+      "path": "Artifacts/isolated-caregiver-fresh-denial-011-479AB4FE-5D11-4545-9716-C258818B111A.json",
+      "description": "native-settings-navigation-apps_0_1E4CA5A8-D524-4846-8634-71B2C1572913.json",
+      "sha256": "b39a919b63ad7e0dc3067ed1414e133e17664e4e15ee99d5788f41312750652c",
+      "test": "PermissionSettingsBoundaryUITests/testFreshNotificationDenyThenSettingsAllowKeepsOwnedSessionUsable()",
+      "packagedSha256": "b39a919b63ad7e0dc3067ed1414e133e17664e4e15ee99d5788f41312750652c"
+    },
+    {
+      "path": "Artifacts/isolated-caregiver-fresh-denial-012-0A68DA04-40BE-4894-9416-34FCF6F0C233.png",
+      "description": "permission-authenticated-matches-tab-only_0_668C980A-20AE-43CC-9C82-4045C1F87AE9.png",
+      "sha256": "324e3e375820d1586677c91cf02e4f7d5af9ea8596374d5c697ff8fe7a5b3bba",
+      "test": "PermissionSettingsBoundaryUITests/testFreshNotificationDenyThenSettingsAllowKeepsOwnedSessionUsable()",
+      "packagedSha256": "324e3e375820d1586677c91cf02e4f7d5af9ea8596374d5c697ff8fe7a5b3bba"
+    },
+    {
+      "path": "Artifacts/isolated-caregiver-fresh-denial-013-761FAF06-A4BE-45E9-887D-FC8C9ED497B2.png",
+      "description": "permission-authenticated-matches-tab-only_0_E168D9BB-08C8-457A-A927-DA99EB77B2DC.png",
+      "sha256": "bc33c958b90806975aabd80df678b485786b31c19f6d63ee8c6900df90aa27a6",
+      "test": "PermissionSettingsBoundaryUITests/testFreshNotificationDenyThenSettingsAllowKeepsOwnedSessionUsable()",
+      "packagedSha256": "bc33c958b90806975aabd80df678b485786b31c19f6d63ee8c6900df90aa27a6"
+    },
+    {
+      "path": "Artifacts/isolated-caregiver-fresh-denial-014-00025BC9-26EC-40AD-A099-268CDBCBDA0D.png",
+      "description": "notification-real-initial-permission-alert_0_9C1368E3-6016-46F8-9C34-E16158983DCF.png",
+      "sha256": "f4e6ffe067d80764b13d00af4494d580868820b0b112a42f4290acc0259759e6",
+      "test": "PermissionSettingsBoundaryUITests/testFreshNotificationDenyThenSettingsAllowKeepsOwnedSessionUsable()",
+      "packagedSha256": "f4e6ffe067d80764b13d00af4494d580868820b0b112a42f4290acc0259759e6"
+    }
+  ],
+  "publicPackage": {
+    "originalEvidenceRetainedLocally": true,
+    "rawLogsAndXCResultsIncluded": false,
+    "privateSettingsAXAndFullScreenshotsIncluded": false,
+    "allBoundedArtifactsRootReviewed": true
+  }
+}

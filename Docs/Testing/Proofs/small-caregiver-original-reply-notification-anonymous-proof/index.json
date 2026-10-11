@@ -1,0 +1,136 @@
+{
+  "source": "fresh-small-caregiver-original-peer-reply-notification.xcresult",
+  "wholeProcessExit": 0,
+  "allocation": "small caregiver",
+  "passesSeconds": {
+    "replyOriginalPeer": 182.597,
+    "notificationMissingChat": 34.16,
+    "notificationMissingPerson": 33.718
+  },
+  "rootReviewedCroppedPNGs": 5,
+  "replyTimingSeconds": 9.974097967147827,
+  "notificationScope": "Exact owned existing first-page HTTP200 selected metadata removal; no actual deleted backend person or physical network",
+  "notificationDestinationGETs": 0,
+  "originalAllFourCasesComplete": false,
+  "artifacts": [
+    {
+      "path": "Artifacts/small-caregiver-original-reply-notification-001-21789851-7068-48C9-961D-E36D16B70BF3.json",
+      "description": "owned-reply-race-acknowledged-caregiver_0_8322D693-22F4-451B-8B15-5286DD0612F5.json",
+      "sha256": "3229ee5ae66d95f574287552ba542e259fa6b77f16fdabf10db9097da699d97c"
+    },
+    {
+      "path": "Artifacts/small-caregiver-original-reply-notification-002-1574E1FD-A56D-47FF-B7D4-78A7D4BC0B98.png",
+      "description": "owned-reply-race-synthetic-acknowledged-message-only-caregiver_0_FE6D9B1D-1890-40DC-B3CC-8CB8E85CDBC8.png",
+      "sha256": "7fce56b3304749fa4de18a4aeba86bf1626fac507bfb1f2486cfea0f1253af45"
+    },
+    {
+      "path": "Artifacts/small-caregiver-original-reply-notification-003-C385E6EC-F572-44C7-B864-5CFC529D3BD8.json",
+      "description": "owned-reply-race-timing-caregiver_0_E92FE53D-9485-4C04-AFE7-62DFAB4C2B23.json",
+      "sha256": "271e11a60492a55084ebfb31ad08ebd2cb53203fa196a2209dafe30352e6912e"
+    },
+    {
+      "path": "Artifacts/small-caregiver-original-reply-notification-004-380B5AC7-FC46-4BE7-88CE-3E892858D005.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_72457E7A-2A0F-4FB6-AA46-9039DDD9E8F2.json",
+      "sha256": "6ece3f756a8e4ee8c988a6c381288b8846c9a8a272f93866e4bc472fecc54f35"
+    },
+    {
+      "path": "Artifacts/small-caregiver-original-reply-notification-005-7ED1B640-FF85-4519-ADFF-1F543C9C45E7.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_19364D21-5301-43CC-9E88-0F313F26F7D6.json",
+      "sha256": "8a2d188e7dd1e6112a5822da25e28f9b2ff282e4c1ebc0235978e82a9a116b56"
+    },
+    {
+      "path": "Artifacts/small-caregiver-original-reply-notification-006-D0F735ED-951F-4F87-BF49-8323F117CD5E.json",
+      "description": "owned-notification-missing-chat-native-fallback_0_A77215F9-172B-4211-B3DC-F32E41757611.json",
+      "sha256": "044ceb46a4ccae5b13763e1e62c29149d04c5f16cce2b520164494d1068cf008"
+    },
+    {
+      "path": "Artifacts/small-caregiver-original-reply-notification-007-DAD6A427-0EDE-456F-98E6-093785841422.png",
+      "description": "notification-missing-chat-show-only_0_ED90BE6E-2E86-4DD9-90FA-ED8C60B46D31.png",
+      "sha256": "8eb1cb616134f2f6a5d80ce5bf3f4b877bd03155ba360c96a809b70a66fb2aa6"
+    },
+    {
+      "path": "Artifacts/small-caregiver-original-reply-notification-008-43AD1C42-337A-4E28-A0F1-DBFBC0779F7F.png",
+      "description": "notification-missing-chat-cancel-only_0_318E6813-BA82-40D4-B025-7BAC48339E29.png",
+      "sha256": "46d2a993b25f3da6dc0f8a8f7da2f6db48dd37217f5f5008b97dc5ea08db2760"
+    },
+    {
+      "path": "Artifacts/small-caregiver-original-reply-notification-009-D30D33EA-72A8-471D-ABD0-6DA7C3FCA022.json",
+      "description": "owned-notification-missing-person-native-fallback_0_FE6D07EF-37B9-46DA-832F-452D8C9AC9DF.json",
+      "sha256": "67b2f54c1645b08f7877753b815b90b977a07b1811230f85dfe3fcc153642b60"
+    },
+    {
+      "path": "Artifacts/small-caregiver-original-reply-notification-010-1A64F8B3-D213-49FA-A6CC-C8A813CBB8B0.png",
+      "description": "notification-missing-person-show-only_0_5175EB3D-ACF7-4797-95A6-32865489134E.png",
+      "sha256": "dfff6b95961498e9893b4e2291b5f91815200275e1494dcb77144e240391819b"
+    },
+    {
+      "path": "Artifacts/small-caregiver-original-reply-notification-011-7EADFBC4-E949-407F-950A-17A68D634CFF.png",
+      "description": "notification-missing-person-cancel-only_0_B46CDFDB-2FCC-4A1A-BD8C-601B5B97C652.png",
+      "sha256": "6ee833c4dbd3fbd1e2a325398530464a569615242b11608583843989f73b0e02"
+    }
+  ],
+  "publicPackage": {
+    "status": "REVIEWABLE — not staged or delivered",
+    "originalEvidenceRetainedLocally": true,
+    "rawLogsAndXCResultsIncluded": false,
+    "artifactInventory": [
+      {
+        "path": "Artifacts/small-caregiver-original-reply-notification-001-21789851-7068-48C9-961D-E36D16B70BF3.json",
+        "bytes": 368,
+        "sha256": "0bcc0ed1d5c1a5d1a5ead2de7da59af4cce4752c9c7b17aeec762db15725f471"
+      },
+      {
+        "path": "Artifacts/small-caregiver-original-reply-notification-002-1574E1FD-A56D-47FF-B7D4-78A7D4BC0B98.png",
+        "bytes": 13960,
+        "sha256": "7fce56b3304749fa4de18a4aeba86bf1626fac507bfb1f2486cfea0f1253af45"
+      },
+      {
+        "path": "Artifacts/small-caregiver-original-reply-notification-003-C385E6EC-F572-44C7-B864-5CFC529D3BD8.json",
+        "bytes": 267,
+        "sha256": "267f41e31ebe3453df4229b772d420aa3dff8bb8105cb508daf69d91d31906ad"
+      },
+      {
+        "path": "Artifacts/small-caregiver-original-reply-notification-004-380B5AC7-FC46-4BE7-88CE-3E892858D005.json",
+        "bytes": 613,
+        "sha256": "51cd09898212b58fb01a10235283fcdc6519042edc7116b5a217d9b81a87eaf4"
+      },
+      {
+        "path": "Artifacts/small-caregiver-original-reply-notification-005-7ED1B640-FF85-4519-ADFF-1F543C9C45E7.json",
+        "bytes": 617,
+        "sha256": "fbd9766f002c28af6400e3dc94bb3e3e7021461f82a04e837e5ca1789ca23753"
+      },
+      {
+        "path": "Artifacts/small-caregiver-original-reply-notification-006-D0F735ED-951F-4F87-BF49-8323F117CD5E.json",
+        "bytes": 311,
+        "sha256": "e13aa64f63265bcdcf45ef27d10e4705bb376e9fd4b11a511612454fae068b51"
+      },
+      {
+        "path": "Artifacts/small-caregiver-original-reply-notification-007-DAD6A427-0EDE-456F-98E6-093785841422.png",
+        "bytes": 5691,
+        "sha256": "8eb1cb616134f2f6a5d80ce5bf3f4b877bd03155ba360c96a809b70a66fb2aa6"
+      },
+      {
+        "path": "Artifacts/small-caregiver-original-reply-notification-008-43AD1C42-337A-4E28-A0F1-DBFBC0779F7F.png",
+        "bytes": 4507,
+        "sha256": "46d2a993b25f3da6dc0f8a8f7da2f6db48dd37217f5f5008b97dc5ea08db2760"
+      },
+      {
+        "path": "Artifacts/small-caregiver-original-reply-notification-009-D30D33EA-72A8-471D-ABD0-6DA7C3FCA022.json",
+        "bytes": 313,
+        "sha256": "8c9cb1f41d4b02b6fdda70c9e4d62a2d9faf51fb95a3db9d3af34499d9a79735"
+      },
+      {
+        "path": "Artifacts/small-caregiver-original-reply-notification-010-1A64F8B3-D213-49FA-A6CC-C8A813CBB8B0.png",
+        "bytes": 5698,
+        "sha256": "dfff6b95961498e9893b4e2291b5f91815200275e1494dcb77144e240391819b"
+      },
+      {
+        "path": "Artifacts/small-caregiver-original-reply-notification-011-7EADFBC4-E949-407F-950A-17A68D634CFF.png",
+        "bytes": 4137,
+        "sha256": "6ee833c4dbd3fbd1e2a325398530464a569615242b11608583843989f73b0e02"
+      }
+    ],
+    "sourceIndexSHA256": "9d1203a4cc26265d99415f651237c340adeccfdcb8815df2eb38e42306bad1fe",
+    "artifactHashNote": "Public JSON/text are sanitized; artifactInventory hashes apply to packaged bytes. Original indexed hashes, where present, refer to preserved original evidence."
+  }
+}

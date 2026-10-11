@@ -1,0 +1,11 @@
+{
+  "activeMessageDeliveryCovered": false,
+  "actualChatGETs": 1,
+  "existingChatReusedAndParticipantsVerified": true,
+  "nativeChatSendPOSTs": 0,
+  "profileMessageEntryObserved": true,
+  "publicState": "active",
+  "role": "client",
+  "syntheticDraftAbsentFromBackend": true,
+  "syntheticDraftEnteredSendEnabled": true
+}

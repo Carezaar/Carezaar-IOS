@@ -1,0 +1,83 @@
+{
+  "source": "fresh-small-client-owned-notification-fallback.xcresult",
+  "wholeProcessExit": 0,
+  "allocation": "small client",
+  "passesSeconds": {
+    "missingChat": 27.069,
+    "missingPerson": 25.477
+  },
+  "rootReviewedCroppedPNGs": 4,
+  "scope": "Owned existing first-page HTTP200 selected metadata removal; actual backend deletion not tested",
+  "destinationGETs": 0,
+  "artifacts": [
+    {
+      "path": "Artifacts/small-client-notification-001-C10A753F-692B-4A7C-88CA-ADB75EB0978C.json",
+      "description": "owned-notification-missing-chat-native-fallback_0_C642E860-C214-4BB0-8E06-C3BF7004479A.json",
+      "sha256": "bad11a5aba7c7625ab80c311ff608f9c9e98f4f0cbc6ab5e0dc60e3970138c9d"
+    },
+    {
+      "path": "Artifacts/small-client-notification-002-E40B8BD3-2A45-4E2A-B5A1-877717CFAA1E.png",
+      "description": "notification-missing-chat-show-only_0_AC5F8CD5-3A36-4223-9212-2205B6D891A0.png",
+      "sha256": "8eb1cb616134f2f6a5d80ce5bf3f4b877bd03155ba360c96a809b70a66fb2aa6"
+    },
+    {
+      "path": "Artifacts/small-client-notification-003-06A9E1F0-B145-4648-ABA2-DC7015DBE594.png",
+      "description": "notification-missing-chat-cancel-only_0_27422F90-366E-4575-9F9A-4C1A5EFA9D82.png",
+      "sha256": "42eece88e821ffdacc52bc4beb6a1319aa3fba9c22b19c31169468d2a774cff5"
+    },
+    {
+      "path": "Artifacts/small-client-notification-004-3446FE04-06FF-4B1A-9168-B7B4001FD182.json",
+      "description": "owned-notification-missing-person-native-fallback_0_D5D7E4FE-906F-4FE3-93AA-20CB8E11412B.json",
+      "sha256": "a9f8749b758b2816c7d1f8f1b6fc5952bfc34348a77e76a12fcbdfdc4fa3ca40"
+    },
+    {
+      "path": "Artifacts/small-client-notification-005-0FE0C31D-6B3E-45E3-95A7-8D3EABB7BB52.png",
+      "description": "notification-missing-person-show-only_0_CF79CD2E-E5F7-4979-A29F-54B412E5C4AA.png",
+      "sha256": "d006fd8a15b96442e939d1ed62f9ef8a06a872a015ff32de37f05b129e33792b"
+    },
+    {
+      "path": "Artifacts/small-client-notification-006-0CB699D4-FDF3-4F7D-BB63-D5BACAA72412.png",
+      "description": "notification-missing-person-cancel-only_0_2B85B2A3-4777-404B-B32B-93D588006E29.png",
+      "sha256": "11b3b19608042b29491bdc45cc86014bc056a72975d18b722e8830a7a76aad3a"
+    }
+  ],
+  "publicPackage": {
+    "status": "REVIEWABLE — not staged or delivered",
+    "originalEvidenceRetainedLocally": true,
+    "rawLogsAndXCResultsIncluded": false,
+    "artifactInventory": [
+      {
+        "path": "Artifacts/small-client-notification-001-C10A753F-692B-4A7C-88CA-ADB75EB0978C.json",
+        "bytes": 308,
+        "sha256": "f6e0ef97c36dde881a6725a1340ebaadcf5df0b8834da410366b17917b87e60c"
+      },
+      {
+        "path": "Artifacts/small-client-notification-002-E40B8BD3-2A45-4E2A-B5A1-877717CFAA1E.png",
+        "bytes": 5691,
+        "sha256": "8eb1cb616134f2f6a5d80ce5bf3f4b877bd03155ba360c96a809b70a66fb2aa6"
+      },
+      {
+        "path": "Artifacts/small-client-notification-003-06A9E1F0-B145-4648-ABA2-DC7015DBE594.png",
+        "bytes": 4134,
+        "sha256": "42eece88e821ffdacc52bc4beb6a1319aa3fba9c22b19c31169468d2a774cff5"
+      },
+      {
+        "path": "Artifacts/small-client-notification-004-3446FE04-06FF-4B1A-9168-B7B4001FD182.json",
+        "bytes": 310,
+        "sha256": "4159c52047cf1e4d1526f31358fdfc9281fcdd0e0ef136b93f3ee8997abecf45"
+      },
+      {
+        "path": "Artifacts/small-client-notification-005-0FE0C31D-6B3E-45E3-95A7-8D3EABB7BB52.png",
+        "bytes": 5733,
+        "sha256": "d006fd8a15b96442e939d1ed62f9ef8a06a872a015ff32de37f05b129e33792b"
+      },
+      {
+        "path": "Artifacts/small-client-notification-006-0CB699D4-FDF3-4F7D-BB63-D5BACAA72412.png",
+        "bytes": 2317,
+        "sha256": "11b3b19608042b29491bdc45cc86014bc056a72975d18b722e8830a7a76aad3a"
+      }
+    ],
+    "sourceIndexSHA256": "d923e6562f670499ea2f51cf14d4f9116b33dca8d3008e2eaf5cf9f45502b54c",
+    "artifactHashNote": "Public JSON/text are sanitized; artifactInventory hashes apply to packaged bytes. Original indexed hashes, where present, refer to preserved original evidence."
+  }
+}

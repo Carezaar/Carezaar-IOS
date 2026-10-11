@@ -1,0 +1,56 @@
+{
+  "source": "fresh-modern-client-strict-reply-immediate-predicates-final.xcresult",
+  "rootReviewed": true,
+  "publishable": false,
+  "artifacts": [
+    {
+      "path": "Artifacts/FBBBB5EB-F141-42F1-AFAC-A390D1A1A33B.json",
+      "description": "owned-reply-race-acknowledged-client_0_A8D2770D-DDA5-432E-8C6E-58105DF191E5.json",
+      "sha256": "b24ae2ab59e89287f37401a0661e53e315a5bda17f446ea5372809e6e1090699",
+      "packagedSha256": "b24ae2ab59e89287f37401a0661e53e315a5bda17f446ea5372809e6e1090699"
+    },
+    {
+      "path": "Artifacts/813A9FDA-786C-47AC-B445-81F04C5DBD35.png",
+      "description": "owned-reply-race-synthetic-acknowledged-message-only-client_0_06E57F26-CD7E-401D-BBEE-04C844A08A28.png",
+      "sha256": "4705075ad6d03d6e02920f8b7414be5c1a4b20c31dfb361bc11e8a7750d692dd",
+      "packagedSha256": "4705075ad6d03d6e02920f8b7414be5c1a4b20c31dfb361bc11e8a7750d692dd"
+    },
+    {
+      "path": "Artifacts/BF02A8C8-5EAF-442F-8B02-A838B9C7F507.json",
+      "description": "owned-reply-race-timing-client_0_B7F56C86-09FD-4F6B-8F55-FC89A778BE2A.json",
+      "sha256": "647a2d5aa61d71dfb30732888f1e09da494b30d94720bb6eeb9537cd06d7cd75",
+      "packagedSha256": "647a2d5aa61d71dfb30732888f1e09da494b30d94720bb6eeb9537cd06d7cd75"
+    },
+    {
+      "path": "Artifacts/2ECB8952-D93C-4FDE-A4D3-EBCD72071E8B.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_A6669C4B-AD5F-4BF1-80C0-1D898CA4A793.json",
+      "sha256": "724c0faca307e2e9ee5e09035efc5a0e25e721eddb21f1a5abead5fb1fc1ce1d",
+      "packagedSha256": "724c0faca307e2e9ee5e09035efc5a0e25e721eddb21f1a5abead5fb1fc1ce1d"
+    },
+    {
+      "path": "Artifacts/FC3AF794-E60B-413E-A07F-9C4C30D7B8E6.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_125C9D2C-B879-4E07-9D24-BA85EC5A065A.json",
+      "sha256": "436dce3b55c4df6590c9bef34122e56e731b99cd16b4797d4ae2fae4369b3e67",
+      "packagedSha256": "436dce3b55c4df6590c9bef34122e56e731b99cd16b4797d4ae2fae4369b3e67"
+    }
+  ],
+  "rootReviewScope": "Read4 anonymousJSON and directlyview1synthetic boundedbubble, allhashesverified/noPII. FullstrictReplyPASS183.550; actual8.456730s checkpoint no clock exclusions/0banner dismissals, native1POST/originalparentverifiedboth/newReplyretained.",
+  "independentlyReviewed": true,
+  "independentReviewScope": "Directly inspected the complete synthetic bounded bubble and read all four anonymous JSON artifacts; all five hashes match and no private fixture data, tokens, absolute paths, unindexed files, or symlinks were found. Supports full Modern client strict Reply completion: 8.456730008-second checkpoint including all observations, zero banner dismissals, zero native POSTs before change, one acknowledged POST, original parent verified from both owned perspectives, and newer reply retained. Does not establish the banner-dismissal branch or other allocations.",
+  "independentReviewed": true,
+  "independentReview": "Directly inspected the complete synthetic bounded bubble and read all four anonymous JSON artifacts; all five hashes match and no private fixture data, tokens, absolute paths, unindexed files, or symlinks were found. Supports full Modern client strict Reply completion: 8.456730008-second checkpoint including all observations, zero banner dismissals, zero native POSTs before change, one acknowledged POST, original parent verified from both owned perspectives, and newer reply retained. Does not establish the banner-dismissal branch or other allocations.",
+  "scope": "Full Modern client strictReply PASS183.550; actualpending checkpoint8.456730008s includes all observations/no exclusions, 0 nativePOST beforechange/1 nativePOSTack, originalparent both perspectives andnewReplyretained. No actualbanner dismissal occurred; no banner-casepassclaim.",
+  "testResults": [
+    {
+      "method": "testOwnedReplySendKeepsSubmittedParentAndNewerReplyAfterAcknowledgement",
+      "status": "PASS",
+      "seconds": 183.55
+    }
+  ],
+  "publicPackage": {
+    "rootReviewed": true,
+    "independentReviewed": true,
+    "originalEvidencePreserved": true,
+    "rawLogsXCResultsFullScreenPhotosPrivateFixturesIncluded": false
+  }
+}

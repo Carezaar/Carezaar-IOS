@@ -1,0 +1,573 @@
+{
+  "source": "fresh-modern-caregiver-current-recovery-location-notification.xcresult",
+  "wholeProcessExit": 0,
+  "allocation": "Modern caregiver",
+  "nativeMethodsPassed": 13,
+  "rootReviewedCroppedPNGs": 30,
+  "publishedCroppedPNGs": 28,
+  "excludedBlankCoordinateReviewCrops": [
+    "C69A1BDA-78DE-4195-B37F-B29E2381A116.png",
+    "D2F0F74E-E90D-4D98-8551-E19119D70333.png"
+  ],
+  "coordinateReviewSupportedByNativeAssertionsNotTheseBlankRasters": true,
+  "replyTimingEvidenceLimitation": "Date<10 evaluated before subsequent AX predicates; recorded final elapsed11.653099 differs. Do not claim strict completed replacement under10 from this run; measurement repair/retest pending.",
+  "locationScope": "controlled Debug provider; no physicalGPS/OSpermission",
+  "notificationScope": "actual owned HTTP200 row with target metadata removed; not actual deleted server person",
+  "physicalCamera": "untested deferred by user",
+  "nativePassSeconds": {
+    "offline": 103.539,
+    "reply": 252.357,
+    "slow": 84.585,
+    "cached": 18.864,
+    "invalid": 99.939,
+    "manualLate": 30.135,
+    "noFix": 80.748,
+    "stale": 26.545,
+    "failedPreflight": 212.894,
+    "otherSession": 37.449,
+    "lostAck": 33.752,
+    "missingChat": 23.116,
+    "missingPerson": 24.557
+  },
+  "artifacts": [
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-001-F5B611BB-9205-49D6-A26F-4992C769222E.json",
+      "description": "owned-offline-preflight-retry-caregiver_0_B0133F83-2C64-4C06-B843-4CF2BA16F4FC.json",
+      "sha256": "3eed613f98b4fb9777bdda230db906264484b10091d52aacb14916b0c2446c0f"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-002-24764226-6967-4497-BE9B-A136529BD1D5.png",
+      "description": "owned-offline-retry-synthetic-bubble-only-caregiver_0_76F8E9AB-4323-458A-B380-7E396932A62B.png",
+      "sha256": "b9ed60a980a78403e0ef3ae3fbcc1ca0f3b7a61c2cc7298dd92f7f0e891199d6"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-003-1F225450-96BC-49FA-A6A8-30F1C92AE3C8.png",
+      "description": "owned-offline-managed-network-error-only-caregiver_0_4A75035F-9AB0-4B13-ACCC-4D13010BB33D.png",
+      "sha256": "a117e392cfdd54c32554e58c02aac2ec52f01494d348d3ef29a471a769f7cbff"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-004-5F6CAF19-41A0-4309-A427-034A4E901396.json",
+      "description": "owned-reply-race-acknowledged-caregiver_0_82447B45-824E-41E6-BA2F-08175769A4D8.json",
+      "sha256": "3229ee5ae66d95f574287552ba542e259fa6b77f16fdabf10db9097da699d97c"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-005-0526C843-89D3-4315-A401-4EDBE3E4BD19.png",
+      "description": "owned-reply-race-synthetic-acknowledged-message-only-caregiver_0_9ADFC6CF-1F9C-4A0E-A7AB-6D4784D73105.png",
+      "sha256": "f94e386e61b2eb2c31170b42338db427611beff79e93bf941c493e4ab7c4f889"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-006-00FD7E1B-7AE1-4030-ADC6-79E457276E00.json",
+      "description": "owned-reply-race-timing-caregiver_0_CEB72554-D34E-4D70-9DDF-6ACAFB5768E9.json",
+      "sha256": "71a4ac668fa8d3672d26c592f3d62dc0e3213af173c99f930ae6f442c0324eab"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-007-A93BC67E-D621-45E6-8D5D-087C8B6E0BF4.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_A59EFBD7-CBB4-4317-A40C-A7F2615B1218.json",
+      "sha256": "3d4d5238e1fc6b02e4a223f3ac15553ea341a631f0b11c047129bd29315e0314"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-008-23CC3D05-1386-470E-A3F3-0C4C1A8D44C7.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_455533A9-F90A-470F-88FA-C615218735FB.json",
+      "sha256": "0b8ae2c36cfb0131c571dc4cb33a74ff0f735bb7cd520ec27ca34ad107547a81"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-009-782B477E-6988-45AF-A58C-775A2AD82396.json",
+      "description": "owned-slow-send-new-typing-caregiver_0_277D6FE3-98DF-4743-931D-AAD04ECDAA6A.json",
+      "sha256": "dd28804b4e08f78c3082d55a147b75501f350205643f339d09d7132bf0918abb"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-010-DE1F4514-33D8-4273-A758-4C6D7CADB3BA.png",
+      "description": "owned-slow-send-retained-synthetic-draft-only-caregiver_0_1B666D70-CD1F-4BDD-9368-9876FE7B114F.png",
+      "sha256": "5b48cdf722fdfa6c72a7ae129106b48bcdeea7ac28eb57f99c51bd80f0589a6a"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-011-D9C2DB8B-92E9-40AD-8BE0-911A5A2D6CB5.png",
+      "description": "owned-slow-send-first-synthetic-bubble-only-caregiver_0_42C2815C-760E-4337-9DE2-F203EE715314.png",
+      "sha256": "807defd4d179fa901c5c37f56028426ed0676d3226eda659e88b08fa638b377a"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-012-C2B3383C-AEED-469C-B6F5-435CF92854F1.json",
+      "description": "P03-021-controlled-cached-native_0_5F7B51D5-9F45-4DED-B8BB-6A7D38611E2F.json",
+      "sha256": "df958ae00bc8919114b135188807c981c6eb9fb866072cf4edc90f3ae59ccb5b"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-013-12535EAA-B59C-4DAC-A790-FF6D0C868317.png",
+      "description": "P03-021-controlled-cached-coordinate-only_0_96D34A6A-53E0-4424-A0B2-2F3EBC69D674.png",
+      "sha256": "87bf0fb66143904c0facb4ee45801c40213629e73aca78ed145f53912a2b2c41"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-014-72834AC7-39DA-4465-8EB8-6F8A7A6FED38.json",
+      "description": "controlled-location-opening-available-native_0_042800A3-E308-48A6-8DF3-0D1BB456420D.json",
+      "sha256": "f4d3fa900a896f2258179c08356df7b26c51ee5683f6514b5831ec556a1c5419"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-015-998EF60A-1D30-475F-AFF4-7669A92037A8.json",
+      "description": "P03-025-controlled-future-native_0_84DD9C13-5D5A-43AD-8104-712B690E1F32.json",
+      "sha256": "43dbbbef392a3878fba8aefbf1ebe688b6fe2ec87adeece41d8db7d4181d4509"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-016-3510A4C2-4395-43B1-9960-81D238631A9E.png",
+      "description": "controlled-location-empty-review-value-only_0_5656C21B-8852-4051-A2DB-552151112EF5.png",
+      "sha256": "50f83868bdcb8eff850393413bdfc237f241b6fe8d7531c8e5904640e5264ca8"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-017-3F0C2882-CE65-470A-AAB9-F8C136AA12F9.json",
+      "description": "controlled-location-opening-future-native_0_88741433-1335-4043-B0F7-9EA3989567BC.json",
+      "sha256": "f4d3fa900a896f2258179c08356df7b26c51ee5683f6514b5831ec556a1c5419"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-018-549F6F5C-190A-470B-B56D-EBAA2C407199.json",
+      "description": "P03-025-controlled-out-of-range-native_0_AB4660F2-8C11-4231-81F6-BC8A838DE9C5.json",
+      "sha256": "43dbbbef392a3878fba8aefbf1ebe688b6fe2ec87adeece41d8db7d4181d4509"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-019-66815D4F-195A-4234-B3D8-316B6272849A.png",
+      "description": "controlled-location-empty-review-value-only_0_35E7564C-E0AF-4DE4-BE7C-87D15C0458AA.png",
+      "sha256": "50f83868bdcb8eff850393413bdfc237f241b6fe8d7531c8e5904640e5264ca8"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-020-980F4365-85DB-4197-A815-8F22B1FBED48.json",
+      "description": "controlled-location-opening-out-of-range-native_0_D79D3E2C-9363-4B61-B8D2-F3702D4063F1.json",
+      "sha256": "f4d3fa900a896f2258179c08356df7b26c51ee5683f6514b5831ec556a1c5419"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-021-DEE7C5EB-EFFD-435A-BCA3-2F8BABCA9A74.json",
+      "description": "P03-025-controlled-negative-accuracy-native_0_4D82A773-16DC-4DF8-AF7C-647272F64123.json",
+      "sha256": "43dbbbef392a3878fba8aefbf1ebe688b6fe2ec87adeece41d8db7d4181d4509"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-022-1E3262D9-C38D-48FD-B148-4B10821C4D5E.png",
+      "description": "controlled-location-empty-review-value-only_0_BC17CD9B-E5B8-4489-95C9-F13E506F2A07.png",
+      "sha256": "50f83868bdcb8eff850393413bdfc237f241b6fe8d7531c8e5904640e5264ca8"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-023-F7C0A0B2-FE64-45CE-B514-B3996D6E2A22.json",
+      "description": "controlled-location-opening-negative-accuracy-native_0_9F0DF3A4-F595-4124-BAC6-765AA9F74236.json",
+      "sha256": "f4d3fa900a896f2258179c08356df7b26c51ee5683f6514b5831ec556a1c5419"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-024-89928F02-EB93-44DE-B57D-316C631E044A.json",
+      "description": "P03-027-controlled-map-manual-late-native_0_0E019777-FD31-47BF-94D5-E1C142419C2E.json",
+      "sha256": "c7f433478d91b5aedb5211050059facff6defa3a77389d15a0f751ccd009b217"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-025-0D40F2B4-7F32-4272-88C6-41FA83F9BB03.png",
+      "description": "P03-027-controlled-manual-coordinate-row-only_0_96DEDA1A-4672-401E-A576-A6B81B68789B.png",
+      "sha256": "632746306c74aa311e34f047c740533a99f3f098208d06d49cd72f00feceaac3"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-026-D2E7C2BD-2374-40B1-AE25-0D702711C26F.png",
+      "description": "P03-027-controlled-late-fix-manual-confirm-only_0_BEBC741D-D05A-41A2-B2C9-0C21D47CAB22.png",
+      "sha256": "8459ee7e5170e37930a76e271efab1060320fd142484f14c2c11ee31a9ffc99a"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-027-9F7601B1-F4DB-4D53-A4E7-E7D51E54C1E6.json",
+      "description": "controlled-location-opening-late-valid-native_0_08C83200-08A1-4003-9335-898358E87B7F.json",
+      "sha256": "f4d3fa900a896f2258179c08356df7b26c51ee5683f6514b5831ec556a1c5419"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-028-B0FC8A74-13A2-48B3-AAC2-DDD1B33E0554.json",
+      "description": "P03-023-024-026-controlled-no-fix-native_0_34272B94-5C58-4E02-B385-B97BF2046877.json",
+      "sha256": "0a3eb6bcc05746fb7ded3c160d471f011edf1254093e2d00f2ce44152508a258"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-029-1537B63C-B993-4C92-A200-853EEBA65C6E.png",
+      "description": "P03-024-controlled-ordinary-map-reason-reset-only_0_47406970-1F01-4C87-B862-D9B22975F5B5.png",
+      "sha256": "50b3805879176b5056b87c7641cd0eb1f542272e4bc6c386810bdac225a1a8dd"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-030-67C9F4A8-749F-4415-9051-B6F4C92B41F4.png",
+      "description": "controlled-location-empty-review-value-only_0_E4ECA1AF-1767-447C-9C71-138D4B8ABE84.png",
+      "sha256": "50f83868bdcb8eff850393413bdfc237f241b6fe8d7531c8e5904640e5264ca8"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-031-86BDFC8F-7340-48ED-BC8B-1528BDC02F9C.png",
+      "description": "P03-024-controlled-no-fix-save-guidance-only_0_7B377992-2D50-413F-88A4-E16559FD5C2F.png",
+      "sha256": "7c21a660cce61cec60255b22d3b3e14da62dd8da91c61a39faefc80e44f58a95"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-032-18BCDE38-C3D8-4DD1-8EB0-1707E8A31185.png",
+      "description": "controlled-location-empty-review-value-only_0_4BC27CE2-9DF2-4631-9348-892766E00400.png",
+      "sha256": "50f83868bdcb8eff850393413bdfc237f241b6fe8d7531c8e5904640e5264ca8"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-033-F8F21E25-E272-48BB-9DD7-971B953C469C.png",
+      "description": "P03-026-controlled-unselected-map-continue-only_0_515F8ABE-4FDA-4D2B-823C-7F026A453BEF.png",
+      "sha256": "2c832af045504060ef35dd260c1fd4267b651ce1b36bf9b23f28b18de8e31ab1"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-034-25F9C477-948A-4005-BDC1-35F25F77FC85.json",
+      "description": "controlled-location-opening-none-native_0_DD92EA70-497B-4C94-BBF7-C9D0A9AE124D.json",
+      "sha256": "f4d3fa900a896f2258179c08356df7b26c51ee5683f6514b5831ec556a1c5419"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-035-7822DFBA-6BCA-4A00-937C-A0E5260BFD61.json",
+      "description": "P03-022-controlled-stale-native_0_7D5FC480-8395-4E4F-9387-DC25C5BAC1AD.json",
+      "sha256": "8e1b4dffa3ec6328eec3445ae05056320d5387b844b4d4d50d7f4a0936d1750c"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-036-E75E5F84-5AC9-4957-8CC0-B15D4EF9E1D4.png",
+      "description": "P03-022-controlled-map-last-known-only_0_9D9905B5-2076-4305-A7C9-F38A4C64ED4C.png",
+      "sha256": "a1e1d64de4028cdffff19cb8e62f676ffec1eaf858e4b2c565e1b905a19be65c"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-037-884C1217-96BA-43F3-A943-000171106F7C.png",
+      "description": "P03-022-controlled-wizard-last-known-only_0_A822FAC6-3892-4C61-B3C2-51DC5A131CE8.png",
+      "sha256": "4fe8676efb7add0b234e1922252dcc8daf79cfc1d98fa70d2b631fff61f4ff5f"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-038-4901C7DF-F11E-475E-9455-3999B9EDB379.json",
+      "description": "controlled-location-opening-stale-native_0_DB624507-E905-4171-8C97-BE3B022408D7.json",
+      "sha256": "f4d3fa900a896f2258179c08356df7b26c51ee5683f6514b5831ec556a1c5419"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-039-EEC0D3FD-1812-4B14-A652-59FEFCEDA0A9.json",
+      "description": "P23-018-native-read-only-recovery_0_6AB4ABBC-30FA-4914-A554-E42618186FFC.json",
+      "sha256": "30175396563bd992c3d0141895e5534fd495c90aff566a81ad523896607bab46"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-040-893C3012-F7DB-428A-9C59-F7AE92CF08B4.png",
+      "description": "P23-018-managed-retry-control_0_50282A30-3288-45E4-9171-7E06E8FA0F21.png",
+      "sha256": "65795a74f6815f4ac5bb309d3ddae77916d82366f137a77309012770bbdfa5cb"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-041-BC187E20-A984-4099-B398-03A3DD7FC6D6.json",
+      "description": "P23-017-real-owned-other-session-action-change_0_BD3B8CA9-5F65-4536-92AF-AB625CD97C67.json",
+      "sha256": "d63751a8e5798ae7237af4c000bfbc72bc06c016fe1cf5aa102e38ca879fbc76"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-042-4710A886-49A9-422D-ADD7-927502E55A4A.png",
+      "description": "P23-017-other-session-match-reject-only_0_79144F28-BB29-4446-8767-F2AF9BBD5AE8.png",
+      "sha256": "15f063f7d6011eae380a20f23b42a827a6f515da9e6cba19fab06008c6bfff8d"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-043-E7475782-B600-41D5-B8C2-C11544802EFE.png",
+      "description": "P23-017-other-session-match-accept-only_0_8F01BAE2-7F65-453A-A3AA-8E44E1777191.png",
+      "sha256": "90f8d54794f5b2e982b4c0202a8e2472a66e6dea19c4b59a6182b5b4db6fd3ff"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-044-F5431147-CAB5-4E97-B5CB-42841AD30F36.png",
+      "description": "P23-017-other-session-standard-changed-control_0_D9ECA7E4-5EF8-4CCD-9CC0-F00EC5332D0F.png",
+      "sha256": "9bb64410911f46fa2d83b8f988033b87c900b1cc3c3e13482d592016c85836f8"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-045-57B3C738-F0C8-4435-A73F-D05A245AE2FA.json",
+      "description": "P23-017-real-owned-request-lost-ack-reconciliation_0_B3BD5AB1-4C2A-4DD6-A0E2-DCC8F583F6F6.json",
+      "sha256": "0781c4a3e01278e646ee682e27737724cc82295baea58c58e1031ad6c039c401"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-046-2AFCADAF-A8D0-4C51-A9D1-56E7BD0250AC.png",
+      "description": "P23-017-lost-ack-sent-withdraw-control_0_D3B1D862-EA9C-441C-A13A-2AB8A57C6AA4.png",
+      "sha256": "73da20779b6bc6843975aa2981e4d18950f18d749ab330c91becf3441ed2326a"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-047-4B709428-1330-49A1-B742-271CE21798E2.png",
+      "description": "P23-017-lost-ack-managed-changed-control_0_77EC841D-9964-4335-AC06-50AEF230C66B.png",
+      "sha256": "9bb64410911f46fa2d83b8f988033b87c900b1cc3c3e13482d592016c85836f8"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-048-DBEC1A77-7F30-40EA-95DF-9145BA78DD46.json",
+      "description": "owned-notification-missing-chat-native-fallback_0_2ADC9DC9-C772-4809-B4E0-C5418522D6EB.json",
+      "sha256": "044ceb46a4ccae5b13763e1e62c29149d04c5f16cce2b520164494d1068cf008"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-049-4FDD4048-0263-4892-B135-92888F0F984B.png",
+      "description": "notification-missing-chat-show-only_0_31C5A547-36E5-48AD-9153-647843E8F006.png",
+      "sha256": "be41f3ff4ab4f9277168feabf7904828d6829bb33dd12d0ff154b854e30d469a"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-050-C6F8B536-9A73-4EC9-B09E-2CA73A5C4BC9.png",
+      "description": "notification-missing-chat-cancel-only_0_DEE4DEC8-6F15-4C5E-8FF6-6414C1DDE507.png",
+      "sha256": "2ad32d349d4bd594e4706f46339abb3a70e476cd89bc32c94c11134d79be6aa6"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-051-2F70737D-6884-45B6-A327-66CBDAE55101.json",
+      "description": "owned-notification-missing-person-native-fallback_0_FCB7826F-6524-4FCE-BD05-E0EC9C8B5A5D.json",
+      "sha256": "67b2f54c1645b08f7877753b815b90b977a07b1811230f85dfe3fcc153642b60"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-052-70F9470B-8E56-4740-9569-CA1A893894E4.png",
+      "description": "notification-missing-person-show-only_0_6C310439-B172-47EE-A23F-6038852C8D94.png",
+      "sha256": "508e7969762999b81b9a5445e42883b84e9dc9a55b8976c13d5977d93dd0ca69"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-current-recovery-053-91BF619E-A21A-4BC2-A830-B1BAF1B1B584.png",
+      "description": "notification-missing-person-cancel-only_0_D61BB2C0-9D4D-483E-AFF8-DAAF2F5091C4.png",
+      "sha256": "9b33039bab94be61054fe633bd6fe1cc4b0d30f0f0d385ffcf1b45299dce1f4c"
+    }
+  ],
+  "publicPackage": {
+    "status": "REVIEWABLE — not staged or delivered",
+    "originalEvidenceRetainedLocally": true,
+    "rawLogsAndXCResultsIncluded": false,
+    "artifactInventory": [
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-001-F5B611BB-9205-49D6-A26F-4992C769222E.json",
+        "bytes": 395,
+        "sha256": "927eba7ad7b01c7ec08848176116541bf3bfe70101bf9a6f37c67d79ba946b08"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-002-24764226-6967-4497-BE9B-A136529BD1D5.png",
+        "bytes": 19857,
+        "sha256": "b9ed60a980a78403e0ef3ae3fbcc1ca0f3b7a61c2cc7298dd92f7f0e891199d6"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-003-1F225450-96BC-49FA-A6A8-30F1C92AE3C8.png",
+        "bytes": 22133,
+        "sha256": "a117e392cfdd54c32554e58c02aac2ec52f01494d348d3ef29a471a769f7cbff"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-004-5F6CAF19-41A0-4309-A427-034A4E901396.json",
+        "bytes": 368,
+        "sha256": "0bcc0ed1d5c1a5d1a5ead2de7da59af4cce4752c9c7b17aeec762db15725f471"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-005-0526C843-89D3-4315-A401-4EDBE3E4BD19.png",
+        "bytes": 21035,
+        "sha256": "f94e386e61b2eb2c31170b42338db427611beff79e93bf941c493e4ab7c4f889"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-006-00FD7E1B-7AE1-4030-ADC6-79E457276E00.json",
+        "bytes": 268,
+        "sha256": "1f1903eec2fc2a7d746b8364a56bf30e02c873aae0412a402b347af3238cbee7"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-007-A93BC67E-D621-45E6-8D5D-087C8B6E0BF4.json",
+        "bytes": 686,
+        "sha256": "d49e6d14aee4104790dc3ce2b997f21eae349654e8cda4b83530a44625255610"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-008-23CC3D05-1386-470E-A3F3-0C4C1A8D44C7.json",
+        "bytes": 684,
+        "sha256": "7225264e4849f840b908341d1a61589d8bdc6add2db15486db14f75b66496114"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-009-782B477E-6988-45AF-A58C-775A2AD82396.json",
+        "bytes": 363,
+        "sha256": "282b071d530487a404684f545f8ee0cffea7038c8253d1c87fea28d1e7128cb3"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-010-DE1F4514-33D8-4273-A758-4C6D7CADB3BA.png",
+        "bytes": 8108,
+        "sha256": "5b48cdf722fdfa6c72a7ae129106b48bcdeea7ac28eb57f99c51bd80f0589a6a"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-011-D9C2DB8B-92E9-40AD-8BE0-911A5A2D6CB5.png",
+        "bytes": 19611,
+        "sha256": "807defd4d179fa901c5c37f56028426ed0676d3226eda659e88b08fa638b377a"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-012-C2B3383C-AEED-469C-B6F5-435CF92854F1.json",
+        "bytes": 308,
+        "sha256": "6d770e6d8785461556ef87749377bd4d83f3657414cebed609afb1a8f43f52b1"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-013-12535EAA-B59C-4DAC-A790-FF6D0C868317.png",
+        "bytes": 44502,
+        "sha256": "87bf0fb66143904c0facb4ee45801c40213629e73aca78ed145f53912a2b2c41"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-014-72834AC7-39DA-4465-8EB8-6F8A7A6FED38.json",
+        "bytes": 325,
+        "sha256": "fd25c3a812b33827f1771080eb1f01dce7e93a35ad38267195cff91c86f6d15d"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-015-998EF60A-1D30-475F-AFF4-7669A92037A8.json",
+        "bytes": 333,
+        "sha256": "c0afae239e6b0a4b21692c232761d58373abdb5151fa2ee51df9a7660da9e30a"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-016-3510A4C2-4395-43B1-9960-81D238631A9E.png",
+        "bytes": 1050,
+        "sha256": "50f83868bdcb8eff850393413bdfc237f241b6fe8d7531c8e5904640e5264ca8"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-017-3F0C2882-CE65-470A-AAB9-F8C136AA12F9.json",
+        "bytes": 325,
+        "sha256": "fd25c3a812b33827f1771080eb1f01dce7e93a35ad38267195cff91c86f6d15d"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-018-549F6F5C-190A-470B-B56D-EBAA2C407199.json",
+        "bytes": 333,
+        "sha256": "c0afae239e6b0a4b21692c232761d58373abdb5151fa2ee51df9a7660da9e30a"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-019-66815D4F-195A-4234-B3D8-316B6272849A.png",
+        "bytes": 1050,
+        "sha256": "50f83868bdcb8eff850393413bdfc237f241b6fe8d7531c8e5904640e5264ca8"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-020-980F4365-85DB-4197-A815-8F22B1FBED48.json",
+        "bytes": 325,
+        "sha256": "fd25c3a812b33827f1771080eb1f01dce7e93a35ad38267195cff91c86f6d15d"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-021-DEE7C5EB-EFFD-435A-BCA3-2F8BABCA9A74.json",
+        "bytes": 333,
+        "sha256": "c0afae239e6b0a4b21692c232761d58373abdb5151fa2ee51df9a7660da9e30a"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-022-1E3262D9-C38D-48FD-B148-4B10821C4D5E.png",
+        "bytes": 1050,
+        "sha256": "50f83868bdcb8eff850393413bdfc237f241b6fe8d7531c8e5904640e5264ca8"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-023-F7C0A0B2-FE64-45CE-B514-B3996D6E2A22.json",
+        "bytes": 325,
+        "sha256": "fd25c3a812b33827f1771080eb1f01dce7e93a35ad38267195cff91c86f6d15d"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-024-89928F02-EB93-44DE-B57D-316C631E044A.json",
+        "bytes": 416,
+        "sha256": "419720f77f50084deb56396ec1101b33bf8af8b9b488403f11f29cc17ed588c6"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-025-0D40F2B4-7F32-4272-88C6-41FA83F9BB03.png",
+        "bytes": 43398,
+        "sha256": "632746306c74aa311e34f047c740533a99f3f098208d06d49cd72f00feceaac3"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-026-D2E7C2BD-2374-40B1-AE25-0D702711C26F.png",
+        "bytes": 8938,
+        "sha256": "8459ee7e5170e37930a76e271efab1060320fd142484f14c2c11ee31a9ffc99a"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-027-9F7601B1-F4DB-4D53-A4E7-E7D51E54C1E6.json",
+        "bytes": 325,
+        "sha256": "fd25c3a812b33827f1771080eb1f01dce7e93a35ad38267195cff91c86f6d15d"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-028-B0FC8A74-13A2-48B3-AAC2-DDD1B33E0554.json",
+        "bytes": 582,
+        "sha256": "835ae46272b4fcbe978d2f4a92cfe01c758c1eb362e16023d19b0d19b792c6e5"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-029-1537B63C-B993-4C92-A200-853EEBA65C6E.png",
+        "bytes": 10298,
+        "sha256": "50b3805879176b5056b87c7641cd0eb1f542272e4bc6c386810bdac225a1a8dd"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-030-67C9F4A8-749F-4415-9051-B6F4C92B41F4.png",
+        "bytes": 1050,
+        "sha256": "50f83868bdcb8eff850393413bdfc237f241b6fe8d7531c8e5904640e5264ca8"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-031-86BDFC8F-7340-48ED-BC8B-1528BDC02F9C.png",
+        "bytes": 14243,
+        "sha256": "7c21a660cce61cec60255b22d3b3e14da62dd8da91c61a39faefc80e44f58a95"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-032-18BCDE38-C3D8-4DD1-8EB0-1707E8A31185.png",
+        "bytes": 1050,
+        "sha256": "50f83868bdcb8eff850393413bdfc237f241b6fe8d7531c8e5904640e5264ca8"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-033-F8F21E25-E272-48BB-9DD7-971B953C469C.png",
+        "bytes": 9750,
+        "sha256": "2c832af045504060ef35dd260c1fd4267b651ce1b36bf9b23f28b18de8e31ab1"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-034-25F9C477-948A-4005-BDC1-35F25F77FC85.json",
+        "bytes": 325,
+        "sha256": "fd25c3a812b33827f1771080eb1f01dce7e93a35ad38267195cff91c86f6d15d"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-035-7822DFBA-6BCA-4A00-937C-A0E5260BFD61.json",
+        "bytes": 277,
+        "sha256": "b92efedf8d82fd5c891134f95fdd9c8dd1226a5b539f057ffc2687c0a37254e6"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-036-E75E5F84-5AC9-4957-8CC0-B15D4EF9E1D4.png",
+        "bytes": 5673,
+        "sha256": "a1e1d64de4028cdffff19cb8e62f676ffec1eaf858e4b2c565e1b905a19be65c"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-037-884C1217-96BA-43F3-A943-000171106F7C.png",
+        "bytes": 5401,
+        "sha256": "4fe8676efb7add0b234e1922252dcc8daf79cfc1d98fa70d2b631fff61f4ff5f"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-038-4901C7DF-F11E-475E-9455-3999B9EDB379.json",
+        "bytes": 325,
+        "sha256": "fd25c3a812b33827f1771080eb1f01dce7e93a35ad38267195cff91c86f6d15d"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-039-EEC0D3FD-1812-4B14-A652-59FEFCEDA0A9.json",
+        "bytes": 373,
+        "sha256": "ebbd91aedb02894849c6aa8db962f89a3d09d53696a310400ba4095db6f11169"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-040-893C3012-F7DB-428A-9C59-F7AE92CF08B4.png",
+        "bytes": 9663,
+        "sha256": "65795a74f6815f4ac5bb309d3ddae77916d82366f137a77309012770bbdfa5cb"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-041-BC187E20-A984-4099-B398-03A3DD7FC6D6.json",
+        "bytes": 541,
+        "sha256": "5ca9040ec53f50ac4b8a8eddc53d48c486ed9614d81d67e981b53ad41703abd5"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-042-4710A886-49A9-422D-ADD7-927502E55A4A.png",
+        "bytes": 10862,
+        "sha256": "15f063f7d6011eae380a20f23b42a827a6f515da9e6cba19fab06008c6bfff8d"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-043-E7475782-B600-41D5-B8C2-C11544802EFE.png",
+        "bytes": 9561,
+        "sha256": "90f8d54794f5b2e982b4c0202a8e2472a66e6dea19c4b59a6182b5b4db6fd3ff"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-044-F5431147-CAB5-4E97-B5CB-42841AD30F36.png",
+        "bytes": 6920,
+        "sha256": "9bb64410911f46fa2d83b8f988033b87c900b1cc3c3e13482d592016c85836f8"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-045-57B3C738-F0C8-4435-A73F-D05A245AE2FA.json",
+        "bytes": 524,
+        "sha256": "9d9c94a4b4fe1e61285bdfc16ffd99395c477f8140c46cdef138aacc784c4ba2"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-046-2AFCADAF-A8D0-4C51-A9D1-56E7BD0250AC.png",
+        "bytes": 15156,
+        "sha256": "73da20779b6bc6843975aa2981e4d18950f18d749ab330c91becf3441ed2326a"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-047-4B709428-1330-49A1-B742-271CE21798E2.png",
+        "bytes": 6920,
+        "sha256": "9bb64410911f46fa2d83b8f988033b87c900b1cc3c3e13482d592016c85836f8"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-048-DBEC1A77-7F30-40EA-95DF-9145BA78DD46.json",
+        "bytes": 311,
+        "sha256": "e13aa64f63265bcdcf45ef27d10e4705bb376e9fd4b11a511612454fae068b51"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-049-4FDD4048-0263-4892-B135-92888F0F984B.png",
+        "bytes": 9925,
+        "sha256": "be41f3ff4ab4f9277168feabf7904828d6829bb33dd12d0ff154b854e30d469a"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-050-C6F8B536-9A73-4EC9-B09E-2CA73A5C4BC9.png",
+        "bytes": 5204,
+        "sha256": "2ad32d349d4bd594e4706f46339abb3a70e476cd89bc32c94c11134d79be6aa6"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-051-2F70737D-6884-45B6-A327-66CBDAE55101.json",
+        "bytes": 313,
+        "sha256": "8c9cb1f41d4b02b6fdda70c9e4d62a2d9faf51fb95a3db9d3af34499d9a79735"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-052-70F9470B-8E56-4740-9569-CA1A893894E4.png",
+        "bytes": 9592,
+        "sha256": "508e7969762999b81b9a5445e42883b84e9dc9a55b8976c13d5977d93dd0ca69"
+      },
+      {
+        "path": "Artifacts/modern-caregiver-current-recovery-053-91BF619E-A21A-4BC2-A830-B1BAF1B1B584.png",
+        "bytes": 5409,
+        "sha256": "9b33039bab94be61054fe633bd6fe1cc4b0d30f0f0d385ffcf1b45299dce1f4c"
+      }
+    ],
+    "sourceIndexSHA256": "b1f5a17850b79ff730ef255aa49ba59f03f038f793aa26e6f4c340a5bdd5cd7f",
+    "artifactHashNote": "Public JSON/text are sanitized; artifactInventory hashes apply to packaged bytes. Original indexed hashes, where present, refer to preserved original evidence."
+  }
+}

@@ -1,0 +1,145 @@
+{
+  "source": "fresh-small-caregiver-owned-recovery-204-timing-cross-session.xcresult",
+  "wholeProcessExit": 0,
+  "allocation": "small caregiver",
+  "individualPassSeconds": {
+    "immutableReply": 161.005,
+    "otherSessionMatchChange": 47.657,
+    "lostAcknowledgement": 50.815
+  },
+  "rootReviewedControlPNGs": 6,
+  "artifacts": [
+    {
+      "path": "Artifacts/small-caregiver-owned-recovery-clean-001-DC6BDFA5-3F2B-4723-BA32-211AA9999B35.json",
+      "description": "owned-reply-race-acknowledged-caregiver_0_C188EADE-EC62-45E8-96DA-7516C6EFC7C1.json",
+      "sha256": "6b3a295620649ceaf6c413f2ac8b41f26f698298490596c714ec26b62a33eb7a"
+    },
+    {
+      "path": "Artifacts/small-caregiver-owned-recovery-clean-002-CFFCE327-D90B-42FA-AF60-8C5DD6F0964A.png",
+      "description": "owned-reply-race-synthetic-acknowledged-message-only-caregiver_0_8305491E-3646-4318-ADC8-EC4227EB4F02.png",
+      "sha256": "10b4545748dd495bd7a53d1704508475bcf402d5124ba1fa3284f462c021c906"
+    },
+    {
+      "path": "Artifacts/small-caregiver-owned-recovery-clean-003-5D5A3AD0-9170-4ED6-A277-3EF5B1D15AEC.json",
+      "description": "owned-reply-race-timing-caregiver_0_85AFBF0D-54B7-42A6-9087-600CA1AA21CE.json",
+      "sha256": "22ebc733f77b8398b82f445c783ffa6e7e0ab85fbe8c5a76df5f33d046e19e17"
+    },
+    {
+      "path": "Artifacts/small-caregiver-owned-recovery-clean-004-82EA83E3-F296-47DE-9FFE-1708F5B2E877.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_257ED844-DFB8-44CA-80BC-977A76E229AC.json",
+      "sha256": "4b2bb638ba7d5d65b98c9b375a574bcc10f026ee126e034b6f70a26df9a32cdc"
+    },
+    {
+      "path": "Artifacts/small-caregiver-owned-recovery-clean-005-EA7441F7-BD03-4463-A335-E3188F063EBC.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_9CDBD58F-4828-4BA1-A12C-A7714140BADB.json",
+      "sha256": "5c7ea584507be183362171c00eba82629fb735e119921b92fd350589b452441c"
+    },
+    {
+      "path": "Artifacts/small-caregiver-owned-recovery-clean-006-D067C335-BF5B-47B0-B722-7A924F4A73B5.json",
+      "description": "P23-017-real-owned-other-session-action-change_0_99F0824E-6D35-4AD8-9211-2D852478D4D4.json",
+      "sha256": "d63751a8e5798ae7237af4c000bfbc72bc06c016fe1cf5aa102e38ca879fbc76"
+    },
+    {
+      "path": "Artifacts/small-caregiver-owned-recovery-clean-007-0CC69D33-7451-4DEA-84DC-84CE4E542F98.png",
+      "description": "P23-017-other-session-match-reject-only_0_FF49831C-8081-4A33-934E-4B4384C97CAC.png",
+      "sha256": "beba550f9137af737971f0be4e30a160e2bb4ca7987e49c2bd291c5330c211f2"
+    },
+    {
+      "path": "Artifacts/small-caregiver-owned-recovery-clean-008-844818A3-8199-42EB-97C3-C28259BFBB4B.png",
+      "description": "P23-017-other-session-match-accept-only_0_6D5DC139-B9E7-4BDD-B578-BC2796DB12CD.png",
+      "sha256": "9107543908af92df2a5e17db3e69f219a31f321ff74c5a29082a078008ab33c4"
+    },
+    {
+      "path": "Artifacts/small-caregiver-owned-recovery-clean-009-8B12702A-343D-403B-9051-13F1793A181C.png",
+      "description": "P23-017-other-session-standard-changed-control_0_61D33630-E613-4FE2-B44B-B2FD369EBD25.png",
+      "sha256": "39b414549a2b4b95127f416c70c4cb3d04aed61ff1f21156b50d11780bd59a2e"
+    },
+    {
+      "path": "Artifacts/small-caregiver-owned-recovery-clean-010-FA93FCFF-11EF-4C98-A752-554AFA74CDF5.json",
+      "description": "P23-017-real-owned-request-lost-ack-reconciliation_0_20E2AB8E-C74B-4B2F-9F4B-F40904EABDCC.json",
+      "sha256": "0781c4a3e01278e646ee682e27737724cc82295baea58c58e1031ad6c039c401"
+    },
+    {
+      "path": "Artifacts/small-caregiver-owned-recovery-clean-011-9492A065-BFD0-40BD-A96E-90FFC4AD9B04.png",
+      "description": "P23-017-lost-ack-sent-withdraw-control_0_A9A45ACA-4354-40B3-A4A0-DC076AE9D5F0.png",
+      "sha256": "0c5596e0a969d25c3e7460ce278464c3bdb5a60ae9fdf4e9a987dc310616308a"
+    },
+    {
+      "path": "Artifacts/small-caregiver-owned-recovery-clean-012-EDE5B5F5-AE3C-43D8-9CAD-8FE2E546142F.png",
+      "description": "P23-017-lost-ack-managed-changed-control_0_8E6AB024-4BAF-45E2-BC5D-FA7A318D4140.png",
+      "sha256": "575b9510f36a145ae7d89081bbdd0538ccb9e3075b40ac72990c8a487f94a0c3"
+    }
+  ],
+  "futureUnquotedReplyFilterRuntimeVerified": false,
+  "allFourAllocationsVerified": false,
+  "cleanupBothOwnedPerspectivesNone": true,
+  "publicPackage": {
+    "status": "REVIEWABLE — not staged or delivered",
+    "originalEvidenceRetainedLocally": true,
+    "rawLogsAndXCResultsIncluded": false,
+    "artifactInventory": [
+      {
+        "path": "Artifacts/small-caregiver-owned-recovery-clean-001-DC6BDFA5-3F2B-4723-BA32-211AA9999B35.json",
+        "bytes": 264,
+        "sha256": "fba83d15347ef2059ac92e8f9b37279e7ae184f9cbefae74bc77d898003cd51c"
+      },
+      {
+        "path": "Artifacts/small-caregiver-owned-recovery-clean-002-CFFCE327-D90B-42FA-AF60-8C5DD6F0964A.png",
+        "bytes": 15026,
+        "sha256": "10b4545748dd495bd7a53d1704508475bcf402d5124ba1fa3284f462c021c906"
+      },
+      {
+        "path": "Artifacts/small-caregiver-owned-recovery-clean-003-5D5A3AD0-9170-4ED6-A277-3EF5B1D15AEC.json",
+        "bytes": 267,
+        "sha256": "cdc89c5b644131d60f7b8ac9286aa9d15dd56a14adf6f3023aa30163ba65eb12"
+      },
+      {
+        "path": "Artifacts/small-caregiver-owned-recovery-clean-004-82EA83E3-F296-47DE-9FFE-1708F5B2E877.json",
+        "bytes": 438,
+        "sha256": "61d059838547862a9b057f9f6dbe7280706c483aec6cf57e01fa2d24737f7c4f"
+      },
+      {
+        "path": "Artifacts/small-caregiver-owned-recovery-clean-005-EA7441F7-BD03-4463-A335-E3188F063EBC.json",
+        "bytes": 440,
+        "sha256": "5bcd3e06d95150256c9441254e40267139226e98b3a72d5aae24ca14469b025d"
+      },
+      {
+        "path": "Artifacts/small-caregiver-owned-recovery-clean-006-D067C335-BF5B-47B0-B722-7A924F4A73B5.json",
+        "bytes": 541,
+        "sha256": "5ca9040ec53f50ac4b8a8eddc53d48c486ed9614d81d67e981b53ad41703abd5"
+      },
+      {
+        "path": "Artifacts/small-caregiver-owned-recovery-clean-007-0CC69D33-7451-4DEA-84DC-84CE4E542F98.png",
+        "bytes": 6695,
+        "sha256": "beba550f9137af737971f0be4e30a160e2bb4ca7987e49c2bd291c5330c211f2"
+      },
+      {
+        "path": "Artifacts/small-caregiver-owned-recovery-clean-008-844818A3-8199-42EB-97C3-C28259BFBB4B.png",
+        "bytes": 6155,
+        "sha256": "9107543908af92df2a5e17db3e69f219a31f321ff74c5a29082a078008ab33c4"
+      },
+      {
+        "path": "Artifacts/small-caregiver-owned-recovery-clean-009-8B12702A-343D-403B-9051-13F1793A181C.png",
+        "bytes": 8132,
+        "sha256": "39b414549a2b4b95127f416c70c4cb3d04aed61ff1f21156b50d11780bd59a2e"
+      },
+      {
+        "path": "Artifacts/small-caregiver-owned-recovery-clean-010-FA93FCFF-11EF-4C98-A752-554AFA74CDF5.json",
+        "bytes": 524,
+        "sha256": "9d9c94a4b4fe1e61285bdfc16ffd99395c477f8140c46cdef138aacc784c4ba2"
+      },
+      {
+        "path": "Artifacts/small-caregiver-owned-recovery-clean-011-9492A065-BFD0-40BD-A96E-90FFC4AD9B04.png",
+        "bytes": 8714,
+        "sha256": "0c5596e0a969d25c3e7460ce278464c3bdb5a60ae9fdf4e9a987dc310616308a"
+      },
+      {
+        "path": "Artifacts/small-caregiver-owned-recovery-clean-012-EDE5B5F5-AE3C-43D8-9CAD-8FE2E546142F.png",
+        "bytes": 8457,
+        "sha256": "575b9510f36a145ae7d89081bbdd0538ccb9e3075b40ac72990c8a487f94a0c3"
+      }
+    ],
+    "sourceIndexSHA256": "b8c259af4b1f9a55912d6feda378040a2c973b97c2eba017690cfce866f6b7f3",
+    "artifactHashNote": "Public JSON/text are sanitized; artifactInventory hashes apply to packaged bytes. Original indexed hashes, where present, refer to preserved original evidence."
+  }
+}

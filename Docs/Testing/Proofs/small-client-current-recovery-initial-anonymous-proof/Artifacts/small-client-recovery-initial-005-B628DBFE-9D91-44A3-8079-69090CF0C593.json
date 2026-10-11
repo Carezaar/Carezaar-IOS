@@ -1,0 +1,25 @@
+{
+  "boundedBothDirections": true,
+  "composerFrame": {
+    "height": 24,
+    "width": 267,
+    "x": 26,
+    "y": 623
+  },
+  "gestureCount": 0,
+  "syntheticTargetExists": true,
+  "syntheticTargetHittable": true,
+  "targetFrame": {
+    "height": 47,
+    "width": 231,
+    "x": 30,
+    "y": 231
+  },
+  "transcriptFrame": {
+    "height": 468.5,
+    "width": 375,
+    "x": 0,
+    "y": 134.5
+  },
+  "transcriptHasTextFieldDescendant": false
+}

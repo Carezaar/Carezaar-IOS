@@ -1,0 +1,56 @@
+{
+  "source": "fresh-small-client-strict-reply-bounded-exposure-final.xcresult",
+  "rootReviewed": true,
+  "publishable": false,
+  "artifacts": [
+    {
+      "path": "Artifacts/50FA659A-8AD5-4CF5-92FB-AF98A1B7B0CB.json",
+      "description": "owned-reply-race-acknowledged-client_0_86555197-0604-407B-A544-51EC29D01697.json",
+      "sha256": "b24ae2ab59e89287f37401a0661e53e315a5bda17f446ea5372809e6e1090699",
+      "packagedSha256": "b24ae2ab59e89287f37401a0661e53e315a5bda17f446ea5372809e6e1090699"
+    },
+    {
+      "path": "Artifacts/D5CAE6AC-6A7A-4B26-9DD7-C2512376C5C8.png",
+      "description": "owned-reply-race-synthetic-acknowledged-message-only-client_0_4E3A0C3F-3A6C-47D3-9C16-06EEC44E86B3.png",
+      "sha256": "0ce420a4048315113b19bcc50d67b722138a6e850d3623ddb455c11e2091138d",
+      "packagedSha256": "0ce420a4048315113b19bcc50d67b722138a6e850d3623ddb455c11e2091138d"
+    },
+    {
+      "path": "Artifacts/BD8F16DA-4A5A-4973-AE07-29B16260F2A3.json",
+      "description": "owned-reply-race-timing-client_0_B75787FC-B51F-42C0-B88A-AAE50F02D4EB.json",
+      "sha256": "3c7d3b821b9d4e598d6cac83a8d30be42d220f00f0588605874b2368104369c2",
+      "packagedSha256": "3c7d3b821b9d4e598d6cac83a8d30be42d220f00f0588605874b2368104369c2"
+    },
+    {
+      "path": "Artifacts/DF32886A-8E33-4A37-B2D3-B5E9EA90AA3B.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_3153A515-D42E-461E-8945-FCD00693E664.json",
+      "sha256": "bd93544b0a786f111939c00fe8ee14181658cd1fe0b638b7961eb1b7c756d326",
+      "packagedSha256": "bd93544b0a786f111939c00fe8ee14181658cd1fe0b638b7961eb1b7c756d326"
+    },
+    {
+      "path": "Artifacts/7B8F14C4-90B7-467A-A1C8-17D24F444EDF.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_A4A15B41-DF37-4E6E-A98E-6107D08513C0.json",
+      "sha256": "578d28ed76b8abc0381384f53b53d9ab0b5416a995abe1dbca5bfcd89e2cc7e0",
+      "packagedSha256": "578d28ed76b8abc0381384f53b53d9ab0b5416a995abe1dbca5bfcd89e2cc7e0"
+    }
+  ],
+  "rootReviewScope": "Directly viewed complete bounded synthetic message PNG; read all four anonymous JSONs; verified all five hashes. Full Small client strict Reply PASS186.850, all observations checkpoint7.661126017 including all time, no banners encountered. Full exact peer body/menu visibility reached after seven observed-frame gestures; actual44x44Menu; native1POSTack/originalparentboth/newReplyretained/emptydraftSenddisabled. No private fixture or camera data, whole-transcript crop, or weakened gates.",
+  "independentlyReviewed": true,
+  "independentReviewScope": "Independently viewed the complete bounded synthetic-only PNG; parsed all four anonymous JSON artifacts and verified all five SHA-256 hashes. Exact peer text/menu union fully contained in transcript after seven observed-frame gestures (menu44x44); strict all-observations checkpoint7.6611260175704956<10 includes all elapsed time with zero encountered banners; native POST0 before reply change and acknowledged POST1 afterward, original parent verified from both owned perspectives, newer reply retained, empty new draft and disabled Send. This proof does not establish the banner-dismissal branch, keyboard dismissal, larger-history performance, or all-original-case coverage. No raw credentials, fixture identities, private paths, camera content, or whole-transcript image found.",
+  "independentReviewed": true,
+  "independentReview": "Independently viewed the complete bounded synthetic-only PNG; parsed all four anonymous JSON artifacts and verified all five SHA-256 hashes. Exact peer text/menu union fully contained in transcript after seven observed-frame gestures (menu44x44); strict all-observations checkpoint7.6611260175704956<10 includes all elapsed time with zero encountered banners; native POST0 before reply change and acknowledged POST1 afterward, original parent verified from both owned perspectives, newer reply retained, empty new draft and disabled Send. This proof does not establish the banner-dismissal branch, keyboard dismissal, larger-history performance, or all-original-case coverage. No raw credentials, fixture identities, private paths, camera content, or whole-transcript image found.",
+  "scope": "Full Small client strict Reply PASS186.850. Complete peer body/menu containment after seven bounded gestures; all timed observations7.6611260175704956sec, no excluded time, zero banners encountered. Native one acknowledged POST/originalparentboth/newReplyretained. Other broader cases separately required.",
+  "testResults": [
+    {
+      "method": "testOwnedReplySendKeepsSubmittedParentAndNewerReplyAfterAcknowledgement",
+      "status": "PASS",
+      "seconds": 186.85
+    }
+  ],
+  "publicPackage": {
+    "rootReviewed": true,
+    "independentReviewed": true,
+    "originalEvidencePreserved": true,
+    "rawLogsXCResultsFullScreenPhotosPrivateFixturesIncluded": false
+  }
+}

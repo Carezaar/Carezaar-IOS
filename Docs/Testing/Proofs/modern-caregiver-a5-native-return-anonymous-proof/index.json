@@ -1,0 +1,149 @@
+{
+  "source": "fresh-modern-caregiver-a5-native-return.xcresult",
+  "rootReviewed": true,
+  "publishable": false,
+  "artifacts": [
+    {
+      "path": "Artifacts/0E858C5B-FD11-48A6-879A-26BC1D4531FC.png",
+      "description": "A5-fully-exposed-matches-preferences-gray-on-role-panel_0_9123083D-B0AB-4489-AB21-0E4ED0D450AB.png",
+      "sha256": "a04571f494dae3ab7196d4f9e464f76ee5afe119f56381b110659e07049ceadc",
+      "packagedSha256": "a04571f494dae3ab7196d4f9e464f76ee5afe119f56381b110659e07049ceadc"
+    },
+    {
+      "path": "Artifacts/ED22E134-491A-4A7D-A11C-7E4EF9710B25.png",
+      "description": "A5-fully-exposed-help-description-gray-on-white_0_BB31D703-839F-40A4-A94D-72674ED77E88.png",
+      "sha256": "e5771f5f517257842edf132488cf5a53a855d817c53e6fdcbf3605a91001ebb3",
+      "packagedSha256": "e5771f5f517257842edf132488cf5a53a855d817c53e6fdcbf3605a91001ebb3"
+    },
+    {
+      "path": "Artifacts/63A07BF7-5A83-47BA-B6DD-43ACD566E368.png",
+      "description": "A5-fully-exposed-satisfied-password-rule-dark-green-on-green_0_DBCAE685-1E71-46CB-BEB1-CA5A49808A67.png",
+      "sha256": "e4772f21c2998bf3e817213c6ee97998a156fc8b84e2ed8505df4d8e620eb476",
+      "packagedSha256": "e4772f21c2998bf3e817213c6ee97998a156fc8b84e2ed8505df4d8e620eb476"
+    },
+    {
+      "path": "Artifacts/712704A2-47CA-4FC5-9907-6F3277C7DB08.png",
+      "description": "A5-fully-exposed-empty-password-rule-gray-on-gray_0_6A6A178A-E7E1-45C7-8430-CBF850B4A00E.png",
+      "sha256": "14954f213ada00a2eb3b959968a4da0405485bbbcd706950814de613d0418dad",
+      "packagedSha256": "14954f213ada00a2eb3b959968a4da0405485bbbcd706950814de613d0418dad"
+    },
+    {
+      "path": "Artifacts/0B4FFFBB-E8F4-4B2A-9A5F-8FFB3D1B6F12.png",
+      "description": "A5-fully-exposed-delete-warning-black-on-pink_0_524E2692-A934-44F7-929C-9B0298A890B0.png",
+      "sha256": "a75e012021b320332653119f67638c35e1f75d1c526f745a2c5dd96d3ddbbbc3",
+      "packagedSha256": "a75e012021b320332653119f67638c35e1f75d1c526f745a2c5dd96d3ddbbbc3"
+    }
+  ],
+  "rootReviewScope": "Directly inspected all5complete bounded rasters/no private data. Full diagnostic PASS81.537; raw nine-screen audit remains failed.",
+  "independentlyReviewed": true,
+  "independentReviewScope": "Directly inspected all five complete bounded PNGs; artifact hashes, exact foreground/background core-pixel counts, and WCAG luminance ratios independently match the measurement record. No private fixture data visible; public support address is managed product copy. Supports fully exposed raster states only; retained raw nine-screen audit remains failed.",
+  "independentReviewed": true,
+  "independentReview": "Directly inspected all five complete bounded PNGs; artifact hashes, exact foreground/background core-pixel counts, and WCAG luminance ratios independently match the measurement record. No private fixture data visible; public support address is managed product copy. Supports fully exposed raster states only; retained raw nine-screen audit remains failed.",
+  "scope": "Modern caregiver actual OS A5 full exposed-raster diagnostic PASS81.537. Five complete target rasters above header/footer, actual native Return keyboard dismissal, disabled Delete/Change and zero DELETE/PATCH guards. Does not reclassify retained strict nine-screen audit or certify all screen states.",
+  "testResults": [
+    {
+      "method": "testA5ReportedContrastTextRenderedAboveFooter",
+      "status": "PASS",
+      "seconds": 81.537
+    }
+  ],
+  "fullyExposedRasterContrasts": [
+    {
+      "description": "A5-fully-exposed-matches-preferences-gray-on-role-panel_0_9123083D-B0AB-4489-AB21-0E4ED0D450AB.png",
+      "foregroundRGB": [
+        51,
+        51,
+        51
+      ],
+      "foregroundCorePixels": 71349,
+      "backgroundRGB": [
+        237,
+        244,
+        252
+      ],
+      "backgroundCorePixels": 552407,
+      "contrastRatio": 11.399366245764817,
+      "wholeExactTargetAboveHeaderAndFooterVerifiedBeforeCapture": true,
+      "doesNotReplaceOriginalAudit": true
+    },
+    {
+      "description": "A5-fully-exposed-help-description-gray-on-white_0_BB31D703-839F-40A4-A94D-72674ED77E88.png",
+      "foregroundRGB": [
+        89,
+        89,
+        89
+      ],
+      "foregroundCorePixels": 68373,
+      "backgroundRGB": [
+        255,
+        255,
+        255
+      ],
+      "backgroundCorePixels": 449426,
+      "contrastRatio": 7.004729208035935,
+      "wholeExactTargetAboveHeaderAndFooterVerifiedBeforeCapture": true,
+      "doesNotReplaceOriginalAudit": true
+    },
+    {
+      "description": "A5-fully-exposed-satisfied-password-rule-dark-green-on-green_0_DBCAE685-1E71-46CB-BEB1-CA5A49808A67.png",
+      "foregroundRGB": [
+        4,
+        122,
+        90
+      ],
+      "foregroundCorePixels": 16504,
+      "backgroundRGB": [
+        233,
+        248,
+        243
+      ],
+      "backgroundCorePixels": 158703,
+      "contrastRatio": 4.873707864431461,
+      "wholeExactTargetAboveHeaderAndFooterVerifiedBeforeCapture": true,
+      "doesNotReplaceOriginalAudit": true
+    },
+    {
+      "description": "A5-fully-exposed-empty-password-rule-gray-on-gray_0_6A6A178A-E7E1-45C7-8430-CBF850B4A00E.png",
+      "foregroundRGB": [
+        89,
+        89,
+        89
+      ],
+      "foregroundCorePixels": 16823,
+      "backgroundRGB": [
+        243,
+        244,
+        246
+      ],
+      "backgroundCorePixels": 158639,
+      "contrastRatio": 6.364955577890367,
+      "wholeExactTargetAboveHeaderAndFooterVerifiedBeforeCapture": true,
+      "doesNotReplaceOriginalAudit": true
+    },
+    {
+      "description": "A5-fully-exposed-delete-warning-black-on-pink_0_524E2692-A934-44F7-929C-9B0298A890B0.png",
+      "foregroundRGB": [
+        0,
+        0,
+        0
+      ],
+      "foregroundCorePixels": 34816,
+      "backgroundRGB": [
+        253,
+        236,
+        236
+      ],
+      "backgroundCorePixels": 254299,
+      "contrastRatio": 18.385936176909585,
+      "wholeExactTargetAboveHeaderAndFooterVerifiedBeforeCapture": true,
+      "doesNotReplaceOriginalAudit": true
+    }
+  ],
+  "originalStrictAuditReclassifiedAsPass": false,
+  "publicPackage": {
+    "rootReviewed": true,
+    "independentReviewed": true,
+    "originalEvidencePreserved": true,
+    "rawLogsXCResultsFullScreenPhotosPrivateFixturesIncluded": false
+  }
+}

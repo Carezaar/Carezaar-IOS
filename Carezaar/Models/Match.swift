@@ -48,7 +48,15 @@ struct Match: Codable, Identifiable, Hashable, Sendable {
     /// `finished_at` marks a match as ended.
     var stage: Stage {
         if finishedAt != nil { return .history }
-        return (isClientAccepted && isCaregiverAccepted) ? .active : .pending
+        return (isActive && isClientAccepted && isCaregiverAccepted) ? .active : .pending
+    }
+
+    /// A successful mutation must confirm the requested person, not just return an
+    /// active record. Missing partner data is reconciled through the profile.
+    func isActive(with partnerId: String, for role: UserRole) -> Bool {
+        guard stage == .active else { return false }
+        let otherId = role == .client ? caregiver?.id : client?.id
+        return otherId == partnerId
     }
 
     /// True when the signed-in role still has to answer an incoming request.

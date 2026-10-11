@@ -1,0 +1,17 @@
+{
+  "AndroidExpectationBasis": "decompiled-APK-composer-state-and-popBackStack-source",
+  "AndroidRuntimeExecuted": false,
+  "case": "P08-007",
+  "exactUnchangedSyntheticBaselineVerifiedImmediatelyBeforeBack": true,
+  "expectedRevisitBehavior": "empty-draft-no-selected-reply-Send-disabled",
+  "nativeDraftResetToExactEmptyPlaceholder": true,
+  "nativeSelectedReplyAbsentAfterRevisit": true,
+  "nativeSendDisabledAfterRevisit": true,
+  "nativeSendPOSTs": 0,
+  "navigation": "Back-to-Messages-and-revisit",
+  "ownedPairIndependentlyVerified": true,
+  "processRelaunchCovered": false,
+  "replySelectionCovered": false,
+  "role": "client",
+  "syntheticTextAbsentFromBackend": true
+}

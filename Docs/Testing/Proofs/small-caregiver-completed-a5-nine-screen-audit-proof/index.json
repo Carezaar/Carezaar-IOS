@@ -1,0 +1,28 @@
+{
+  "test": "fresh-small-caregiver-a5-completed-nine-screen-audit",
+  "role": "caregiver",
+  "device": "iPhone SE (3rd generation)",
+  "actualOSContentSize": "accessibility-extra-extra-extra-large",
+  "exit": 0,
+  "seconds": 143.79,
+  "completedScreens": 9,
+  "findings": 0,
+  "artifact": "Artifacts/small-caregiver-a5-clean-nine-screen-audit.txt",
+  "sha256": "7c523c2f7c4e79504692e0dfbdb4ee055754071f5b38c3391d8898aa42fbde10",
+  "priorFailedReportWritePreserved": true,
+  "broaderP17CasesPromoted": false,
+  "publicPackage": {
+    "status": "REVIEWABLE — not staged or delivered",
+    "originalEvidenceRetainedLocally": true,
+    "rawLogsAndXCResultsIncluded": false,
+    "artifactInventory": [
+      {
+        "path": "Artifacts/small-caregiver-a5-clean-nine-screen-audit.txt",
+        "bytes": 142,
+        "sha256": "7c523c2f7c4e79504692e0dfbdb4ee055754071f5b38c3391d8898aa42fbde10"
+      }
+    ],
+    "sourceIndexSHA256": "19b72855890b575fe8b6e0206b48b8db5eb9c587d64db0c3d8f2ed421b6a702c",
+    "artifactHashNote": "Public JSON/text are sanitized; artifactInventory hashes apply to packaged bytes. Original indexed hashes, where present, refer to preserved original evidence."
+  }
+}

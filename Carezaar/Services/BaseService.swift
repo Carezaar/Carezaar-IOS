@@ -56,6 +56,11 @@ struct BaseService: Sendable {
                                        query: ["ts_cache": String(tsCache)], requiresAuth: false))
     }
 
+    func media(tsCache: Int = 0) async throws -> [BaseMedia] {
+        try await client.send(Endpoint(method: .get, path: "base/media",
+                                       query: ["ts_cache": String(tsCache)], requiresAuth: false))
+    }
+
     func faqCategories(tsCache: Int = 0) async throws -> [FaqCategory] {
         try await client.send(Endpoint(method: .get, path: "base/faq_categories",
                                        query: ["ts_cache": String(tsCache)], requiresAuth: false))

@@ -1,0 +1,30 @@
+{
+  "invocation": "fresh-small-client-empty-ax-password-disabled-guard",
+  "result": "PASS",
+  "seconds": 29.046,
+  "root_visual_review": "Complete wrapped neutral Change Password label reviewed at actual OS A5.",
+  "scope": "Exact retained owned identity, actual empty fields, real disabled semantics, observed native center tap, same form, zero password PATCH with positive auth-info ledger. Prior incorrect AX value failures preserved.",
+  "attachments": [
+    "Artifacts/small-client-completed-password-guard-empty-password-native-disabled-guard.json",
+    "Artifacts/small-client-completed-password-guard-empty-password-native-disabled-guard-button-only.png"
+  ],
+  "publicPackage": {
+    "status": "REVIEWABLE — not staged or delivered",
+    "originalEvidenceRetainedLocally": true,
+    "rawLogsAndXCResultsIncluded": false,
+    "artifactInventory": [
+      {
+        "path": "Artifacts/small-client-completed-password-guard-empty-password-native-disabled-guard.json",
+        "bytes": 307,
+        "sha256": "97173a0292374a7e3e83a10a7284c88f394ea1b4035f0c0aad303784f9503961"
+      },
+      {
+        "path": "Artifacts/small-client-completed-password-guard-empty-password-native-disabled-guard-button-only.png",
+        "bytes": 20942,
+        "sha256": "94728ed681423f030f82c3ab9bfcc4bbd9f54cd8a85bd89c8106b9dd3943f200"
+      }
+    ],
+    "sourceIndexSHA256": "11243c0611d71e03161a801216e03694c8d1d2c871047757979438279f7f1af2",
+    "artifactHashNote": "Public JSON/text are sanitized; artifactInventory hashes apply to packaged bytes. Original indexed hashes, where present, refer to preserved original evidence."
+  }
+}

@@ -1,16 +1,8 @@
 import SwiftUI
 
-/// `CaregiverDetails/{id}` (a client viewing) and `ClientDetails/{id}` (a caregiver
-/// viewing). Match requests live here (client specification, October 2026): one set of
-/// actions per `match_status` from the profile response, each confirmed first.
-/// - `none`: Request a Match, with an optional Introduction (`POST users/matches`);
-/// - `sent`: Pending Review and Withdraw (`DELETE users/matches/{id}/withdraw`);
-/// - `received`: the requester's Introduction, Accept (`PATCH …/accept`, then
-///   "It's a Match!") and Reject (`DELETE …/reject`);
-/// - `active`: Unmatch (`DELETE users/matches/{id}`).
-/// Before each action the profile is re-read; if the state has changed meanwhile nothing
-/// is sent. Messaging needs an active match. There is no background-check gate (removed
-/// at the client's request).
+/// Native partner profile: load once per opening, and re-check only when the user
+/// explicitly confirms a relationship mutation. Messaging is offered only for an
+/// active relationship; failed checks never replay a mutation automatically.
 struct PartnerDetailsView: View {
     enum Kind: Hashable { case caregiver(id: String), client(id: String) }
     let kind: Kind
@@ -20,8 +12,6 @@ struct PartnerDetailsView: View {
     @EnvironmentObject private var baseData: BaseDataStore
     @EnvironmentObject private var loc: Localization
     @EnvironmentObject private var feedback: Feedback
-    @EnvironmentObject private var poller: NotificationPoller
-    @Environment(\.scenePhase) private var scenePhase
 
     @State private var caregiver: CaregiverFull?
     @State private var client: ClientFull?
@@ -30,6 +20,11 @@ struct PartnerDetailsView: View {
     @State private var requesting = false
     @State private var introduction = ""
     @State private var busy = false
+    @State private var didLoad = false
+    @State private var visible = false
+    @State private var delayedBack: Task<Void, Never>?
+    @State private var checkUnavailable = false
+    @State private var failedCheckAction: MatchMutation?
 
     private var isCaregiver: Bool { if case .caregiver = kind { return true } else { return false } }
     private var partner: User? { caregiver?.user ?? client?.user }
@@ -43,7 +38,7 @@ struct PartnerDetailsView: View {
     var body: some View {
         Group {
             if let error, partner == nil {
-                ErrorState(message: Feedback.message(error)) { Task { await load() } }
+                Text(Feedback.message(error)).font(Theme.Typography.body(15)).padding(24)
             } else if let partner {
                 content(partner)
             } else {
@@ -62,20 +57,25 @@ struct PartnerDetailsView: View {
                 }
             }
         }
+        .onAppear { visible = true }
+        .onDisappear { visible = false; delayedBack?.cancel(); delayedBack = nil }
         .task { await load() }
-        // Coming back from Matches or "It's a Match!": the state may have changed.
-        .onAppear { if partner != nil { Task { await refreshQuietly() } } }
-        // The partner may answer while this screen is open (accept, unmatch): a new
-        // notification, a return to the app, or a pull re-reads the relationship.
-        .onChange(of: poller.unread) { old, new in if new > old, partner != nil { Task { await refreshQuietly() } } }
-        .onChange(of: scenePhase) { _, phase in if phase == .active, partner != nil { Task { await refreshQuietly() } } }
+        .alert(loc.t("match_check_failed_title", "Couldn't check this match"), isPresented: $checkUnavailable) {
+            Button(loc.t("general_cancel", "Cancel"), role: .cancel) { failedCheckAction = nil }
+            Button(loc.t("general_try_again", "Try Again")) {
+                // Retry the read only. The user must confirm any mutation again.
+                Task { await retryCheck() }
+            }
+        } message: { Text(loc.t("match_check_failed_message", "Please check your connection and try again.")) }
         .alert(confirming.map(title) ?? "", isPresented: Binding(get: { confirming != nil }, set: { if !$0 { confirming = nil } })) {
-            Button(loc.t("general_cancel", "Cancel"), role: .cancel) { confirming = nil }
+            Button(confirming == .withdraw ? loc.t("general_close", "Close") : loc.t("general_cancel", "Cancel"), role: .cancel) { confirming = nil }
+                .accessibilityIdentifier("match-confirm-dismiss")
             if let which = confirming {
                 Button(confirmLabel(which), role: which == .accept ? nil : .destructive) {
                     confirming = nil
                     Task { await perform(which) }
                 }
+                .accessibilityIdentifier("match-action-confirm")
             }
         } message: {
             Text(confirming.map(confirmMessage) ?? "")
@@ -92,10 +92,6 @@ struct PartnerDetailsView: View {
     private func content(_ partner: User) -> some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                if let text = matchIntroduction?.trimmingCharacters(in: .whitespacesAndNewlines), !text.isEmpty,
-                   matchState?.status == .received || matchState?.status == .sent {
-                    introductionCard(text)
-                }
                 AdaptiveStack(spacing: 16) {
                     PhotoBox(url: partner.photo, width: 132, height: 160, radius: 16)
                     VStack(alignment: .leading, spacing: 10) {
@@ -137,6 +133,11 @@ struct PartnerDetailsView: View {
                         items(.caredays, caregiver?.caredayIds ?? client?.caredayIds ?? []))
                 section(isCaregiver ? loc.t("caregiver_details_certifications", "Certifications") : loc.t("client_details_certifications", "Required Certifications"),
                         items(.certifications, caregiver?.certificationIds ?? client?.certificationIds ?? []))
+                if !isCaregiver {
+                    section(loc.t("client_details_gender_preferences", "Gender Preferences"), items(.genders, client?.genderIds ?? []))
+                    section(loc.t("client_details_experience", "Minimum Experience"), items(.experiences, client?.experienceIds ?? []))
+                    section(loc.t("client_details_role", "Preferred Caregiver Role"), items(.roles, client?.roleIds ?? []))
+                }
                 if isCaregiver {
                     section(loc.t("caregiver_details_supported_care_needer_types", "Supported Care Needer Types"),
                             items(.clienttypes, caregiver?.clienttypeIds ?? []), coloured: true)
@@ -144,36 +145,22 @@ struct PartnerDetailsView: View {
             }
             .padding(20).padding(.bottom, 90)
         }
-        .refreshable { await refreshQuietly() }
         .safeAreaInset(edge: .bottom) {
             VStack(spacing: 8) {
                 if matchState?.status == .sent {
-                    Label(loc.t("match_pending_review", "Pending Review"), systemImage: "clock")
+                    Label(loc.t("match_pending_acceptance", "Pending Acceptance"), systemImage: "clock")
                         .font(Theme.Typography.control(14)).foregroundStyle(Theme.Palette.warning)
                         .accessibilityAddTraits(.isStaticText)
                 }
                 AdaptiveStack(alignment: .center, spacing: 12, stackedSpacing: 8) {
-                    WideButton(title: loc.t("\(prefix)_message", "Message"), icon: "ic_message", style: .outline) { Task { await message() } }
+                    if matchState?.status == .active {
+                        WideButton(title: loc.t("\(prefix)_message", "Message"), icon: "ic_message", style: .outline) { Task { await message() } }
+                    }
                     matchButtons
                 }
             }
             .padding(.horizontal, 20).padding(.vertical, 10).background(.white)
         }
-    }
-
-    /// The requester's note, shown with an open request to both people.
-    private func introductionCard(_ text: String) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(loc.t("match_introduction_title", "Introduction")).font(Theme.Typography.title(15))
-                .foregroundStyle(Theme.Palette.primaryDark)
-            // Not selectable: VoiceOver treats selectable text as a text area and keeps the
-            // swipe inside it, so the rest of the profile was never reached.
-            Text(text).font(Theme.Typography.body(15))
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .padding(14).frame(maxWidth: .infinity, alignment: .leading)
-        .background(Theme.Palette.clientPanel, in: RoundedRectangle(cornerRadius: 14))
-        .accessibilityElement(children: .combine)
     }
 
     /// One set of actions per state, never two at once.
@@ -188,21 +175,17 @@ struct PartnerDetailsView: View {
                 }
                 .accessibilityIdentifier("match-request")
             case .sent:
-                WideButton(title: loc.t("match_withdraw_button", "Withdraw"), icon: "ic_match_off", style: .outline) { ask(.withdraw) }
+                WideButton(title: loc.t("match_withdraw_title", "Cancel"), icon: "ic_match_off", style: .outline) { ask(.withdraw) }
                     .accessibilityIdentifier("match-withdraw")
             case .received:
+                WideButton(title: loc.t("match_reject_title", loc.t("match_reject", "Reject")), style: .danger) { ask(.reject) }
+                    .accessibilityIdentifier("match-reject")
                 WideButton(title: loc.t("match_accept_title", "Accept"), icon: "ic_match_on") { ask(.accept) }
                     .accessibilityIdentifier("match-accept")
-                WideButton(title: loc.t("match_reject_title", "Reject"), style: .danger) { ask(.reject) }
-                    .accessibilityIdentifier("match-reject")
             case .active:
                 WideButton(title: loc.t("match_unmatch_title", "Unmatch"), icon: "ic_match_off", style: .danger) { ask(.unmatch) }
                     .accessibilityIdentifier("match-unmatch")
             }
-        } else if partner != nil {
-            // Missing or contradictory match fields: no action until the profile is re-read.
-            WideButton(title: loc.t("general_try_again", "Try Again"), style: .outline) { Task { await refreshQuietly() } }
-                .accessibilityHint(loc.t("match_state_unavailable", "Match information is unavailable."))
         }
     }
 
@@ -212,24 +195,36 @@ struct PartnerDetailsView: View {
         switch which {
         case .request: return loc.t("match_match_button", "Request a Match")
         case .accept: return loc.t("match_accept_title", "Accept")
-        case .reject: return loc.t("match_reject_title", "Reject")
-        case .withdraw: return loc.t("match_withdraw_button", "Withdraw")
+        case .reject: return loc.t("match_reject_title", loc.t("match_reject", "Reject"))
+        case .withdraw: return loc.t("match_withdraw_title", "Cancel")
         case .unmatch: return loc.t("match_unmatch_title", "Unmatch")
         }
     }
 
     private func confirmLabel(_ which: MatchMutation) -> String {
-        which == .request ? loc.t("match_match_title", "Match") : loc.t("general_confirm", "Confirm")
+        switch which {
+        case .request: return loc.t("match_match_title", "Match")
+        case .withdraw: return loc.t("match_withdraw_title", "Cancel")
+        case .accept: return loc.t("match_accept_title", "Accept")
+        case .reject: return loc.t("match_reject_title", loc.t("match_reject", "Reject"))
+        case .unmatch: return loc.t("match_unmatch_title", "Unmatch")
+        }
     }
 
     private func confirmMessage(_ which: MatchMutation) -> String {
+        let question: String
         switch which {
-        case .request: return loc.t("match_match_message", "Are you sure you want to match with this user? They should accept your request.")
-        case .accept: return loc.t("match_accept_message", "Are you sure you want to accept this match request?")
-        case .reject: return loc.t("match_reject_message", "Are you sure you want to reject this match request?")
-        case .withdraw: return loc.t("match_withdraw_message", "Are you sure you want to withdraw this match request?")
-        case .unmatch: return loc.t("match_unmatch_message", "Are you sure you want to end your match with this user?")
+        case .request: question = loc.t("match_match_message", "Are you sure you want to match with this user? They should accept your request.")
+        case .accept: question = loc.t("match_accept_message", "Are you sure you want to accept this match request?")
+        case .reject: question = loc.t("match_reject_message", "Are you sure you want to reject this match request?")
+        case .withdraw: question = loc.t("match_withdraw_message", "Are you sure you want to cancel this match request?")
+        case .unmatch: question = loc.t("match_unmatch_message", "Are you sure you want to end your match with this user?")
         }
+        if (which == .accept || which == .reject), let introduction = matchIntroduction,
+           !introduction.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return question + "\n\n" + loc.t("match_introduction_title", "Introduction") + "\n" + introduction
+        }
+        return question
     }
 
     private func fact(_ icon: String, bold: String, rest: String) -> some View {
@@ -285,14 +280,38 @@ struct PartnerDetailsView: View {
     // MARK: actions
 
     private func load() async {
+        guard !didLoad else { return }
+        didLoad = true
         error = nil
         do {
             try await feedback.run(loc.t("loading_profile_get", "Getting profile")) { try await fetch() }
-        } catch { self.error = error }
+            if matchState == nil { checkUnavailable = true }
+        } catch is CancellationError { return }
+        catch { failAndReturn(error) }
     }
 
-    /// Re-reads the profile (and so its match state) without the busy card.
-    private func refreshQuietly() async { try? await fetch() }
+    private func failAndReturn(_ failure: Error) {
+        guard visible else { return }
+        error = failure
+        feedback.toast(Feedback.message(failure))
+        let openedRoute = router.path.last
+        delayedBack?.cancel()
+        delayedBack = Task {
+            do { try await Task.sleep(for: .seconds(2)) } catch { return }
+            guard !Task.isCancelled, visible, router.path.last == openedRoute else { return }
+            router.pop()
+        }
+    }
+
+    private func retryCheck() async {
+        do {
+            try await fetch()
+            guard matchState != nil else { checkUnavailable = true; return }
+            // Confirmation remains a separate user action, preventing an ambiguous replay.
+            failedCheckAction = nil
+        } catch is CancellationError { return }
+        catch { checkUnavailable = true }
+    }
 
     private func fetch() async throws {
         switch kind {
@@ -314,11 +333,10 @@ struct PartnerDetailsView: View {
             let chat = try await feedback.run(loc.t("loading_chat_create", "Creating a new chat")) {
                 try await UserService().createChat(partnerId: partnerId)
             }
+            guard visible, !Task.isCancelled else { return }
             router.push(.chat(chatId: chat.id))
         } catch { feedback.toast(Feedback.message(error)) }
     }
-
-    private enum StateChanged: Error { case changed }
 
     /// Confirms the state is still the one the action was offered for, sends the one
     /// operation that belongs to it, and re-reads the profile. Accept succeeds only
@@ -327,42 +345,78 @@ struct PartnerDetailsView: View {
         guard !busy, let shown = matchState else { return }
         busy = true
         defer { busy = false }
-        let label = switch which {
-        case .request: loc.t("loading_match_submit", "Submitting match request")
-        case .accept: loc.t("loading_match_accept", "Accepting match request")
-        case .reject: loc.t("loading_match_reject", "Rejecting match request")
-        case .withdraw: loc.t("loading_match_withdraw", "Withdrawing match request")
-        case .unmatch: loc.t("loading_unmatch_submit", "Submitting unmatch request")
+        let expected = which.expectedStatus
+        let current: ProfileMatchState
+        do {
+            let checked = try await freshState()
+            guard visible, !Task.isCancelled else { return }
+            guard let checked else {
+                failedCheckAction = which; checkUnavailable = true; return
+            }
+            current = checked
+        } catch is CancellationError { return }
+        catch {
+            guard visible, !Task.isCancelled else { return }
+            failedCheckAction = which; checkUnavailable = true; return
         }
-        let expected: ProfileMatchStatus = switch which {
-        case .request: .none
-        case .withdraw: .sent
-        case .accept, .reject: .received
-        case .unmatch: .active
+        guard visible, !Task.isCancelled else { return }
+        guard current.status == expected, current == shown else {
+            feedback.toast(loc.t("match_changed_message", "This match has changed")); return
         }
         do {
-            try await feedback.run(label) {
-                guard let current = try await freshState(), current.status == expected, current == shown || which == .request
-                else { throw StateChanged.changed }
+            let result: Match? = try await feedback.run(loc.t(which.loadingKey, which.loadingFallback)) {
                 let service = UserService()
                 switch which {
-                case .request: _ = try await service.requestMatch(partnerId: partnerId, introduction: introduction)
-                case .accept: _ = try await service.acceptMatch(id: current.id ?? 0)
-                case .reject: try await service.rejectMatch(id: current.id ?? 0)
-                case .withdraw: try await service.withdrawMatch(id: current.id ?? 0)
-                case .unmatch: _ = try await service.breakMatch(id: current.id ?? 0)
+                case .request: return try await service.requestMatch(partnerId: partnerId, introduction: introduction)
+                case .accept: return try await service.acceptMatch(id: current.id ?? 0)
+                case .reject: try await service.rejectMatch(id: current.id ?? 0); return nil
+                case .withdraw: try await service.withdrawMatch(id: current.id ?? 0); return nil
+                case .unmatch: return try await service.breakMatch(id: current.id ?? 0)
                 }
-                let after = try await freshState()
-                if which == .accept, after?.status != .active { throw StateChanged.changed }
             }
+            guard visible, !Task.isCancelled else { return }
             introduction = ""
-            if which == .accept { router.push(.matched(partner: matchedPartner)) }
-        } catch {
-            await refreshQuietly()
-            feedback.toast(error is StateChanged
-                ? loc.t("match_state_changed", "This match has changed. Please review the updated profile and try again.")
-                : Feedback.message(error))
+            if (which == .request || which == .accept), result?.isActive(with: partnerId, for: session.role ?? .client) == true {
+                // The mutation response confirms an active relationship. MatchedView
+                // obtains the profile once; no separate connection check is needed.
+                applyMatchResult(result!)
+                router.push(.matched(partner: matchedPartner))
+            } else {
+                try await fetch() // Explicit mutation reconciliation, never appearance refresh.
+                guard visible, !Task.isCancelled else { return }
+                guard let reconciled = matchState else {
+                    failedCheckAction = which; checkUnavailable = true; return
+                }
+                if (which == .accept || which == .request), reconciled.status == .active {
+                    router.push(.matched(partner: matchedPartner))
+                } else if which == .accept {
+                    feedback.toast(loc.t("match_changed_message", "This match has changed"))
+                }
+            }
+        } catch is CancellationError { return }
+        catch {
+            // Never retry the write: it may have succeeded before the response was lost.
+            guard visible, !Task.isCancelled else { return }
+            let reconciled: ProfileMatchState?
+            do {
+                reconciled = try await freshState()
+            } catch is CancellationError { return }
+            catch {
+                guard visible, !Task.isCancelled else { return }
+                failedCheckAction = which; checkUnavailable = true; return
+            }
+            guard visible, !Task.isCancelled else { return }
+            switch MatchFailureResolution.resolve(before: current, after: reconciled) {
+            case .changed: feedback.toast(loc.t("match_changed_message", "This match has changed"))
+            case .checkUnavailable: failedCheckAction = which; checkUnavailable = true
+            case .originalError: feedback.toast(Feedback.message(error))
+            }
         }
+    }
+
+    private func applyMatchResult(_ match: Match) {
+        if let value = caregiver { caregiver = value.with(matchStatus: "active", matchId: match.id) }
+        if let value = client { client = value.with(matchStatus: "active", matchId: match.id) }
     }
 
     private var matchedPartner: MatchedPartner {
@@ -392,9 +446,33 @@ struct PartnerDetailsView: View {
     }
 }
 
+/// Presentation chosen after a failed write has been reconciled with a fresh profile.
+/// Missing/failed checks cannot justify replay; a changed state gets the standard
+/// changed message. An unchanged state retains the original operation error.
+/// Kept separate from transport so lost-response behavior can be regression-tested.
+enum MatchFailureResolution: Equatable {
+    case changed, checkUnavailable, originalError
+
+    static func resolve(before: ProfileMatchState, after: ProfileMatchState?) -> Self {
+        guard let after else { return .checkUnavailable }
+        return after == before ? .originalError : .changed
+    }
+}
+
 // MARK: - Match request
 
-enum MatchMutation: Hashable { case request, withdraw, accept, reject, unmatch }
+enum MatchMutation: Hashable {
+    case request, withdraw, accept, reject, unmatch
+    var expectedStatus: ProfileMatchStatus {
+        switch self { case .request: .none; case .withdraw: .sent; case .accept, .reject: .received; case .unmatch: .active }
+    }
+    var loadingKey: String {
+        switch self { case .request: "loading_match_submit"; case .withdraw: "loading_match_withdraw"; case .accept: "loading_match_accept"; case .reject: "loading_match_reject"; case .unmatch: "loading_unmatch_submit" }
+    }
+    var loadingFallback: String {
+        switch self { case .request: "Submitting match request"; case .withdraw: "Cancelling match request"; case .accept: "Accepting match request"; case .reject: "Rejecting match request"; case .unmatch: "Submitting unmatch request" }
+    }
+}
 
 /// The Request a Match confirmation: the question, an optional Introduction, Cancel and
 /// Match. Cancel sends nothing.
@@ -451,10 +529,8 @@ enum MatchedPartner: Hashable, Sendable {
     var id: String { switch self { case .caregiver(let id), .client(let id): return id } }
 }
 
-/// "It's a Match!", shown after accepting a request and from a request-accepted
-/// notification (`match_accept`). It replaces the old Pending screen. The match is
-/// re-checked when the screen opens (profile `match_status` and the connection itself),
-/// so a stale notification shows that the match is no longer active instead.
+/// Successful match presentation. One profile read supplies current relationship
+/// information; an inactive relationship routes directly to that person's profile.
 struct MatchedView: View {
     let partnerRef: MatchedPartner
 
@@ -464,7 +540,10 @@ struct MatchedView: View {
     @EnvironmentObject private var feedback: Feedback
 
     @State private var partner: User?
-    @State private var stale = false
+    @State private var didLoad = false
+    @State private var visible = false
+    @State private var delayedBack: Task<Void, Never>?
+    @EnvironmentObject private var baseData: BaseDataStore
     @State private var error: Error?
     @AccessibilityFocusState private var headingFocused: Bool
 
@@ -478,17 +557,7 @@ struct MatchedView: View {
     var body: some View {
         Group {
             if let error {
-                ErrorState(message: Feedback.message(error)) { Task { await load() } }
-            } else if stale {
-                VStack(spacing: 14) {
-                    AppIcon(name: "ic_match_off", size: 56, tint: Theme.Palette.textSecondary)
-                    Text(loc.t("match_no_longer_active", "This match is no longer active."))
-                        .font(Theme.Typography.title(17)).multilineTextAlignment(.center)
-                    WideButton(title: loc.t("profile_matches_title", "Matches"), style: .outline) {
-                        router.pop(); router.push(.manageMatches)
-                    }
-                }
-                .padding(30).frame(maxWidth: .infinity, maxHeight: .infinity)
+                Text(Feedback.message(error)).font(Theme.Typography.body(15)).padding(24)
             } else if let partner {
                 content(partner)
             } else {
@@ -496,20 +565,20 @@ struct MatchedView: View {
             }
         }
         .backHeader(loc.t("match_matched_title", "It's a Match!"))
+        .onAppear { visible = true }
+        .onDisappear { visible = false; delayedBack?.cancel(); delayedBack = nil }
         .task { await load() }
     }
 
     private func content(_ partner: User) -> some View {
-        let name = partner.firstName ?? ""
+        let name = partner.fullName
         return ScrollView {
             VStack(spacing: 18) {
-                HStack(spacing: -14) {
-                    Avatar(url: session.state.user?.photo, size: 96)
-                    AppIcon(name: "ic_match_on", size: 22, tint: Theme.Palette.primary)
-                        .frame(width: 40, height: 40).background(.white, in: Circle())
-                        .shadow(color: .black.opacity(0.12), radius: 4, y: 1).zIndex(1)
+                HStack(alignment: .center, spacing: 10) {
+                    photoCard(session.state.user, label: loc.t("chat_screen_chats_you", "You"))
+                    Image(systemName: "heart.fill").font(.system(size: 24)).foregroundStyle(Theme.Palette.primary)
                         .accessibilityHidden(true)
-                    Avatar(url: partner.photo, size: 96).accessibilityLabel(partner.fullName)
+                    photoCard(partner, label: partner.fullName)
                 }
                 .padding(.top, 12)
                 Text(loc.t("match_matched_prompt", "You and {PARTNER} have matched!").replacingOccurrences(of: "{PARTNER}", with: name))
@@ -542,6 +611,24 @@ struct MatchedView: View {
         }
     }
 
+    private func photoCard(_ user: User?, label: String) -> some View {
+        VStack(spacing: 8) {
+            PhotoBox(url: user?.photo, width: 96, height: 128, radius: 12)
+            Text(label).font(Theme.Typography.title(15)).multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+            Text(roleLabel(user?.role)).font(Theme.Typography.caption(12))
+                .foregroundStyle(Theme.Palette.textSecondary).multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(8).background(Theme.Palette.clientPanel, in: RoundedRectangle(cornerRadius: 14))
+        .accessibilityElement(children: .combine)
+    }
+
+    private func roleLabel(_ role: UserRole?) -> String {
+        guard let role else { return "" }
+        return role == .client ? loc.t("general_usertype_client", "Client") : loc.t("general_usertype_caregiver", "Caregiver")
+    }
+
     private func info(_ icon: String, _ title: String, _ text: String) -> some View {
         HStack(alignment: .top, spacing: 12) {
             AppIcon(name: icon, size: 22, tint: Theme.Palette.primary)
@@ -561,8 +648,8 @@ struct MatchedView: View {
         else { router.pop(); router.push(profileRoute) }
     }
 
-    /// The profile must say `active` for this partner and the connection it names must be
-    /// active with them; anything else is a stale or invalid target.
+    /// The profile must identify an active relationship with this partner. There is
+    /// no redundant GET for the connection itself.
     private func activeProfile() async throws -> (ProfileMatchState, User)? {
         let state: ProfileMatchState?
         let user: User
@@ -579,27 +666,42 @@ struct MatchedView: View {
     }
 
     private func load() async {
-        error = nil; stale = false
+        guard !didLoad else { return }
+        didLoad = true
+        error = nil
         do {
             try await feedback.run(loc.t("loading_match_get", "Getting match details")) {
-                guard let (state, user) = try await activeProfile(), let id = state.id else { stale = true; return }
-                let connection = try await UserService().match(id: id)
-                let other = session.role == .client ? connection.caregiver?.id : connection.client?.id
-                guard connection.stage == .active, other == partnerRef.id else { stale = true; return }
+                let profile = try await activeProfile()
+                guard visible, !Task.isCancelled else { return }
+                guard let (_, user) = profile else { openProfile(); return }
                 partner = user
             }
-            if partner != nil {
+            if partner != nil, visible {
                 try? await Task.sleep(for: .milliseconds(600))
-                headingFocused = true
+                if !Task.isCancelled, visible { headingFocused = true }
             }
-        } catch { self.error = error }
+        } catch is CancellationError { return }
+        catch {
+            guard visible else { return }
+            self.error = error
+            feedback.toast(Feedback.message(error))
+            let openedRoute = router.path.last
+            delayedBack = Task {
+                do { try await Task.sleep(for: .seconds(2)) } catch { return }
+                guard !Task.isCancelled, visible, router.path.last == openedRoute else { return }
+                router.pop()
+            }
+        }
     }
 
     private func chat() async {
+        guard partner != nil else { return }
         do {
             try await feedback.run(loc.t("loading_chat_create", "Creating a new chat")) {
-                guard try await activeProfile() != nil else { stale = true; return }
+                // A single profile read already confirmed active on this opening.
+                // The create-chat endpoint remains the authority for authorization.
                 let conversation = try await UserService().createChat(partnerId: partnerRef.id)
+                guard visible, !Task.isCancelled else { return }
                 router.push(.chat(chatId: conversation.id))
             }
         } catch { feedback.toast(Feedback.message(error)) }

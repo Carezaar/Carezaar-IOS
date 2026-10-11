@@ -1,0 +1,11 @@
+{
+  "emptyNewDraftSendDisabled": true,
+  "existingQuotedParentIDsExcludedFromTargets": true,
+  "nativeMessagePOSTs": 1,
+  "newerSelectedReplyRetained": true,
+  "originalPeerTargetsWithoutParentQuotes": true,
+  "persistedOriginalParentVerifiedBothOwnedPerspectives": true,
+  "requestBodyCaptured": false,
+  "role": "caregiver",
+  "syntheticPeerMessagesSeeded": false
+}

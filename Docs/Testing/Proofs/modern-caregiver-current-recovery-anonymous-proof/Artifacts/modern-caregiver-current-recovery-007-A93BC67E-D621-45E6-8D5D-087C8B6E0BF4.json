@@ -1,0 +1,33 @@
+{
+  "adjacentMenuExistsAndHittable": true,
+  "adjacentMenuFrame": {
+    "height": 35.999999999999886,
+    "width": 28,
+    "x": 344,
+    "y": 408.3333333333333
+  },
+  "boundedBothDirections": true,
+  "composerFrame": {
+    "height": 47,
+    "width": 332,
+    "x": 26,
+    "y": 571
+  },
+  "gestureCount": 29,
+  "syntheticTargetExists": true,
+  "syntheticTargetHittable": true,
+  "targetFrame": {
+    "height": 47,
+    "width": 263,
+    "x": 30,
+    "y": 418.3333333333332
+  },
+  "transcriptFrame": {
+    "height": 328.33333333333337,
+    "width": 440,
+    "x": 0,
+    "y": 176.33333333333337
+  },
+  "transcriptHasTextFieldDescendant": false,
+  "wholeTextAndMenuInsideTranscript": true
+}

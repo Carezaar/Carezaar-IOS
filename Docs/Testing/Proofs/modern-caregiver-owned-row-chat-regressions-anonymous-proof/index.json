@@ -1,0 +1,191 @@
+{
+  "source": "fresh-modern-caregiver-owned-row-chat-regressions.xcresult",
+  "rootReviewed": true,
+  "publishable": false,
+  "artifacts": [
+    {
+      "path": "Artifacts/AC9A40F0-90A6-4A93-9251-FEDFC2358331.json",
+      "description": "owned-incoming-bottom-older-position-timestamps-caregiver_0_7890DE1E-CA89-477F-BC4A-B79176645BB6.json",
+      "sha256": "d8c5eb95790849627b8fa2d90d80e6c9bc049dc7139c9177c525fd008da0a6ca",
+      "packagedSha256": "d8c5eb95790849627b8fa2d90d80e6c9bc049dc7139c9177c525fd008da0a6ca"
+    },
+    {
+      "path": "Artifacts/91F79038-019D-4A16-B0EC-8A4C32516134.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_181F2F4E-1B57-45A2-B12C-1D66FC489F05.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/937F71BB-A589-48B0-B7F3-03EDAEC34792.png",
+      "description": "owned-incoming-reading-stored-timestamp-only-caregiver_0_0E09BE7A-22C3-409A-9E53-3E8E1B143002.png",
+      "sha256": "5e77465463698a37542ede4169620c5045a24eac1dfe08f809f9948b6c991527",
+      "packagedSha256": "5e77465463698a37542ede4169620c5045a24eac1dfe08f809f9948b6c991527"
+    },
+    {
+      "path": "Artifacts/09D61738-C910-499E-B8CC-9362CBF46E5E.png",
+      "description": "owned-incoming-after-manual-return-synthetic-message-only-caregiver_0_992B4E14-EDED-419A-BBC6-A8EBE44401C0.png",
+      "sha256": "77347bbf51899ffb881e6daa44fda28a1742e54d299296700dfa1b02712cda63",
+      "packagedSha256": "77347bbf51899ffb881e6daa44fda28a1742e54d299296700dfa1b02712cda63"
+    },
+    {
+      "path": "Artifacts/FD76F5B9-2476-46B6-925C-D3EB7FB26C3B.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_5198E8D1-63C7-475F-A69A-9027733D8B66.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/58B92A15-CF1D-485B-B7C6-93D9DD407F80.png",
+      "description": "owned-incoming-preserved-older-synthetic-message-only-caregiver_0_D82BE9EC-BB86-44B3-A093-A1D167F2A1D1.png",
+      "sha256": "2bc3b2a2fa041c38251cf92793f54e622bcafe831b132ad8cce81450cc14182f",
+      "packagedSha256": "2bc3b2a2fa041c38251cf92793f54e622bcafe831b132ad8cce81450cc14182f"
+    },
+    {
+      "path": "Artifacts/FB73140F-726E-4C57-BAB6-C1AB670FD743.png",
+      "description": "owned-incoming-bottom-stored-timestamp-only-caregiver_0_3EDE86B7-D911-4698-8286-B1E239AB1FBA.png",
+      "sha256": "5e77465463698a37542ede4169620c5045a24eac1dfe08f809f9948b6c991527",
+      "packagedSha256": "5e77465463698a37542ede4169620c5045a24eac1dfe08f809f9948b6c991527"
+    },
+    {
+      "path": "Artifacts/28CE807F-7D8A-4B3E-8207-DF6F6374914B.png",
+      "description": "owned-incoming-bottom-synthetic-message-only-caregiver_0_26F81408-AC41-4983-AC90-761B1FCD4FF3.png",
+      "sha256": "920e6999bda79c14bcd9ce9574d33d12805d28fed241c164a9603c95f2204baf",
+      "packagedSha256": "920e6999bda79c14bcd9ce9574d33d12805d28fed241c164a9603c95f2204baf"
+    },
+    {
+      "path": "Artifacts/34DF22D8-699B-4AE9-AC43-DE4EE4099585.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_BD773433-D207-49DE-806D-3BA32B59B115.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/02F4A281-A5E5-44A2-B376-16E1E43F6133.json",
+      "description": "owned-keyboard-visible-incoming-boundaries-caregiver_0_754510E2-68C3-4524-8DD8-1DC932231CF8.json",
+      "sha256": "789ff0c4b344b668fc249f11ab06e0ee313c6ac239133b1301be7877dd48a249",
+      "packagedSha256": "789ff0c4b344b668fc249f11ab06e0ee313c6ac239133b1301be7877dd48a249"
+    },
+    {
+      "path": "Artifacts/B0FC33EF-C723-4EF4-9DC1-41C0B914A96E.png",
+      "description": "owned-keyboard-incoming-latest-reachable-synthetic-message-only-caregiver_0_FC8D5B8B-3D47-4831-A259-30D40793E5F9.png",
+      "sha256": "5224aa22b7290bd5dcf30214ee68593096bda9a39381bf5f1cad1fa57d3c6180",
+      "packagedSha256": "5224aa22b7290bd5dcf30214ee68593096bda9a39381bf5f1cad1fa57d3c6180"
+    },
+    {
+      "path": "Artifacts/D78B7368-1F34-482A-8B1F-39942B76183B.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_80570942-B497-4D27-9F5F-CFE8971D8170.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/93A3E699-CBC6-4574-9FAE-FB076E31A008.png",
+      "description": "owned-keyboard-incoming-anchored-older-synthetic-message-only-caregiver_0_11C86D94-CE62-4124-A707-F4265ED86515.png",
+      "sha256": "8fdde899c3c0cef50db79d9b5186e362635d8f0ff0ae29d8ec054920735fc8d9",
+      "packagedSha256": "8fdde899c3c0cef50db79d9b5186e362635d8f0ff0ae29d8ec054920735fc8d9"
+    },
+    {
+      "path": "Artifacts/C9640D4F-6482-4879-9945-3BDFF0C47348.png",
+      "description": "owned-keyboard-incoming-bottom-synthetic-message-only-caregiver_0_CADFB309-477B-4493-9E7C-5F902BCBAF8E.png",
+      "sha256": "df911bc2ab8e26cb08d5ecfff1dfc13013b5757b0941806793c428f268ba16d4",
+      "packagedSha256": "df911bc2ab8e26cb08d5ecfff1dfc13013b5757b0941806793c428f268ba16d4"
+    },
+    {
+      "path": "Artifacts/C2C4516F-4AAE-4FF5-8A36-0AC49964FDB2.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_DFC15BD5-6E1B-4225-AB29-7D1BFA59516E.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/CD848129-AB71-4EF5-87BB-1B57C7D1DD03.png",
+      "description": "owned-keyboard-incoming-unsent-synthetic-draft-only-caregiver_0_23337604-195D-4499-B3B2-DC68AD30C1D9.png",
+      "sha256": "7f84198fd625cc9c9e8371193c1d12414b0f752d1b095903d3db30ff7509e47f",
+      "packagedSha256": "7f84198fd625cc9c9e8371193c1d12414b0f752d1b095903d3db30ff7509e47f"
+    },
+    {
+      "path": "Artifacts/DF4F31AE-F37A-4D36-9CD2-05E7CEB79A53.json",
+      "description": "owned-keyboard-older-focus-geometry_0_946EBAB7-C5A1-4442-ADFA-72D4CF8171BF.json",
+      "sha256": "e783c1b2608b51b1961f8981b62c159dfa6de82c8ab576c122c6d036dc9c3376",
+      "packagedSha256": "e783c1b2608b51b1961f8981b62c159dfa6de82c8ab576c122c6d036dc9c3376"
+    },
+    {
+      "path": "Artifacts/A2761BE8-C29F-4E4D-9511-6356319ED251.json",
+      "description": "owned-reply-race-acknowledged-caregiver_0_024D372F-01C9-495A-B80C-2A52551362AF.json",
+      "sha256": "3229ee5ae66d95f574287552ba542e259fa6b77f16fdabf10db9097da699d97c",
+      "packagedSha256": "3229ee5ae66d95f574287552ba542e259fa6b77f16fdabf10db9097da699d97c"
+    },
+    {
+      "path": "Artifacts/B71D3C98-B6F8-4D63-AA14-69B409BD7C82.png",
+      "description": "owned-reply-race-synthetic-acknowledged-message-only-caregiver_0_E40CE708-8F58-4C2E-8B00-E6D4A437CC13.png",
+      "sha256": "873ba556a4e9aed57a27040b77a1d7bde7df585c55959b40d97c43b0559e1f2e",
+      "packagedSha256": "873ba556a4e9aed57a27040b77a1d7bde7df585c55959b40d97c43b0559e1f2e"
+    },
+    {
+      "path": "Artifacts/1620033E-D9A2-4C79-A0FB-CE33285A59B3.json",
+      "description": "owned-reply-race-timing-caregiver_0_DDFC6E2C-953C-4A3A-B58E-D482916F8418.json",
+      "sha256": "df6573b5b8abbf590f366cc104159de81e60e94cf7b288437b247f24d318e910",
+      "packagedSha256": "df6573b5b8abbf590f366cc104159de81e60e94cf7b288437b247f24d318e910"
+    },
+    {
+      "path": "Artifacts/50ED4579-7BB5-4601-8FE2-60DAC5C2A1BD.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_C507D220-884E-4304-90CE-429AED61FA7D.json",
+      "sha256": "c969e026e43c932184157cc64d05e75fb0284d6abba3d3b618544bb254abe627",
+      "packagedSha256": "c969e026e43c932184157cc64d05e75fb0284d6abba3d3b618544bb254abe627"
+    },
+    {
+      "path": "Artifacts/FD00DB60-E9B7-4678-B68C-8E57E4DBBC7C.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_168D3760-B193-40F8-A615-806F300299A0.json",
+      "sha256": "795a03acbb1a4c8b2ea5c35c0c0f2a7bd4e6e8eb9f749a3a7f683f69267211f2",
+      "packagedSha256": "795a03acbb1a4c8b2ea5c35c0c0f2a7bd4e6e8eb9f749a3a7f683f69267211f2"
+    },
+    {
+      "path": "Artifacts/9698E513-946E-49FF-A7A4-3BB336E32609.json",
+      "description": "owned-slow-send-new-typing-caregiver_0_762DF8D1-93A6-4A77-A034-F54F437EA8C4.json",
+      "sha256": "dd28804b4e08f78c3082d55a147b75501f350205643f339d09d7132bf0918abb",
+      "packagedSha256": "dd28804b4e08f78c3082d55a147b75501f350205643f339d09d7132bf0918abb"
+    },
+    {
+      "path": "Artifacts/EE16CD02-2180-4CE9-9769-01B9B5E508EA.png",
+      "description": "owned-slow-send-retained-synthetic-draft-only-caregiver_0_FF5E7D20-63D3-466B-A9DC-446D9FF8D72F.png",
+      "sha256": "2de2dea87eb8bcf27def2eca44d17247232a2de5975db9f1353d4da4acdad599",
+      "packagedSha256": "2de2dea87eb8bcf27def2eca44d17247232a2de5975db9f1353d4da4acdad599"
+    },
+    {
+      "path": "Artifacts/AB2063D5-E50F-469F-B9CB-1396603C66F7.png",
+      "description": "owned-slow-send-first-synthetic-bubble-only-caregiver_0_311F77DC-6A9F-4B47-91F6-1C30CD11D94D.png",
+      "sha256": "c85d8d5dddc4f01c2c10e39f93f48cce45f3039b7aa08c407d75807406fb1bdc",
+      "packagedSha256": "c85d8d5dddc4f01c2c10e39f93f48cce45f3039b7aa08c407d75807406fb1bdc"
+    }
+  ],
+  "wholeProcessExit": 0,
+  "publicPackage": {
+    "rootReviewed": true,
+    "independentReview": "final_review: no concrete evidence or privacy blocker; all25 hashes and bounded artifacts reviewed",
+    "originalEvidencePreserved": true,
+    "rawLogsXCResultsFullScreenPhotosPrivateFixturesIncluded": false
+  },
+  "reviewScope": "Root read all13 anonymous JSON and viewed all12 bounded synthetic PNGs via two unscaled sheets.",
+  "tests": {
+    "incomingBottomOlderStoredFooter": {
+      "status": "PASS",
+      "seconds": 93.218
+    },
+    "keyboardIncomingBottomOlder": {
+      "status": "PASS",
+      "seconds": 78.207
+    },
+    "strictReply": {
+      "status": "PASS",
+      "seconds": 159.748,
+      "allObservationsSeconds": 7.6319899559021
+    },
+    "slowSendContinuedTyping": {
+      "status": "PASS",
+      "seconds": 68.003
+    }
+  },
+  "limitations": [
+    "Physical camera untested by user direction",
+    "Incoming during initial load untested",
+    "Native keyboard dismissal unavailable/unverified",
+    "Large retained-history performance unverified",
+    "Other allocation regressions and final Release/Git delivery pending"
+  ]
+}

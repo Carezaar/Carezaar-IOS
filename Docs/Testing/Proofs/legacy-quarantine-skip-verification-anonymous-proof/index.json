@@ -1,0 +1,25 @@
+{
+  "source": "fresh-legacy-quarantine-skip-verification.xcresult",
+  "rootReviewed": true,
+  "rootReviewScope": "Read complete completed log; exact16 selected methods allSKIP, zeroFAIL/no functionalPASS; verified six source hashes against10 independent reviewed source gates; build passed. No explicit screenshot attachments in execution trace. Physical camera method skipped before device entry; injectIncoming boundary source-only; no original coverage promotion. Anonymous record excludes fixtures/privatepaths/tokens/rawlogs.",
+  "publishable": false,
+  "artifacts": [
+    {
+      "path": "Artifacts/legacy-quarantine-skip-verification.json",
+      "description": "Sixteen legacy live-test skips with exact source binding and retained coverage limits",
+      "sha256": "d9a42bdbc4366cfcba0fc3f6f7e5d0195a6d4075207d05b53b3e7b9c3628649a",
+      "packagedSha256": "d9a42bdbc4366cfcba0fc3f6f7e5d0195a6d4075207d05b53b3e7b9c3628649a"
+    }
+  ],
+  "independentlyReviewed": true,
+  "independentReviewScope": "Independently read completed selection log, parsed the sole anonymous JSON and verified artifact/log SHA-256 plus all six current source hashes binding ten previously reviewed quarantine gates. Exact16 selected methods are SKIPPED with zero failures and zero functional passes; process completed with TEST EXECUTE SUCCEEDED. No explicit screenshot attachment events in trace; skipped teardown guards were compiled and source ordering remains verified. No relationship/message/support/profile mutation can execute before these gates per source review; some helper callers perform auth login POST and GET reads, so no zero-total-HTTP-POST claim. Physical DeviceCamera method skipped in simulator setUp before entry; its entry skip and injectIncoming boundary are source-only, not runtime-executed. No credential/private fixture/absolute path/raw log/fullscreen content in anonymous artifact. No original coverage promoted, camera or broad functionality pass claimed.",
+  "independentReviewed": true,
+  "independentReview": "Independently read completed selection log, parsed the sole anonymous JSON and verified artifact/log SHA-256 plus all six current source hashes binding ten previously reviewed quarantine gates. Exact16 selected methods are SKIPPED with zero failures and zero functional passes; process completed with TEST EXECUTE SUCCEEDED. No explicit screenshot attachment events in trace; skipped teardown guards were compiled and source ordering remains verified. No relationship/message/support/profile mutation can execute before these gates per source review; some helper callers perform auth login POST and GET reads, so no zero-total-HTTP-POST claim. Physical DeviceCamera method skipped in simulator setUp before entry; its entry skip and injectIncoming boundary are source-only, not runtime-executed. No credential/private fixture/absolute path/raw log/fullscreen content in anonymous artifact. No original coverage promoted, camera or broad functionality pass claimed.",
+  "scope": "Test-only legacy mutation quarantine:16 selectedmethods skipped/0failures/0functionalpasses oncompiled source. Fourhelper bodies/6directentry gates source-reviewed; devicegate/injectIncomingruntimeunexecuted. No originalcasepromotion or physicalcameraclaim.",
+  "publicPackage": {
+    "rootReviewed": true,
+    "independentReviewed": true,
+    "originalEvidencePreserved": true,
+    "rawLogsXCResultsFullScreenPhotosPrivateFixturesIncluded": false
+  }
+}

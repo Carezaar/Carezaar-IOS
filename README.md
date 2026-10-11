@@ -6,9 +6,9 @@ The native iOS app for Carezaar, written in SwiftUI. It connects families who ne
 
 - **Accounts**
   - Sign up as a client or as a caregiver, using email and password with an emailed verification code.
-  - Sign in, forgot password, change password and delete account.
+  - Sign in, forgot password, change password and delete account. Sign In requires both fields and sends the entered values to the backend for validation.
 - **Onboarding**
-  - A preferences wizard: needs, availability, location and languages.
+  - A preferences wizard: needs, availability, location and languages. Users can continue without a location; Save opens the map with guidance if no valid point is selected.
   - A profile with a photo, taken with the camera or picked from the gallery, then cropped.
 - **Discovery:** browse and sort profiles, add favourites, and open profile details.
 - **Matches**
@@ -23,7 +23,7 @@ The native iOS app for Carezaar, written in SwiftUI. It connects families who ne
 - **Messages:** one-to-one chat between matched users.
 - **Notifications:** an in-app list. Match notifications open the related profile or the "It's a Match!" screen.
 - **Settings:** language, Help Center (FAQ, contact, Delete Account) and Report an Issue (on the Profile page).
-- **Languages:** English, French and Arabic, with right-to-left layout for Arabic.
+- **Languages:** the language list and translations come from the backend. The verified list includes English, Hindi, Chinese, Spanish, French, Russian, Arabic and Persian, with right-to-left layout for Arabic and Persian.
 
 ## Requirements
 
@@ -98,6 +98,6 @@ The Release build compiles none of these and ships none of their assets.
 
 ## Known limitations
 
-- A few newer labels, for example "Withdraw", are not yet in the backend content table. Until they are added there, they show in English in every language.
+- Missing managed translations use coherent English fallback copy. The QA reports identify which language controls and flows were actually verified.
 - Notifications are polled every 30 seconds while the app is open. There is no remote push (APNs).
 - The app depends on the live backend for all content, including UI text. Some backend endpoints are slow on first load, so the app caches base tables locally.

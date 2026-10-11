@@ -83,7 +83,16 @@ struct DesignElement: View {
                         .lineLimit(3...8)
                         .textInputAutocapitalization(.sentences)
                 }
-                else if rendered.inputType == "password" { SecureField("", text: text, prompt: Text(rendered.displayText).foregroundColor(rendered.color)) }
+                else if rendered.inputType == "password" {
+                    Group {
+                        if binder.isPasswordRevealed(rendered) {
+                            TextField("", text: text, prompt: Text(rendered.displayText).foregroundColor(rendered.color))
+                        } else {
+                            SecureField("", text: text, prompt: Text(rendered.displayText).foregroundColor(rendered.color))
+                        }
+                    }
+                    .textInputAutocapitalization(.never).autocorrectionDisabled()
+                }
                 else {
                     TextField("", text: text, prompt: Text(rendered.displayText).foregroundColor(rendered.color))
                         .keyboardType(rendered.inputType == "email" ? .emailAddress : rendered.inputType == "tel" ? .phonePad : .default)
@@ -106,7 +115,6 @@ struct DesignElement: View {
             } label: { content }
                 .buttonStyle(.plain)
                 .disabled(!binder.isEnabled(rendered))
-                .accessibilityElement(children: .ignore)
                 .accessibilityLabel(rendered.label.isEmpty ? rendered.name : rendered.label)
                 .accessibilityAddTraits(.isButton)
         } else { content }

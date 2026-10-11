@@ -1,0 +1,11 @@
+{
+  "actualOpeningOwnedProfileGETs": 2,
+  "actualPrefilledCareTypeSelected": true,
+  "controlledDebugLocationOnly": true,
+  "loadingFinishedBeforeContinue": true,
+  "OSLocationPermissionVerified": false,
+  "physicalGPSVerified": false,
+  "profileMutationRequests": 0,
+  "role": "caregiver",
+  "wizardHeadingObserved": true
+}

@@ -12,23 +12,35 @@ actor APIClient {
 
     private let session: URLSession
     private let decoder: JSONDecoder
-    private let tokens: TokenStore
+    private let tokens: any SessionTokenStorage
     /// Single-flight refresh: concurrent 403s must not fire parallel refresh calls.
-    private var refreshTask: Task<Bool, Never>?
+    private var refreshTask: (generation: UUID, id: UUID, task: Task<Bool, Never>)?
 
-    init(tokens: TokenStore = .shared) {
+    init(tokens: any SessionTokenStorage = TokenStore.shared, session: URLSession? = nil) {
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = APIConfiguration.requestTimeout
-        config.timeoutIntervalForResource = APIConfiguration.requestTimeout * 1.5
+        config.timeoutIntervalForResource = APIConfiguration.requestTimeout
         // Fail fast offline: waiting for connectivity would leave a screen spinning
         // with no way for the user to know or retry.
         config.waitsForConnectivity = false
-        self.session = URLSession(configuration: config)
+        self.session = session ?? URLSession(configuration: config)
         self.tokens = tokens
         self.decoder = JSONDecoder()
     }
 
     // MARK: - Public
+
+    /// Verify a candidate login credential without installing it, refreshing the
+    /// global session, or borrowing its generation. The owning handoff validates
+    /// identity/revision before committing the returned pair.
+    func verifyUser(accessToken: String) async throws -> User {
+        guard !accessToken.isEmpty else { throw APIError.unauthenticated("") }
+        let envelope: APIEnvelope<User> = try await perform(
+            Endpoint(method: .get, path: "auth/info"), generation: nil, accessToken: accessToken)
+        guard let user = envelope.result else { throw APIError.decoding("Login did not return an authenticated user.") }
+        return user
+    }
+
 
     /// Sends a request and unwraps the envelope's `result`.
     func send<T: Decodable>(_ endpoint: Endpoint, as type: T.Type = T.self) async throws -> T {
@@ -56,38 +68,79 @@ actor APIClient {
         return (result, envelope.meta)
     }
 
+    /// Revoke only the captured signed-out credential. Never refresh or borrow a
+    /// subsequent account's session to finish an old logout request.
+    func revoke(accessToken: String?) async {
+        guard let accessToken else { return }
+        guard var request = try? buildRequest(Endpoint(method: .delete, path: "auth/logout", requiresAuth: false)) else { return }
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        _ = try? await transfer(request, safeToReplay: false)
+    }
+
     // MARK: - Core
 
     private func sendEnvelope<T: Decodable>(_ endpoint: Endpoint) async throws -> APIEnvelope<T> {
+        let attemptedGeneration = tokens.generation
+        let attemptedAccess = tokens.accessToken
         do {
-            return try await perform(endpoint)
+            return try await performChecked(endpoint, generation: attemptedGeneration, accessToken: attemptedAccess)
         } catch APIError.unauthenticated(let message) {
             // The backend answers 403 for an absent or expired token. Refresh once,
             // then replay the original request.
             // An unauthenticated endpoint (login, register) says nothing about the session.
-            guard endpoint.requiresAuth, tokens.accessToken != nil else { throw APIError.unauthenticated(message) }
+            guard endpoint.requiresAuth, tokens.generation == attemptedGeneration, tokens.accessToken != nil else { throw APIError.unauthenticated(message) }
+            // Another caller already renewed the rejected credential while this
+            // response was in flight. Reuse it instead of rotating again.
+            if tokens.accessToken != attemptedAccess { return try await replayAfterRenewal(endpoint, generation: attemptedGeneration) }
             guard tokens.refreshToken != nil else {
-                await expireSession()
+                await expireSession(ifGeneration: attemptedGeneration)
                 throw APIError.unauthenticated(message)
             }
-            guard await refreshSession() else {
-                await expireSession()
+            guard await refreshSession(ifGeneration: attemptedGeneration) else {
+                await expireSession(ifGeneration: attemptedGeneration)
                 throw APIError.unauthenticated(message)
             }
-            return try await perform(endpoint)
+            guard tokens.generation == attemptedGeneration else { throw CancellationError() }
+            return try await replayAfterRenewal(endpoint, generation: attemptedGeneration)
         }
     }
 
-    private func perform<T: Decodable>(_ endpoint: Endpoint) async throws -> APIEnvelope<T> {
-        var request = try buildRequest(endpoint)
+    /// A valid-looking refresh pair is not enough when its authenticated replay
+    /// is explicitly refused. End only the captured session, never a newer login.
+    private func replayAfterRenewal<T: Decodable>(_ endpoint: Endpoint, generation: UUID) async throws -> APIEnvelope<T> {
+        guard tokens.generation == generation else { throw CancellationError() }
+        do {
+            return try await performChecked(endpoint, generation: generation, accessToken: tokens.accessToken)
+        } catch APIError.unauthenticated(let message) {
+            await expireSession(ifGeneration: generation)
+            throw APIError.unauthenticated(message)
+        }
+    }
+
+    private func performChecked<T: Decodable>(_ endpoint: Endpoint, generation: UUID, accessToken: String?) async throws -> APIEnvelope<T> {
+        let result: APIEnvelope<T> = try await perform(endpoint, generation: generation, accessToken: accessToken)
+        guard !endpoint.requiresAuth || tokens.generation == generation else { throw CancellationError() }
+        return result
+    }
+
+    private func perform<T: Decodable>(_ endpoint: Endpoint, generation: UUID?, accessToken: String?) async throws -> APIEnvelope<T> {
+        // Pin the bearer to this operation. A later login must never lend its
+        // credential to an old request, even if its result is later discarded.
+        var request = try buildRequest(endpoint, accessToken: accessToken)
         #if DEBUG
         request = QANetworkFault.apply(request)
         if let latency = QANetworkFault.latency { try await Task.sleep(for: .seconds(latency)) }
         #endif
+        // Nil is reserved for independent candidate-bearer verification. Every
+        // ordinary authenticated request continues to use its captured generation.
+        guard !endpoint.requiresAuth || generation == nil || tokens.generation == generation else { throw CancellationError() }
         var data: Data
         let response: URLResponse
         do {
-            (data, response) = try await session.data(for: request)
+            (data, response) = try await transfer(request, safeToReplay: endpoint.method == .get,
+                                                      generation: endpoint.requiresAuth ? generation : nil)
+        } catch is CancellationError {
+            throw CancellationError()
         } catch let error as URLError where error.code == .cancelled {
             // A view that went away cancelled its task; not a connectivity problem.
             throw CancellationError()
@@ -103,7 +156,25 @@ actor APIClient {
             throw APIError.unknown("Malformed response.")
         }
         #if DEBUG
+        if QANetworkFault.loseOwnedMatchAcknowledgement(request, statusCode: http.statusCode) {
+            await QARequestLedger.shared.recordLostOwnedMatchAcknowledgement()
+            throw APIError.network("The network connection was lost.")
+        }
+        let locationScenario = QANetworkFault.ownedProfileLocationScenario(data, path: endpoint.path,
+            method: endpoint.method, statusCode: http.statusCode)
+        data = locationScenario.data
+        if let attestation = locationScenario.attestation {
+            await QARequestLedger.shared.recordProfileWithoutLocation(attestation)
+        }
+        let notificationScenario = QANetworkFault.notificationMissingTargetScenario(data, path: endpoint.path,
+            method: endpoint.method, statusCode: http.statusCode, page: endpoint.query["page"] ?? nil)
+        data = notificationScenario.data
+        if let attestation = notificationScenario.attestation {
+            await QARequestLedger.shared.recordNotificationFallback(attestation)
+        }
         data = QANetworkFault.corruptMatchState(data, path: endpoint.path)
+        data = QANetworkFault.profileResponseScenario(data, path: endpoint.path,
+                                                    method: endpoint.method, statusCode: http.statusCode)
         #endif
 
         // Several write endpoints answer 204 with an empty body instead of the envelope.
@@ -137,37 +208,64 @@ actor APIClient {
 
     // MARK: - Refresh
 
-    private func refreshSession() async -> Bool {
-        if let existing = refreshTask { return await existing.value }
+    /// A lost response to a mutation is ambiguous: it may already have committed.
+    /// Retry reads, or failures that establish no connection was made, only.
+    private func transfer(_ request: URLRequest, safeToReplay: Bool, generation: UUID? = nil) async throws -> (Data, URLResponse) {
+        var retries = 0
+        while true {
+            try Task.checkCancellation()
+            if let generation, tokens.generation != generation { throw CancellationError() }
+            do {
+                #if DEBUG
+                await QARequestLedger.shared.record(request)
+                #endif
+                if let generation, tokens.generation != generation { throw CancellationError() }
+                return try await session.data(for: request)
+            }
+            catch let error as URLError {
+                let beforeConnection: Set<URLError.Code> = [.cannotFindHost, .dnsLookupFailed, .cannotConnectToHost, .notConnectedToInternet]
+                let retryable = beforeConnection.contains(error.code)
+                    || (safeToReplay && error.code == .networkConnectionLost)
+                guard retryable, retries < 3 else { throw error }
+                try await Task.sleep(for: .milliseconds(250 * (1 << retries)))
+                retries += 1
+            }
+        }
+    }
+
+    private func refreshSession(ifGeneration expected: UUID) async -> Bool {
+        if let existing = refreshTask, existing.generation == expected { return await existing.task.value }
+        let id = UUID()
         let task = Task<Bool, Never> { [tokens] in
-            guard let refresh = tokens.refreshToken else { return false }
+            guard tokens.generation == expected, let refresh = tokens.refreshToken else { return false }
             var request = URLRequest(url: APIConfiguration.baseURL.appendingPathComponent("auth/refresh"))
+            request.timeoutInterval = APIConfiguration.requestTimeout
             request.httpMethod = HTTPMethod.put.rawValue
             // The refresh token is presented as the bearer credential.
             request.setValue("Bearer \(refresh)", forHTTPHeaderField: "Authorization")
             request.setValue("application/json", forHTTPHeaderField: "Accept")
             request.setValue(AppLanguage.currentCode, forHTTPHeaderField: "Accept-Language")
-            // The live backend answers 422 ("The version app field is required.") to a
-            // refresh without the login device fields, although Android sends none and
-            // so signs its users out on every expiry (BE-06).
+            // The current contract requires only the app version as device metadata.
             request.setValue("application/x-www-form-urlencoded; charset=utf-8", forHTTPHeaderField: "Content-Type")
-            request.httpBody = Self.formEncode(DeviceInfo.loginFields)
-            guard let (data, response) = try? await self.session.data(for: request),
+            request.httpBody = Self.formEncode(["version_app": .string(DeviceInfo.appVersion)])
+            // A new login may arrive while reading the refresh credential. Never
+            // rotate that account on behalf of this captured generation.
+            guard tokens.generation == expected else { return false }
+            guard let (data, response) = try? await self.transfer(request, safeToReplay: false, generation: expected),
                   let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode),
                   let envelope = try? self.decoder.decode(APIEnvelope<Session>.self, from: data),
                   let session = envelope.result
             else { return false }
-            tokens.save(session)
-            return true
+            return tokens.replace(session, ifGeneration: expected, refreshToken: refresh)
         }
-        refreshTask = task
+        refreshTask = (expected, id, task)
         let result = await task.value
-        refreshTask = nil
+        if refreshTask?.id == id { refreshTask = nil }
         return result
     }
 
-    private func expireSession() async {
-        tokens.clear()
+    private func expireSession(ifGeneration expected: UUID) async {
+        guard tokens.clear(ifGeneration: expected) else { return }
         await MainActor.run {
             NotificationCenter.default.post(name: .carezaarSessionExpired, object: nil)
         }
@@ -175,7 +273,7 @@ actor APIClient {
 
     // MARK: - Request building
 
-    private func buildRequest(_ endpoint: Endpoint) throws -> URLRequest {
+    private func buildRequest(_ endpoint: Endpoint, accessToken: String? = nil) throws -> URLRequest {
         var components = URLComponents(
             url: APIConfiguration.baseURL.appendingPathComponent(endpoint.path),
             resolvingAgainstBaseURL: false
@@ -187,13 +285,14 @@ actor APIClient {
         }
 
         var request = URLRequest(url: url)
+        request.timeoutInterval = APIConfiguration.requestTimeout
         request.httpMethod = endpoint.method.rawValue
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         // The backend localises from this header and 500s on "*".
         request.setValue(AppLanguage.currentCode, forHTTPHeaderField: "Accept-Language")
 
-        if endpoint.requiresAuth, let token = tokens.accessToken {
-            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        if endpoint.requiresAuth, let accessToken {
+            request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         }
 
         switch endpoint.body {

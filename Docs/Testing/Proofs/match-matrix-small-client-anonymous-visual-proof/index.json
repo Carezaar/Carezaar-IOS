@@ -1,0 +1,194 @@
+{
+  "role": "client",
+  "allocation": "small",
+  "renderMethodPassed": true,
+  "renderDurationSeconds": 77.071,
+  "chatGuardMethodPassed": true,
+  "chatGuardDurationSeconds": 86.017,
+  "wholeBatchExit": 65,
+  "unrelatedDraftOnlyPretypingFailurePreserved": true,
+  "rootViewedAllTenAnonymousCrops": true,
+  "pairRestoredNone": true,
+  "artifacts": [
+    {
+      "path": "Artifacts/match-matrix-small-matrix-owned-none-restored.json",
+      "sha256": "00910059b3e475c490423995576e8bc56cd6628a2bb7dd247b8419766c2c0965"
+    },
+    {
+      "path": "Artifacts/match-matrix-small-owned-state-render-active-client.json",
+      "sha256": "2ec0041c0772b8a3ec6a282d0efb4d998a2753a460fe3ef965a796d375904176"
+    },
+    {
+      "path": "Artifacts/match-matrix-small-owned-active-match-unmatch-control-only-client.png",
+      "sha256": "1217ae04aecaa0767cddb882d21380f98dd8086cef321e34e042f74ac9bfd5a6"
+    },
+    {
+      "path": "Artifacts/match-matrix-small-owned-active-match-icon-only-client.png",
+      "sha256": "8a5f27b5d24b6de5478094f38a84da535fadd1d9aac5af65bdbbb62d4ca6d4f8"
+    },
+    {
+      "path": "Artifacts/match-matrix-small-owned-state-render-received-client.json",
+      "sha256": "1a0c2dfc8792b5a5cbc617f72ff893bc9815282ec095269eb32c415462e2c3e3"
+    },
+    {
+      "path": "Artifacts/match-matrix-small-owned-received-match-accept-control-only-client.png",
+      "sha256": "a84132866cd7ae03b720669726b1eb6938cee0907e5c3f5357414a4860733c33"
+    },
+    {
+      "path": "Artifacts/match-matrix-small-owned-received-match-reject-control-only-client.png",
+      "sha256": "beba550f9137af737971f0be4e30a160e2bb4ca7987e49c2bd291c5330c211f2"
+    },
+    {
+      "path": "Artifacts/match-matrix-small-owned-state-render-sent-client.json",
+      "sha256": "8dc7219773eea936e4799a126724b095e0ee13087ea2e98bce414f9dec73b41d"
+    },
+    {
+      "path": "Artifacts/match-matrix-small-owned-sent-match-withdraw-control-only-client.png",
+      "sha256": "0c5596e0a969d25c3e7460ce278464c3bdb5a60ae9fdf4e9a987dc310616308a"
+    },
+    {
+      "path": "Artifacts/match-matrix-small-owned-state-render-none-client.json",
+      "sha256": "39ab60af782fd1c123b3a174aabe1ae4149f8d3fd051ad20d7bfe199fbf8a2b1"
+    },
+    {
+      "path": "Artifacts/match-matrix-small-owned-none-match-request-control-only-client.png",
+      "sha256": "055fb780f9c542775f8b3a1bee266de830669cb394896deb584c93dce03d3439"
+    },
+    {
+      "path": "Artifacts/match-matrix-small-active-owned-existing-chat-entry-client.json",
+      "sha256": "ea582060726fd027a9ccf5456adf9ad688644d957e823b8a59cdd442c77cd521"
+    },
+    {
+      "path": "Artifacts/match-matrix-small-active-chat-send-enabled-control-only-client.png",
+      "sha256": "3b03c0573755a9c4b131ee3a054eff7500a39b08ed4338a5d5ea44bd3fc9ea46"
+    },
+    {
+      "path": "Artifacts/match-matrix-small-owned-received-native-send-guard-client.json",
+      "sha256": "d4d578a39837650a4a16cc35d2f2ee8662ac326246b975f3bb31e4b70a4f1b0f"
+    },
+    {
+      "path": "Artifacts/match-matrix-small-owned-received-chat-restriction-only-client.png",
+      "sha256": "620dfe6de2da4070893d63d4be812c866b78a83ce412d70423629b533afc8fa1"
+    },
+    {
+      "path": "Artifacts/match-matrix-small-owned-sent-native-send-guard-client.json",
+      "sha256": "a77366ded964cd98942d9726b8bb1fa502c548838481b477a962b539228fcb5d"
+    },
+    {
+      "path": "Artifacts/match-matrix-small-owned-sent-chat-restriction-only-client.png",
+      "sha256": "cb15fa4823b6545d870b2071e58586cb264f27f853a0c2f85451d62c2c6d37aa"
+    },
+    {
+      "path": "Artifacts/match-matrix-small-owned-none-native-send-guard-client.json",
+      "sha256": "9b64bb66510f192717f86b48a3574cc8b32ae26e7ae4910aa8b10832a103b24e"
+    },
+    {
+      "path": "Artifacts/match-matrix-small-owned-none-chat-restriction-only-client.png",
+      "sha256": "6a9da1363a9f863bf50d7f429490e7bb6b244350c00aefe85c2d2e94c0be9cd3"
+    }
+  ],
+  "publicPackage": {
+    "status": "REVIEWABLE — not staged or delivered",
+    "originalEvidenceRetainedLocally": true,
+    "rawLogsAndXCResultsIncluded": false,
+    "artifactInventory": [
+      {
+        "path": "Artifacts/match-matrix-small-matrix-owned-none-restored.json",
+        "bytes": 171,
+        "sha256": "fedc083a3f904f4aaf925b60810873faf6bb2a98ef9f55dac6fcc187bc028763"
+      },
+      {
+        "path": "Artifacts/match-matrix-small-owned-state-render-active-client.json",
+        "bytes": 287,
+        "sha256": "cd69d2549dd88ac7b049d4c0f013e1906bd8be17d4a06e191f4430b24f677733"
+      },
+      {
+        "path": "Artifacts/match-matrix-small-owned-active-match-unmatch-control-only-client.png",
+        "bytes": 8052,
+        "sha256": "1217ae04aecaa0767cddb882d21380f98dd8086cef321e34e042f74ac9bfd5a6"
+      },
+      {
+        "path": "Artifacts/match-matrix-small-owned-active-match-icon-only-client.png",
+        "bytes": 3592,
+        "sha256": "8a5f27b5d24b6de5478094f38a84da535fadd1d9aac5af65bdbbb62d4ca6d4f8"
+      },
+      {
+        "path": "Artifacts/match-matrix-small-owned-state-render-received-client.json",
+        "bytes": 311,
+        "sha256": "1d341c6b8315bf50f4dc6b944b18531ffc7de7771fb0fe629b9b95ed2a7d6da9"
+      },
+      {
+        "path": "Artifacts/match-matrix-small-owned-received-match-accept-control-only-client.png",
+        "bytes": 6154,
+        "sha256": "a84132866cd7ae03b720669726b1eb6938cee0907e5c3f5357414a4860733c33"
+      },
+      {
+        "path": "Artifacts/match-matrix-small-owned-received-match-reject-control-only-client.png",
+        "bytes": 6695,
+        "sha256": "beba550f9137af737971f0be4e30a160e2bb4ca7987e49c2bd291c5330c211f2"
+      },
+      {
+        "path": "Artifacts/match-matrix-small-owned-state-render-sent-client.json",
+        "bytes": 288,
+        "sha256": "894750d36e23c8aaf4971f4ab26368e253e25b89b3d77fadd79f0311548237f3"
+      },
+      {
+        "path": "Artifacts/match-matrix-small-owned-sent-match-withdraw-control-only-client.png",
+        "bytes": 8714,
+        "sha256": "0c5596e0a969d25c3e7460ce278464c3bdb5a60ae9fdf4e9a987dc310616308a"
+      },
+      {
+        "path": "Artifacts/match-matrix-small-owned-state-render-none-client.json",
+        "bytes": 288,
+        "sha256": "4ca77b13c0277683d2e315f4b1e8e6928e1688c8781d8951ce5336c8fd9eedea"
+      },
+      {
+        "path": "Artifacts/match-matrix-small-owned-none-match-request-control-only-client.png",
+        "bytes": 9093,
+        "sha256": "055fb780f9c542775f8b3a1bee266de830669cb394896deb584c93dce03d3439"
+      },
+      {
+        "path": "Artifacts/match-matrix-small-active-owned-existing-chat-entry-client.json",
+        "bytes": 321,
+        "sha256": "6ed7e9a8a4050b87766940fbb033c910f28d521adc629de3649a294d37aadcd0"
+      },
+      {
+        "path": "Artifacts/match-matrix-small-active-chat-send-enabled-control-only-client.png",
+        "bytes": 2934,
+        "sha256": "3b03c0573755a9c4b131ee3a054eff7500a39b08ed4338a5d5ea44bd3fc9ea46"
+      },
+      {
+        "path": "Artifacts/match-matrix-small-owned-received-native-send-guard-client.json",
+        "bytes": 297,
+        "sha256": "19d9ef284d8600c7872583fc9651418313d99ef1b171d53e97762db256be2672"
+      },
+      {
+        "path": "Artifacts/match-matrix-small-owned-received-chat-restriction-only-client.png",
+        "bytes": 14263,
+        "sha256": "620dfe6de2da4070893d63d4be812c866b78a83ce412d70423629b533afc8fa1"
+      },
+      {
+        "path": "Artifacts/match-matrix-small-owned-sent-native-send-guard-client.json",
+        "bytes": 293,
+        "sha256": "f336abcfd2bd27302adb62bb510625f55f2d465832984a442125f58b2353e488"
+      },
+      {
+        "path": "Artifacts/match-matrix-small-owned-sent-chat-restriction-only-client.png",
+        "bytes": 13341,
+        "sha256": "cb15fa4823b6545d870b2071e58586cb264f27f853a0c2f85451d62c2c6d37aa"
+      },
+      {
+        "path": "Artifacts/match-matrix-small-owned-none-native-send-guard-client.json",
+        "bytes": 293,
+        "sha256": "bd13578f7c0576831526ecd0c2387fa66663e3b73761134be3f3505704a5e739"
+      },
+      {
+        "path": "Artifacts/match-matrix-small-owned-none-chat-restriction-only-client.png",
+        "bytes": 11412,
+        "sha256": "6a9da1363a9f863bf50d7f429490e7bb6b244350c00aefe85c2d2e94c0be9cd3"
+      }
+    ],
+    "sourceIndexSHA256": "ba3ce40b37099b022bdce7b0901e5fcb2ef91454b161d83ef57cc75f95645022",
+    "artifactHashNote": "Public JSON/text are sanitized; artifactInventory hashes apply to packaged bytes. Original indexed hashes, where present, refer to preserved original evidence."
+  }
+}

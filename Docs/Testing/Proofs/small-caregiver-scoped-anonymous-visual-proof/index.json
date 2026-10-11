@@ -1,0 +1,394 @@
+{
+  "wholeRun": "fresh-small-caregiver-scoped-state-settings-drafts",
+  "result": "PASS",
+  "exitCode": 0,
+  "methods": 13,
+  "reviewedSafeCrops": 14,
+  "physicalCamera": "UNTESTED user deferred",
+  "attachments": [
+    {
+      "file": "Artifacts/small-caregiver-scoped-P04-032-owned-favorite-persistence.json",
+      "test": "FavoritePersistenceUITests/testOwnedPartnerFavoritePersistsAcrossFavoritesAndProfileReopen()",
+      "visualReviewed": false
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-support-required-gates-native.json",
+      "test": "HelpSettingsBoundaryUITests/testSupportRequiredDescriptionAndWhitespaceSubjectPreserveDraftWithoutPOST()",
+      "visualReviewed": false
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-P08-003-three-language-native-persistence.json",
+      "test": "LanguagePersistenceUITests/testEnglishFrenchArabicNativeSelectionPersistsAcrossOrdinaryRelaunch()",
+      "visualReviewed": false
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-matrix-owned-none-restored.json",
+      "test": "MatchStateMatrixUITests/testExactOwnedPairCardsAndProfileActionsAcrossNoneSentReceivedActive()",
+      "visualReviewed": false
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-owned-state-render-active-caregiver.json",
+      "test": "MatchStateMatrixUITests/testExactOwnedPairCardsAndProfileActionsAcrossNoneSentReceivedActive()",
+      "visualReviewed": false
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-owned-active-match-unmatch-control-only-caregiver.png",
+      "test": "MatchStateMatrixUITests/testExactOwnedPairCardsAndProfileActionsAcrossNoneSentReceivedActive()",
+      "visualReviewed": true
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-owned-active-match-icon-only-caregiver.png",
+      "test": "MatchStateMatrixUITests/testExactOwnedPairCardsAndProfileActionsAcrossNoneSentReceivedActive()",
+      "visualReviewed": true
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-owned-state-render-received-caregiver.json",
+      "test": "MatchStateMatrixUITests/testExactOwnedPairCardsAndProfileActionsAcrossNoneSentReceivedActive()",
+      "visualReviewed": false
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-owned-received-match-accept-control-only-caregiver.png",
+      "test": "MatchStateMatrixUITests/testExactOwnedPairCardsAndProfileActionsAcrossNoneSentReceivedActive()",
+      "visualReviewed": true
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-owned-received-match-reject-control-only-caregiver.png",
+      "test": "MatchStateMatrixUITests/testExactOwnedPairCardsAndProfileActionsAcrossNoneSentReceivedActive()",
+      "visualReviewed": true
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-owned-state-render-sent-caregiver.json",
+      "test": "MatchStateMatrixUITests/testExactOwnedPairCardsAndProfileActionsAcrossNoneSentReceivedActive()",
+      "visualReviewed": false
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-owned-sent-match-withdraw-control-only-caregiver.png",
+      "test": "MatchStateMatrixUITests/testExactOwnedPairCardsAndProfileActionsAcrossNoneSentReceivedActive()",
+      "visualReviewed": true
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-owned-state-render-none-caregiver.json",
+      "test": "MatchStateMatrixUITests/testExactOwnedPairCardsAndProfileActionsAcrossNoneSentReceivedActive()",
+      "visualReviewed": false
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-owned-none-match-request-control-only-caregiver.png",
+      "test": "MatchStateMatrixUITests/testExactOwnedPairCardsAndProfileActionsAcrossNoneSentReceivedActive()",
+      "visualReviewed": true
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-active-owned-existing-chat-entry-caregiver.json",
+      "test": "MatchStateMatrixUITests/testOwnedExistingChatRejectsInactiveDraftSendAndActiveProfileMessageOpensSameChat()",
+      "visualReviewed": false
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-active-chat-send-enabled-control-only-caregiver.png",
+      "test": "MatchStateMatrixUITests/testOwnedExistingChatRejectsInactiveDraftSendAndActiveProfileMessageOpensSameChat()",
+      "visualReviewed": true
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-owned-received-native-send-guard-caregiver.json",
+      "test": "MatchStateMatrixUITests/testOwnedExistingChatRejectsInactiveDraftSendAndActiveProfileMessageOpensSameChat()",
+      "visualReviewed": false
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-owned-received-chat-restriction-only-caregiver.png",
+      "test": "MatchStateMatrixUITests/testOwnedExistingChatRejectsInactiveDraftSendAndActiveProfileMessageOpensSameChat()",
+      "visualReviewed": true
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-owned-sent-native-send-guard-caregiver.json",
+      "test": "MatchStateMatrixUITests/testOwnedExistingChatRejectsInactiveDraftSendAndActiveProfileMessageOpensSameChat()",
+      "visualReviewed": false
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-owned-sent-chat-restriction-only-caregiver.png",
+      "test": "MatchStateMatrixUITests/testOwnedExistingChatRejectsInactiveDraftSendAndActiveProfileMessageOpensSameChat()",
+      "visualReviewed": true
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-owned-none-native-send-guard-caregiver.json",
+      "test": "MatchStateMatrixUITests/testOwnedExistingChatRejectsInactiveDraftSendAndActiveProfileMessageOpensSameChat()",
+      "visualReviewed": false
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-owned-none-chat-restriction-only-caregiver.png",
+      "test": "MatchStateMatrixUITests/testOwnedExistingChatRejectsInactiveDraftSendAndActiveProfileMessageOpensSameChat()",
+      "visualReviewed": true
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-P05-011-native-boundary-ledger.json",
+      "test": "PartnerNavigationBoundaryUITests/testAbsentPartnerIDReturnsSafelyWithoutShowingPartnerData()",
+      "visualReviewed": false
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-P05-006-native-boundary-ledger.json",
+      "test": "PartnerNavigationBoundaryUITests/testInactiveMatchedThenUnavailableProfileReturnsOnceWithoutLoop()",
+      "visualReviewed": false
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-P05-005-native-boundary-ledger.json",
+      "test": "PartnerNavigationBoundaryUITests/testLeavingFailedMatchedCancelsDelayedReturn()",
+      "visualReviewed": false
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-P05-004-native-boundary-ledger.json",
+      "test": "PartnerNavigationBoundaryUITests/testLeavingFailedProfileCancelsDelayedReturn()",
+      "visualReviewed": false
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-P05-008-native-boundary-ledger.json",
+      "test": "PartnerNavigationBoundaryUITests/testPartnerProfileReopensWithOneRequestPerOpening()",
+      "visualReviewed": false
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-logout-fresh-owned-login-restored-role-data.json",
+      "test": "SessionNetworkTests/testNativeLogoutCancelThenConfirmPersistsSignedOutAcrossOrdinaryRelaunch()",
+      "visualReviewed": false
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-P08-002-native-logout-scope-and-limits.json",
+      "test": "SessionNetworkTests/testNativeLogoutCancelThenConfirmPersistsSignedOutAcrossOrdinaryRelaunch()",
+      "visualReviewed": false
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-logout-confirm-ordinary-relaunch-signed-out.json",
+      "test": "SessionNetworkTests/testNativeLogoutCancelThenConfirmPersistsSignedOutAcrossOrdinaryRelaunch()",
+      "visualReviewed": false
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-logout-confirm-welcome.json",
+      "test": "SessionNetworkTests/testNativeLogoutCancelThenConfirmPersistsSignedOutAcrossOrdinaryRelaunch()",
+      "visualReviewed": false
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-logout-cancel-ordinary-relaunch-restored.json",
+      "test": "SessionNetworkTests/testNativeLogoutCancelThenConfirmPersistsSignedOutAcrossOrdinaryRelaunch()",
+      "visualReviewed": false
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-logout-cancel-main-retained.json",
+      "test": "SessionNetworkTests/testNativeLogoutCancelThenConfirmPersistsSignedOutAcrossOrdinaryRelaunch()",
+      "visualReviewed": false
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-P08-007-synthetic-draft-after-revisit.png",
+      "test": "UnsentChatDraftUITests/testUnsentOwnedChatDraftResetsOnBackAndRevisitWithoutSend()",
+      "visualReviewed": true
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-P08-007-unsent-draft-revisit-caregiver.json",
+      "test": "UnsentChatDraftUITests/testUnsentOwnedChatDraftResetsOnBackAndRevisitWithoutSend()",
+      "visualReviewed": false
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-P08-007-synthetic-draft-before-back.png",
+      "test": "UnsentChatDraftUITests/testUnsentOwnedChatDraftResetsOnBackAndRevisitWithoutSend()",
+      "visualReviewed": true
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-P08-007-synthetic-draft-after-revisit.png",
+      "test": "UnsentChatDraftUITests/testUnsentOwnedChatReplyAndDraftResetOnBackAndRevisitWithoutSend()",
+      "visualReviewed": true
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-P08-007-unsent-draft-revisit-caregiver.json",
+      "test": "UnsentChatDraftUITests/testUnsentOwnedChatReplyAndDraftResetOnBackAndRevisitWithoutSend()",
+      "visualReviewed": false
+    },
+    {
+      "file": "Artifacts/small-caregiver-scoped-P08-007-synthetic-draft-before-back.png",
+      "test": "UnsentChatDraftUITests/testUnsentOwnedChatReplyAndDraftResetOnBackAndRevisitWithoutSend()",
+      "visualReviewed": true
+    }
+  ],
+  "publicPackage": {
+    "status": "REVIEWABLE — not staged or delivered",
+    "originalEvidenceRetainedLocally": true,
+    "rawLogsAndXCResultsIncluded": false,
+    "artifactInventory": [
+      {
+        "path": "Artifacts/small-caregiver-scoped-P04-032-owned-favorite-persistence.json",
+        "bytes": 325,
+        "sha256": "c831690bba4bcc7636060236a5301285b49dda286558e61382247c4ed9230129"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-support-required-gates-native.json",
+        "bytes": 131,
+        "sha256": "c8f4ad7d9651dc6cf40abe6295de86e0c15ce977f806c4a08b2c1e76f22acffc"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-P08-003-three-language-native-persistence.json",
+        "bytes": 546,
+        "sha256": "68173923dff2b5089cabdf27c70f10bba5ce410297845a01d80968eee4444070"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-matrix-owned-none-restored.json",
+        "bytes": 174,
+        "sha256": "79c57e94520dc3bbc81ea39bef07666970d3f43711943506e354a0810ef706f1"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-owned-state-render-active-caregiver.json",
+        "bytes": 290,
+        "sha256": "0f519ce4c7dde3ce519b6bc62cf8131a5390a519664c9b6989b6fd3a26b18d7c"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-owned-active-match-unmatch-control-only-caregiver.png",
+        "bytes": 8052,
+        "sha256": "1217ae04aecaa0767cddb882d21380f98dd8086cef321e34e042f74ac9bfd5a6"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-owned-active-match-icon-only-caregiver.png",
+        "bytes": 3587,
+        "sha256": "47b36628f216e6eee7f468b43ecf359dd715ac05592cbcb18b9a489773f320ec"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-owned-state-render-received-caregiver.json",
+        "bytes": 314,
+        "sha256": "32cf2a35b46a2ae4dcef3c0924d8bdd277fe1673536d760bbc04772ab80298ae"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-owned-received-match-accept-control-only-caregiver.png",
+        "bytes": 6155,
+        "sha256": "9107543908af92df2a5e17db3e69f219a31f321ff74c5a29082a078008ab33c4"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-owned-received-match-reject-control-only-caregiver.png",
+        "bytes": 6695,
+        "sha256": "beba550f9137af737971f0be4e30a160e2bb4ca7987e49c2bd291c5330c211f2"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-owned-state-render-sent-caregiver.json",
+        "bytes": 291,
+        "sha256": "413dbe8a4f6ed371ba921c10a84057e3378b4246f05054442713a6d436e3b16f"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-owned-sent-match-withdraw-control-only-caregiver.png",
+        "bytes": 8714,
+        "sha256": "5a77ae2cdf7bae80db93662284a08a1567da617f9d6f3ba5fbbc878954ad4237"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-owned-state-render-none-caregiver.json",
+        "bytes": 291,
+        "sha256": "8b93e8358e04d80a586c4285d8ccd32de9dc9a8b7db1896b39fe74752fe1698b"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-owned-none-match-request-control-only-caregiver.png",
+        "bytes": 9093,
+        "sha256": "a8d8216c878afd6096cbfc6283efdd3736d60ef10b27281084f0cdba398e0f83"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-active-owned-existing-chat-entry-caregiver.json",
+        "bytes": 324,
+        "sha256": "f3dc8d53365e3f563ac94238396f41f5ed2852b45db49d7db3efbfb1355f6352"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-active-chat-send-enabled-control-only-caregiver.png",
+        "bytes": 2934,
+        "sha256": "3b03c0573755a9c4b131ee3a054eff7500a39b08ed4338a5d5ea44bd3fc9ea46"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-owned-received-native-send-guard-caregiver.json",
+        "bytes": 300,
+        "sha256": "1bb7b7a835bd1c266a4b1160312e0d59584e29897ea033e11f92aebef1d0da81"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-owned-received-chat-restriction-only-caregiver.png",
+        "bytes": 12420,
+        "sha256": "3cc03d121bcf908bc829bebe30aa35bf99f5edf309770bb25f5098fc786c9b34"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-owned-sent-native-send-guard-caregiver.json",
+        "bytes": 296,
+        "sha256": "03ce6730ca562a795eafcdfb02e28317dbe2c003713c4d2f6d40a601310294e1"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-owned-sent-chat-restriction-only-caregiver.png",
+        "bytes": 12393,
+        "sha256": "7b92d696b50b133e6ad8f646d6a3bf11b187cf5b6f4fd3f96ade3fa5f0f086de"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-owned-none-native-send-guard-caregiver.json",
+        "bytes": 296,
+        "sha256": "8e40c0b30d29607ac3e0f4ae69c1f4823645cb1a118ac4cc6b6bb13c5b0342c1"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-owned-none-chat-restriction-only-caregiver.png",
+        "bytes": 11412,
+        "sha256": "6a9da1363a9f863bf50d7f429490e7bb6b244350c00aefe85c2d2e94c0be9cd3"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-P05-011-native-boundary-ledger.json",
+        "bytes": 122,
+        "sha256": "d8e012cab6a5ca3bf5b42ad3c14353fba8966bf1361e17aca53e05d983be908f"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-P05-006-native-boundary-ledger.json",
+        "bytes": 218,
+        "sha256": "175ad9ce109d1225257db23a4d02295f3610817f9721d9e0d709c0039b2b0523"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-P05-005-native-boundary-ledger.json",
+        "bytes": 125,
+        "sha256": "226bd39028d30368080cd7d8d92f577414eea9e72ff6bbdf78f7ca048b4d5648"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-P05-004-native-boundary-ledger.json",
+        "bytes": 125,
+        "sha256": "226bd39028d30368080cd7d8d92f577414eea9e72ff6bbdf78f7ca048b4d5648"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-P05-008-native-boundary-ledger.json",
+        "bytes": 92,
+        "sha256": "5a197e2df1c4649b8de54ff8a265e98d979a32b9c042dace3758c856df820a27"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-logout-fresh-owned-login-restored-role-data.json",
+        "bytes": 269,
+        "sha256": "37be5b540b3983d46ad411bfd0fe62d4cb03f757e0b7b7f025c6f806ddfbcb2a"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-P08-002-native-logout-scope-and-limits.json",
+        "bytes": 754,
+        "sha256": "50212a817436c9d7d3923e4a70f7da8120bf2ef3fc69c9ffbdc6ac64f89b5a88"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-logout-confirm-ordinary-relaunch-signed-out.json",
+        "bytes": 269,
+        "sha256": "363948a7331a094f8bad2776842e5ff443f483ad7c4e11234202d7f234340f50"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-logout-confirm-welcome.json",
+        "bytes": 248,
+        "sha256": "3912fb94f6df9076908e2cac0e02e36f66dc382572491f0c74674786cf9680a5"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-logout-cancel-ordinary-relaunch-restored.json",
+        "bytes": 266,
+        "sha256": "bcadcb24cda230cf8edc93c7f14bbf4479b42fed7ec12523a0b15febc05dcc1a"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-logout-cancel-main-retained.json",
+        "bytes": 253,
+        "sha256": "fa17b1427a616e10b7273675e3227e84a34f7982991099acffefef6487dab506"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-P08-007-synthetic-draft-after-revisit.png",
+        "bytes": 5247,
+        "sha256": "67f4cabc076c1bcbf4c52f85d8a29100e5cc59e071b7fa7246612cb52fec257a"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-P08-007-unsent-draft-revisit-caregiver.json",
+        "bytes": 682,
+        "sha256": "99e2a583d7fb176fe17ad8c2a76053ccebe350bf102e4c2de1ef97493ec3c3e4"
+      },
+      {
+        "path": "Artifacts/small-caregiver-scoped-P08-007-synthetic-draft-before-back.png",
+        "bytes": 9584,
+        "sha256": "1d4e0a3e1e18dbd22881fe02f04a71e70479b795094408249be0befe2e66f22f"
+      }
+    ],
+    "sourceIndexSHA256": "99c11cecbe668250ba728a21a98a4c63945d227b26a76ce3f778dcb74b536b5a",
+    "artifactHashNote": "Public JSON/text are sanitized; artifactInventory hashes apply to packaged bytes. Original indexed hashes, where present, refer to preserved original evidence."
+  }
+}

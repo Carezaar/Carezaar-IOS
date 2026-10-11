@@ -1,0 +1,52 @@
+{
+  "invocation": "fresh-small-caregiver-offline-action-check-public-units",
+  "overall": "PASS",
+  "publicUnitCount": 95,
+  "publicUnitSeconds": 26.942,
+  "nativeOfflineRetrySeconds": 113.437,
+  "nativeMatchReadOnlyRecoverySeconds": 213.894,
+  "rootSafeCropsReviewed": 3,
+  "rootReview": "Complete managed network error and synthetic retry bubble; complete managed TryAgain button.",
+  "scope": "Smallcaregiver only; P23-018 other3allocations untested. Global apptransportfault window, no endpoint-only or physical network claim. Exact owned NONE pair, nativepreflight+failedTryAgain+one successfulrecoveryGET, zerorelationshipmutation/backendNONEunchanged.",
+  "attachments": [
+    "Artifacts/small-caregiver-completed-recovery-owned-offline-preflight-retry-caregiver.json",
+    "Artifacts/small-caregiver-completed-recovery-owned-offline-retry-synthetic-bubble-only-caregiver.png",
+    "Artifacts/small-caregiver-completed-recovery-owned-offline-managed-network-error-only-caregiver.png",
+    "Artifacts/small-caregiver-completed-recovery-P23-018-native-read-only-recovery.json",
+    "Artifacts/small-caregiver-completed-recovery-P23-018-managed-retry-control.png"
+  ],
+  "publicPackage": {
+    "status": "REVIEWABLE — not staged or delivered",
+    "originalEvidenceRetainedLocally": true,
+    "rawLogsAndXCResultsIncluded": false,
+    "artifactInventory": [
+      {
+        "path": "Artifacts/small-caregiver-completed-recovery-owned-offline-preflight-retry-caregiver.json",
+        "bytes": 395,
+        "sha256": "927eba7ad7b01c7ec08848176116541bf3bfe70101bf9a6f37c67d79ba946b08"
+      },
+      {
+        "path": "Artifacts/small-caregiver-completed-recovery-owned-offline-retry-synthetic-bubble-only-caregiver.png",
+        "bytes": 15144,
+        "sha256": "d4c87b94c6fe5ec0b943de063164950867fd0ccaea0948cad4f368ae05b6c977"
+      },
+      {
+        "path": "Artifacts/small-caregiver-completed-recovery-owned-offline-managed-network-error-only-caregiver.png",
+        "bytes": 19395,
+        "sha256": "6a4a8156eda2f1b2314ca206ea93417a8549645ccc6b9656f7498ea702e41335"
+      },
+      {
+        "path": "Artifacts/small-caregiver-completed-recovery-P23-018-native-read-only-recovery.json",
+        "bytes": 373,
+        "sha256": "ebbd91aedb02894849c6aa8db962f89a3d09d53696a310400ba4095db6f11169"
+      },
+      {
+        "path": "Artifacts/small-caregiver-completed-recovery-P23-018-managed-retry-control.png",
+        "bytes": 6612,
+        "sha256": "fabe9fa2ba5501a10a577f585f17cd3e13b2697a7496f34c2d2c14f160a312d8"
+      }
+    ],
+    "sourceIndexSHA256": "e0ea5dac21e80cd275bf7a8f39ed9b3ae591744386a46a5507eb99efca37517a",
+    "artifactHashNote": "Public JSON/text are sanitized; artifactInventory hashes apply to packaged bytes. Original indexed hashes, where present, refer to preserved original evidence."
+  }
+}

@@ -1,0 +1,127 @@
+{
+  "role": "client",
+  "device": "Modern",
+  "nativeTestSeconds": 80.23,
+  "wholeInvocation": "PASS",
+  "rootViewedAllSixAnonymousCrops": true,
+  "sourceResult": "fresh-modern-client-match-state-contract-retest.xcresult",
+  "crops": {
+    "active-icon": {
+      "file": "Artifacts/match-state-modern-client-active-icon.png",
+      "width": 78,
+      "height": 78,
+      "sha256": "f9e923183eeb4575296fb32923a1bc7ab5c344428aeed91dd9be4ac62614d686",
+      "mostCommonNonWhiteRGB": [
+        {
+          "rgb": [
+            1,
+            187,
+            138
+          ],
+          "pixels": 190
+        },
+        {
+          "rgb": [
+            2,
+            187,
+            138
+          ],
+          "pixels": 15
+        },
+        {
+          "rgb": [
+            5,
+            188,
+            140
+          ],
+          "pixels": 9
+        },
+        {
+          "rgb": [
+            3,
+            187,
+            139
+          ],
+          "pixels": 8
+        },
+        {
+          "rgb": [
+            3,
+            188,
+            139
+          ],
+          "pixels": 8
+        }
+      ]
+    },
+    "none-request": {
+      "file": "Artifacts/match-state-modern-client-none-request.png",
+      "width": 1200,
+      "height": 156,
+      "sha256": "fb82bdeb1c85e834edfb61fac631b7d8ad5900ca550d3a0c86b539d1e9708fe7"
+    },
+    "sent-cancel": {
+      "file": "Artifacts/match-state-modern-client-sent-cancel.png",
+      "width": 1205,
+      "height": 161,
+      "sha256": "9907d897c1f85bf92fe80377cb39f3ec88ca45c82b84d49d843f6a44a930b7a4"
+    },
+    "received-reject": {
+      "file": "Artifacts/match-state-modern-client-received-reject.png",
+      "width": 587,
+      "height": 161,
+      "sha256": "15f063f7d6011eae380a20f23b42a827a6f515da9e6cba19fab06008c6bfff8d"
+    },
+    "received-accept": {
+      "file": "Artifacts/match-state-modern-client-received-accept.png",
+      "width": 582,
+      "height": 156,
+      "sha256": "b29c956158ee1918e8b5723a7c74c80ad720ed79de36c5931ef3bf792aa24f57"
+    },
+    "active-unmatch": {
+      "file": "Artifacts/match-state-modern-client-active-unmatch.png",
+      "width": 587,
+      "height": 161,
+      "sha256": "501da3731bf14cfd3db86aa25d6f93a27ebb33ca6ecc97b0b1d4d0a580dbd6ce"
+    }
+  },
+  "publicPackage": {
+    "status": "REVIEWABLE — not staged or delivered",
+    "originalEvidenceRetainedLocally": true,
+    "rawLogsAndXCResultsIncluded": false,
+    "artifactInventory": [
+      {
+        "path": "Artifacts/match-state-modern-client-active-icon.png",
+        "bytes": 5567,
+        "sha256": "f9e923183eeb4575296fb32923a1bc7ab5c344428aeed91dd9be4ac62614d686"
+      },
+      {
+        "path": "Artifacts/match-state-modern-client-none-request.png",
+        "bytes": 13740,
+        "sha256": "fb82bdeb1c85e834edfb61fac631b7d8ad5900ca550d3a0c86b539d1e9708fe7"
+      },
+      {
+        "path": "Artifacts/match-state-modern-client-sent-cancel.png",
+        "bytes": 15159,
+        "sha256": "9907d897c1f85bf92fe80377cb39f3ec88ca45c82b84d49d843f6a44a930b7a4"
+      },
+      {
+        "path": "Artifacts/match-state-modern-client-received-reject.png",
+        "bytes": 10862,
+        "sha256": "15f063f7d6011eae380a20f23b42a827a6f515da9e6cba19fab06008c6bfff8d"
+      },
+      {
+        "path": "Artifacts/match-state-modern-client-received-accept.png",
+        "bytes": 9562,
+        "sha256": "b29c956158ee1918e8b5723a7c74c80ad720ed79de36c5931ef3bf792aa24f57"
+      },
+      {
+        "path": "Artifacts/match-state-modern-client-active-unmatch.png",
+        "bytes": 13548,
+        "sha256": "501da3731bf14cfd3db86aa25d6f93a27ebb33ca6ecc97b0b1d4d0a580dbd6ce"
+      }
+    ],
+    "sourceIndexSHA256": "7a9dc300f4edfa228b62451dc83bf2bae359922d49ebc57fd78d48de5ce98fa2",
+    "artifactHashNote": "Public JSON/text are sanitized; artifactInventory hashes apply to packaged bytes. Original indexed hashes, where present, refer to preserved original evidence."
+  }
+}

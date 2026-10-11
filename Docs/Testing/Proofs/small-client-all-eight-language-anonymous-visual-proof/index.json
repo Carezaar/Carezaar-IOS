@@ -1,0 +1,338 @@
+{
+  "role": "client",
+  "device": "iPhone SE (3rd generation)",
+  "iOS": "26.5",
+  "test": "fresh-small-client-all-languages-full-row-guard",
+  "exit": 0,
+  "seconds": 455.258,
+  "languages": [
+    "in",
+    "cn",
+    "en",
+    "sp",
+    "fr",
+    "ru",
+    "ar",
+    "fa"
+  ],
+  "deliberateSafeControlCrops": 56,
+  "rootReviewedAll56CropsInEightUnscaledAnalysisSheets": true,
+  "scope": "Matches heading, sampled Messages label/control (may be bottom navigation tab), Profile description, Help subtitle, FAQ All, language settings heading and selected row; exact managed AX labels and ordinary relaunch; original language restored",
+  "allAppSurfacesVerified": false,
+  "exactCurrentSaveCopyVerified": false,
+  "forcedMissingTranslationFallbackVerified": false,
+  "artifacts": [
+    {
+      "name": "small-client-all-eight-language-P17-008-native-language-cleanup-result.txt",
+      "sha256": "be912a1106b420c2ec5f430f538812d453efb234908586791b8efe5594f5a1d3"
+    },
+    {
+      "name": "small-client-all-eight-language-ar-native-picker-restored_row_check-geometry.json",
+      "sha256": "ce15c719b9015936318fc0f60bc3b24e7a7da49bc1ec9aefe39268658e5a5b7b"
+    },
+    {
+      "name": "small-client-all-eight-language-ar-native-picker-before_selection_tap-geometry.json",
+      "sha256": "98f7f3a1f089f0c2e3af8a07883b364f228d7ea816a6e8f17c660c890c8dd24c"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-all-supported-managed-language-native-surfaces.json",
+      "sha256": "0599859eb2ca83e884ef8fa234a2f95205b1bd835ee7519a570690a3d6059fe2"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-fa-selected_language_option-control-crop.png",
+      "sha256": "e7d3b15f0bbd1880a1d464c2f476e5541a1fe3641adfd73e13ccbc36c8a5e851"
+    },
+    {
+      "name": "small-client-all-eight-language-fa-native-picker-selected_row_crop-geometry.json",
+      "sha256": "036c4442fcdadb954481b9d254c7c00f0a696f7cebc40a41a39f6a6b209e75d5"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-fa-settings_change_language_app_title-control-crop.png",
+      "sha256": "a1ef407e3abdd6f019caf20fc3a19760f2975ce26b7e7c52361710c0a5db0d05"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-fa-general_all-control-crop.png",
+      "sha256": "bdb3ece7f6f909d7b3d28c6527234d1ec4f51d7d624a7e5ccacf1e6c174058e0"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-fa-contact_support_subtitle-control-crop.png",
+      "sha256": "ad666b12375858229ac8cce97b4446fc95d6cf30d88940715e7f05aac9963443"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-fa-profile_description-control-crop.png",
+      "sha256": "03ba7218adcb85dc1240db6078865eb10c843f67f0d5d83472ef0d299d64dc1c"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-fa-messages_title-control-crop.png",
+      "sha256": "8bd5b47e94efe175e6c4fb11e4d1f517d90b59c5dcb3bf4da7780177175afb36"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-fa-client_matches_page_title-control-crop.png",
+      "sha256": "d23af83614fd506f36f0c59f8049f1b734fd2491b05c79f7fd5cc7a5f49498a6"
+    },
+    {
+      "name": "small-client-all-eight-language-fa-native-picker-before_selection_tap-geometry.json",
+      "sha256": "ff9234c5fe539c24f82fe6cea6942b0e2683ca0e3e03958e154421979ab948d7"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-ar-selected_language_option-control-crop.png",
+      "sha256": "05f3e857e883b3baa580f7a5aae844361187e66bf388b64841ab4fcc4fca1667"
+    },
+    {
+      "name": "small-client-all-eight-language-ar-native-picker-selected_row_crop-geometry.json",
+      "sha256": "d608677c4be3fd0610692cea38bbb33a38da452d89c4d46c2570dc1d63a58545"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-ar-settings_change_language_app_title-control-crop.png",
+      "sha256": "ffcf422355c2fad01f411f55476200a3061bde54dc9c0020f7a2ae210d3245e8"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-ar-general_all-control-crop.png",
+      "sha256": "00b2cf6f15b448ba9d81ac2f16b10bb802d3aff0b4f75bcdd82b808988fa34cb"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-ar-contact_support_subtitle-control-crop.png",
+      "sha256": "f0d4299e8955fee00435892a962c5fb29cee47a7bae75cc252f401d216ca3ba1"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-ar-profile_description-control-crop.png",
+      "sha256": "da06935a085ea4e2f5a16ff34b3ff6c5d6ff4165698973726a55dc487bacba71"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-ar-messages_title-control-crop.png",
+      "sha256": "7ab6fbffc2e0076daa5f209175d15e1e99d1c1b97c3550f9eafa183ce5bc9ac0"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-ar-client_matches_page_title-control-crop.png",
+      "sha256": "d21605b551c1c8b8ffd11d752de67372c2aa72449877b11b2466ecca9699d1ef"
+    },
+    {
+      "name": "small-client-all-eight-language-ar-native-picker-before_selection_tap-geometry.json",
+      "sha256": "3969fc3ff119fecd8a055a1d48cd0131911c18b120c16f66b85c38de7e4e49a2"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-ru-selected_language_option-control-crop.png",
+      "sha256": "3d56fefdc84e577ad79bb2d927acb6b5bbbe0407e5645ee8a73be57136018666"
+    },
+    {
+      "name": "small-client-all-eight-language-ru-native-picker-selected_row_crop-geometry.json",
+      "sha256": "80488f5bf60087e1aa8c6cb33b8c665ce0fbd42103d9e5212035c519a8ff5297"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-ru-settings_change_language_app_title-control-crop.png",
+      "sha256": "db90d28713a2344f9a58752012f8a377b8e34b8d4d31773aeac71581da300432"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-ru-general_all-control-crop.png",
+      "sha256": "d597767f20f0043836753458f9e1511da624cb2c19b28650170a4245e9fd73c7"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-ru-contact_support_subtitle-control-crop.png",
+      "sha256": "c776e4ca3bd7e4128bf8cd44ef929c8b075bdcb919660372476bbccc2baa3800"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-ru-profile_description-control-crop.png",
+      "sha256": "c378f70a939dfce0eee8b2324bccaa98b2d6d534552395d96de231f669a8e82d"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-ru-messages_title-control-crop.png",
+      "sha256": "db2fe1bef8981d47f9ce0f2c0fdded8898427c51d6c9d0613adace3876b6377b"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-ru-client_matches_page_title-control-crop.png",
+      "sha256": "668bc4aa5ff5cc83b2d0c08417198c4b74184cf55c264df4bb97b24cb463cb66"
+    },
+    {
+      "name": "small-client-all-eight-language-ru-native-picker-before_selection_tap-geometry.json",
+      "sha256": "b47c8b4230ec7aab4a1e091f779bc134f0ddb235c0797141aa925a87494ff954"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-fr-selected_language_option-control-crop.png",
+      "sha256": "5b79c4fe5eef3ccef3a7bf48b2ab5709a695984eebdcef329bb9050f799ac7c3"
+    },
+    {
+      "name": "small-client-all-eight-language-fr-native-picker-selected_row_crop-geometry.json",
+      "sha256": "9ee87dc48b87a050904044113c98dd506e51aa143dfc4470b7e2bc58f2f30178"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-fr-settings_change_language_app_title-control-crop.png",
+      "sha256": "ec3cd4e9e055fc6bd872d1c5f9ae2b03f543ba9b280c45b10795392643d96a87"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-fr-general_all-control-crop.png",
+      "sha256": "ad3a5862ed1d1d2cddbd0c8484dff44c3bfb5179fe96cf30cba68416383b773a"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-fr-contact_support_subtitle-control-crop.png",
+      "sha256": "77726bb9a4a7d2e7d8024b5d06e7753c170429f7744428221bdafc613513aa21"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-fr-profile_description-control-crop.png",
+      "sha256": "1beeff50bfa9df14838882e5d154ac5d6604992627540ce1b44a03b1af968192"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-fr-messages_title-control-crop.png",
+      "sha256": "e3fde76e0016cad0c3b0fbf255392ff4c41af1486980c61750177ed431d9bf35"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-fr-client_matches_page_title-control-crop.png",
+      "sha256": "081223833b8713126b9065e24d64b81dcd36d44b69d5849d4b71a34bbdd6620b"
+    },
+    {
+      "name": "small-client-all-eight-language-fr-native-picker-before_selection_tap-geometry.json",
+      "sha256": "06669f9c10ca048be45060974740113109ab05f96675c512165b5c3e06cbd8c6"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-sp-selected_language_option-control-crop.png",
+      "sha256": "9f601d946bd80024a7b5282f4176e346df1ac3e1ea2998972e87a06d63616888"
+    },
+    {
+      "name": "small-client-all-eight-language-sp-native-picker-selected_row_crop-geometry.json",
+      "sha256": "6b5265938c6df182f6b6ece5f25c36f76e5a47144b6b40c593669f11171bfb65"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-sp-settings_change_language_app_title-control-crop.png",
+      "sha256": "fb8417cdc55e32e71691c18ee83f8f154140f825d9d766a4120b6f108a29cb63"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-sp-general_all-control-crop.png",
+      "sha256": "25c17b980ac1b0f0d9468cd23e9c8546a1cf58c837b1719b6586bf203aa2aa71"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-sp-contact_support_subtitle-control-crop.png",
+      "sha256": "301352b6b432e93d4a5fe6e9f8e81d2addbe0ca79c60c374359df5e48550e158"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-sp-profile_description-control-crop.png",
+      "sha256": "8ee78a510ff001882f07205dd0a6c32be22079569a0d81470b963daf15e8cf0d"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-sp-messages_title-control-crop.png",
+      "sha256": "901f641c1ad227aab9126ccacb859510f1fce1fac050253ca166a5d9acbed859"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-sp-client_matches_page_title-control-crop.png",
+      "sha256": "6c3763c7bd68a804c1d88a17a5b86365ecd52affa517763752b5ec5fd7eaa143"
+    },
+    {
+      "name": "small-client-all-eight-language-sp-native-picker-before_selection_tap-geometry.json",
+      "sha256": "5e00aab24ac2ff3eafc00c5a20b2a49b3c762d611769e11e1d2fef931b6237a3"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-en-selected_language_option-control-crop.png",
+      "sha256": "03e543e5d6478448c457e7d643810dc32813685b9123c06a63a9e7e6067960f5"
+    },
+    {
+      "name": "small-client-all-eight-language-en-native-picker-selected_row_crop-geometry.json",
+      "sha256": "9995869c4aadb13783650d70c93d0ee7a7b8fb8415591a8829240c7136b17fab"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-en-settings_change_language_app_title-control-crop.png",
+      "sha256": "aa54bb7b8e0f51dd59c5278331e636a585fcb0eb262140a06ae032de33d8e8e5"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-en-general_all-control-crop.png",
+      "sha256": "8a121e95b6d5601466865bffd41aee6141d0cc1df463b470bac2a20995fd256e"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-en-contact_support_subtitle-control-crop.png",
+      "sha256": "4d9e1b65276d40b19b1a3672840f3cc07ba2c64a391c2a072c345dba6704a4e6"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-en-profile_description-control-crop.png",
+      "sha256": "d1d7a6fa3415d1a7eef5bd396d3d07d3f0855d0fdc692e36f05e65d347ebc812"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-en-messages_title-control-crop.png",
+      "sha256": "e3fde76e0016cad0c3b0fbf255392ff4c41af1486980c61750177ed431d9bf35"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-en-client_matches_page_title-control-crop.png",
+      "sha256": "6522f20950296bffeb8c99a38087ae7e9e403b1cc355f2382c456930fb86ff0a"
+    },
+    {
+      "name": "small-client-all-eight-language-en-native-picker-before_selection_tap-geometry.json",
+      "sha256": "f6bff1d4699dbd40bdf56bfaa7562b082c678738031ab9eb47a8bd74e557438d"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-cn-selected_language_option-control-crop.png",
+      "sha256": "92d1f0e56cf4ab4cde54d630337d803ce5f0d8ecfa4fc7228168f4f1f81e2f6c"
+    },
+    {
+      "name": "small-client-all-eight-language-cn-native-picker-selected_row_crop-geometry.json",
+      "sha256": "09f4bcb6f476f3edf9df523ce796d784297d6c912c3eb3ea59f4aa258cac2b62"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-cn-settings_change_language_app_title-control-crop.png",
+      "sha256": "cc1c0d6c956e6f9acb50bee1771e972ea9482a8d16fd448bf888e481ac870b1e"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-cn-general_all-control-crop.png",
+      "sha256": "870a10b38039729dc60213e5414c6914a500c3c2f46d1371833de17ca39df885"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-cn-contact_support_subtitle-control-crop.png",
+      "sha256": "14842a417e98c74871fd18b22700b7c0f108167a74f1c47fd0345cf8eeed8db6"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-cn-profile_description-control-crop.png",
+      "sha256": "221e771bac093ccfdf8c4bc0a394808adebf7d8780793d6eab9afd4de4e16d61"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-cn-messages_title-control-crop.png",
+      "sha256": "bb0f0ad0d0c264f7b207f421e9e147d7dfa52b38da5e146956ed7556b583bb9f"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-cn-client_matches_page_title-control-crop.png",
+      "sha256": "f51865fcaceeb1f1775aa164a7c2c8964fc52e8385aef027e3a9701c17bcb916"
+    },
+    {
+      "name": "small-client-all-eight-language-cn-native-picker-before_selection_tap-geometry.json",
+      "sha256": "0906845b5e01bc2d27406ddf5cfbdbb61aaa8162074c42e04324f05e2dcb4aba"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-in-selected_language_option-control-crop.png",
+      "sha256": "8b340beaa2a97486080d9e1696efc607d933d9441d54651d9803b1ee5f85a96c"
+    },
+    {
+      "name": "small-client-all-eight-language-in-native-picker-selected_row_crop-geometry.json",
+      "sha256": "a5f0cbc1eccba5a6840e7c801c7834a30ae0bd8cf403b920c2294a29db1ee149"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-in-settings_change_language_app_title-control-crop.png",
+      "sha256": "374e7ec732efd062180237920affb1ddc4fdcb5e2c206f6291551f84840a6a1c"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-in-general_all-control-crop.png",
+      "sha256": "7e95191c61c16fcb7d61b725c195f2b8ab40f9ea193f3a4900215b8897bd38d7"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-in-contact_support_subtitle-control-crop.png",
+      "sha256": "6ae2c83fb98841bda44b152cad859fcf3273ca8fd0a01be7a497db45908508ec"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-in-profile_description-control-crop.png",
+      "sha256": "cf289398946f1e78313823ece135cd4f6b8f71a9bad1934123094bb5b17a91b1"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-in-messages_title-control-crop.png",
+      "sha256": "8e3fcba70fc50ca51f775cfff3417921d99c2dfb608c60ac078e9d70d267eba4"
+    },
+    {
+      "name": "small-client-all-eight-language-P17-008-in-client_matches_page_title-control-crop.png",
+      "sha256": "a7c37e53aa4b598bc0dfed5d4018fe3712c804b9220bd524b923596d6f383cac"
+    },
+    {
+      "name": "small-client-all-eight-language-in-native-picker-before_selection_tap-geometry.json",
+      "sha256": "d9fddf76ef44276de0fa324261262a0dd43fb5332f8d956999828a9707596d2b"
+    }
+  ],
+  "publicPackage": {
+    "status": "REVIEWABLE — not staged or delivered",
+    "originalEvidenceRetainedLocally": true,
+    "rawLogsAndXCResultsIncluded": false,
+    "artifactInventory": [],
+    "sourceIndexSHA256": "ee51a442495521b22630759596a5fed148c6f4102eb776a0618462cd7ab51df9",
+    "artifactHashNote": "Public JSON/text are sanitized; artifactInventory hashes apply to packaged bytes. Original indexed hashes, where present, refer to preserved original evidence."
+  }
+}

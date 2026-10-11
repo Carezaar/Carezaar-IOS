@@ -1,0 +1,17 @@
+{
+  "case": "P08-002",
+  "credentialValuesInspectedOrAttached": false,
+  "nativeCancelAndConfirmObserved": true,
+  "nativeKeychainBackedStorePresenceInspected": true,
+  "ordinaryRelaunchRemainedSignedOut": true,
+  "postConfirmWelcomeAndSingleLogoutRequestStableSeconds": 3,
+  "repeatedConfirmAvailabilityCheckedAfterFirstTap": true,
+  "repeatedConfirmTapsCovered": false,
+  "role": "caregiver",
+  "savedSessionNotUsedAfterLogout": true,
+  "secondConfirmUnavailableReason": "native-alert-confirm-not-hittable-after-first-tap",
+  "secondRealConfirmTapPerformed": false,
+  "setupAndRecoveryAuthentication": "private-QA-login-env-not-typed-Sign-In",
+  "storedAccessPresentAfterOrdinaryRelaunch": false,
+  "storedRefreshPresentAfterOrdinaryRelaunch": false
+}

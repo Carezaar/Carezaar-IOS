@@ -1,0 +1,66 @@
+{
+  "bottom_navigation_matches": {
+    "captionFrame": {
+      "height": 168,
+      "width": 125,
+      "x": 250,
+      "y": 468.5
+    },
+    "expectedAXLabel": "المطابقات",
+    "observedAXLabel": "المطابقات",
+    "selected": true,
+    "targetFrame": {
+      "height": 168,
+      "width": 125,
+      "x": 250,
+      "y": 468.5
+    }
+  },
+  "bottom_navigation_messages": {
+    "captionFrame": {
+      "height": 107,
+      "width": 125,
+      "x": 125,
+      "y": 499
+    },
+    "expectedAXLabel": "الرسائل",
+    "observedAXLabel": "الرسائل",
+    "selected": true,
+    "targetFrame": {
+      "height": 107,
+      "width": 125,
+      "x": 125,
+      "y": 499
+    }
+  },
+  "bottom_navigation_profile": {
+    "captionFrame": {
+      "height": 229,
+      "width": 125,
+      "x": 0,
+      "y": 438
+    },
+    "expectedAXLabel": "الملف الشخصي",
+    "observedAXLabel": "الملف الشخصي",
+    "selected": true,
+    "targetFrame": {
+      "height": 229,
+      "width": 125,
+      "x": 0,
+      "y": 438
+    }
+  },
+  "brand": {
+    "height": 53.5,
+    "width": 137.5,
+    "x": 221.5,
+    "y": 26
+  },
+  "role": "client",
+  "viewport": {
+    "height": 667,
+    "width": 375,
+    "x": 0,
+    "y": 0
+  }
+}

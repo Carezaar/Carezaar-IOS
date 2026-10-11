@@ -1,0 +1,13 @@
+{
+  "backendRelationshipUnchanged": true,
+  "caseID": "P23-018",
+  "failedPreflightGETAttempts": 4,
+  "faultScope": "global-app-transport-during-action-phase",
+  "initialNoneVerified": true,
+  "initialProfileGETs": 1,
+  "noRelationStaging": true,
+  "originalActionRetained": true,
+  "ownedIdentityVerified": true,
+  "recoveryGETs": 1,
+  "relationshipMutationRequests": 0
+}

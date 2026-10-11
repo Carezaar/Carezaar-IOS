@@ -1,0 +1,468 @@
+{
+  "checkedAtUTC": "2026-10-11T18:12:37.441946+00:00",
+  "configuration": "Release",
+  "platform": "iOS Simulator",
+  "build": "PASS",
+  "analyze": "PASS",
+  "processExit": 0,
+  "binarySHA256": "0190da8906a78191b24d5dca7be8596e768f7837bb393d8e239972ef6b3c6d37",
+  "binaryBytes": 16051976,
+  "logSHA256": "e23dc61089a2a6e82515327f6787ffa4b51f71de5e60180e31a964672bca592f",
+  "requiredExcludedMarkers": [
+    {
+      "marker": "--qa-break-access",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    },
+    {
+      "marker": "--qa-break-access-later",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    },
+    {
+      "marker": "--qa-break-both",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    },
+    {
+      "marker": "--qa-clear-reference-cache",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    },
+    {
+      "marker": "--qa-corrupt-match-state",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    },
+    {
+      "marker": "--qa-latency",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    },
+    {
+      "marker": "--qa-location-fixture",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    },
+    {
+      "marker": "--qa-login",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    },
+    {
+      "marker": "--qa-login-env",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    },
+    {
+      "marker": "--qa-lose-owned-match-ack",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    },
+    {
+      "marker": "--qa-notification-missing-target",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    },
+    {
+      "marker": "--qa-offline",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    },
+    {
+      "marker": "--qa-owned-profile-no-location",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    },
+    {
+      "marker": "--qa-profile-inactive-then-unavailable",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    },
+    {
+      "marker": "--qa-push",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    },
+    {
+      "marker": "--qa-request-counts",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    },
+    {
+      "marker": "--qa-route",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    },
+    {
+      "marker": "--qa-seed-invalid-session",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    },
+    {
+      "marker": "--qa-signout",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    },
+    {
+      "marker": "--qa-tab",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    },
+    {
+      "marker": "QA lost-owned-match-ack",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    },
+    {
+      "marker": "notification-row-",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    },
+    {
+      "marker": "qa-location-fixture",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    },
+    {
+      "marker": "qa-notification-fallback",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    },
+    {
+      "marker": "qa-profile-no-location",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    },
+    {
+      "marker": "qa-request-counts",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    },
+    {
+      "marker": "qa-token-presence",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    },
+    {
+      "marker": "qaManualMapSelectionOccurred",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    },
+    {
+      "marker": "QA_CG_ID",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    },
+    {
+      "marker": "QA_CLIENT_USER_ID",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    },
+    {
+      "marker": "QA_EMAIL",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    },
+    {
+      "marker": "QA_PASSWORD",
+      "absentFromBinaryBytes": true,
+      "absentFromBinaryStrings": true
+    }
+  ],
+  "requiredExcludedMarkerCount": 32,
+  "debugAPIOverrideNameAbsent": true,
+  "productionSourceFilesMatchedPassing107UnitSnapshot": 57,
+  "productionSourceInventory": [
+    {
+      "path": "Carezaar/CarezaarApp.swift",
+      "sha256": "b2556a20824459c65c77b6013cf6a1db2471fcbeca98ec56ac510f321b4691bd",
+      "bytes": 10464
+    },
+    {
+      "path": "Carezaar/Components/DesignElement.swift",
+      "sha256": "469f2d85f5c455e70f0cfccde8ecc3daec3bdb1748bb796084ba98e365dfa0fc",
+      "bytes": 9089
+    },
+    {
+      "path": "Carezaar/Components/SourceSurface.swift",
+      "sha256": "5372fe2fa3c8debbf1e3d94e636ab36514a465eb9a419ad7daee8ab63836e7fd",
+      "bytes": 4744
+    },
+    {
+      "path": "Carezaar/Components/SourceText.swift",
+      "sha256": "23f0e66ef1a91dcbc38a6b957f280f3cf29b54f333320da4a9a4216477e18712",
+      "bytes": 7643
+    },
+    {
+      "path": "Carezaar/Components/SourceVector.swift",
+      "sha256": "a204b025291a95cc2bdb30b44b76a5b8cc41dc6ba0123e8c787187148139149c",
+      "bytes": 7030
+    },
+    {
+      "path": "Carezaar/Core/Networking/APIClient.swift",
+      "sha256": "6dc5d66e516c9464c7ad61a129a29a63c0a42200f6001b91569032bbe01e2ae3",
+      "bytes": 18481
+    },
+    {
+      "path": "Carezaar/Core/Networking/APIConfiguration.swift",
+      "sha256": "586c8d66e23704e893be57376b2f0e7d14212e65809eaeee9766c4efd919274f",
+      "bytes": 776
+    },
+    {
+      "path": "Carezaar/Core/Networking/APIEnvelope.swift",
+      "sha256": "d8396e5f4c43ee3808fd8b4806a6b60ed9713972a3961e97caee5ecc85e7d0dc",
+      "bytes": 2265
+    },
+    {
+      "path": "Carezaar/Core/Networking/APIError.swift",
+      "sha256": "e4c1d639fd609c60640caf5f60ce6db6fc042f1810dbd6ec578fb04dc0a3e2f1",
+      "bytes": 2754
+    },
+    {
+      "path": "Carezaar/Core/Networking/AppLanguage.swift",
+      "sha256": "e132903143cc3af0ecec07c2bf8af5340f66358a66f3b5521c33ace3b56f6c22",
+      "bytes": 1438
+    },
+    {
+      "path": "Carezaar/Core/Networking/Endpoint.swift",
+      "sha256": "e11075eab17f705bacf4856c628a069089020e7454e166a77f50d49cc6297ca1",
+      "bytes": 1745
+    },
+    {
+      "path": "Carezaar/Core/Session/DeviceInfo.swift",
+      "sha256": "384c7ee08ecb31e64d8e09fee9c550216cfb854590244710e9e40923f4fdb236",
+      "bytes": 1187
+    },
+    {
+      "path": "Carezaar/Core/Session/NotificationPoller.swift",
+      "sha256": "a8d9dda9a986c47db7fbe3d4e488989506475cc800d93758d64e3c01f85b04cf",
+      "bytes": 5380
+    },
+    {
+      "path": "Carezaar/Core/Session/ServerTime.swift",
+      "sha256": "c98fe0a4f2e2f47db073a653afdb3380ea71d341b4edcb6ac82857d5b519385c",
+      "bytes": 216
+    },
+    {
+      "path": "Carezaar/Core/Session/SessionManager.swift",
+      "sha256": "32360a09721ba3a8fdafc09d8ff0fe4dae94ed8476833eedfa172045e4d8d933",
+      "bytes": 8006
+    },
+    {
+      "path": "Carezaar/Core/Session/TokenStore.swift",
+      "sha256": "cb96f7e5cb9e1c8d55d0be7ed6975aa3f1b0c17b2c6290d4ff202674af479f83",
+      "bytes": 4204
+    },
+    {
+      "path": "Carezaar/Core/Storage/BaseDataStore.swift",
+      "sha256": "b93d3cbcab958f90bfd1fc9c3367175b711a24d8f321aeede094ac4f16e5a0dc",
+      "bytes": 8234
+    },
+    {
+      "path": "Carezaar/Core/Storage/Localization.swift",
+      "sha256": "d6951b77478f2b2b9e90e57069f1a78a8ed14be5e6f05e2cbed9f77082912fb8",
+      "bytes": 5275
+    },
+    {
+      "path": "Carezaar/Core/Validation/Validation.swift",
+      "sha256": "941d017d7beafb5c7f2e22b825f5ee4d4a7dacf884e654938282a89b0f31e718",
+      "bytes": 3077
+    },
+    {
+      "path": "Carezaar/Design/DesignNode.swift",
+      "sha256": "608068f3ba6cfa4cef59449e8821ba85f66d0189e08bb799117a4dfd45a7d907",
+      "bytes": 4445
+    },
+    {
+      "path": "Carezaar/Design/ViewportLayout.swift",
+      "sha256": "682e336e8d7382df343c5a4ddec1e0d0032a51f46bab44b945dc5430967a5717",
+      "bytes": 2162
+    },
+    {
+      "path": "Carezaar/Features/Auth/AuthScreens.swift",
+      "sha256": "2c5ea76815e0f8766618c18212f8dd06a000d72b703e3e0ce8e4139be73e116d",
+      "bytes": 30477
+    },
+    {
+      "path": "Carezaar/Features/Auth/PhotoCropper.swift",
+      "sha256": "33b87ac1588a6155e1f593a1718a6fba8d40523273b26438c154a66b36cb72bf",
+      "bytes": 5925
+    },
+    {
+      "path": "Carezaar/Features/Auth/ProfileFormView.swift",
+      "sha256": "40405c0bb8fd765249d004c455c0fed0113667b237ce6f63ebe33abc76f74523",
+      "bytes": 17928
+    },
+    {
+      "path": "Carezaar/Features/Auth/SignUpFlow.swift",
+      "sha256": "bc64d7b158903d26f2e05478bd9327a4b27c9148f173046055d44b09b8934831",
+      "bytes": 1131
+    },
+    {
+      "path": "Carezaar/Features/Auth/SplashView.swift",
+      "sha256": "32187a2edceab31f570d34d73216613fa8e722e81ef0275935e2ada24028267a",
+      "bytes": 1934
+    },
+    {
+      "path": "Carezaar/Features/DesignSystem/AppIcon.swift",
+      "sha256": "2510c3f10f05bf56a68f78728ad10f0ab01cedd1d58bb030de3e2084a6293cdc",
+      "bytes": 12055
+    },
+    {
+      "path": "Carezaar/Features/DesignSystem/Components.swift",
+      "sha256": "d0d0025d270b7d980e706e03ddaf36e99d911f3ad6a434d76ca8446ecda50cc2",
+      "bytes": 13710
+    },
+    {
+      "path": "Carezaar/Features/DesignSystem/Feedback.swift",
+      "sha256": "0cf49f88a784a9c45687b7061cc64e68235215946483b016fbe9f772fa56af88",
+      "bytes": 10524
+    },
+    {
+      "path": "Carezaar/Features/DesignSystem/FigmaScreen.swift",
+      "sha256": "e630faf213e202aabf6fcf23c7cc859a59f859aeed1c5d66e6263523418c95cb",
+      "bytes": 6676
+    },
+    {
+      "path": "Carezaar/Features/DesignSystem/Kit.swift",
+      "sha256": "03feef697b4a6c99c17e2d12980c6d59e6699337146903f334f2e95783ebb8a0",
+      "bytes": 17146
+    },
+    {
+      "path": "Carezaar/Features/DesignSystem/SceneBinder.swift",
+      "sha256": "d390bc72451dff8c67d68f9f97889b207a0d12747e5a3ce3b16ecf84bebecbe9",
+      "bytes": 2749
+    },
+    {
+      "path": "Carezaar/Features/DesignSystem/SelectionControls.swift",
+      "sha256": "65a466ed852ec1d8a745243624f6370bd0e5a8eacafa87297c5369f841a321bf",
+      "bytes": 6792
+    },
+    {
+      "path": "Carezaar/Features/DesignSystem/Theme.swift",
+      "sha256": "0d1164cd6c54458909c564092cfcb8dbf98eb89d7f22d524358e5d6fe6f6b9ce",
+      "bytes": 3891
+    },
+    {
+      "path": "Carezaar/Features/Main/ChatView.swift",
+      "sha256": "24a78ec38bf09c468f26842c93375accf55ea2726e3cddb7cf3517097ea5315e",
+      "bytes": 29983
+    },
+    {
+      "path": "Carezaar/Features/Main/FavoritesView.swift",
+      "sha256": "021ecc52b9f0033251875b137f12c02ad804b59739b1a4e96d78689d25528a62",
+      "bytes": 3440
+    },
+    {
+      "path": "Carezaar/Features/Main/MainView.swift",
+      "sha256": "4da97d01aba57b54332ce06dfedaaf5277bd333d16f11ab301185d8019726691",
+      "bytes": 27961
+    },
+    {
+      "path": "Carezaar/Features/Main/NotificationsView.swift",
+      "sha256": "40e14819da012b8f1d0f2f0a2bfdd7800be56436f07a22b4082e86c2ae78406a",
+      "bytes": 7041
+    },
+    {
+      "path": "Carezaar/Features/Main/PartnerDetailsView.swift",
+      "sha256": "eb39cbcf456c6abca64af1a1bae10ed8feb444e5abb542a83c22cd42b87bff8e",
+      "bytes": 37096
+    },
+    {
+      "path": "Carezaar/Features/Onboarding/LocationProvider.swift",
+      "sha256": "581423cc0c7b52697d7d68984d2c7c4e7ce77953d48e24ee10d7578698ed8ca9",
+      "bytes": 8650
+    },
+    {
+      "path": "Carezaar/Features/Onboarding/PreferencesWizard.swift",
+      "sha256": "6ebebbb5739b026362e934f562bbd2d07dc7205b1106ba49de8fdcbe38b63adc",
+      "bytes": 37648
+    },
+    {
+      "path": "Carezaar/Features/Settings/SettingsScreens.swift",
+      "sha256": "befeb8be84f1b1906f9b83550c38794a21e5bc536a10415f7835fe0eb41fd607",
+      "bytes": 26697
+    },
+    {
+      "path": "Carezaar/Models/BaseMetadata.swift",
+      "sha256": "816742afc9bf5ff6698a09fecf023ebc5c80f00ef6a91e8ac7f96eb6dba96eab",
+      "bytes": 5713
+    },
+    {
+      "path": "Carezaar/Models/Chat.swift",
+      "sha256": "677698448c56cc9ecf5d4fae31099b065ef7d351a7bda394e3df6cd5299edabc",
+      "bytes": 4117
+    },
+    {
+      "path": "Carezaar/Models/Match.swift",
+      "sha256": "aed5eff0f073e26e3a9f4863685da570779ff72e8c4ca55ae275cefc18bf1609",
+      "bytes": 4685
+    },
+    {
+      "path": "Carezaar/Models/Profiles.swift",
+      "sha256": "c9c3b1d1f6b75b23ef1282e01077e1fad1e0d190cb469c9b529abe193f389349",
+      "bytes": 9810
+    },
+    {
+      "path": "Carezaar/Models/Support.swift",
+      "sha256": "eb2297bea4ebb80f86c57cec578ed970b0c4c25d745711c37317e4021ed44d85",
+      "bytes": 1178
+    },
+    {
+      "path": "Carezaar/Models/User.swift",
+      "sha256": "1d9950d2ba2560d92c422e9e55d6688419b38df353a0922d2927c4fe29d8b9f3",
+      "bytes": 4484
+    },
+    {
+      "path": "Carezaar/Navigation/AppRouter.swift",
+      "sha256": "f97563e347872bb35389e957bad9f22663a4cc158b1b8dc0613efb3def936dbe",
+      "bytes": 743
+    },
+    {
+      "path": "Carezaar/Navigation/QALaunch.swift",
+      "sha256": "bf96d3e9ab38a5f6ce1a3b95317228715efc08b7f5fc62abe2342f7ad756ebd6",
+      "bytes": 20597
+    },
+    {
+      "path": "Carezaar/Navigation/Route.swift",
+      "sha256": "0d55d8c1f1cc4cb97592c27f87715cc04a3c0fe42e1c4f63c6b73d821a9f1c42",
+      "bytes": 3522
+    },
+    {
+      "path": "Carezaar/Screens/SourceScreen.swift",
+      "sha256": "ac93d91c6b760c071f13af00baa2c2bf191a1bd50d02125d6518e22c367d1016",
+      "bytes": 4486
+    },
+    {
+      "path": "Carezaar/Services/AuthService.swift",
+      "sha256": "3b9ee6d393c0c849e2293266adfef190fa9aad4c5161a30b001a48da912ddd39",
+      "bytes": 1786
+    },
+    {
+      "path": "Carezaar/Services/BaseService.swift",
+      "sha256": "b806541b44f3490d0deba3f57840e1f88618b522bf375ae3516c8a4e8d5d6987",
+      "bytes": 3385
+    },
+    {
+      "path": "Carezaar/Services/CaregiverService.swift",
+      "sha256": "4d14b0b1a5a2a7e86bb6d560a99190cda0641a10cd27d2a10d284318439ef053",
+      "bytes": 2998
+    },
+    {
+      "path": "Carezaar/Services/ClientService.swift",
+      "sha256": "4df459941b725df39cb6ad089ae6b3a396526c971a6cc0a615834d2d41c24de9",
+      "bytes": 3376
+    },
+    {
+      "path": "Carezaar/Services/UserService.swift",
+      "sha256": "e97e28ab665cd207c3624551af72eebc84c2890070c5a547760b416763d63074",
+      "bytes": 10594
+    }
+  ],
+  "warnings": [
+    "AppIntents metadata extraction skipped because the application has no AppIntents framework dependency"
+  ],
+  "physicalSigningDistributionAndReleaseRuntimeSuiteVerified": false,
+  "stagedCommittedPushed": false
+}

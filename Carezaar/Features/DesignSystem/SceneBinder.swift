@@ -12,6 +12,8 @@ import SwiftUI
 struct SceneBinder {
     /// Live text for an input node, or nil to leave it as a local demo field.
     var binding: (DesignNode) -> Binding<String>? = { _ in nil }
+    /// A screen-owned visibility toggle; password inputs stay secure by default.
+    var isPasswordRevealed: (DesignNode) -> Bool = { _ in false }
     /// Handles a tap. Return true when handled, false to fall back to scene navigation.
     var handle: (DesignNode) -> Bool = { _ in false }
     /// Whether a selectable node is currently selected (`selectionGroup` nodes).

@@ -34,7 +34,8 @@ struct UserService: Sendable {
         )
     }
 
-    /// Served since 2026-10-01. Success ends the session (the user signs in again).
+    /// Change the password without locally revoking a valid current session.
+    /// The caller verifies auth/info; actual backend refusal still ends authentication.
     func changePassword(oldPassword: String, newPassword: String) async throws {
         try await client.sendIgnoringResult(
             Endpoint(method: .patch, path: "users/password/change",

@@ -1,0 +1,15 @@
+{
+  "actualSuccessfulAcknowledgementsDropped": 1,
+  "backendSentReceivedSameOwnedEdge": true,
+  "caseID": "P23-017",
+  "faultScope": "one-actual-2xx-owned-request-acknowledgement",
+  "managedChangedFeedbackObserved": true,
+  "nativeProfileReadsBeforeRevisit": 3,
+  "nativeSentActionObserved": true,
+  "ownedPairStartedNone": true,
+  "realRequestPOSTsBeforeRevisit": 1,
+  "requestBodyCaptured": false,
+  "revisitMutationRequests": 0,
+  "scenarioLostAcknowledgement": true,
+  "scenarioOtherSessionRelationshipChange": false
+}

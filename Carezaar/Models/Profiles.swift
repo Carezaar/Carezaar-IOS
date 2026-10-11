@@ -39,9 +39,9 @@ struct CaregiverFull: Codable, Identifiable, Hashable, Sendable {
     let clienttypeIds: [Int]
     let languageskillIds: [Int]
     let shiftIds: [Int]
-    let isMatch: Bool
-    let matchStatus: String?
-    let matchId: Int?
+    var isMatch: Bool
+    var matchStatus: String?
+    var matchId: Int?
     let matchIntroduction: String?
 
     private enum CodingKeys: String, CodingKey {
@@ -109,9 +109,9 @@ struct ClientFull: Codable, Identifiable, Hashable, Sendable {
     let roleIds: [Int]
     let shiftIds: [Int]
     let worktypeIds: [Int]
-    let isMatch: Bool
-    let matchStatus: String?
-    let matchId: Int?
+    var isMatch: Bool
+    var matchStatus: String?
+    var matchId: Int?
     let matchIntroduction: String?
 
     private enum CodingKeys: String, CodingKey {
@@ -259,4 +259,15 @@ extension CaregiverFull {
 
 extension ClientFull {
     var matchState: ProfileMatchState? { ProfileMatchState(status: matchStatus, id: matchId) }
+}
+
+extension CaregiverFull {
+    func with(matchStatus: String, matchId: Int) -> Self {
+        var copy = self; copy.matchStatus = matchStatus; copy.matchId = matchId; copy.isMatch = matchStatus == "active"; return copy
+    }
+}
+extension ClientFull {
+    func with(matchStatus: String, matchId: Int) -> Self {
+        var copy = self; copy.matchStatus = matchStatus; copy.matchId = matchId; copy.isMatch = matchStatus == "active"; return copy
+    }
 }

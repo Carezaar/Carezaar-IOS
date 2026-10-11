@@ -1,0 +1,203 @@
+{
+  "source": "fresh-small-client-current-chat-match-recovery.xcresult",
+  "wholeProcessExit": 65,
+  "allocation": "small client",
+  "individualPassSeconds": {
+    "offline": 112.406,
+    "slow": 79.914,
+    "failedCheckRetry": 209.798,
+    "otherSessionMatch": 50.45,
+    "lostAck": 43.767
+  },
+  "replyFailure": {
+    "seconds": 111.666,
+    "line": 238,
+    "beforeNativeSend": true,
+    "reason": "Selected candidate itself has parent quote; no adjacent visible menu in text-based range"
+  },
+  "rootReviewedCroppedPNGs": 10,
+  "lostAckToastCropFading": true,
+  "correctedOriginalPeerAndWholeMenuHelperRuntimePending": true,
+  "strictBothOwnedNoneCleanupVerified": true,
+  "artifacts": [
+    {
+      "path": "Artifacts/small-client-recovery-initial-001-BE97CB65-6101-41A2-A074-9D1E71C22188.json",
+      "description": "owned-offline-preflight-retry-client_0_FA710FFC-0446-4AF4-90E4-31A99EF3124B.json",
+      "sha256": "a678592cd1ca02aeb402cf84e019c8ac94182580b39748249d3badbd7e693128"
+    },
+    {
+      "path": "Artifacts/small-client-recovery-initial-002-F2FE4523-A34E-4E53-85A1-73BEE4DD6970.png",
+      "description": "owned-offline-retry-synthetic-bubble-only-client_0_C3E7817B-1BF6-4BB3-A881-07329DC07087.png",
+      "sha256": "116016ac5df344c3c6b55bb0b6913147b9e69d2093c0748066aed9ae54f89ef8"
+    },
+    {
+      "path": "Artifacts/small-client-recovery-initial-003-FE3DBD6B-740D-49AF-8CB9-0A5259E46932.png",
+      "description": "owned-offline-managed-network-error-only-client_0_3CE3A5CF-FA38-4945-99CF-B70C320855B2.png",
+      "sha256": "10f2c4b976b246339e02a6881bf46bf4f91afca417971b19e0aad568be96cc55"
+    },
+    {
+      "path": "Artifacts/small-client-recovery-initial-004-CD5231A3-1074-4D34-BCA4-34B48A117890.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_97B1637E-2D41-46EA-AA50-9B22E22CEE54.json",
+      "sha256": "6165b727e11d8b2bf5a4e10d88185facf0aebc303dcc7254777d2fc1e0aed6d0"
+    },
+    {
+      "path": "Artifacts/small-client-recovery-initial-005-B628DBFE-9D91-44A3-8079-69090CF0C593.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_30E37CAC-766C-4C90-B173-5B8D66E429EA.json",
+      "sha256": "f19d41a3b71defe0f675dfe493e0a8a07b6dc5c32e49f6ddc788a9f5c6f72b1c"
+    },
+    {
+      "path": "Artifacts/small-client-recovery-initial-006-85038C59-D28B-4376-900C-E911073D8488.json",
+      "description": "owned-slow-send-new-typing-client_0_C31C5408-1B43-4DFF-8CE0-3E0E2C82EE20.json",
+      "sha256": "5f5cc60ec4509e84bf66307890c6423767f3c9c28c613c242c64bc12f115992a"
+    },
+    {
+      "path": "Artifacts/small-client-recovery-initial-007-5D1F41D5-A655-4D16-AA02-0D8649B0091F.png",
+      "description": "owned-slow-send-retained-synthetic-draft-only-client_0_31943470-E72C-4E97-9731-AE7B71CB0D78.png",
+      "sha256": "bc427ac02934de36d261f196c5eb011c9c379261723a285aad8c578d190b418c"
+    },
+    {
+      "path": "Artifacts/small-client-recovery-initial-008-08FF2161-F788-4882-8DEC-2FA6C1DD23E0.png",
+      "description": "owned-slow-send-first-synthetic-bubble-only-client_0_7DE0C22B-F91B-43E7-820D-C8472EBB7A0A.png",
+      "sha256": "4b26ba109eaf666d4027a989aa3cca903dfeff12151166c0b6b4496201a5ed7a"
+    },
+    {
+      "path": "Artifacts/small-client-recovery-initial-009-1E7A3CAA-2FCA-4901-A9E7-785C950CC478.json",
+      "description": "P23-018-native-read-only-recovery_0_860C63C4-CF9D-43DB-918C-BF5C11A9FA47.json",
+      "sha256": "30175396563bd992c3d0141895e5534fd495c90aff566a81ad523896607bab46"
+    },
+    {
+      "path": "Artifacts/small-client-recovery-initial-010-3219D7A5-D190-47AC-A0E4-CBB9C82D4A0A.png",
+      "description": "P23-018-managed-retry-control_0_F9D578FB-393F-4F6B-A2BA-635BD879BB6A.png",
+      "sha256": "5cba0f7bfa34ae7392af4a0b5ffb9bcb8a9afa70d62c276b05f07cfbf6ed43bb"
+    },
+    {
+      "path": "Artifacts/small-client-recovery-initial-011-2C2B1DEC-0027-4D96-82A5-2F8952D9CD03.json",
+      "description": "P23-017-real-owned-other-session-action-change_0_25D6B1C8-3980-49D5-BB2F-63CC3751FC29.json",
+      "sha256": "d63751a8e5798ae7237af4c000bfbc72bc06c016fe1cf5aa102e38ca879fbc76"
+    },
+    {
+      "path": "Artifacts/small-client-recovery-initial-012-CAF88D67-AC19-47E5-96DB-4E8B10B674BA.png",
+      "description": "P23-017-other-session-match-reject-only_0_A2268175-7B7E-403E-8036-2BE608B3F37C.png",
+      "sha256": "beba550f9137af737971f0be4e30a160e2bb4ca7987e49c2bd291c5330c211f2"
+    },
+    {
+      "path": "Artifacts/small-client-recovery-initial-013-40AD0348-8F08-4834-966D-24F732765AB5.png",
+      "description": "P23-017-other-session-match-accept-only_0_B2D05E4C-A73B-4BE1-BB5F-2CD09E37EFD4.png",
+      "sha256": "a84132866cd7ae03b720669726b1eb6938cee0907e5c3f5357414a4860733c33"
+    },
+    {
+      "path": "Artifacts/small-client-recovery-initial-014-94FFA109-2880-4BC1-85FE-EC300E0B5B5A.png",
+      "description": "P23-017-other-session-standard-changed-control_0_A65A6F9A-006B-4B60-BAC0-12AFA57D204F.png",
+      "sha256": "fbe3aad4c562f90bd4259f3e2869c50988f3a1414839348ea25b237a7a9b393f"
+    },
+    {
+      "path": "Artifacts/small-client-recovery-initial-015-663E97EC-0B8F-4E81-9C9A-526A4887170B.json",
+      "description": "P23-017-real-owned-request-lost-ack-reconciliation_0_810C771E-A3AA-48C3-8CE8-447E5CC196F7.json",
+      "sha256": "0781c4a3e01278e646ee682e27737724cc82295baea58c58e1031ad6c039c401"
+    },
+    {
+      "path": "Artifacts/small-client-recovery-initial-016-21B47F2E-A7FA-43BC-B76D-B744A73BA1C2.png",
+      "description": "P23-017-lost-ack-sent-withdraw-control_0_EEB80C47-01A5-4672-B336-FCB586BFB180.png",
+      "sha256": "0c5596e0a969d25c3e7460ce278464c3bdb5a60ae9fdf4e9a987dc310616308a"
+    },
+    {
+      "path": "Artifacts/small-client-recovery-initial-017-7EF06F84-6F64-4CE6-AABF-70D6425C6F4C.png",
+      "description": "P23-017-lost-ack-managed-changed-control_0_FA2BA879-BC19-4C5F-B195-5F997225DF7D.png",
+      "sha256": "b291c4bf2a282670cab94ea18bd05fcc33117ad56e087042646a25d3298cf000"
+    }
+  ],
+  "publicPackage": {
+    "status": "REVIEWABLE — not staged or delivered",
+    "originalEvidenceRetainedLocally": true,
+    "rawLogsAndXCResultsIncluded": false,
+    "artifactInventory": [
+      {
+        "path": "Artifacts/small-client-recovery-initial-001-BE97CB65-6101-41A2-A074-9D1E71C22188.json",
+        "bytes": 392,
+        "sha256": "d25a441ad2908d407b882a03dde21234e36af88131b661eb5fec1327a4b4aefa"
+      },
+      {
+        "path": "Artifacts/small-client-recovery-initial-002-F2FE4523-A34E-4E53-85A1-73BEE4DD6970.png",
+        "bytes": 15889,
+        "sha256": "116016ac5df344c3c6b55bb0b6913147b9e69d2093c0748066aed9ae54f89ef8"
+      },
+      {
+        "path": "Artifacts/small-client-recovery-initial-003-FE3DBD6B-740D-49AF-8CB9-0A5259E46932.png",
+        "bytes": 23971,
+        "sha256": "10f2c4b976b246339e02a6881bf46bf4f91afca417971b19e0aad568be96cc55"
+      },
+      {
+        "path": "Artifacts/small-client-recovery-initial-004-CD5231A3-1074-4D34-BCA4-34B48A117890.json",
+        "bytes": 442,
+        "sha256": "94f30fc9bf2b8068329965a05254b97a29b2d856fb21ad8164c2f20804fb7a14"
+      },
+      {
+        "path": "Artifacts/small-client-recovery-initial-005-B628DBFE-9D91-44A3-8079-69090CF0C593.json",
+        "bytes": 438,
+        "sha256": "0af4a97a093c1c2fb8f8e8ed7b8d4daaa568af911fddca45bbdf6769ac1a57f7"
+      },
+      {
+        "path": "Artifacts/small-client-recovery-initial-006-85038C59-D28B-4376-900C-E911073D8488.json",
+        "bytes": 360,
+        "sha256": "47fe92d75244cfb6f9b4628d1f4f3a33d6e3340820901c2a88bf211c8aa26744"
+      },
+      {
+        "path": "Artifacts/small-client-recovery-initial-007-5D1F41D5-A655-4D16-AA02-0D8649B0091F.png",
+        "bytes": 5389,
+        "sha256": "bc427ac02934de36d261f196c5eb011c9c379261723a285aad8c578d190b418c"
+      },
+      {
+        "path": "Artifacts/small-client-recovery-initial-008-08FF2161-F788-4882-8DEC-2FA6C1DD23E0.png",
+        "bytes": 15264,
+        "sha256": "4b26ba109eaf666d4027a989aa3cca903dfeff12151166c0b6b4496201a5ed7a"
+      },
+      {
+        "path": "Artifacts/small-client-recovery-initial-009-1E7A3CAA-2FCA-4901-A9E7-785C950CC478.json",
+        "bytes": 373,
+        "sha256": "ebbd91aedb02894849c6aa8db962f89a3d09d53696a310400ba4095db6f11169"
+      },
+      {
+        "path": "Artifacts/small-client-recovery-initial-010-3219D7A5-D190-47AC-A0E4-CBB9C82D4A0A.png",
+        "bytes": 5848,
+        "sha256": "5cba0f7bfa34ae7392af4a0b5ffb9bcb8a9afa70d62c276b05f07cfbf6ed43bb"
+      },
+      {
+        "path": "Artifacts/small-client-recovery-initial-011-2C2B1DEC-0027-4D96-82A5-2F8952D9CD03.json",
+        "bytes": 541,
+        "sha256": "5ca9040ec53f50ac4b8a8eddc53d48c486ed9614d81d67e981b53ad41703abd5"
+      },
+      {
+        "path": "Artifacts/small-client-recovery-initial-012-CAF88D67-AC19-47E5-96DB-4E8B10B674BA.png",
+        "bytes": 6695,
+        "sha256": "beba550f9137af737971f0be4e30a160e2bb4ca7987e49c2bd291c5330c211f2"
+      },
+      {
+        "path": "Artifacts/small-client-recovery-initial-013-40AD0348-8F08-4834-966D-24F732765AB5.png",
+        "bytes": 6154,
+        "sha256": "a84132866cd7ae03b720669726b1eb6938cee0907e5c3f5357414a4860733c33"
+      },
+      {
+        "path": "Artifacts/small-client-recovery-initial-014-94FFA109-2880-4BC1-85FE-EC300E0B5B5A.png",
+        "bytes": 5500,
+        "sha256": "fbe3aad4c562f90bd4259f3e2869c50988f3a1414839348ea25b237a7a9b393f"
+      },
+      {
+        "path": "Artifacts/small-client-recovery-initial-015-663E97EC-0B8F-4E81-9C9A-526A4887170B.json",
+        "bytes": 524,
+        "sha256": "9d9c94a4b4fe1e61285bdfc16ffd99395c477f8140c46cdef138aacc784c4ba2"
+      },
+      {
+        "path": "Artifacts/small-client-recovery-initial-016-21B47F2E-A7FA-43BC-B76D-B744A73BA1C2.png",
+        "bytes": 8714,
+        "sha256": "0c5596e0a969d25c3e7460ce278464c3bdb5a60ae9fdf4e9a987dc310616308a"
+      },
+      {
+        "path": "Artifacts/small-client-recovery-initial-017-7EF06F84-6F64-4CE6-AABF-70D6425C6F4C.png",
+        "bytes": 5164,
+        "sha256": "b291c4bf2a282670cab94ea18bd05fcc33117ad56e087042646a25d3298cf000"
+      }
+    ],
+    "sourceIndexSHA256": "bbb288053fe48296c9ed6f62a94f6fd730c352e27307e0e7d629d3697c04a651",
+    "artifactHashNote": "Public JSON/text are sanitized; artifactInventory hashes apply to packaged bytes. Original indexed hashes, where present, refer to preserved original evidence."
+  }
+}

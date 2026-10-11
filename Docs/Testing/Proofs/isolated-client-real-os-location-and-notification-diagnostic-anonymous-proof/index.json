@@ -1,0 +1,100 @@
+{
+  "source": "isolated-native-real-settings-and-location-direct-label-retest.xcresult",
+  "wholeProcessExit": 65,
+  "individualLocationResult": "PASS",
+  "individualLocationSeconds": 54.031,
+  "separateNotificationSettingsResult": "FAIL47.678 after observedoriginalenabledswitch; centered label tap didnotchangestate",
+  "role": "client",
+  "device": "Task-owned isolated iPhoneSE3 iOS26.5",
+  "rootReviewedAllFiveBoundedCropsAndSixAnonymousJSON": true,
+  "scope": "ActualOSlocationNever; nativeLocationProvider withoutlocationfixture, controlled exactownednil-coordinateprofileread; mapContinuewithoutselection, zero profilewrites, savedpreferences unchanged. Notificationenabledswitch observed only.",
+  "notificationSettingsChangeAndRestoreVerified": false,
+  "physicalGPSVerified": false,
+  "validSaveAttempted": false,
+  "physicalCamera": "UNTESTED user deferred",
+  "artifacts": [
+    {
+      "path": "Artifacts/isolated-client-permission-001-AF6DD11B-AA8F-4B7A-B35D-10987EAA8B03.json",
+      "description": "actual-os-location-denied-native_0_8BB96A53-609C-4DA0-B734-BD939309563B.json",
+      "sha256": "4f784a3605c0c0c9992ab97af50af9b280bbd5be85c2ed3e339e8b660889a4e5",
+      "test": "PermissionSettingsBoundaryUITests/testActualOSLocationDeniedMapContinueKeepsNilWithoutProfileWrites()",
+      "packagedSha256": "4f784a3605c0c0c9992ab97af50af9b280bbd5be85c2ed3e339e8b660889a4e5"
+    },
+    {
+      "path": "Artifacts/isolated-client-permission-002-3C115836-9CA0-4938-85B6-58A86F9BF0B6.png",
+      "description": "actual-location-denied-map-continue-only_0_073860D6-C63E-43F5-8029-0FBFC50B18E8.png",
+      "sha256": "40c9ac5decd71b7b646db63db66c3b4df703bb0361810cc7d6ce11c3d27ec7b2",
+      "test": "PermissionSettingsBoundaryUITests/testActualOSLocationDeniedMapContinueKeepsNilWithoutProfileWrites()",
+      "packagedSha256": "40c9ac5decd71b7b646db63db66c3b4df703bb0361810cc7d6ce11c3d27ec7b2"
+    },
+    {
+      "path": "Artifacts/isolated-client-permission-003-3913EA89-FB3F-47A3-9F9A-25663683F46A.png",
+      "description": "actual-location-denied-schedule-guidance-only_0_99A1A567-C21B-4AF2-9FCC-B6BFE6B29691.png",
+      "sha256": "0ddc85426e5d3d52bd57d2371f0f38460d939a5e395b86e2a34cab14678769dd",
+      "test": "PermissionSettingsBoundaryUITests/testActualOSLocationDeniedMapContinueKeepsNilWithoutProfileWrites()",
+      "packagedSha256": "0ddc85426e5d3d52bd57d2371f0f38460d939a5e395b86e2a34cab14678769dd"
+    },
+    {
+      "path": "Artifacts/isolated-client-permission-004-377BF7FB-248D-4F77-AA53-E737201DB6CA.png",
+      "description": "location-native-settings-never-only_0_668647C4-9F87-4E65-9293-33896E3DDF92.png",
+      "sha256": "519dda30ece7fa2218478e3f3f7e3eeba32327fb9f75c3a98522965526af5057",
+      "test": "PermissionSettingsBoundaryUITests/testActualOSLocationDeniedMapContinueKeepsNilWithoutProfileWrites()",
+      "packagedSha256": "519dda30ece7fa2218478e3f3f7e3eeba32327fb9f75c3a98522965526af5057"
+    },
+    {
+      "path": "Artifacts/isolated-client-permission-005-DE0D3191-6F4B-4E56-AEF4-80BD2E7E0FBD.json",
+      "description": "native-settings-navigation-carezaar_0_80932FB6-5E9B-4F41-92D1-189AF901C097.json",
+      "sha256": "6cba7a7c6c2258e0698f3a47fa956b4c10fd7ec0759d9af11a8cfaaa36e0a245",
+      "test": "PermissionSettingsBoundaryUITests/testActualOSLocationDeniedMapContinueKeepsNilWithoutProfileWrites()",
+      "packagedSha256": "6cba7a7c6c2258e0698f3a47fa956b4c10fd7ec0759d9af11a8cfaaa36e0a245"
+    },
+    {
+      "path": "Artifacts/isolated-client-permission-006-B07A9839-B46D-4F15-BE6A-002C146EFA83.json",
+      "description": "native-settings-navigation-apps_0_B9BE30A8-116C-4B12-89B9-83FA5E6C5002.json",
+      "sha256": "4e18a5e4524144e3f2765203f04964d801d0aa226e942de355c12eedb0fb9bd4",
+      "test": "PermissionSettingsBoundaryUITests/testActualOSLocationDeniedMapContinueKeepsNilWithoutProfileWrites()",
+      "packagedSha256": "4e18a5e4524144e3f2765203f04964d801d0aa226e942de355c12eedb0fb9bd4"
+    },
+    {
+      "path": "Artifacts/isolated-client-permission-007-FE0BF222-FD53-4820-B859-63C50386726E.png",
+      "description": "notification-settings-original-switch-only_0_485FD2D4-E7B1-4037-B3F9-37DFB72BFB06.png",
+      "sha256": "20b0737e238577031adc529bfd173936db2309f5a2d6be88cfcd610eb6dab20c",
+      "test": "PermissionSettingsBoundaryUITests/testOwnedDecidedNotificationSettingsChangeAndRestore()",
+      "packagedSha256": "20b0737e238577031adc529bfd173936db2309f5a2d6be88cfcd610eb6dab20c"
+    },
+    {
+      "path": "Artifacts/isolated-client-permission-008-EA9D1EB7-7D09-4B5A-B85C-7883AF21B30C.json",
+      "description": "native-settings-navigation-notifications_0_AAC6BC55-C71F-4A6F-801E-5102E2966F23.json",
+      "sha256": "1e5caedd4d096a736b2418d3c3fdb9cef0b4b0ae49eb4c2e30fe1c19575e124b",
+      "test": "PermissionSettingsBoundaryUITests/testOwnedDecidedNotificationSettingsChangeAndRestore()",
+      "packagedSha256": "1e5caedd4d096a736b2418d3c3fdb9cef0b4b0ae49eb4c2e30fe1c19575e124b"
+    },
+    {
+      "path": "Artifacts/isolated-client-permission-009-EC0FAD0B-86A6-47FA-BA13-3C6911E3452F.json",
+      "description": "native-settings-navigation-carezaar_0_00005ED7-B721-41C8-9C63-D48C2B7B716E.json",
+      "sha256": "6cba7a7c6c2258e0698f3a47fa956b4c10fd7ec0759d9af11a8cfaaa36e0a245",
+      "test": "PermissionSettingsBoundaryUITests/testOwnedDecidedNotificationSettingsChangeAndRestore()",
+      "packagedSha256": "6cba7a7c6c2258e0698f3a47fa956b4c10fd7ec0759d9af11a8cfaaa36e0a245"
+    },
+    {
+      "path": "Artifacts/isolated-client-permission-010-1972707E-E40C-4D7B-A9AD-542BAF6780C2.json",
+      "description": "native-settings-navigation-apps_0_81E9BFC9-F62E-42E7-914C-B8F8CD9C88A2.json",
+      "sha256": "048816c0fcf7bc58ca3d5d12426191d6886fa13189ab67d9cd12ea2ef62166e5",
+      "test": "PermissionSettingsBoundaryUITests/testOwnedDecidedNotificationSettingsChangeAndRestore()",
+      "packagedSha256": "048816c0fcf7bc58ca3d5d12426191d6886fa13189ab67d9cd12ea2ef62166e5"
+    },
+    {
+      "path": "Artifacts/isolated-client-permission-011-6F965005-F2CA-4D40-947F-58D5F82288AB.png",
+      "description": "permission-authenticated-matches-tab-only_0_17C386EB-C30E-4EB0-BF4E-8C75FC97E3E1.png",
+      "sha256": "6d32c081d8626dbffc706c8a4614b6f0d62560138baba092c5d93e251c2c1bec",
+      "test": "PermissionSettingsBoundaryUITests/testOwnedDecidedNotificationSettingsChangeAndRestore()",
+      "packagedSha256": "6d32c081d8626dbffc706c8a4614b6f0d62560138baba092c5d93e251c2c1bec"
+    }
+  ],
+  "publicPackage": {
+    "originalEvidenceRetainedLocally": true,
+    "rawLogsAndXCResultsIncluded": false,
+    "privateSettingsAXAndFullScreenshotsIncluded": false,
+    "allBoundedArtifactsRootReviewed": true
+  }
+}

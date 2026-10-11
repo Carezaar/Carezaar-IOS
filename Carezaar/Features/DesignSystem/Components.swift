@@ -15,9 +15,9 @@ struct PrimaryButton: View {
                 if isLoading { ProgressView().tint(.white) }
             }
             .font(Theme.Typography.filledLabel())
-            .foregroundStyle(.white)
+            .foregroundStyle(isEnabled ? Color.white : Theme.Palette.disabledForeground)
             .frame(maxWidth: .infinity, minHeight: 52)
-            .background(isEnabled ? Theme.Palette.primary : Theme.Palette.primary.opacity(0.4))
+            .background(isEnabled ? Theme.Palette.primary : Theme.Palette.disabledBackground)
             .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.field, style: .continuous))
         }
         .disabled(!isEnabled || isLoading)
@@ -62,10 +62,31 @@ struct LabeledField: View {
 
             HStack {
                 Group {
-                    if isSecure && !isRevealed {
-                        SecureField(placeholder, text: $text)
+                    if isSecure {
+                        // UITextField's native placeholder is always one line. Keep
+                        // the complete instruction visible when it needs to wrap.
+                        ZStack(alignment: .leading) {
+                            if text.isEmpty {
+                                Text(placeholder)
+                                    .foregroundStyle(Theme.Palette.textSecondary)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .allowsHitTesting(false)
+                                    .accessibilityHidden(true)
+                            }
+                            Group {
+                                if isRevealed { TextField("", text: $text) }
+                                else { SecureField("", text: $text) }
+                            }
+                            .frame(minHeight: 44)
+                            .accessibilityLabel(label)
+                            .accessibilityHint(placeholder)
+                            .accessibilityIdentifier(placeholder)
+                        }
                     } else {
                         TextField(placeholder, text: $text)
+                            .accessibilityLabel(label)
+                            .accessibilityHint(placeholder)
+                            .accessibilityIdentifier(placeholder)
                     }
                 }
                 .font(Theme.Typography.control())
@@ -115,7 +136,7 @@ struct PasswordRulesView: View {
                             tint: rule.isSatisfied ? Theme.Palette.success : Theme.Palette.textSecondary)
                     Text(loc.t("\(prefix)_password_validation_\(rule.id)", rule.label))
                         .font(Theme.Typography.caption(12))
-                        .foregroundStyle(rule.isSatisfied ? Theme.Palette.success : Theme.Palette.textSecondary)
+                        .foregroundStyle(rule.isSatisfied ? Theme.Palette.successText : Theme.Palette.textSecondary)
                 }
                 .padding(.horizontal, 10).padding(.vertical, 6)
                 .background(rule.isSatisfied ? Color(hex: 0xE9F8F3) : Color(hex: 0xF3F4F6), in: Capsule())

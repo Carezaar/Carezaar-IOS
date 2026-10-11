@@ -1,0 +1,271 @@
+{
+  "source": "fresh-small-caregiver-current-chat-final.xcresult",
+  "rootReviewed": true,
+  "publishable": false,
+  "artifacts": [
+    {
+      "path": "Artifacts/06FC9DDC-87DC-4892-B93F-A470ED491B05.json",
+      "description": "owned-unread-zero-incoming-native-read-clear-caregiver_0_CC49EA8C-AD81-4F8E-9093-169628EE668F.json",
+      "sha256": "578598b248294c8256000f12ecb974eb7d989315af7bee85351bc7a2d0bf0d72",
+      "packagedSha256": "578598b248294c8256000f12ecb974eb7d989315af7bee85351bc7a2d0bf0d72"
+    },
+    {
+      "path": "Artifacts/162825DB-7F03-4F95-8883-C98B43904FD8.json",
+      "description": "owned-unread-native-row-geometry-caregiver_0_AA4A39D8-8848-4884-A4AE-D613E358A72C.json",
+      "sha256": "3956c944f4266fd515b2dc89ce21c85e793ebee2199b7a0a7ed2554f0b06638a",
+      "packagedSha256": "3956c944f4266fd515b2dc89ce21c85e793ebee2199b7a0a7ed2554f0b06638a"
+    },
+    {
+      "path": "Artifacts/E7D5D741-2FD6-41D2-8459-09B192D57790.png",
+      "description": "owned-unread-indicator-control-only-caregiver_0_D76C9459-32D1-4C9A-955F-F2EF14F36D22.png",
+      "sha256": "74e1cb09dbff0b1396fa01c92822e7dcf1e2d47b735436e540f661375339e12e",
+      "packagedSha256": "74e1cb09dbff0b1396fa01c92822e7dcf1e2d47b735436e540f661375339e12e"
+    },
+    {
+      "path": "Artifacts/252CD6F2-4B00-46F5-AA67-FF7FB25FD820.json",
+      "description": "owned-incoming-bottom-older-position-timestamps-caregiver_0_05606A2E-6C03-4A10-A35F-1F77C057C60E.json",
+      "sha256": "01f7efde40294ef6364946598a4391b0809479c435899bd0384c79f1d28ca72d",
+      "packagedSha256": "01f7efde40294ef6364946598a4391b0809479c435899bd0384c79f1d28ca72d"
+    },
+    {
+      "path": "Artifacts/4B97CCA7-3205-40A3-BE67-3943C2B51504.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_82E7B0AF-214D-4855-B42E-55835F158F75.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/7E4C79B3-B1C8-4212-BE6A-87260EACE41D.png",
+      "description": "owned-incoming-reading-stored-timestamp-only-caregiver_0_BA479ECC-90C8-43F1-9CEF-218AC43072A5.png",
+      "sha256": "6e7167a1593a36114b439162dad105764609ead9a962430b870805008e08f36e",
+      "packagedSha256": "6e7167a1593a36114b439162dad105764609ead9a962430b870805008e08f36e"
+    },
+    {
+      "path": "Artifacts/6A7E906F-CD7A-40D6-83D1-8533984DC480.png",
+      "description": "owned-incoming-after-manual-return-synthetic-message-only-caregiver_0_F39F48B8-CD39-4B84-8B02-95B115A7A982.png",
+      "sha256": "d6fa44730a437c5d93e14b44e4cbbcb89382f13b7b4c841f95476abe270b6103",
+      "packagedSha256": "d6fa44730a437c5d93e14b44e4cbbcb89382f13b7b4c841f95476abe270b6103"
+    },
+    {
+      "path": "Artifacts/C8D6E0AF-E3F2-4C5B-9350-F31710AD436F.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_E84A9CAC-0154-4114-8697-00414E9BF1A5.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/3F5F8C8E-CE23-4D36-AC20-F9A0D7AEC033.png",
+      "description": "owned-incoming-preserved-older-synthetic-message-only-caregiver_0_ECB38DEB-8114-4EC9-AB9F-83058602B0DE.png",
+      "sha256": "fa9f5d0da3365283451efdbcbdb8619f93c848fc8557aab7c33c0b4844750b62",
+      "packagedSha256": "fa9f5d0da3365283451efdbcbdb8619f93c848fc8557aab7c33c0b4844750b62"
+    },
+    {
+      "path": "Artifacts/BB68816D-8028-4F80-AB33-DE66F4CC8C69.png",
+      "description": "owned-incoming-bottom-stored-timestamp-only-caregiver_0_9BD75D80-A2E8-464A-ACE2-5CCFB50B6022.png",
+      "sha256": "032c75edeef3c7000b6ad6abc5af6af8190d01398ee9c46faed949dae57d4921",
+      "packagedSha256": "032c75edeef3c7000b6ad6abc5af6af8190d01398ee9c46faed949dae57d4921"
+    },
+    {
+      "path": "Artifacts/8495E937-3347-4BEE-B9E0-54F201A4038D.png",
+      "description": "owned-incoming-bottom-synthetic-message-only-caregiver_0_631DD1AA-A541-4413-886C-4D510463475D.png",
+      "sha256": "b3a5ebb9f2f16515ef0f1daf69626722e3b71c53cba75916c003ba5a38c18bd2",
+      "packagedSha256": "b3a5ebb9f2f16515ef0f1daf69626722e3b71c53cba75916c003ba5a38c18bd2"
+    },
+    {
+      "path": "Artifacts/DB5EBDB8-476E-4E30-A5F5-A5E2666A1A1E.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_B89B99E6-06A4-4582-8FDC-FECD77341DFE.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/FD4CFA09-7EA3-4D8B-90CB-EB7CF4F84D09.json",
+      "description": "owned-incoming-during-initial-load-completed_0_D035F40A-73DD-4AF7-902A-89F6694FF826.json",
+      "sha256": "d6268d1d45c4ce2671bb231208cba9bd1763ced8667f291bf1276556b0cdb074",
+      "packagedSha256": "d6268d1d45c4ce2671bb231208cba9bd1763ced8667f291bf1276556b0cdb074"
+    },
+    {
+      "path": "Artifacts/DF1FE245-DD34-41DA-AAF2-E07F8D3224FE.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_6E645131-1312-49DC-91F2-80F5B4834143.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/87F507F5-22E7-48CD-812B-BDAE2E880F44.png",
+      "description": "owned-incoming-during-initial-load-synthetic-message-only-caregiver_0_725DC3C6-7803-4E64-A7A4-5E9713D6747F.png",
+      "sha256": "e8d93ea20f594014c065a965d2cab1f7c07ad3e95eb108d29f286920d6919986",
+      "packagedSha256": "e8d93ea20f594014c065a965d2cab1f7c07ad3e95eb108d29f286920d6919986"
+    },
+    {
+      "path": "Artifacts/223CF22C-97E9-4F2F-9687-A32A6EF4C31A.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_CA52928F-883B-4001-8C35-615DA30A58D9.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/E54C43C4-689E-4BC2-B08D-4F0D5C4BC04A.json",
+      "description": "owned-incoming-during-initial-load-pending_0_96A8366E-C1BF-4A6E-BEC5-F790AB35189C.json",
+      "sha256": "b7eda1d5710ef13da8e77aa1e07209db414c2fa55cb58035d20f507cf448c61a",
+      "packagedSha256": "b7eda1d5710ef13da8e77aa1e07209db414c2fa55cb58035d20f507cf448c61a"
+    },
+    {
+      "path": "Artifacts/03C82432-9114-42B7-AAFE-79C481D21AC7.json",
+      "description": "owned-keyboard-visible-incoming-boundaries-caregiver_0_0E9C871B-A317-410B-90A9-E5EAE90856FA.json",
+      "sha256": "789ff0c4b344b668fc249f11ab06e0ee313c6ac239133b1301be7877dd48a249",
+      "packagedSha256": "789ff0c4b344b668fc249f11ab06e0ee313c6ac239133b1301be7877dd48a249"
+    },
+    {
+      "path": "Artifacts/D69DAEB6-E1B1-420D-938F-893DD5AD4BA1.png",
+      "description": "owned-keyboard-incoming-latest-reachable-synthetic-message-only-caregiver_0_B604A825-E58C-4C3D-97BD-136F03D530A5.png",
+      "sha256": "e25ead22fd4da46534e42933b5617a32f06fbac272dfcfa2bdb6f6275a652891",
+      "packagedSha256": "e25ead22fd4da46534e42933b5617a32f06fbac272dfcfa2bdb6f6275a652891"
+    },
+    {
+      "path": "Artifacts/6EBCB05D-DAF7-42B2-986F-3747B3F2A94D.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_A1667FF9-F92D-4518-985C-0BE248960CB4.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/5E0D8ECC-662A-4964-9EF7-9DD8F072550F.png",
+      "description": "owned-keyboard-incoming-anchored-older-synthetic-message-only-caregiver_0_C2C1FD62-7ACA-409C-BBF5-A8425FE4C5FE.png",
+      "sha256": "2f72cb8b0ce63d1b65f78189a600ef4e2eb8da311dbdc1dd1fec53ed56169a5f",
+      "packagedSha256": "2f72cb8b0ce63d1b65f78189a600ef4e2eb8da311dbdc1dd1fec53ed56169a5f"
+    },
+    {
+      "path": "Artifacts/D6991483-4537-45F1-A0FA-C53F1D08400D.png",
+      "description": "owned-keyboard-incoming-bottom-synthetic-message-only-caregiver_0_A41A727B-7EC2-4ED2-8A4A-0B3FBC6B648F.png",
+      "sha256": "cc281d5fbfe2b09855064593d936b7b2c8683ac4af63e851cac78846f34ebf4b",
+      "packagedSha256": "cc281d5fbfe2b09855064593d936b7b2c8683ac4af63e851cac78846f34ebf4b"
+    },
+    {
+      "path": "Artifacts/D58DA7D3-8B9F-4064-B5D5-75E0765D0836.json",
+      "description": "owned-adjacent-timestamp-structural-ownership_0_031537BA-96C6-447B-BDAE-54324AFA512D.json",
+      "sha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b",
+      "packagedSha256": "82dee9694a509c63995beefd93634a419049e3115df2bdddce8af088bb6ecf3b"
+    },
+    {
+      "path": "Artifacts/BD85226E-2C16-498A-8EE4-9DE8409BD7F2.png",
+      "description": "owned-keyboard-incoming-unsent-synthetic-draft-only-caregiver_0_61AD6CE2-7277-42BB-81F6-F5711B9F5EC2.png",
+      "sha256": "73ceb3fdbebefc30755893db6388d420ed47a518ed7d1bef787f9647d2dc0839",
+      "packagedSha256": "73ceb3fdbebefc30755893db6388d420ed47a518ed7d1bef787f9647d2dc0839"
+    },
+    {
+      "path": "Artifacts/63F3FEBB-A613-4D4A-85F4-F79FC675E7DA.json",
+      "description": "owned-keyboard-older-focus-geometry_0_8C0A4FCF-B915-4491-B372-770EC38F2A90.json",
+      "sha256": "9d35b13dc5e9c5b9449df0b06d96dbccbdeca97e45224eaffc101cecb0d50e64",
+      "packagedSha256": "9d35b13dc5e9c5b9449df0b06d96dbccbdeca97e45224eaffc101cecb0d50e64"
+    },
+    {
+      "path": "Artifacts/429447A4-12DC-4FC0-96CF-CDE732D8F2D7.json",
+      "description": "owned-reply-race-acknowledged-caregiver_0_5764691F-B7EB-4BC9-9AFB-931927A532C5.json",
+      "sha256": "3229ee5ae66d95f574287552ba542e259fa6b77f16fdabf10db9097da699d97c",
+      "packagedSha256": "3229ee5ae66d95f574287552ba542e259fa6b77f16fdabf10db9097da699d97c"
+    },
+    {
+      "path": "Artifacts/098B05FD-5CF9-4F0E-9EE5-930368E412A4.png",
+      "description": "owned-reply-race-synthetic-acknowledged-message-only-caregiver_0_BC952657-3590-44A0-9902-C097B44607AB.png",
+      "sha256": "639806d673fadc342f0cf518ab0f7e857a0d8509fcef50e35fef7e8c5555d39f",
+      "packagedSha256": "639806d673fadc342f0cf518ab0f7e857a0d8509fcef50e35fef7e8c5555d39f"
+    },
+    {
+      "path": "Artifacts/606F92A9-C37F-4BE4-BC66-97CEB35F8B0B.json",
+      "description": "owned-reply-race-timing-caregiver_0_96801BD0-84DE-4C69-84D5-C1C551CFEABE.json",
+      "sha256": "5e3d527292482ff17bdb0caaf864348aaee0cdac3493046217767270ec37b5e4",
+      "packagedSha256": "5e3d527292482ff17bdb0caaf864348aaee0cdac3493046217767270ec37b5e4"
+    },
+    {
+      "path": "Artifacts/CCBF5F0E-0857-4998-B034-546A60865F6F.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_87223531-02E2-4BE9-8C28-0460ABC3B127.json",
+      "sha256": "afe69d0c04cce84b735f0494caf4398ec08b602ccee02cccda78bc4aeed5225d",
+      "packagedSha256": "afe69d0c04cce84b735f0494caf4398ec08b602ccee02cccda78bc4aeed5225d"
+    },
+    {
+      "path": "Artifacts/A2D21BEB-DA4B-46E1-BED6-FCBE11B63760.json",
+      "description": "owned-reply-race-native-transcript-reveal_0_630EFD12-DB97-427B-A3E3-AF39F4E5B7DA.json",
+      "sha256": "81a33478f045a824e7629e417516096b546e74e685c37067a6b38057b1d37c6e",
+      "packagedSha256": "81a33478f045a824e7629e417516096b546e74e685c37067a6b38057b1d37c6e"
+    },
+    {
+      "path": "Artifacts/7810D920-F2FE-49F2-95DB-CDFC55AC0CC4.json",
+      "description": "owned-slow-send-new-typing-caregiver_0_93E63A3B-F609-47E4-96F0-F7F8353FD731.json",
+      "sha256": "dd28804b4e08f78c3082d55a147b75501f350205643f339d09d7132bf0918abb",
+      "packagedSha256": "dd28804b4e08f78c3082d55a147b75501f350205643f339d09d7132bf0918abb"
+    },
+    {
+      "path": "Artifacts/C48121EB-F54B-4A15-8718-5FD52019A067.png",
+      "description": "owned-slow-send-retained-synthetic-draft-only-caregiver_0_8259CDBC-C25F-4693-974D-E6CD2C206C77.png",
+      "sha256": "dc4627d64774dc12545c987a0abe87c6e48a02085fbe333e3fe3c28b745a28ac",
+      "packagedSha256": "dc4627d64774dc12545c987a0abe87c6e48a02085fbe333e3fe3c28b745a28ac"
+    },
+    {
+      "path": "Artifacts/B2F1752C-9353-46D7-AF2E-07F6FA8D2AE5.png",
+      "description": "owned-slow-send-first-synthetic-bubble-only-caregiver_0_056CCE39-EF9E-47A8-A832-5EF5755D8C9A.png",
+      "sha256": "e47d1c8717a6bf588d03b100747d079bb843f10fa51b3fb6a0cbc3822fe77488",
+      "packagedSha256": "e47d1c8717a6bf588d03b100747d079bb843f10fa51b3fb6a0cbc3822fe77488"
+    },
+    {
+      "path": "Artifacts/B4F1F42A-0829-4E08-BDAB-F38510ACB5FE.json",
+      "description": "real-native-instant-reciprocal-proof_0_5DD0F44A-7920-495A-84FA-7ED320D2B0E7.json",
+      "sha256": "36fb4df529d36a04d89f6d978e202b4884a2d06457137e299c14453b5b05f1ad",
+      "packagedSha256": "36fb4df529d36a04d89f6d978e202b4884a2d06457137e299c14453b5b05f1ad"
+    },
+    {
+      "path": "Artifacts/A8381691-5F12-457A-8A61-84392A7ACDA5.png",
+      "description": "real-instant-matched-profile-control_0_38E8762C-EB13-47A1-B7F2-AA81C956B910.png",
+      "sha256": "ac4b954ef326dd84cf15f45aaaf2f71578ab62af93eef2d66a3ec48f42899efd",
+      "packagedSha256": "ac4b954ef326dd84cf15f45aaaf2f71578ab62af93eef2d66a3ec48f42899efd"
+    }
+  ],
+  "rootReviewScope": "Directly inspected all15 boundedPNGs via3unscaledprivate sheets; read20anonymousJSONs/all35hashesverified. Seven fullSmallCGPASS andContactSKIP10.877 noMail retained. Existinghistory unread0\u21921\u21920, actualapplied incoming/position\u22643/storedstructuralfooter/Backreentry, pretransportinitialload\u2014notheldHTTPresponse, actual216keyboard/reducedviewport/draft viaAX\u2014nativekeyboarddismissal unavailableUNVERIFIED. Replyfull180.384/checkpoint8.5983099937438965 allobs/0banners/2gesturesfulltextMenu44/native1ack/originalparentboth/newReplyretained. Slow61.846 native1progress/typingnotsent. GenuineInstant153.529 actualACTIVEboth/native1Request0Accept/peerwindow2.4816960096. No fulltranscript/profile/privatefixture/camera crops; croppedinputvisiblepart only, exactdraft viaAX/JSON.",
+  "independentlyReviewed": true,
+  "independentReviewScope": "Independently inspected all15 bounded PNGs through three unscaled review sheets; parsed all20 anonymous JSON artifacts and verified all35 SHA-256 hashes. Synthetic-only message/control/draft rasters contain no fixture names/emails/credentials/profile/camera/whole-transcript content. Input crops show visible prefixes only; exact retained draft is supported by AX/JSON assertions, not full visual text. Scoped evidence covers existing-history unread0\u21921\u21920; actual applied incoming and older-position tolerance3points, exact structural raw timestamp footer/Backreentry; pretransport initial-operation incoming (not held HTTP response); actual216point software keyboard with reduced viewport and retained unsent draft; strict Reply checkpoint8.5983099937438965<10 includes all observations/zero encountered banners, two observed-frame gestures expose fullbody+44x44Menu, nativePOST0\u21921ack/originalparent bothperspectives/newerReply retained; slow-send native1POST/progress and continued typing unsent; genuine reciprocal instant ACTIVE bothaccepted/native1Request0Accept/peer window2.4816960096359253. Seven completed individualPASS, ContactSKIP10.877 no mail handler preserved. Native keyboard dismissal, held HTTP response, never-opened empty conversation, larger-history performance and full original-case QA remain unverified. No scope promotion or publication performed.",
+  "independentReviewed": true,
+  "independentReview": "Independently inspected all15 bounded PNGs through three unscaled review sheets; parsed all20 anonymous JSON artifacts and verified all35 SHA-256 hashes. Synthetic-only message/control/draft rasters contain no fixture names/emails/credentials/profile/camera/whole-transcript content. Input crops show visible prefixes only; exact retained draft is supported by AX/JSON assertions, not full visual text. Scoped evidence covers existing-history unread0\u21921\u21920; actual applied incoming and older-position tolerance3points, exact structural raw timestamp footer/Backreentry; pretransport initial-operation incoming (not held HTTP response); actual216point software keyboard with reduced viewport and retained unsent draft; strict Reply checkpoint8.5983099937438965<10 includes all observations/zero encountered banners, two observed-frame gestures expose fullbody+44x44Menu, nativePOST0\u21921ack/originalparent bothperspectives/newerReply retained; slow-send native1POST/progress and continued typing unsent; genuine reciprocal instant ACTIVE bothaccepted/native1Request0Accept/peer window2.4816960096359253. Seven completed individualPASS, ContactSKIP10.877 no mail handler preserved. Native keyboard dismissal, held HTTP response, never-opened empty conversation, larger-history performance and full original-case QA remain unverified. No scope promotion or publication performed.",
+  "scope": "Small caregiver selected batch completed exit0 with seven PASS and Contact SKIP10.877. Full strictReply180.384/checkpoint8.5983099937438965 includesallobservations, zero banners, 2 boundedgestures/fulltext+44Menu, native1ack/parentboth/newReplyretained. Other scope limits preserved.",
+  "testResults": [
+    {
+      "method": "Unread",
+      "status": "PASS",
+      "seconds": 60.946
+    },
+    {
+      "method": "Incoming",
+      "status": "PASS",
+      "seconds": 107.657
+    },
+    {
+      "method": "Initial loading and reentry",
+      "status": "PASS",
+      "seconds": 239.699
+    },
+    {
+      "method": "Keyboard incoming and older reading",
+      "status": "PASS",
+      "seconds": 120.844
+    },
+    {
+      "method": "Strict Reply",
+      "status": "PASS",
+      "seconds": 180.384
+    },
+    {
+      "method": "Slow send",
+      "status": "PASS",
+      "seconds": 61.846
+    },
+    {
+      "method": "Contact Email",
+      "status": "SKIP",
+      "seconds": 10.877
+    },
+    {
+      "method": "Genuine reciprocal instant match",
+      "status": "PASS",
+      "seconds": 153.529
+    }
+  ],
+  "publicPackage": {
+    "rootReviewed": true,
+    "independentReviewed": true,
+    "originalEvidencePreserved": true,
+    "rawLogsXCResultsFullScreenPhotosPrivateFixturesIncluded": false
+  }
+}

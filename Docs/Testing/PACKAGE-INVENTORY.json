@@ -1,0 +1,399 @@
+{
+  "status": "REVIEWABLE \u2014 root privacy scan/review pending; no staging/commit/push",
+  "reports": [
+    "IOS_TEST_EXECUTION_REPORT.md",
+    "IOS-FUNCTIONAL-PARITY-MATRIX.md",
+    "IOS-FIGMA-PARITY.md",
+    "BACKEND-ISSUES-FOR-CLIENT.md",
+    "QA-CASE-MANIFEST.md",
+    "EVIDENCE-COVERAGE-MAPPING.md",
+    "ACCESSIBILITY-TRIAGE.md",
+    "NATIVE-SIGNUP-EXECUTION.md",
+    "CROSS-ROLE-EXECUTION.md"
+  ],
+  "proofs": [
+    {
+      "index": "Proofs/modern-client-current-recovery-anonymous-proof/index.json",
+      "artifactCount": 53,
+      "bytes": 344891,
+      "reviewProvenance": "Explicit reviewed crop/anonymous evidence record in source index and parent review checkpoint; individual/mixed failures retained."
+    },
+    {
+      "index": "Proofs/modern-caregiver-current-recovery-anonymous-proof/index.json",
+      "artifactCount": 53,
+      "bytes": 337092,
+      "reviewProvenance": "Explicit reviewed crop/anonymous evidence record in source index and parent review checkpoint; individual/mixed failures retained."
+    },
+    {
+      "index": "Proofs/match-state-modern-client-anonymous-visual-proof/index.json",
+      "artifactCount": 6,
+      "bytes": 68438,
+      "reviewProvenance": "Explicit reviewed crop/anonymous evidence record in source index and parent review checkpoint; individual/mixed failures retained."
+    },
+    {
+      "index": "Proofs/match-state-modern-caregiver-anonymous-visual-proof/index.json",
+      "artifactCount": 6,
+      "bytes": 68445,
+      "reviewProvenance": "Explicit reviewed crop/anonymous evidence record in source index and parent review checkpoint; individual/mixed failures retained."
+    },
+    {
+      "index": "Proofs/chat-guard-modern-client-anonymous-visual-proof/index.json",
+      "artifactCount": 8,
+      "bytes": 55446,
+      "reviewProvenance": "Explicit reviewed crop/anonymous evidence record in source index and parent review checkpoint; individual/mixed failures retained."
+    },
+    {
+      "index": "Proofs/chat-guard-modern-caregiver-anonymous-visual-proof/index.json",
+      "artifactCount": 8,
+      "bytes": 59260,
+      "reviewProvenance": "Explicit reviewed crop/anonymous evidence record in source index and parent review checkpoint; individual/mixed failures retained."
+    },
+    {
+      "index": "Proofs/match-matrix-small-client-anonymous-visual-proof/index.json",
+      "artifactCount": 19,
+      "bytes": 86799,
+      "reviewProvenance": "Explicit reviewed crop/anonymous evidence record in source index and parent review checkpoint; individual/mixed failures retained."
+    },
+    {
+      "index": "Proofs/small-caregiver-scoped-anonymous-visual-proof/index.json",
+      "artifactCount": 36,
+      "bytes": 103287,
+      "reviewProvenance": "Explicit reviewed crop/anonymous evidence record in source index and parent review checkpoint; individual/mixed failures retained."
+    },
+    {
+      "index": "Proofs/small-client-loaded-draft-retest-anonymous-proof/index.json",
+      "artifactCount": 6,
+      "bytes": 39381,
+      "reviewProvenance": "Explicit reviewed crop/anonymous evidence record in source index and parent review checkpoint; individual/mixed failures retained."
+    },
+    {
+      "index": "Proofs/small-client-all-eight-language-anonymous-visual-proof/index.json",
+      "artifactCount": 0,
+      "bytes": 0,
+      "reviewProvenance": "Explicit reviewed crop/anonymous evidence record in source index and parent review checkpoint; individual/mixed failures retained."
+    },
+    {
+      "index": "Proofs/small-caregiver-completed-all-eight-language-anonymous-proof/index.json",
+      "artifactCount": 0,
+      "bytes": 0,
+      "reviewProvenance": "Explicit reviewed crop/anonymous evidence record in source index and parent review checkpoint; individual/mixed failures retained."
+    },
+    {
+      "index": "Proofs/small-client-completed-a5-anonymous-proof/index.json",
+      "artifactCount": 30,
+      "bytes": 146022,
+      "reviewProvenance": "Explicit reviewed crop/anonymous evidence record in source index and parent review checkpoint; individual/mixed failures retained."
+    },
+    {
+      "index": "Proofs/small-caregiver-a5-individual-passes-anonymous-proof/index.json",
+      "artifactCount": 0,
+      "bytes": 0,
+      "reviewProvenance": "Explicit reviewed crop/anonymous evidence record in source index and parent review checkpoint; individual/mixed failures retained."
+    },
+    {
+      "index": "Proofs/small-caregiver-completed-a5-nine-screen-audit-proof/index.json",
+      "artifactCount": 1,
+      "bytes": 142,
+      "reviewProvenance": "Explicit reviewed crop/anonymous evidence record in source index and parent review checkpoint; individual/mixed failures retained."
+    },
+    {
+      "index": "Proofs/small-client-completed-password-guard-proof/index.json",
+      "artifactCount": 2,
+      "bytes": 21249,
+      "reviewProvenance": "Explicit reviewed crop/anonymous evidence record in source index and parent review checkpoint; individual/mixed failures retained."
+    },
+    {
+      "index": "Proofs/small-caregiver-completed-recovery-proof/index.json",
+      "artifactCount": 5,
+      "bytes": 41919,
+      "reviewProvenance": "Explicit reviewed crop/anonymous evidence record in source index and parent review checkpoint; individual/mixed failures retained."
+    },
+    {
+      "index": "Proofs/small-caregiver-owned-recovery-clean-anonymous-proof/index.json",
+      "artifactCount": 12,
+      "bytes": 55653,
+      "reviewProvenance": "Explicit reviewed crop/anonymous evidence record in source index and parent review checkpoint; individual/mixed failures retained."
+    },
+    {
+      "index": "Proofs/small-caregiver-phase2-anonymous-reviewed-proof/index.json",
+      "artifactCount": 33,
+      "bytes": 165946,
+      "reviewProvenance": "Explicit reviewed crop/anonymous evidence record in source index and parent review checkpoint; individual/mixed failures retained."
+    },
+    {
+      "index": "Proofs/small-client-introduction-completed-anonymous-visual-proof/index.json",
+      "artifactCount": 5,
+      "bytes": 44603,
+      "reviewProvenance": "Explicit reviewed crop/anonymous evidence record in source index and parent review checkpoint; individual/mixed failures retained."
+    },
+    {
+      "index": "Proofs/small-caregiver-save-guidance-anonymous-proof/index.json",
+      "artifactCount": 7,
+      "bytes": 29714,
+      "reviewProvenance": "Explicit reviewed crop/anonymous evidence record in source index and parent review checkpoint; individual/mixed failures retained."
+    },
+    {
+      "index": "Proofs/small-client-save-guidance-anonymous-proof/index.json",
+      "artifactCount": 7,
+      "bytes": 29708,
+      "reviewProvenance": "Explicit reviewed crop/anonymous evidence record in source index and parent review checkpoint; individual/mixed failures retained."
+    },
+    {
+      "index": "Proofs/small-caregiver-original-reply-notification-anonymous-proof/index.json",
+      "artifactCount": 11,
+      "bytes": 36482,
+      "reviewProvenance": "Explicit reviewed crop/anonymous evidence record in source index and parent review checkpoint; individual/mixed failures retained."
+    },
+    {
+      "index": "Proofs/small-client-original-reply-anonymous-proof/index.json",
+      "artifactCount": 5,
+      "bytes": 16093,
+      "reviewProvenance": "Explicit reviewed crop/anonymous evidence record in source index and parent review checkpoint; individual/mixed failures retained."
+    },
+    {
+      "index": "Proofs/small-client-notification-anonymous-proof/index.json",
+      "artifactCount": 6,
+      "bytes": 18493,
+      "reviewProvenance": "Explicit reviewed crop/anonymous evidence record in source index and parent review checkpoint; individual/mixed failures retained."
+    },
+    {
+      "index": "Proofs/small-client-location-four-anonymous-proof/index.json",
+      "artifactCount": 22,
+      "bytes": 77928,
+      "reviewProvenance": "Explicit reviewed crop/anonymous evidence record in source index and parent review checkpoint; individual/mixed failures retained."
+    },
+    {
+      "index": "Proofs/small-caregiver-location-pair-visible-anonymous-proof/index.json",
+      "artifactCount": 25,
+      "bytes": 85363,
+      "reviewProvenance": "Explicit reviewed crop/anonymous evidence record in source index and parent review checkpoint; individual/mixed failures retained."
+    },
+    {
+      "index": "Proofs/small-client-current-recovery-initial-anonymous-proof/index.json",
+      "artifactCount": 17,
+      "bytes": 101658,
+      "reviewProvenance": "Explicit reviewed crop/anonymous evidence record in source index and parent review checkpoint; individual/mixed failures retained."
+    },
+    {
+      "index": "Proofs/modern-client-resumed-default-anonymous-proof/index.json",
+      "artifactCount": 119,
+      "bytes": 1945867,
+      "reviewProvenance": "Root viewed each indexed cropped PNG and read anonymous native records; exact scope and mixed failure preserved in index."
+    },
+    {
+      "index": "Proofs/modern-caregiver-owned-unread-anonymous-proof/index.json",
+      "artifactCount": 3,
+      "bytes": 4382,
+      "reviewProvenance": "Root viewed each indexed cropped PNG and read anonymous native records; exact scope and mixed failure preserved in index."
+    },
+    {
+      "index": "Proofs/isolated-client-real-os-location-and-notification-diagnostic-anonymous-proof/index.json",
+      "artifactCount": 11,
+      "bytes": 43753,
+      "reviewProvenance": "Root viewed5boundedcrops/read6anonymousJSON; locationindividualPASS/notificationseparateFAIL/wholemixed65 retained."
+    },
+    {
+      "index": "Proofs/isolated-client-real-notification-settings-change-restore-anonymous-proof/index.json",
+      "artifactCount": 12,
+      "bytes": 44114,
+      "reviewProvenance": "Root viewed6boundedcrops/read6anonymousJSON; actualnativeSettingschange+restore67.595 whole0; initialprompt/remoteDeliverynotclaimed."
+    },
+    {
+      "index": "Proofs/isolated-caregiver-real-initial-notification-denial-settings-anonymous-proof/index.json",
+      "artifactCount": 14,
+      "bytes": 184062,
+      "reviewProvenance": "Root viewed8boundedcrops/read6anonymousJSON; freshactualinitialdenial andnativeSettingsenable/restore115.525whole0; remoteDeliverynotclaimed."
+    },
+    {
+      "index": "Proofs/modern-caregiver-final-default-anonymous-proof/index.json",
+      "artifactCount": 107,
+      "bytes": 1807009,
+      "reviewProvenance": "Root viewed all66 bounded PNGs via10unscaled sheets and read41 text records with parsed field checks; five individualPASS and twoFAIL retained; whole65."
+    },
+    {
+      "index": "Proofs/modern-caregiver-current-chat-regressions-anonymous-proof/index.json",
+      "artifactCount": 27,
+      "bytes": 213315,
+      "reviewProvenance": "Root viewed12boundedPNG in2unscaled sheets/read15anonymousJSON; 3PASS2FAIL/whole65 and unverified keyboard dismissal retained."
+    },
+    {
+      "index": "Proofs/modern-caregiver-owned-row-chat-regressions-anonymous-proof/index.json",
+      "artifactCount": 25,
+      "bytes": 222223,
+      "reviewProvenance": "Root reviewed12 bounded PNGs and13 anonymous JSON; independent final_review checked all25 hashes and claims. Current caregiver4methods wholePASS0; other allocations pending."
+    },
+    {
+      "index": "Proofs/modern-client-readable-chat-target-regressions-anonymous-proof/index.json",
+      "artifactCount": 23,
+      "bytes": 201262,
+      "reviewProvenance": "final_review checked all31 hashes and13 bounded synthetic PNGs across both batches; no privacy/hash blocker; mixedfailures and unexercisedbannerbranch retained."
+    },
+    {
+      "index": "Proofs/modern-client-initial-load-reply-banner-regressions-anonymous-proof/index.json",
+      "artifactCount": 8,
+      "bytes": 46411,
+      "reviewProvenance": "final_review checked all31 hashes and13 bounded synthetic PNGs across both batches; no privacy/hash blocker; mixedfailures and unexercisedbannerbranch retained."
+    },
+    {
+      "index": "Proofs/modern-client-initial-load-final-readiness-anonymous-proof/index.json",
+      "artifactCount": 5,
+      "bytes": 27432,
+      "reviewProvenance": "final_review independently inspected completed log, retained source gates and all five artifact hashes/privacy; scoped PASS230.078; no dispatched held HTTP response claim."
+    },
+    {
+      "index": "Proofs/modern-caregiver-final-current-chat-units-anonymous-proof/index.json",
+      "artifactCount": 28,
+      "bytes": 221224,
+      "reviewProvenance": "final_review independently verified all28 artifact hashes/privacy and all12PNG via2sheets; four UI passes/107unitpasses; strictReply11.450127959FAIL before ack/parent assertions; entire batch exit65 retained."
+    },
+    {
+      "index": "Proofs/modern-client-a5-final-anonymous-proof/index.json",
+      "artifactCount": 20,
+      "bytes": 208397,
+      "reviewProvenance": "final_review independently checked all20 artifact hashes/privacy and all12caption/brandPNGs; fivepasses/strictnine-screenaudit4findingsFAIL retained; Englishheldviewerraster verified separately/private."
+    },
+    {
+      "index": "Proofs/modern-caregiver-a5-final-anonymous-proof/index.json",
+      "artifactCount": 20,
+      "bytes": 208406,
+      "reviewProvenance": "final_review checked all20 hashes/privacy and all12caption/brand crops; fourpasses/twofailures retained; rolecorrectedLargest selector pendingruntime."
+    },
+    {
+      "index": "Proofs/modern-caregiver-a5-visible-diagnostics-anonymous-proof/index.json",
+      "artifactCount": 2,
+      "bytes": 47424,
+      "reviewProvenance": "final_review checkedbothPNGhash/privacy/fullyexposedtext and independently recalculated6.36496/18.38594 corecontrast. DiagnosticFAIL41.015 retained; laterstatesnotreached; 107units andLargestReach separatepasses."
+    },
+    {
+      "index": "Proofs/modern-caregiver-a5-native-return-anonymous-proof/index.json",
+      "artifactCount": 5,
+      "bytes": 283075,
+      "reviewProvenance": "Directly inspected all five complete bounded PNGs; artifact hashes, exact foreground/background core-pixel counts, and WCAG luminance ratios independently match the measurement record. No private fixture data visible; public support address is managed product copy. Supports fully exposed raster states only; retained raw nine-screen audit remains failed."
+    },
+    {
+      "index": "Proofs/modern-client-a5-native-return-anonymous-proof/index.json",
+      "artifactCount": 5,
+      "bytes": 286818,
+      "reviewProvenance": "Directly inspected all five complete bounded PNGs; artifact hashes, exact foreground/background core-pixel counts, and WCAG luminance ratios independently match the measurement record. No private fixture data visible; public support address is managed product copy. Supports fully exposed raster states only; retained raw nine-screen audit remains failed."
+    },
+    {
+      "index": "Proofs/modern-client-strict-reply-immediate-predicates-final-anonymous-proof/index.json",
+      "artifactCount": 5,
+      "bytes": 22923,
+      "reviewProvenance": "Directly inspected the complete synthetic bounded bubble and read all four anonymous JSON artifacts; all five hashes match and no private fixture data, tokens, absolute paths, unindexed files, or symlinks were found. Supports full Modern client strict Reply completion: 8.456730008-second checkpoint including all observations, zero banner dismissals, zero native POSTs before change, one acknowledged POST, original parent verified from both owned perspectives, and newer reply retained. Does not establish the banner-dismissal branch or other allocations."
+    },
+    {
+      "index": "Proofs/modern-caregiver-strict-reply-direct-readiness-final-anonymous-proof/index.json",
+      "artifactCount": 5,
+      "bytes": 21104,
+      "reviewProvenance": "Directly inspected the complete synthetic bounded bubble and read all four anonymous JSON artifacts; all five hashes match and no private fixture data, tokens, absolute paths, unindexed files, or symlinks were found. Supports full Modern caregiver strict Reply completion: 9.061739921-second checkpoint including all observations and one native banner dismissal, zero native POSTs before change, one acknowledged POST, original parent verified from both owned perspectives, and newer reply retained. Observed 43.999999999999972-point AX menu height is within the source eight-ULP numerical allowance for the declared 44-point target; no physical-size relaxation claimed. Does not establish other allocations."
+    },
+    {
+      "index": "Proofs/small-client-current-chat-final-anonymous-proof/index.json",
+      "artifactCount": 32,
+      "bytes": 178836,
+      "reviewProvenance": "Read all 18 anonymous JSON artifacts and directly inspected all 14 bounded PNGs via three review sheets; all 32 hashes match, no private fixture data or tokens/absolute paths detected, and no unindexed files or symlinks present. Supports six completed Small client tests (unread existing history, incoming/older position/timestamps, pre-transport initial loading and reentry, keyboard incoming/older reading, slow send, and genuine reciprocal instant match). Preserves Reply failure before the timing interval because body/menu union is above the transcript after 48 gestures, Contact skip without a mail handler, absent native keyboard-dismissal control, and whole mixed-batch failure. Does not establish a Reply timing/acknowledgement pass, native keyboard dismissal, held HTTP response, or never-opened empty-chat unread coverage."
+    },
+    {
+      "index": "Proofs/small-client-strict-reply-bounded-exposure-final-anonymous-proof/index.json",
+      "artifactCount": 5,
+      "bytes": 15848,
+      "reviewProvenance": "Independently viewed the complete bounded synthetic-only PNG; parsed all four anonymous JSON artifacts and verified all five SHA-256 hashes. Exact peer text/menu union fully contained in transcript after seven observed-frame gestures (menu44x44); strict all-observations checkpoint7.6611260175704956<10 includes all elapsed time with zero encountered banners; native POST0 before reply change and acknowledged POST1 afterward, original parent verified from both owned perspectives, newer reply retained, empty new draft and disabled Send. This proof does not establish the banner-dismissal branch, keyboard dismissal, larger-history performance, or all-original-case coverage. No raw credentials, fixture identities, private paths, camera content, or whole-transcript image found."
+    },
+    {
+      "index": "Proofs/small-caregiver-current-chat-final-anonymous-proof/index.json",
+      "artifactCount": 35,
+      "bytes": 198566,
+      "reviewProvenance": "Independently inspected all15 bounded PNGs through three unscaled review sheets; parsed all20 anonymous JSON artifacts and verified all35 SHA-256 hashes. Synthetic-only message/control/draft rasters contain no fixture names/emails/credentials/profile/camera/whole-transcript content. Input crops show visible prefixes only; exact retained draft is supported by AX/JSON assertions, not full visual text. Scoped evidence covers existing-history unread0\u21921\u21920; actual applied incoming and older-position tolerance3points, exact structural raw timestamp footer/Backreentry; pretransport initial-operation incoming (not held HTTP response); actual216point software keyboard with reduced viewport and retained unsent draft; strict Reply checkpoint8.5983099937438965<10 includes all observations/zero encountered banners, two observed-frame gestures expose fullbody+44x44Menu, nativePOST0\u21921ack/originalparent bothperspectives/newerReply retained; slow-send native1POST/progress and continued typing unsent; genuine reciprocal instant ACTIVE bothaccepted/native1Request0Accept/peer window2.4816960096359253. Seven completed individualPASS, ContactSKIP10.877 no mail handler preserved. Native keyboard dismissal, held HTTP response, never-opened empty conversation, larger-history performance and full original-case QA remain unverified. No scope promotion or publication performed."
+    },
+    {
+      "index": "Proofs/legacy-quarantine-skip-verification-anonymous-proof/index.json",
+      "artifactCount": 1,
+      "bytes": 4123,
+      "reviewProvenance": "Independently read completed selection log, parsed the sole anonymous JSON and verified artifact/log SHA-256 plus all six current source hashes binding ten previously reviewed quarantine gates. Exact16 selected methods are SKIPPED with zero failures and zero functional passes; process completed with TEST EXECUTE SUCCEEDED. No explicit screenshot attachment events in trace; skipped teardown guards were compiled and source ordering remains verified. No relationship/message/support/profile mutation can execute before these gates per source review; some helper callers perform auth login POST and GET reads, so no zero-total-HTTP-POST claim. Physical DeviceCamera method skipped in simulator setUp before entry; its entry skip and injectIncoming boundary are source-only, not runtime-executed. No credential/private fixture/absolute path/raw log/fullscreen content in anonymous artifact. No original coverage promoted, camera or broad functionality pass claimed."
+    },
+    {
+      "index": "Proofs/final-current-native-release-anonymous-proof/index.json",
+      "artifactCount": 1,
+      "bytes": 14809,
+      "reviewProvenance": "Independently verified the sole anonymous artifact hash and completed BUILD SUCCEEDED/ANALYZE SUCCEEDED log hash. Read actual16051976byte SimulatorRelease Mach-O and verified SHA2560190da8906a78191b24d5dca7be8596e768f7837bb393d8e239972ef6b3c6d37; all32 required Debug markers absent from raw bytes and /usr/bin/strings output, CAREZAAR_API_BASE_URL absent. All57 current productionSwift hashes match the release record. Independently compared all57 path/SHA pairs in oct11-post-a5-current-production-source-inventory.json productionSwiftFiles with release productionSourceInventory and actual current files: identical, zero changed. Associated actual107-unit PASS26.947 is fresh-modern-caregiver-a5-visible-diagnostics.log lines372\u2013375; its separate UI diagnostic failure remains retained. The supplied fresh-modern-caregiver-a5-full-raster.log has UI-only failure and is not the107-unit log. Only log warning is AppIntents metadata skipped because no framework dependency; no compiler source warning identified. Anonymous artifact contains relative sourcepaths/hashes and QA marker names, no credential values/fixture identifiers/private absolute paths/rawlog. SimulatorRelease build/static analysis only with CODE_SIGNING_ALLOWED=NO: no Release runtime, physical signing/distribution, all374 QA coverage or production readiness asserted."
+    }
+  ],
+  "proofIndexCount": 51,
+  "indexedArtifactCount": 901,
+  "originalEvidenceIntact": true,
+  "excludedTypes": [
+    "raw logs",
+    "xcresults",
+    "private fixtures/credentials",
+    "local DCIM/media",
+    "full-screen captures",
+    "unindexed files",
+    "two blank Modern caregiver coordinate-review crops"
+  ],
+  "currentOriginalCaseCounts": {
+    "total": 374,
+    "PASS": 97,
+    "NOT RUN": 259,
+    "FAIL": 2,
+    "BLOCKED": 1,
+    "N/A": 15
+  },
+  "documents": [
+    {
+      "path": "IOS_TEST_EXECUTION_REPORT.md",
+      "bytes": 63839,
+      "sha256": "19c8404cd4ef08b82ab435d2fd8c799dc783e2177cd4c5f2915a39cef97f68b7"
+    },
+    {
+      "path": "IOS-FUNCTIONAL-PARITY-MATRIX.md",
+      "bytes": 65253,
+      "sha256": "7c1749841a84aa3f262e588189994d9d1890acbc68ff7ad6783032b4887ddbb2"
+    },
+    {
+      "path": "IOS-FIGMA-PARITY.md",
+      "bytes": 61294,
+      "sha256": "569f5d30dea957b0caa4a639262c993039a1d8e40ee6112bb6fe0c1eb807a1f4"
+    },
+    {
+      "path": "BACKEND-ISSUES-FOR-CLIENT.md",
+      "bytes": 64742,
+      "sha256": "db602752d5cfc8e567cb1adf825ae18867517ac85ca847a4dfb6cdc3ccf0bec2"
+    },
+    {
+      "path": "QA-CASE-MANIFEST.md",
+      "bytes": 502077,
+      "sha256": "79ea5c831ab8f209fdc94c938ac42d114448286cfe0d980926f23569577eb74e"
+    },
+    {
+      "path": "EVIDENCE-COVERAGE-MAPPING.md",
+      "bytes": 671748,
+      "sha256": "0f9a23cc8452552493684476c6cb8ffdc3f79f54feaafc58d33ea7848129abb3"
+    },
+    {
+      "path": "ACCESSIBILITY-TRIAGE.md",
+      "bytes": 134307,
+      "sha256": "98ee8832cd6cd770f89d1f451c5468462ebdc8485981c744f8988979cfc572ef"
+    },
+    {
+      "path": "NATIVE-SIGNUP-EXECUTION.md",
+      "bytes": 130297,
+      "sha256": "f47e4dfe3506dcda06b76a1ca4c23c17d9ddd19a50e6f79e5dc16ab522dfa0b1"
+    },
+    {
+      "path": "CROSS-ROLE-EXECUTION.md",
+      "bytes": 131539,
+      "sha256": "3656db1a6c1f71701245fd7301a4f962a67b4d187f4dfe814984dd9bd4a1c4bc"
+    },
+    {
+      "path": "README.md",
+      "bytes": 27320,
+      "sha256": "9a2549591b79f87a51bb3742f2680cf87602f585c8b209b9a0efa12b3a4c19a6"
+    }
+  ],
+  "readme": {
+    "path": "README.md",
+    "bytes": 27320,
+    "sha256": "9a2549591b79f87a51bb3742f2680cf87602f585c8b209b9a0efa12b3a4c19a6"
+  }
+}
