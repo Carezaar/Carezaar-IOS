@@ -1,5 +1,13 @@
 # Carezaar October 10 client updates — engineering handoff
 
+## Verified GitHub delivery and final smoke checks
+
+The camera/OTP tests and reviewed evidence are verified on authorized `main` at `5b814a6d876b8fa542bfa0a98db8185f54bd3fc2`. The remote commit and five source/report/proof files matched local bytes. A fresh ARM64 Simulator clean build passed after the initial dual-architecture build failed under disk pressure; that raw failure is retained. Post-push OTP request regression passed in 0.010 seconds, and actual public-field client/caregiver login passed in 27.286/35.559 seconds with one login, one identity request, no refresh and no opposite-role request. Setup API authentication is separate; client list count two does not establish deduplication. Both actual Debug images exclude the temporary sign-in diagnostic prefix. All 628 production files remain unchanged.
+
+The later documentation-only commit preserves the tested source and project. Physical camera UI and endpoint acceptance results remain bounded as described below; strict audit failures and the incomplete original QA remain explicit. Post-push proof: `Proofs/oct12-camera-otp-postpush-anonymous-proof/index.json`.
+
+### Camera, endpoint and accessibility result details
+
 ## October 12 physical-camera and OTP endpoint results
 
 Physical iPhone 15/iOS 26.5.2 checks passed for both client and caregiver: permission denial/repeated denial, Settings/Gallery alternatives, permission acceptance, capture, retake, crop entry, pinch/drag with usable controls, and Cancel back to the profile form. Native profile POST/PUT/PATCH counters stayed zero and the server photo was unchanged. Physical test photos were cancelled before upload. Camera UI is now tested; the prior hardware-unavailable/deferred statement is historical. The temporary app and test runner were removed from the phone after testing; framework-generated raw camera artifacts remain private.

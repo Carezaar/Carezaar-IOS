@@ -1,0 +1,27 @@
+{
+  "verifiedTestEvidenceCommit": "5b814a6d876b8fa542bfa0a98db8185f54bd3fc2",
+  "repository": "https://github.com/Carezaar/Carezaar-IOS",
+  "branch": "main",
+  "remoteFilesByteVerified": 5,
+  "freshCleanBuild": "PASS",
+  "debugDiagnosticsAbsent": true,
+  "OTPRequestRegressionResult": "PASS",
+  "OTPRequestRegressionSeconds": 0.01,
+  "nativeRoleSmoke": [
+    {
+      "role": "client",
+      "result": "PASS",
+      "seconds": 27.286
+    },
+    {
+      "role": "caregiver",
+      "result": "PASS",
+      "seconds": 35.559
+    }
+  ],
+  "setupAuthenticationSeparate": true,
+  "originalCaseCountsUnchanged": true,
+  "originalSmallCause": "UNCONFIRMED",
+  "physicalCamera": "Capture/retake/crop-control/Cancel PASS for both roles; no upload",
+  "YahooBackendOnly": "UNVERIFIED"
+}

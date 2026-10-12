@@ -1,0 +1,78 @@
+{
+  "title": "Committed physical-camera/OTP tests: clean build and native role smoke",
+  "sourceCommitSHA": "5b814a6d876b8fa542bfa0a98db8185f54bd3fc2",
+  "artifacts": [
+    {
+      "path": "Artifacts/client-9A64C725-C0F3-49DA-939F-558769A6B50B.json",
+      "description": "P02-012-typed-login-role-list-loaded-client_0_7E914076-8A63-444A-98A7-667913A39DE3.json",
+      "sha256": "70ae2deb3b10da0a8d2a8878976888f93ccee043465035916705cbd627c6b598",
+      "packagedSha256": "70ae2deb3b10da0a8d2a8878976888f93ccee043465035916705cbd627c6b598"
+    },
+    {
+      "path": "Artifacts/client-3A293657-E2DD-4E1C-B80E-2749D2C55C0B.json",
+      "description": "P02-012-public-sign-in-ready-client_0_7FEA6562-E645-48AB-A522-D707839CB603.json",
+      "sha256": "aeea1cf1a92d5c2fc751544a26507d93ce16c94d062231874b4142e5856224c4",
+      "packagedSha256": "aeea1cf1a92d5c2fc751544a26507d93ce16c94d062231874b4142e5856224c4"
+    },
+    {
+      "path": "Artifacts/caregiver-CEC3C116-BE45-4E7E-AEF1-A3D862567A28.json",
+      "description": "P02-012-typed-login-role-list-loaded-caregiver_0_81F1D29A-00CB-4703-BBE0-4DF3F0A981CC.json",
+      "sha256": "07c5040106ca935c6ad8c039ef82fff46f4747af1be88a33aff259b7ea3c6da7",
+      "packagedSha256": "07c5040106ca935c6ad8c039ef82fff46f4747af1be88a33aff259b7ea3c6da7"
+    },
+    {
+      "path": "Artifacts/caregiver-3F42E061-DECE-419E-9668-FCF7EB226D14.json",
+      "description": "P02-012-public-sign-in-ready-caregiver_0_FC389DF4-C421-4ABB-AEC1-CFA63BA44116.json",
+      "sha256": "3e5a92c4bbb682374639554bb37ed022525d263f480e4bb0847b214c2518a3e0",
+      "packagedSha256": "3e5a92c4bbb682374639554bb37ed022525d263f480e4bb0847b214c2518a3e0"
+    },
+    {
+      "path": "Artifacts/summary.json",
+      "description": "Verified main test/evidence delivery, fresh ARM64 clean build and native role smoke",
+      "sha256": "4e9700de0e612d0332004a58d4ed0802c4384acdb45d2772d2d8ab42765a6893",
+      "packagedSha256": "4e9700de0e612d0332004a58d4ed0802c4384acdb45d2772d2d8ab42765a6893"
+    }
+  ],
+  "results": [
+    {
+      "role": "client",
+      "result": "PASS",
+      "seconds": 27.286
+    },
+    {
+      "role": "caregiver",
+      "result": "PASS",
+      "seconds": 35.559
+    }
+  ],
+  "rootReviewed": true,
+  "independentReviewed": true,
+  "scopeLimits": [
+    "Original full QA and unresolved Retry/accessibility/Small observations remain open",
+    "No opposite-role, hidden-login or refresh traffic in native smoke; setup authentication is separate",
+    "Physical camera scope independently verified separately; no Yahoo delivery/backend-only, distribution or Release-runtime claim"
+  ],
+  "independentReview": {
+    "reviewer": "Independent QA verifier /root/cache_review",
+    "checkedAtUTC": "2026-10-12T14:40:04.628601+00:00",
+    "verdict": "PASS for bounded committed test/evidence ARM64 clean-build and role-smoke gate; full QA remains incomplete",
+    "sourceCommitSHA": "5b814a6d876b8fa542bfa0a98db8185f54bd3fc2",
+    "artifactCount": 5,
+    "allArtifactHashesVerified": true,
+    "sourceGate": "All3 current test-source hashes match tested-source record. Independently checked all628 production files against preserved delivered-implementation baseline: unchanged. Current local HEAD equals stated commit. Five remote-file byte verification is root provenance, not independently repeated external action.",
+    "buildGate": "Actual fresh ARM64 Simulator clean build-for-testing -jobs1 completes TEST BUILD SUCCEEDED; loghash matches image record. Both actual Debug image hashes match and SIGNIN_HANDOFF_DIAGNOSTIC is absent. Initial dual-architecture disk NoSpace failure preserved, not reclassified as PASS.",
+    "runtimeGate": "Independently queried actual result bundles: client2Passed/0fail/0skip includes controlled Yahoo OTP unit0.010 and native role smoke27.286; caregiver1Passed/0fail/0skip native35.559. Terminal logs match.",
+    "nativeCounts": "All4 anonymous count records match raw native exports. Prelogin auth/list counterszero. Native final login1/authInfo1/refresh0/opposite-roleGET0, automatedQALoginfalse; correct role list countclient2/caregiver1. No deduplication claim, setup authentication separate.",
+    "privacy": "Five records have only public repository/commit, anonymous role/counters/results/status. No credentials/token/accountidentity/privatepath/camera pixels. No raw framework camera artifact in proof.",
+    "caseLimits": "Full QA108PASS/248NOTRUN/3FAIL/0BLOCKED/15NA remains incomplete. Camera both-role capture/retake/crop-control/Cancel scopePASS but full P12-008 partial NOT RUN, no physical photo upload/outputdimension/persistence. Live OTP204 proves permitted endpoint acceptance only; no inbox/provider/backend-only attribution. Retry/P17 and original Small cause unresolved. No distribution/Release-runtime or full-QA approval.",
+    "provenance": "Root built/executed and verified remote delivery. Reviewer read source/baselines/artifacts/rawlog and exports, queried stored xcresults and read actual Debug binary images; no app/device/networkmutation.",
+    "resourcesOpened": "None",
+    "mutations": "Only private gate and candidate independentReviewed/independentReview."
+  },
+  "publicPackage": {
+    "rootReviewed": true,
+    "independentReviewed": true,
+    "originalEvidencePreserved": true,
+    "rawLogsXCResultsFullScreenPhotosPrivateFixturesIncluded": false
+  }
+}

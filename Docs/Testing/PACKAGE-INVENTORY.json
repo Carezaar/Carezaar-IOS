@@ -1,5 +1,5 @@
 {
-  "status": "Physical camera UI and OTP endpoint verified; raw accessibility FAIL4/5 preserved. New test/evidence delivery follows final remote verification; full original QA remains incomplete.",
+  "status": "Camera/OTP test/evidence delivery verified on authorized main5b814a6; fresh ARM64 clean build and both-role post-push smoke PASS. Strict accessibility FAIL4/5 and original full QA remain incomplete.",
   "reports": [
     "IOS_TEST_EXECUTION_REPORT.md",
     "IOS-FUNCTIONAL-PARITY-MATRIX.md",
@@ -779,10 +779,32 @@
         "resourcesOpened": "None",
         "mutations": "Only private finalgate and candidate independentReviewed/independentReview fields."
       }
+    },
+    {
+      "index": "Proofs/oct12-camera-otp-postpush-anonymous-proof/index.json",
+      "artifactCount": 5,
+      "bytes": 1957,
+      "reviewProvenance": {
+        "reviewer": "Independent QA verifier /root/cache_review",
+        "checkedAtUTC": "2026-10-12T14:40:04.628601+00:00",
+        "verdict": "PASS for bounded committed test/evidence ARM64 clean-build and role-smoke gate; full QA remains incomplete",
+        "sourceCommitSHA": "5b814a6d876b8fa542bfa0a98db8185f54bd3fc2",
+        "artifactCount": 5,
+        "allArtifactHashesVerified": true,
+        "sourceGate": "All3 current test-source hashes match tested-source record. Independently checked all628 production files against preserved delivered-implementation baseline: unchanged. Current local HEAD equals stated commit. Five remote-file byte verification is root provenance, not independently repeated external action.",
+        "buildGate": "Actual fresh ARM64 Simulator clean build-for-testing -jobs1 completes TEST BUILD SUCCEEDED; loghash matches image record. Both actual Debug image hashes match and SIGNIN_HANDOFF_DIAGNOSTIC is absent. Initial dual-architecture disk NoSpace failure preserved, not reclassified as PASS.",
+        "runtimeGate": "Independently queried actual result bundles: client2Passed/0fail/0skip includes controlled Yahoo OTP unit0.010 and native role smoke27.286; caregiver1Passed/0fail/0skip native35.559. Terminal logs match.",
+        "nativeCounts": "All4 anonymous count records match raw native exports. Prelogin auth/list counterszero. Native final login1/authInfo1/refresh0/opposite-roleGET0, automatedQALoginfalse; correct role list countclient2/caregiver1. No deduplication claim, setup authentication separate.",
+        "privacy": "Five records have only public repository/commit, anonymous role/counters/results/status. No credentials/token/accountidentity/privatepath/camera pixels. No raw framework camera artifact in proof.",
+        "caseLimits": "Full QA108PASS/248NOTRUN/3FAIL/0BLOCKED/15NA remains incomplete. Camera both-role capture/retake/crop-control/Cancel scopePASS but full P12-008 partial NOT RUN, no physical photo upload/outputdimension/persistence. Live OTP204 proves permitted endpoint acceptance only; no inbox/provider/backend-only attribution. Retry/P17 and original Small cause unresolved. No distribution/Release-runtime or full-QA approval.",
+        "provenance": "Root built/executed and verified remote delivery. Reviewer read source/baselines/artifacts/rawlog and exports, queried stored xcresults and read actual Debug binary images; no app/device/networkmutation.",
+        "resourcesOpened": "None",
+        "mutations": "Only private gate and candidate independentReviewed/independentReview."
+      }
     }
   ],
-  "proofIndexCount": 67,
-  "indexedArtifactCount": 1078,
+  "proofIndexCount": 68,
+  "indexedArtifactCount": 1083,
   "originalEvidenceIntact": true,
   "excludedTypes": [
     "raw logs",
@@ -854,8 +876,8 @@
     },
     {
       "path": "CLIENT-UPDATE-HANDOFF.md",
-      "bytes": 6019,
-      "sha256": "b071229b48245dc5e21d9d40d004cedd0191e8468c281d519bd136b38ec9ac9b"
+      "bytes": 7209,
+      "sha256": "fa4952d9410ccf6fe264ae4c11bfac6bba2b0fa2a690ae49c7768fe49b9a3203"
     }
   ],
   "readme": {
@@ -891,5 +913,13 @@
     "caregiverFindingCount": 5,
     "rawAuditResult": "FAIL",
     "fullOriginalP17Closed": false
+  },
+  "latestVerifiedTestEvidenceCommit": "5b814a6d876b8fa542bfa0a98db8185f54bd3fc2",
+  "latestPostPushSmoke": {
+    "ARM64CleanBuild": "PASS",
+    "OTPRequestRegression": "PASS",
+    "clientNativeLogin": "PASS",
+    "caregiverNativeLogin": "PASS",
+    "productionSourceChanged": false
   }
 }
