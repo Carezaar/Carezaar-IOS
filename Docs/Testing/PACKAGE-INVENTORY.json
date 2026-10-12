@@ -1,5 +1,5 @@
 {
-  "status": "Direct Modern Simulator Retry evidence reviewed; source/tests unchanged from6919503. P01-008 remains FAIL/open; full QA incomplete.",
+  "status": "Client update implementation and final credential guard verified for engineering review; final main delivery pending remote verification. Full original QA remains incomplete.",
   "reports": [
     "IOS_TEST_EXECUTION_REPORT.md",
     "IOS-FUNCTIONAL-PARITY-MATRIX.md",
@@ -672,10 +672,50 @@
         ],
         "resourcesOpened": "None."
       }
+    },
+    {
+      "index": "Proofs/oct12-login-storage-guard-anonymous-proof/index.json",
+      "artifactCount": 14,
+      "bytes": 5893,
+      "reviewProvenance": {
+        "reviewer": "Independent QA verifier /root/cache_review",
+        "checkedAtUTC": "2026-10-12T08:53:18.228700+00:00",
+        "verdict": "PASS for bounded credential-storage guard regression and pending native sign-in lifecycle evidence; no full QA closure",
+        "artifactCount": 14,
+        "allArtifactHashesVerified": true,
+        "nativeXcresultSummariesIndependentlyRead": {
+          "small-client": "1 Passed, 0 failed/skipped; 77.386 seconds",
+          "small-caregiver": "1 Passed, 0 failed/skipped; 77.366 seconds",
+          "modern-client": "1 Passed, 0 failed/skipped; 78.238 seconds",
+          "modern-caregiver": "1 Passed, 0 failed/skipped; 75.575 seconds"
+        },
+        "sourceSHA256": {
+          "Carezaar/Core/Session/SessionManager.swift": "b681cb8e4a7babacc59550cace7ee566ef442576776d78d07402a12b188a4450",
+          "CarezaarTests/SessionTests.swift": "9829e8bf63ea443d6ce845ae5420589880e9faf41e48e3d347e09d8225b13a1f",
+          "CarezaarUITests/SessionNetworkTests.swift": "0cb8f0c2b15d747461fb4aab0421b8429324dccdee7846fc06ac8b0670dc5025"
+        },
+        "gates": {
+          "source": "8-line product guard verifies exact fresh pair readback before identity verification; four controlled failure modes cover missing, partial and previous credentials. Prior independent source verdict remains applicable.",
+          "units": "Actual terminal full-unit log: 109 passed, zero failures, 28.836 seconds. Separate baseline RED remains preserved.",
+          "nativeStages": "All 12 anonymous stage JSONs match retained raw exported attachment bytes. Pending flow has one login attempt and no Main/authInfo/list; after background/return Main is visible with one login, one authInfo, one correct-role list and zero refresh; ordinary launch restores with login0/authInfo1/refresh0. Client ordinary list count is two, caregiver one; no deduplication claim. Completed source assertions additionally verify stored pair presence, exact owned-role list contents, no opposite-role GET/OTP/register during initial login.",
+          "release": "Actual build/analyze log terminates BUILD SUCCEEDED and ANALYZE SUCCEEDED. Actual Release binary SHA matches proof; all 34 distinct QA/API-override/diagnostic names absent in raw bytes and extracted strings. Simulator Release only.",
+          "privacy": "14 JSON artifacts contain booleans, integer counters, role/stage, synthetic test outcome descriptions and hashes; no real email/password/token/account ID/backend URL/private path/media. No images in this scope.",
+          "provenance": "Root executed tests and generated records; independent reviewer read current source, all artifacts, raw terminal logs and xcresult summaries, raw exported attachment hash matches, actual Release binary/strings. Reviewer did not drive UI or execute network/app operations."
+        },
+        "limits": [
+          "Original Small lifecycle failure cause remains UNCONFIRMED; latest four passing runs do not establish its cause or resolution.",
+          "Original Retry/P17 failures remain open; original 374-case counts unchanged by this proof.",
+          "Home/background is an interruption, not explicit abandonment; no navigation-away cancellation coverage claimed. Pending flow/busy and dispatched native counter do not prove a still-pending HTTP response at Home.",
+          "No full QA, production readiness, physical camera, physical signing/distribution/Release runtime or Yahoo backend-only attribution approval.",
+          "Root review still required before publication."
+        ],
+        "resourcesOpened": "None",
+        "mutations": "Only this private verdict and candidate independentReviewed/independentReview fields."
+      }
     }
   ],
-  "proofIndexCount": 64,
-  "indexedArtifactCount": 1032,
+  "proofIndexCount": 65,
+  "indexedArtifactCount": 1046,
   "originalEvidenceIntact": true,
   "excludedTypes": [
     "raw logs",
@@ -697,58 +737,66 @@
   "documents": [
     {
       "path": "IOS_TEST_EXECUTION_REPORT.md",
-      "bytes": 81638,
-      "sha256": "a8d5818865dd986b4c361cbcce469f27beb6899a356bbaacfd95cc2b1cdcd2a3"
+      "bytes": 84734,
+      "sha256": "c0272d6b4bff03944540a25e737c0e757438de3696a10014560b8d3670f39f5b"
     },
     {
       "path": "IOS-FUNCTIONAL-PARITY-MATRIX.md",
-      "bytes": 81707,
-      "sha256": "d0b87717ccbad2a2a5cfca9be1381f2e973fdf95c98f90d9648fbb51b8cb7deb"
+      "bytes": 83541,
+      "sha256": "bd5c7a61ab5c6d03b51fee56030baeaabd582f7cf8fc93e86e8450515411202e"
     },
     {
       "path": "IOS-FIGMA-PARITY.md",
-      "bytes": 77748,
-      "sha256": "a00eec06335e16b7fc0fe034083e3431ba85cfae4fef75b7ef1916c9f5749a79"
+      "bytes": 79582,
+      "sha256": "a536c41e1269a7b0046549517b337268051b9da8fdaa0332fb1ba0dc401f3471"
     },
     {
       "path": "BACKEND-ISSUES-FOR-CLIENT.md",
-      "bytes": 81196,
-      "sha256": "c44244102c26c6e88c13139d2cabccf39b650b26814510276c44b7aec8d2d598"
+      "bytes": 83030,
+      "sha256": "f984f1990d62918cff568153b659d8cb6a11367dc4bd6c1baa72f4627f7e5a0c"
     },
     {
       "path": "QA-CASE-MANIFEST.md",
-      "bytes": 521976,
-      "sha256": "60622a323a85f7606420bf82e286d8bbae822d6304570945b743aa51af908158"
+      "bytes": 524119,
+      "sha256": "beea2e591d8fe19f5481f43d48f92d01acf42ec12e8d4c3756f4bd80353cac9c"
     },
     {
       "path": "EVIDENCE-COVERAGE-MAPPING.md",
-      "bytes": 689428,
-      "sha256": "469422dbff660328ca7194ef9ea5e0e483ec4ce1857aae1a57e910c62f18beed"
+      "bytes": 691262,
+      "sha256": "e41edb8d341bb983adf923b92e3c7de1918d95b130a737a1f0fe85f80679212f"
     },
     {
       "path": "ACCESSIBILITY-TRIAGE.md",
-      "bytes": 150761,
-      "sha256": "631ba062aef500eb7b354f680698a744ed3e95bd6214ae52ec0e839016b11193"
+      "bytes": 152595,
+      "sha256": "1a4b92acd4b94ae4847dcff598f81367b002deca74474b29ea1fc01ffca9aeac"
     },
     {
       "path": "NATIVE-SIGNUP-EXECUTION.md",
-      "bytes": 146751,
-      "sha256": "5506e8386d6408f6030d8eac3885acf6c09c627acb86c6a5b16e1f97ac018f7c"
+      "bytes": 148585,
+      "sha256": "89facb421df3beb709a8c8f69f485a2c8eb19ffc124d1c215af1d8e23cb61de9"
     },
     {
       "path": "CROSS-ROLE-EXECUTION.md",
-      "bytes": 147993,
-      "sha256": "ff59265ef8d8b01fbd9dfa69b9ad4f89a57667d52c254710bd709135dbdb9cb9"
+      "bytes": 149827,
+      "sha256": "ce38ff85aa086350622ccdf6d4002ff826eeff245d7eb4bd654a011cbc89d2b3"
     },
     {
       "path": "README.md",
-      "bytes": 43774,
-      "sha256": "b7aeceaf463202327faa706c5dc8fb9892ce7eda2da66e88c6c2fbeac585b328"
+      "bytes": 45608,
+      "sha256": "6d7036b29d6c0b7ab730f7ac361b84650cf12f7f74bf0e536f0ab48d7aaa9af2"
     }
   ],
   "readme": {
     "path": "README.md",
-    "bytes": 43774,
-    "sha256": "b7aeceaf463202327faa706c5dc8fb9892ce7eda2da66e88c6c2fbeac585b328"
+    "bytes": 45608,
+    "sha256": "6d7036b29d6c0b7ab730f7ac361b84650cf12f7f74bf0e536f0ab48d7aaa9af2"
+  },
+  "credentialGuardVerification": {
+    "productionSourceChanged": true,
+    "fullUnitTestsPassed": 109,
+    "nativePassingRoleDeviceAllocations": 4,
+    "originalSmallFailureCause": "UNCONFIRMED",
+    "originalFullCaseClosureApproved": false,
+    "finalMainDeliveryPending": true
   }
 }

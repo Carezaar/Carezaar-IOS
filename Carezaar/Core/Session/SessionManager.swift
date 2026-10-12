@@ -90,6 +90,14 @@ final class SessionManager: ObservableObject {
             throw APIError.decoding("Login did not return valid credentials.")
         }
         tokens.save(pair)
+        // Keychain writes can fail or leave an older pair behind. Identity
+        // verification must use the exact credentials returned by this login.
+        guard tokens.accessToken == pair.accessToken,
+              tokens.refreshToken == pair.refreshToken else {
+            tokens.clear()
+            state = .signedOut
+            throw APIError.unknown("Login credentials could not be stored.")
+        }
         do {
             let user = try await auth.currentUser()
             guard revision == authRevision, tokens.hasSession else { throw CancellationError() }

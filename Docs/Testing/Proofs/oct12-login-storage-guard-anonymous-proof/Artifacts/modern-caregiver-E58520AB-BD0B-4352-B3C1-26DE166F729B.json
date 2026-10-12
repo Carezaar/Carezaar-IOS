@@ -1,0 +1,11 @@
+{
+  "authenticatedMainVisible" : true,
+  "authInfoAttempts" : 1,
+  "chatListAttempts" : 0,
+  "loginAttempts" : 0,
+  "matchListAttempts" : 1,
+  "refreshAttempts" : 0,
+  "role" : "caregiver",
+  "stage" : "native-login-background-ordinary-relaunch",
+  "welcomeVisible" : false
+}

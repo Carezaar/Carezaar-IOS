@@ -1,0 +1,11 @@
+{
+  "authenticatedMainVisible" : true,
+  "authInfoAttempts" : 1,
+  "chatListAttempts" : 0,
+  "loginAttempts" : 1,
+  "matchListAttempts" : 1,
+  "refreshAttempts" : 0,
+  "role" : "client",
+  "stage" : "native-login-completed-once-after-background",
+  "welcomeVisible" : false
+}

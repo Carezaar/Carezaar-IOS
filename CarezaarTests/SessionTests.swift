@@ -3,6 +3,39 @@ import XCTest
 
 @MainActor
 final class SessionTests: XCTestCase {
+    func testLoginStorageFailureCannotVerifyMissingPartialOrPreviousCredentials() async {
+        for failure in LoginStorageFailureTokens.Failure.allCases {
+            let tokens = LoginStorageFailureTokens(failure: failure)
+            var identityRequests = 0
+            StubHTTP.handler = { request in
+                if request.url!.lastPathComponent == "login" {
+                    return (200, Data(#"{"result":{"access_token":"new-access","refresh_token":"new-refresh"}}"#.utf8))
+                }
+                if request.url!.lastPathComponent == "info" {
+                    identityRequests += 1
+                    if request.value(forHTTPHeaderField: "Authorization") == "Bearer old-access" {
+                        return (200, Data(#"{"result":{"id":"previous-user","role":"caregiver"}}"#.utf8))
+                    }
+                    if request.value(forHTTPHeaderField: "Authorization") == "Bearer new-access" {
+                        return (200, Data(#"{"result":{"id":"new-user","role":"client"}}"#.utf8))
+                    }
+                }
+                return (403, Data(#"{"message":"Fixture authentication refused"}"#.utf8))
+            }
+            let manager = SessionManager(auth: AuthService(client: APIClient(tokens: tokens, session: StubHTTP.session())), tokens: tokens)
+            do {
+                try await manager.signIn(email: "new@example.invalid", password: "Fixture-password1!")
+                XCTFail("Failed credential persistence must not complete a login")
+            } catch let error as APIError {
+                if case .unknown = error {} else { XCTFail("Local persistence failure must not be reported as backend authentication rejection") }
+            } catch { XCTFail("Local persistence failure must have a managed API error") }
+            XCTAssertEqual(identityRequests, 0, "Do not verify login using absent, partial or previous stored credentials")
+            XCTAssertEqual(manager.state, .signedOut)
+            XCTAssertNil(tokens.accessToken)
+            XCTAssertNil(tokens.refreshToken)
+        }
+    }
+
     func testAcknowledgedPasswordChangeReauthenticatesRevokedPairWithoutChangingGraph() async throws {
         let tokens = FixtureTokens()
         tokens.save(Session(accessToken: "old-access", refreshToken: "old-refresh"))
@@ -583,6 +616,35 @@ final class SessionTests: XCTestCase {
         XCTAssertEqual(manager.state, .signedOut)
         XCTAssertFalse(tokens.hasSession)
     }
+}
+
+/// Faults at the existing public storage seam model failed writes without
+/// exhausting the real disk or modifying the production Keychain.
+private final class LoginStorageFailureTokens: SessionTokenStorage, @unchecked Sendable {
+    enum Failure: CaseIterable { case bothMissing, accessMissing, refreshMissing, previousPair }
+    private let failure: Failure
+    private let storage = FixtureTokens()
+    init(failure: Failure) {
+        self.failure = failure
+        if failure == .previousPair { storage.save(Session(accessToken: "old-access", refreshToken: "old-refresh")) }
+    }
+    var generation: UUID { storage.generation }
+    var accessToken: String? { storage.accessToken }
+    var refreshToken: String? { storage.refreshToken }
+    var hasSession: Bool { storage.hasSession }
+    func save(_ session: Session) {
+        switch failure {
+        case .bothMissing: storage.clear()
+        case .accessMissing: storage.save(Session(accessToken: "", refreshToken: session.refreshToken))
+        case .refreshMissing: storage.save(Session(accessToken: session.accessToken, refreshToken: ""))
+        case .previousPair: storage.save(Session(accessToken: "old-access", refreshToken: "old-refresh"))
+        }
+    }
+    func clear() { storage.clear() }
+    func replace(_ session: Session, ifGeneration: UUID, refreshToken: String) -> Bool {
+        storage.replace(session, ifGeneration: ifGeneration, refreshToken: refreshToken)
+    }
+    func clear(ifGeneration: UUID) -> Bool { storage.clear(ifGeneration: ifGeneration) }
 }
 
 /// Deterministically swaps accounts within a token getter to expose the gap

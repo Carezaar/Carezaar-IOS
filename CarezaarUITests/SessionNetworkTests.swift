@@ -25,6 +25,64 @@ final class SessionNetworkTests: XCTestCase {
 
     // MARK: Session
 
+    /// Backgrounding is an interruption, not an explicit cancellation. A valid
+    /// pending login may finish, but must not be duplicated or restore another role.
+    func testPendingNativeSignInSurvivesBackgroundWithoutDuplicateRequests() throws {
+        anonymousLogoutEvidenceOnly = true
+        let fixture = try ownedPrimaryFixture()
+        launchPrimarySession(["--qa-signout", "--qa-push", "SignIn", "--qa-latency", "12"])
+        let emailField = app.textFields["Enter your email address..."]
+        let passwordField = app.secureTextFields["Enter your password..."]
+        XCTAssertTrue(emailField.waitForExistence(timeout: 60))
+        XCTAssertTrue(passwordField.exists)
+        emailField.tap(); emailField.typeText(email)
+        passwordField.tap()
+        if app.buttons["Close"].waitForExistence(timeout: 1) {
+            app.buttons["Close"].tap(); passwordField.tap()
+        }
+        passwordField.typeText(password)
+        if app.keyboards.buttons["Return"].exists { app.keyboards.buttons["Return"].tap() }
+        let submit = app.buttons["Sign In"].firstMatch
+        for _ in 0..<5 where !submit.isHittable { app.swipeUp(velocity: .slow) }
+        XCTAssertTrue(submit.isEnabled && submit.isHittable)
+        XCTAssertEqual(requestCount("POST /api/auth/login"), 0)
+        submit.tap()
+        let dispatched = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            self.requestCount("POST /api/auth/login") == 1
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [dispatched], timeout: 30), .completed)
+        XCTAssertTrue(busy.exists, "Sign In must still be pending at the lifecycle transition")
+        XCTAssertFalse(app.buttons["Messages"].exists)
+        recordSessionEvidence("native-login-pending-before-background", fixture: fixture)
+        XCUIDevice.shared.press(.home)
+        let backgrounded = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            self.app.state == .runningBackground
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [backgrounded], timeout: 5), .completed)
+        XCTAssertEqual(app.state, .runningBackground, "The app must actually leave the foreground")
+        app.activate()
+        XCTAssertEqual(app.state, .runningForeground)
+        XCTAssertTrue(app.buttons["Messages"].waitForExistence(timeout: 40), "Valid pending login must finish after returning")
+        waitForMatchesLoaded(fixture, timeout: 45)
+        XCTAssertFalse(emailField.exists || passwordField.exists)
+        assertNativeStoredTokenPresence(access: true, refresh: true)
+        XCTAssertEqual(requestCount("POST /api/auth/login"), 1, "Background/return must not duplicate login")
+        XCTAssertEqual(requestCount("GET /api/auth/info"), 1)
+        XCTAssertEqual(requestCount("PUT /api/auth/refresh"), 0)
+        XCTAssertEqual(requestCount(fixture.role == "client" ? "GET /api/caregivers/matches" : "GET /api/clients/matches"), 0)
+        XCTAssertEqual(requestCount("POST /api/auth/register"), 0)
+        XCTAssertEqual(requestCount("POST /api/users/otp/send"), 0)
+        recordSessionEvidence("native-login-completed-once-after-background", fixture: fixture)
+        launchPrimarySession([])
+        XCTAssertTrue(app.buttons["Messages"].waitForExistence(timeout: 60))
+        waitForMatchesLoaded(fixture)
+        assertNativeStoredTokenPresence(access: true, refresh: true)
+        XCTAssertEqual(requestCount("POST /api/auth/login"), 0, "Ordinary relaunch must restore, not sign in again")
+        XCTAssertEqual(requestCount("GET /api/auth/info"), 1)
+        XCTAssertEqual(requestCount("PUT /api/auth/refresh"), 0)
+        recordSessionEvidence("native-login-background-ordinary-relaunch", fixture: fixture)
+    }
+
     /// Real owned saved tokens, an actual persisted reference cache, and a
     /// connection-refused startup. Host witnesses separately inspect cache bytes.
     func testOfflineSavedSessionClearsAuthenticationAndKeepsCachedWelcomeUsable() throws {

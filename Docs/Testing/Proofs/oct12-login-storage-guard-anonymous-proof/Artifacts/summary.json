@@ -1,0 +1,37 @@
+{
+  "productChange": "Reject failed or mismatched login credential persistence before identity verification",
+  "controlledRegression": "Four storage failure modes fail closed; original previous-account reuse reproduced before guard",
+  "fullUnitTests": 109,
+  "fullUnitResult": "PASS",
+  "nativeResults": [
+    {
+      "allocation": "small-client",
+      "result": "PASS",
+      "seconds": 77.386,
+      "logSHA256": "7c345f9d48a924f514faa8e4cefb29b8fedebf0cd2dd1e32961354b08c7974fe"
+    },
+    {
+      "allocation": "small-caregiver",
+      "result": "PASS",
+      "seconds": 77.366,
+      "logSHA256": "0658291a6c45c8fbecf220d54ea3c8a0bbf7676563264e561d33dadadbb82410"
+    },
+    {
+      "allocation": "modern-client",
+      "result": "PASS",
+      "seconds": 78.238,
+      "logSHA256": "ba675de4850c2d17561fb61e66b083c4022978c60aeab64da44439b60d3cf62e"
+    },
+    {
+      "allocation": "modern-caregiver",
+      "result": "PASS",
+      "seconds": 75.575,
+      "logSHA256": "6bbade571a1c993d4fe2405c35cebc67c55e47e7d0f6c803487dc2156f5dac06"
+    }
+  ],
+  "originalSmallFailureCause": "UNCONFIRMED",
+  "original374CaseCountsUnchanged": true,
+  "physicalCamera": "UNTESTED by user choice",
+  "YahooBackendOnly": "UNVERIFIED",
+  "setupAuthenticationSeparateFromNativeCounts": true
+}

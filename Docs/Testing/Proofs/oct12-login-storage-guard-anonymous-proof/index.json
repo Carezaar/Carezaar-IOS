@@ -1,0 +1,164 @@
+{
+  "title": "Login credential storage guard and pending native sign-in lifecycle",
+  "artifacts": [
+    {
+      "path": "Artifacts/small-client-D05D9259-5EBF-4B06-97DE-C6F1BE705AE8.json",
+      "description": "native-login-background-ordinary-relaunch_0_E37102F8-2D10-4D7E-B7A5-F89B08C9E383.json",
+      "sha256": "daf7fea1a336fd94f128e1b3163bd8f5932377809f47aa6b9318dfaf00b02080",
+      "packagedSha256": "daf7fea1a336fd94f128e1b3163bd8f5932377809f47aa6b9318dfaf00b02080"
+    },
+    {
+      "path": "Artifacts/small-client-2125FA33-534C-454E-B524-27772F476419.json",
+      "description": "native-login-completed-once-after-background_0_F087AE0A-1DB5-4AE4-9B59-C2E96F335720.json",
+      "sha256": "9ea0b088ce91754134f1e826aaabad56982133deb4bc82774e9414396db3e919",
+      "packagedSha256": "9ea0b088ce91754134f1e826aaabad56982133deb4bc82774e9414396db3e919"
+    },
+    {
+      "path": "Artifacts/small-client-75D9674A-63D1-47B3-BFA7-F85FB36AD334.json",
+      "description": "native-login-pending-before-background_0_9CDB9926-C5B7-4342-8D57-12B808B59881.json",
+      "sha256": "37aa5844491ec6e276cbaa1784d07ca28dc948ae9153b92a02454e77880cbeac",
+      "packagedSha256": "37aa5844491ec6e276cbaa1784d07ca28dc948ae9153b92a02454e77880cbeac"
+    },
+    {
+      "path": "Artifacts/small-caregiver-FCB96CE1-2D0A-433A-AA96-6C03C0AD9FC4.json",
+      "description": "native-login-background-ordinary-relaunch_0_387A9061-7036-4EBA-9DF3-EA629334C441.json",
+      "sha256": "65eba280910da74d2361de535d5cbed147f4aa4760a2bb375ae25258cf2bcfa8",
+      "packagedSha256": "65eba280910da74d2361de535d5cbed147f4aa4760a2bb375ae25258cf2bcfa8"
+    },
+    {
+      "path": "Artifacts/small-caregiver-417AD072-A0FD-4C96-84F3-7032815ABA0C.json",
+      "description": "native-login-completed-once-after-background_0_E7E5D3AC-5798-4009-92BA-4E6480A3258A.json",
+      "sha256": "fc9bc8641b2f3b42e07bc4f709e4d8c26914b9e5c9ab8b5c3da54fbb4982526f",
+      "packagedSha256": "fc9bc8641b2f3b42e07bc4f709e4d8c26914b9e5c9ab8b5c3da54fbb4982526f"
+    },
+    {
+      "path": "Artifacts/small-caregiver-9527C6F1-1AAD-4FBC-81D5-5BF506F6A71F.json",
+      "description": "native-login-pending-before-background_0_EDC1C2CB-7EBA-4CC6-86F8-400133C67C06.json",
+      "sha256": "a58b4c74932e4fbf6e4702a3770344b60b2ae53ae25efdfb70adcbc7c9310130",
+      "packagedSha256": "a58b4c74932e4fbf6e4702a3770344b60b2ae53ae25efdfb70adcbc7c9310130"
+    },
+    {
+      "path": "Artifacts/modern-client-95EC3765-AD86-4B3E-AD54-1748E90A1ED0.json",
+      "description": "native-login-background-ordinary-relaunch_0_E7346FD3-F481-40D3-8219-FEFDBA597473.json",
+      "sha256": "daf7fea1a336fd94f128e1b3163bd8f5932377809f47aa6b9318dfaf00b02080",
+      "packagedSha256": "daf7fea1a336fd94f128e1b3163bd8f5932377809f47aa6b9318dfaf00b02080"
+    },
+    {
+      "path": "Artifacts/modern-client-66293453-B084-46F7-9BDF-6A383A77103F.json",
+      "description": "native-login-completed-once-after-background_0_2B79E38A-90E1-477B-B69A-38BBC34EF2E8.json",
+      "sha256": "9ea0b088ce91754134f1e826aaabad56982133deb4bc82774e9414396db3e919",
+      "packagedSha256": "9ea0b088ce91754134f1e826aaabad56982133deb4bc82774e9414396db3e919"
+    },
+    {
+      "path": "Artifacts/modern-client-77CA722D-CFBE-4697-A526-AC32FBA1355E.json",
+      "description": "native-login-pending-before-background_0_157B004D-73BB-4A55-A569-005298C98ED3.json",
+      "sha256": "37aa5844491ec6e276cbaa1784d07ca28dc948ae9153b92a02454e77880cbeac",
+      "packagedSha256": "37aa5844491ec6e276cbaa1784d07ca28dc948ae9153b92a02454e77880cbeac"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-E58520AB-BD0B-4352-B3C1-26DE166F729B.json",
+      "description": "native-login-background-ordinary-relaunch_0_1E3B7264-AD98-4C55-8EB1-547B49D733C8.json",
+      "sha256": "65eba280910da74d2361de535d5cbed147f4aa4760a2bb375ae25258cf2bcfa8",
+      "packagedSha256": "65eba280910da74d2361de535d5cbed147f4aa4760a2bb375ae25258cf2bcfa8"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-62B1E006-9CC4-437A-809F-49E85283C5DD.json",
+      "description": "native-login-completed-once-after-background_0_A2B2DBDF-C6C5-4D0E-BB29-3998E2533D6D.json",
+      "sha256": "fc9bc8641b2f3b42e07bc4f709e4d8c26914b9e5c9ab8b5c3da54fbb4982526f",
+      "packagedSha256": "fc9bc8641b2f3b42e07bc4f709e4d8c26914b9e5c9ab8b5c3da54fbb4982526f"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-1980C563-F29A-42EA-A069-135C4A2B9500.json",
+      "description": "native-login-pending-before-background_0_E762ECE5-ACF5-420D-A89F-A3C83E9242FC.json",
+      "sha256": "a58b4c74932e4fbf6e4702a3770344b60b2ae53ae25efdfb70adcbc7c9310130",
+      "packagedSha256": "a58b4c74932e4fbf6e4702a3770344b60b2ae53ae25efdfb70adcbc7c9310130"
+    },
+    {
+      "path": "Artifacts/release-exclusions.json",
+      "description": "Fresh Simulator Release build/static analysis and 34 excluded QA/diagnostic names",
+      "sha256": "719e13e28e4dd9ff1f2ea77932e81d46e0d594dd06a4d7a46feb410b7df83121",
+      "packagedSha256": "719e13e28e4dd9ff1f2ea77932e81d46e0d594dd06a4d7a46feb410b7df83121"
+    },
+    {
+      "path": "Artifacts/summary.json",
+      "description": "Credential guard unit/native results and preserved evidence limits",
+      "sha256": "b8e1b6839efdbe4e200e439cbcb1619d53a4a9d7c0838ef689af811370afda05",
+      "packagedSha256": "b8e1b6839efdbe4e200e439cbcb1619d53a4a9d7c0838ef689af811370afda05"
+    }
+  ],
+  "results": [
+    {
+      "allocation": "small-client",
+      "result": "PASS",
+      "seconds": 77.386,
+      "logSHA256": "7c345f9d48a924f514faa8e4cefb29b8fedebf0cd2dd1e32961354b08c7974fe"
+    },
+    {
+      "allocation": "small-caregiver",
+      "result": "PASS",
+      "seconds": 77.366,
+      "logSHA256": "0658291a6c45c8fbecf220d54ea3c8a0bbf7676563264e561d33dadadbb82410"
+    },
+    {
+      "allocation": "modern-client",
+      "result": "PASS",
+      "seconds": 78.238,
+      "logSHA256": "ba675de4850c2d17561fb61e66b083c4022978c60aeab64da44439b60d3cf62e"
+    },
+    {
+      "allocation": "modern-caregiver",
+      "result": "PASS",
+      "seconds": 75.575,
+      "logSHA256": "6bbade571a1c993d4fe2405c35cebc67c55e47e7d0f6c803487dc2156f5dac06"
+    }
+  ],
+  "rootReviewed": true,
+  "independentReviewed": true,
+  "scopeLimits": [
+    "Controlled storage failure is separately proved; original Small failure cause remains unconfirmed",
+    "Home/background completion does not verify explicit navigation-away cancellation",
+    "Original full QA and Retry/accessibility failures remain open",
+    "Simulator Release compilation/analysis is not physical signing, distribution or Release runtime"
+  ],
+  "independentReview": {
+    "reviewer": "Independent QA verifier /root/cache_review",
+    "checkedAtUTC": "2026-10-12T08:53:18.228700+00:00",
+    "verdict": "PASS for bounded credential-storage guard regression and pending native sign-in lifecycle evidence; no full QA closure",
+    "artifactCount": 14,
+    "allArtifactHashesVerified": true,
+    "nativeXcresultSummariesIndependentlyRead": {
+      "small-client": "1 Passed, 0 failed/skipped; 77.386 seconds",
+      "small-caregiver": "1 Passed, 0 failed/skipped; 77.366 seconds",
+      "modern-client": "1 Passed, 0 failed/skipped; 78.238 seconds",
+      "modern-caregiver": "1 Passed, 0 failed/skipped; 75.575 seconds"
+    },
+    "sourceSHA256": {
+      "Carezaar/Core/Session/SessionManager.swift": "b681cb8e4a7babacc59550cace7ee566ef442576776d78d07402a12b188a4450",
+      "CarezaarTests/SessionTests.swift": "9829e8bf63ea443d6ce845ae5420589880e9faf41e48e3d347e09d8225b13a1f",
+      "CarezaarUITests/SessionNetworkTests.swift": "0cb8f0c2b15d747461fb4aab0421b8429324dccdee7846fc06ac8b0670dc5025"
+    },
+    "gates": {
+      "source": "8-line product guard verifies exact fresh pair readback before identity verification; four controlled failure modes cover missing, partial and previous credentials. Prior independent source verdict remains applicable.",
+      "units": "Actual terminal full-unit log: 109 passed, zero failures, 28.836 seconds. Separate baseline RED remains preserved.",
+      "nativeStages": "All 12 anonymous stage JSONs match retained raw exported attachment bytes. Pending flow has one login attempt and no Main/authInfo/list; after background/return Main is visible with one login, one authInfo, one correct-role list and zero refresh; ordinary launch restores with login0/authInfo1/refresh0. Client ordinary list count is two, caregiver one; no deduplication claim. Completed source assertions additionally verify stored pair presence, exact owned-role list contents, no opposite-role GET/OTP/register during initial login.",
+      "release": "Actual build/analyze log terminates BUILD SUCCEEDED and ANALYZE SUCCEEDED. Actual Release binary SHA matches proof; all 34 distinct QA/API-override/diagnostic names absent in raw bytes and extracted strings. Simulator Release only.",
+      "privacy": "14 JSON artifacts contain booleans, integer counters, role/stage, synthetic test outcome descriptions and hashes; no real email/password/token/account ID/backend URL/private path/media. No images in this scope.",
+      "provenance": "Root executed tests and generated records; independent reviewer read current source, all artifacts, raw terminal logs and xcresult summaries, raw exported attachment hash matches, actual Release binary/strings. Reviewer did not drive UI or execute network/app operations."
+    },
+    "limits": [
+      "Original Small lifecycle failure cause remains UNCONFIRMED; latest four passing runs do not establish its cause or resolution.",
+      "Original Retry/P17 failures remain open; original 374-case counts unchanged by this proof.",
+      "Home/background is an interruption, not explicit abandonment; no navigation-away cancellation coverage claimed. Pending flow/busy and dispatched native counter do not prove a still-pending HTTP response at Home.",
+      "No full QA, production readiness, physical camera, physical signing/distribution/Release runtime or Yahoo backend-only attribution approval.",
+      "Root review still required before publication."
+    ],
+    "resourcesOpened": "None",
+    "mutations": "Only this private verdict and candidate independentReviewed/independentReview fields."
+  },
+  "publicPackage": {
+    "rootReviewed": true,
+    "independentReviewed": true,
+    "originalEvidencePreserved": true,
+    "rawLogsXCResultsFullScreenPhotosPrivateFixturesIncluded": false
+  }
+}
