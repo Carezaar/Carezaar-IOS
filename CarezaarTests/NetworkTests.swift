@@ -35,6 +35,42 @@ final class StubHTTP: URLProtocol {
     }
 }
 final class NetworkTests: XCTestCase {
+    /// Exercises the production service/URLSession boundary without sending mail.
+    /// Acceptance proves request handling, not delivery to the recipient's inbox.
+    @MainActor func testYahooOTPPreservesEmailAndSurfacesServerFailureWithoutReplay() async throws {
+        for email in ["fixture@yahoo.com", "fixture+tag@yahoo.com", "Fixture@Yahoo.com"] {
+            XCTAssertNil(FieldValidator.email(email))
+            for status in [204, 500] {
+                var attempts = 0
+                StubHTTP.handler = { request in
+                    attempts += 1
+                    XCTAssertEqual(request.httpMethod, "POST")
+                    XCTAssertEqual(request.url?.path, "/api/users/otp/send")
+                    XCTAssertNil(request.value(forHTTPHeaderField: "Authorization"))
+                    let form = URLComponents(string: "https://fixture.invalid/?" + StubHTTP.body(request))!.queryItems!
+                    XCTAssertEqual(form.map(\.name), ["email"])
+                    XCTAssertEqual(form.first?.value, email)
+                    return (status, status == 204 ? Data() : Data(#"{"message":"Fixture delivery service unavailable"}"#.utf8))
+                }
+                let service = UserService(client: APIClient(session: StubHTTP.session()))
+                do {
+                    try await service.sendOTP(email: email)
+                    XCTAssertEqual(status, 204, "Server failure must not be treated as OTP success")
+                } catch {
+                    XCTAssertEqual(status, 500, "Successful empty response must be accepted")
+                    if let apiError = error as? APIError, case .server = apiError {} else {
+                        XCTFail("HTTP 500 must surface as a server failure")
+                    }
+                    let message = Feedback.message(error)
+                    XCTAssertFalse(message.isEmpty)
+                    XCTAssertFalse(message.contains("Fixture delivery service unavailable"),
+                                   "Internal delivery details must not replace the managed error")
+                }
+                XCTAssertEqual(attempts, 1, "OTP submission must not silently send duplicate email")
+            }
+        }
+    }
+
     func testClientCertificationsUseOnlyDocumentedSnakeCaseForNoneOneAndMany() async {
         for ids in [[], [1], [1, 3]] {
             let captured = expectation(description: "captured actual preference body")

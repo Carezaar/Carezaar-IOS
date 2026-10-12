@@ -1,0 +1,39 @@
+{
+  "role": "client",
+  "completedScreens": [
+    "intro",
+    "matches",
+    "messages",
+    "profile",
+    "manage-matches",
+    "notifications",
+    "delete-account",
+    "change-password",
+    "help-center"
+  ],
+  "findings": [
+    {
+      "screen": "messages",
+      "auditType": 131072,
+      "description": "Text clipped"
+    },
+    {
+      "screen": "delete-account",
+      "auditType": 1,
+      "description": "Contrast failed"
+    },
+    {
+      "screen": "change-password",
+      "auditType": 1,
+      "description": "Contrast failed"
+    },
+    {
+      "screen": "help-center",
+      "auditType": 1,
+      "description": "Contrast failed"
+    }
+  ],
+  "findingCount": 4,
+  "result": "FAIL",
+  "privateElementLabelsExcluded": true
+}

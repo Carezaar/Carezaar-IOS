@@ -333,6 +333,31 @@ final class ScreenSweepTests: XCTestCase {
             attachment.name = "A5-fully-exposed-" + name
             attachment.lifetime = .keepAlways
             add(attachment)
+            // Diagnostic comparison only: the separate unfiltered nine-screen
+            // audit keeps every finding. Observe whether this same reported
+            // text is flagged once fully exposed above the fixed footer.
+            var allFindings = 0
+            var targetContrastFindings = 0
+            var auditCompleted = false
+            do {
+                try app.performAccessibilityAudit { issue in
+                    allFindings += 1
+                    if issue.auditType.rawValue == 1, issue.element?.label == element.label {
+                        targetContrastFindings += 1
+                    }
+                    return true
+                }
+                auditCompleted = true
+            } catch {}
+            let record: [String: Any] = ["target": name, "auditCompleted": auditCompleted,
+                                        "allSDKFindings": allFindings,
+                                        "targetSDKContrastFindings": targetContrastFindings,
+                                        "fullOriginalAuditUnchanged": true]
+            if let data = try? JSONSerialization.data(withJSONObject: record, options: [.sortedKeys]) {
+                let evidence = XCTAttachment(data: data, uniformTypeIdentifier: "public.json")
+                evidence.name = "A5-fully-exposed-SDK-comparison-" + name
+                evidence.lifetime = .keepAlways; add(evidence)
+            }
         }
         open(["--qa-signout", "--qa-login-env", "--qa-request-counts", "--qa-push", "DeleteAccount"] + english)
         XCTAssertTrue(waitForAuditScreen("delete-account"))

@@ -1,0 +1,246 @@
+{
+  "title": "Physical camera and OTP endpoint verification; preserved accessibility audit investigation",
+  "artifacts": [
+    {
+      "path": "Artifacts/caregiver-A971AF0F-53E1-4594-958C-E6304B210A2B.json",
+      "description": "A5-fully-exposed-SDK-comparison-matches-preferences-gray-on-role-panel_0_AED5DC00-51B8-4F69-8369-7273D9569D2E.json",
+      "sha256": "047692b98f518728853742efb62de66034283cd6f9391f7b51f7330b880fac19",
+      "packagedSha256": "047692b98f518728853742efb62de66034283cd6f9391f7b51f7330b880fac19"
+    },
+    {
+      "path": "Artifacts/caregiver-DAE9CC6B-86CD-44A4-8128-C27803B16328.png",
+      "description": "A5-fully-exposed-matches-preferences-gray-on-role-panel_0_BFA48BE7-1C9A-409C-AF2D-70518379A72D.png",
+      "sha256": "a04571f494dae3ab7196d4f9e464f76ee5afe119f56381b110659e07049ceadc",
+      "packagedSha256": "a04571f494dae3ab7196d4f9e464f76ee5afe119f56381b110659e07049ceadc"
+    },
+    {
+      "path": "Artifacts/caregiver-74267624-AFED-4CE3-99D7-19FF59DFD409.json",
+      "description": "A5-fully-exposed-SDK-comparison-help-description-gray-on-white_0_73C5EE93-DFF0-4B34-86A8-106BD751E5A2.json",
+      "sha256": "ac9f566929d4f10a82d4ac7e059e6807f653a9367431606c131a392563a8be99",
+      "packagedSha256": "ac9f566929d4f10a82d4ac7e059e6807f653a9367431606c131a392563a8be99"
+    },
+    {
+      "path": "Artifacts/caregiver-57D92344-8896-4BF5-85E1-205C625F0415.png",
+      "description": "A5-fully-exposed-help-description-gray-on-white_0_76EE9F7C-B2C8-4DEB-BBC8-72BF807924C2.png",
+      "sha256": "e5771f5f517257842edf132488cf5a53a855d817c53e6fdcbf3605a91001ebb3",
+      "packagedSha256": "e5771f5f517257842edf132488cf5a53a855d817c53e6fdcbf3605a91001ebb3"
+    },
+    {
+      "path": "Artifacts/caregiver-BD7DF6DD-836D-49CC-9F39-2BD8D6BFCB74.json",
+      "description": "A5-fully-exposed-SDK-comparison-satisfied-password-rule-dark-green-on-green_0_6BBFEB5B-4B05-49E5-B097-5523F66067F8.json",
+      "sha256": "296437ba9c869407d2d124cb4fb56e0dee54e0e0bbeb68eb458c70a53f23d12d",
+      "packagedSha256": "296437ba9c869407d2d124cb4fb56e0dee54e0e0bbeb68eb458c70a53f23d12d"
+    },
+    {
+      "path": "Artifacts/caregiver-3B33BB73-FE93-4265-838A-89B21ACEF358.png",
+      "description": "A5-fully-exposed-satisfied-password-rule-dark-green-on-green_0_AC9B30D1-0CA9-4FFB-93DB-F6E7FA2BDBCE.png",
+      "sha256": "e4772f21c2998bf3e817213c6ee97998a156fc8b84e2ed8505df4d8e620eb476",
+      "packagedSha256": "e4772f21c2998bf3e817213c6ee97998a156fc8b84e2ed8505df4d8e620eb476"
+    },
+    {
+      "path": "Artifacts/caregiver-D0034946-8088-4036-A463-07365ADC16B6.json",
+      "description": "A5-fully-exposed-SDK-comparison-empty-password-rule-gray-on-gray_0_1357F577-2392-4021-AAA8-DDE5F39E91A6.json",
+      "sha256": "d08ef32a0020c7e7bd028b524bafe01c76707898d79a452a97415a4f9d9d7053",
+      "packagedSha256": "d08ef32a0020c7e7bd028b524bafe01c76707898d79a452a97415a4f9d9d7053"
+    },
+    {
+      "path": "Artifacts/caregiver-CC7076EC-808B-4AE4-95D2-66477FDA1094.png",
+      "description": "A5-fully-exposed-empty-password-rule-gray-on-gray_0_3B4B28AD-033E-439F-AC30-1445836378E5.png",
+      "sha256": "14954f213ada00a2eb3b959968a4da0405485bbbcd706950814de613d0418dad",
+      "packagedSha256": "14954f213ada00a2eb3b959968a4da0405485bbbcd706950814de613d0418dad"
+    },
+    {
+      "path": "Artifacts/caregiver-9D5AA9F0-FA76-4DD6-A888-2826437C14B4.json",
+      "description": "A5-fully-exposed-SDK-comparison-delete-warning-black-on-pink_0_43D1B309-EF7E-4853-9AE2-EA9081A8FC13.json",
+      "sha256": "48a32330852f51591e18e5013ae19b8c85743a9973ea9dda1a772583a52ea19d",
+      "packagedSha256": "48a32330852f51591e18e5013ae19b8c85743a9973ea9dda1a772583a52ea19d"
+    },
+    {
+      "path": "Artifacts/caregiver-18A62D1B-C687-4A10-A5E9-5D70F9DAF701.png",
+      "description": "A5-fully-exposed-delete-warning-black-on-pink_0_DE26248F-D087-4030-AF9F-97711F860DC9.png",
+      "sha256": "a75e012021b320332653119f67638c35e1f75d1c526f745a2c5dd96d3ddbbbc3",
+      "packagedSha256": "a75e012021b320332653119f67638c35e1f75d1c526f745a2c5dd96d3ddbbbc3"
+    },
+    {
+      "path": "Artifacts/oct12-final-caregiver-contrast-measurements-anonymous.json",
+      "description": "Actual five exposed public-copy core pixel ratios; caregiver",
+      "sha256": "25a41a757a3a5111d305bd8035f28414e61837b4cf5db0d28ed186e8dc9c3ac3",
+      "packagedSha256": "25a41a757a3a5111d305bd8035f28414e61837b4cf5db0d28ed186e8dc9c3ac3"
+    },
+    {
+      "path": "Artifacts/oct12-final-caregiver-strict-audit-summary-anonymous.json",
+      "description": "Preserved unfiltered nine-screen audit failure; caregiver",
+      "sha256": "05405636e8eb94dfc3afd8c2f5c8bb872a64321677cab3b51b3ca5aa04c61441",
+      "packagedSha256": "05405636e8eb94dfc3afd8c2f5c8bb872a64321677cab3b51b3ca5aa04c61441"
+    },
+    {
+      "path": "Artifacts/client-340EB207-76CD-408A-8AB5-197CEA253A48.json",
+      "description": "A5-fully-exposed-SDK-comparison-matches-preferences-gray-on-role-panel_0_98E68607-FFC2-47C3-8DF2-1FCB174B80C4.json",
+      "sha256": "21aaae363c69a2a5fe295cfd616369e700564d3f6c3cbe3b96c466f7fba1a787",
+      "packagedSha256": "21aaae363c69a2a5fe295cfd616369e700564d3f6c3cbe3b96c466f7fba1a787"
+    },
+    {
+      "path": "Artifacts/client-25B025C3-3B4F-49E5-BDD3-657F7E4185E1.png",
+      "description": "A5-fully-exposed-matches-preferences-gray-on-role-panel_0_53DDBE06-1122-4744-BD05-EA9C1E5BDF11.png",
+      "sha256": "7dd86109c615ddd6b39088d646910083b244b1688aae881a846ea348f7213a19",
+      "packagedSha256": "7dd86109c615ddd6b39088d646910083b244b1688aae881a846ea348f7213a19"
+    },
+    {
+      "path": "Artifacts/client-2DE0936F-A734-4441-9AAD-CBF4593684A6.json",
+      "description": "A5-fully-exposed-SDK-comparison-help-description-gray-on-white_0_31140CF1-B44F-4039-AC71-234B3ACDF057.json",
+      "sha256": "0153c0dda8bf2fad539837e06fe0f2bb55ad4c84e764b6abea7fbe28f303e4bb",
+      "packagedSha256": "0153c0dda8bf2fad539837e06fe0f2bb55ad4c84e764b6abea7fbe28f303e4bb"
+    },
+    {
+      "path": "Artifacts/client-BB9D8058-285D-4DDD-ACB6-9C838369638C.png",
+      "description": "A5-fully-exposed-help-description-gray-on-white_0_589042C2-277A-4C1E-878B-89F84DF9772A.png",
+      "sha256": "e5771f5f517257842edf132488cf5a53a855d817c53e6fdcbf3605a91001ebb3",
+      "packagedSha256": "e5771f5f517257842edf132488cf5a53a855d817c53e6fdcbf3605a91001ebb3"
+    },
+    {
+      "path": "Artifacts/client-58877F3B-EA8D-4002-B2AA-306F8BF96166.json",
+      "description": "A5-fully-exposed-SDK-comparison-satisfied-password-rule-dark-green-on-green_0_4FF86067-11BF-472E-96E4-0F942FFD58E8.json",
+      "sha256": "7d8f7c8f666a17e00b884f04c0136bcdaf72d1ad70b79f0cdd3487946ed279cb",
+      "packagedSha256": "7d8f7c8f666a17e00b884f04c0136bcdaf72d1ad70b79f0cdd3487946ed279cb"
+    },
+    {
+      "path": "Artifacts/client-BD129789-3BA9-4F63-AB73-F5E9CE90A106.png",
+      "description": "A5-fully-exposed-satisfied-password-rule-dark-green-on-green_0_7FD7FB31-D212-42EE-A275-F66CC31B163A.png",
+      "sha256": "e4772f21c2998bf3e817213c6ee97998a156fc8b84e2ed8505df4d8e620eb476",
+      "packagedSha256": "e4772f21c2998bf3e817213c6ee97998a156fc8b84e2ed8505df4d8e620eb476"
+    },
+    {
+      "path": "Artifacts/client-332CF38E-7633-4ACE-A394-F4C769F67B98.json",
+      "description": "A5-fully-exposed-SDK-comparison-empty-password-rule-gray-on-gray_0_6D8F2C30-C029-4B2D-8565-AF81787C6266.json",
+      "sha256": "d08ef32a0020c7e7bd028b524bafe01c76707898d79a452a97415a4f9d9d7053",
+      "packagedSha256": "d08ef32a0020c7e7bd028b524bafe01c76707898d79a452a97415a4f9d9d7053"
+    },
+    {
+      "path": "Artifacts/client-3E46ED25-C505-4763-AA4C-883BF5BE121D.png",
+      "description": "A5-fully-exposed-empty-password-rule-gray-on-gray_0_6B84467B-26D2-439F-8056-1A1BF2F4CAD7.png",
+      "sha256": "14954f213ada00a2eb3b959968a4da0405485bbbcd706950814de613d0418dad",
+      "packagedSha256": "14954f213ada00a2eb3b959968a4da0405485bbbcd706950814de613d0418dad"
+    },
+    {
+      "path": "Artifacts/client-33F191DD-1E8C-4093-A430-E2FAEE5E6B35.json",
+      "description": "A5-fully-exposed-SDK-comparison-delete-warning-black-on-pink_0_EA027BB8-C5CC-473E-9C61-3F6FBDDBA740.json",
+      "sha256": "f6398c3459c35578f7f8baadc5d9d896dec7156a4a9990d397c74a10bfcccb5d",
+      "packagedSha256": "f6398c3459c35578f7f8baadc5d9d896dec7156a4a9990d397c74a10bfcccb5d"
+    },
+    {
+      "path": "Artifacts/client-502D7D6A-45E1-44C4-82A9-39E255990DBD.png",
+      "description": "A5-fully-exposed-delete-warning-black-on-pink_0_A692F991-F4A4-4702-B448-4E5402F9179B.png",
+      "sha256": "a75e012021b320332653119f67638c35e1f75d1c526f745a2c5dd96d3ddbbbc3",
+      "packagedSha256": "a75e012021b320332653119f67638c35e1f75d1c526f745a2c5dd96d3ddbbbc3"
+    },
+    {
+      "path": "Artifacts/oct12-final-client-contrast-measurements-anonymous.json",
+      "description": "Actual five exposed public-copy core pixel ratios; client",
+      "sha256": "52e95d7a70ecbcce218d75f642c0f5a5cbe3c9fc358094beaf3d1d18ccb7ace9",
+      "packagedSha256": "52e95d7a70ecbcce218d75f642c0f5a5cbe3c9fc358094beaf3d1d18ccb7ace9"
+    },
+    {
+      "path": "Artifacts/oct12-final-client-strict-audit-summary-anonymous.json",
+      "description": "Preserved unfiltered nine-screen audit failure; client",
+      "sha256": "7ceaf70ee4c89ee7884c87a8f517bf1a416dad5a87ae46f4af2f1af62e7e8490",
+      "packagedSha256": "7ceaf70ee4c89ee7884c87a8f517bf1a416dad5a87ae46f4af2f1af62e7e8490"
+    },
+    {
+      "path": "Artifacts/oct12-final-physical-camera-summary-anonymous.json",
+      "description": "Actual physical iPhone15 camera deny/capture/retake/crop-control/Cancel for both roles; no images",
+      "sha256": "7d4a3662633b13db75a2135d89389bd09bca8e8f4f925e079d35a54cfabc06a7",
+      "packagedSha256": "7d4a3662633b13db75a2135d89389bd09bca8e8f4f925e079d35a54cfabc06a7"
+    },
+    {
+      "path": "Artifacts/oct12-final-otp-endpoint-summary-anonymous.json",
+      "description": "One authorized real OTP endpoint request accepted; no recipient/inbox claim",
+      "sha256": "17daee4ee26cd436ae20dea80239b204d33d56fc66ab5fec41342ab2c22ff2ae",
+      "packagedSha256": "17daee4ee26cd436ae20dea80239b204d33d56fc66ab5fec41342ab2c22ff2ae"
+    },
+    {
+      "path": "Artifacts/oct12-final-camera-otp-accessibility-summary-anonymous.json",
+      "description": "Completed named checks, actual failed audits and original full-QA limits",
+      "sha256": "dc90f46abcdd24c77520f371fc3bb428f6fe3c5bbbcbdb862cebea81679052f4",
+      "packagedSha256": "dc90f46abcdd24c77520f371fc3bb428f6fe3c5bbbcbdb862cebea81679052f4"
+    }
+  ],
+  "results": {
+    "productionSourceChanged": false,
+    "fullUnitTests": 110,
+    "fullUnitSeconds": 28.932,
+    "unitResult": "PASS",
+    "nativeRetryResult": "PASS",
+    "nativeRetrySeconds": 39.816,
+    "exposureTests": {
+      "caregiver": 105.562,
+      "client": 108.846
+    },
+    "strictAuditResults": {
+      "client": "FAIL4",
+      "caregiver": "FAIL5"
+    },
+    "original374CaseCounts": {
+      "PASS": 108,
+      "NOT RUN": 248,
+      "FAIL": 3,
+      "BLOCKED": 0,
+      "N/A": 15
+    },
+    "cameraCaseHardwareBlockRemoved": true,
+    "cameraCaseFullScopeStillPartial": true,
+    "cameraAndEndpointScopeIndependentlyReviewed": true,
+    "fullQAComplete": false,
+    "pixelMeasurementsDoNotReplaceFullAuditOrVoiceOver": true,
+    "appleAuditGuidance": "https://developer.apple.com/videos/play/wwdc2023/10035/?time=597",
+    "remainingOriginalRetryAndSmallLoginCauses": "UNCONFIRMED"
+  },
+  "rootReviewed": true,
+  "independentReviewed": true,
+  "scopeLimits": [
+    "No physical photo/video uploaded; raw framework camera artifacts private",
+    "Capture/retake/crop-control/Cancel passes do not prove saved crop dimensions or upload/persistence",
+    "HTTP204 endpoint acceptance does not prove Yahoo delivery or backend-only defect",
+    "Core pixel contrast and exposure PASS do not replace strict audits or broader VoiceOver/DT/full-screen coverage",
+    "Original failed Retry/Small observations and fullQA remain open"
+  ],
+  "independentReview": {
+    "reviewer": "Independent QA verifier /root/cache_review",
+    "checkedAtUTC": "2026-10-12T14:03:15.169603+00:00",
+    "verdict": "PASS bounded 27-artifact evidence publication; full QA incomplete and no original PASS promotion",
+    "artifactCount": 27,
+    "allHashesVerified": true,
+    "privacyGate": "Ten PNGs show complete public copy only, with safe scalars/anonymous SDK/audit/camera/OTP summaries. Four client PNGs byte-identical to already viewed caregiver public-copy crops; distinct client Matches crop also viewed. Raw camera images/framework results and private labels/device identifiers excluded.",
+    "sourceGate": "All57 production Swift files and project/resources match committed login-storage baseline; only NetworkTests, DeviceCameraTests, ScreenSweepTests differ. OTP test now asserts APIError.server and managed-message suppression on500. Camera source has exact fixture guards/environment credentials/no profile writes/capture-retake-crop gestures-Cancel. Added25-line SDK diagnostic leaves auditCompleted=false on throw; strict audit final report-empty assertion unchanged.",
+    "actualResultsIndependentlyQueried": {
+      "caregiverUnitsAndExposure": "111 Passed/0fail/0skip:110 units28.932 plus exposure105.562",
+      "unitsAndRetry": "111 Passed/0fail/0skip:110 units28.762 plus strict Retry39.816",
+      "clientAuditAndExposure": "Failed:2 tests,1pass(exposure108.846),1fail(strict168.987/4findings)",
+      "caregiverStrictAudit": "Failed:1test,1fail149.155/5findings",
+      "physicalCamera": "Previous independent actual4xcresult Passed1 each:deniedclient30.407/caregiver33.051,capture-retake-crop-control-Cancelclient47.341/caregiver49.417"
+    },
+    "rasterAndSDKGate": "All10 native raster+10SDK candidate bytes match actual exports; independently recomputed both five-image coreRGB counts/dimensions/ratios exactly. Ratios11.399366/7.004729/4.873708/6.364956/18.385936 support these elements/states only. All10 diagnostics auditCompleted=true. Client targetcontrast counts Matches0/Help1/satisfiedrule0/emptyrule0/Delete0; caregiver0/0/0/0/1. AllSDK counts client1/1/1/1/1, caregiver0/1/0/1/2. No warning-always-disappears claim allowed.",
+    "caseScope": "Counts108PASS/248NOTRUN/3FAIL/0BLOCKED/15NA sum374. Only camera hardware blocker removed; P12-008 remains partial NOT RUN because physical crop output dimensions/save/upload not verified. No physical uploads authorized or performed. P17 strict failures and original Retry/Small causes remain open.",
+    "OTPscope": "Actual permitted live endpoint record supports1anonymous OTP POST204/empty acceptance for retained authorized fixture. No email printed, backend edits, inbox delivery or Yahoo-only/backend-cause attribution. User explicitly narrowed scope to endpoint acceptance.",
+    "adjudicationLimits": [
+      "Measured contrast/complete public-copy pixels are evidence for target-specific SDK heuristic disagreement, not whole-screen accessibility PASS.",
+      "Different client/caregiver residual targets demonstrate state/viewport sensitivity; no complete cause inferred.",
+      "Exposure method PASS means exposure/control assertions passed, not clean SDK audit; allSDK counts retained.",
+      "No actual VoiceOver listening/full roles/devices/screens/modal/localization/DynamicType growth approval.",
+      "Latest strict Retry PASS does not explain original stall.",
+      "Publication approval does not complete user fullQA request."
+    ],
+    "priorIndependentReviews": [
+      "oct12-physical-camera-scope-review-private.json",
+      "oct12-final-accessibility-adjudication-review-private.json"
+    ],
+    "provenance": "Root performed device/runtime/OTP actions and generated summaries. Independent reviewer read source/currentbaseline, all27candidate artifacts, actualnative exports byhash, logs and actualxcresults, viewed publicpixels and recomputedscalars. No device/API actions.",
+    "resourcesOpened": "None",
+    "mutations": "Only private finalgate and candidate independentReviewed/independentReview fields."
+  },
+  "publicPackage": {
+    "rootReviewed": true,
+    "independentReviewed": true,
+    "originalEvidencePreserved": true,
+    "rawLogsXCResultsFullScreenPhotosPrivateFixturesIncluded": false
+  }
+}

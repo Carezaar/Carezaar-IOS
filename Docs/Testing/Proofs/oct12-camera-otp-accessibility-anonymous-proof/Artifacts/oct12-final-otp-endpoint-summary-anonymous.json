@@ -1,0 +1,10 @@
+{
+  "endpoint": "POST /api/users/otp/send",
+  "httpStatus": 204,
+  "requests": 1,
+  "responseBytes": 0,
+  "authorizedTestAddressExcluded": true,
+  "backendCodeOrConfigurationEdited": false,
+  "YahooDeliveryVerified": false,
+  "requestedScope": "Endpoint acceptance only; user excluded inbox/provider/backend edits"
+}

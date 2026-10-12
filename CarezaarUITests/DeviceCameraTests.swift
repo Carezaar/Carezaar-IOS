@@ -23,7 +23,9 @@ final class DeviceCameraTests: XCTestCase {
     }
 
     override func tearDown() {
-        if let run = testRun, run.failureCount > 0 { shot("zz-failure-\(name)") }
+        // Camera content and private profile details must not enter attachments.
+        if !name.contains("testCamera"), let run = testRun, run.failureCount > 0 { shot("zz-failure-\(name)") }
+        app?.terminate()
     }
 
     func testCameraDenied() throws {
@@ -45,7 +47,8 @@ final class DeviceCameraTests: XCTestCase {
         app.buttons["Camera"].tap()
         XCTAssertTrue(app.alerts.firstMatch.waitForExistence(timeout: 10), "denied again: no explanation")
         app.alerts.firstMatch.buttons["Cancel"].tap()
-        XCTAssertEqual(try serverPhoto(), photoBefore, "the photo changed")
+        assertNoPhotoWrites()
+        XCTAssertTrue(try serverPhoto() == photoBefore, "the server photo changed")
     }
 
     func testCameraAllowedCaptureThenCancel() throws {
@@ -60,16 +63,28 @@ final class DeviceCameraTests: XCTestCase {
         shutter.tap()
         let use = app.buttons["Use Photo"]
         XCTAssertTrue(use.waitForExistence(timeout: 20), "no captured-photo preview")
+        let retake = app.buttons["Retake"]
+        XCTAssertTrue(retake.waitForExistence(timeout: 5), "Captured photo must support retaking")
+        retake.tap()
+        XCTAssertTrue(shutter.waitForExistence(timeout: 10), "Retake did not reopen the camera")
+        shutter.tap()
+        XCTAssertTrue(use.waitForExistence(timeout: 20), "Retaken photo preview missing")
         use.tap()
         let confirm = app.buttons["Confirm"]
         XCTAssertTrue(confirm.waitForExistence(timeout: 20), "the crop screen did not open for the captured photo")
+        app.pinch(withScale: 1.5, velocity: 1)
+        let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.55))
+        start.press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.6, dy: 0.55)))
+        XCTAssertTrue(confirm.exists && app.buttons["Cancel"].firstMatch.isHittable,
+                      "Crop gestures must preserve usable controls")
         shot("cam-4-crop")
         app.buttons["Cancel"].firstMatch.tap()
         XCTAssertTrue(app.buttons["Save"].firstMatch.waitForExistence(timeout: 10), "Cancel did not return to the form")
         XCTAssertFalse(app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Remove Photo")).firstMatch.exists && photoBefore == "nil",
                        "a discarded capture was applied")
+        assertNoPhotoWrites()
         app.terminate()
-        XCTAssertEqual(try serverPhoto(), photoBefore, "something was uploaded")
+        XCTAssertTrue(try serverPhoto() == photoBefore, "the server photo changed after a cancelled capture")
     }
 
     /// What VoiceOver would read on the new match screens, in order, on the device: every
@@ -149,7 +164,10 @@ final class DeviceCameraTests: XCTestCase {
     // MARK: Helpers
 
     private func openCameraChoice() {
-        app.launchArguments = ["--qa-signout", "--qa-login", env["QA_EMAIL"] ?? "", env["QA_PASSWORD"] ?? "", "--qa-push", "ProfileEdit"]
+        app.launchEnvironment["QA_EMAIL"] = env["QA_EMAIL"]
+        app.launchEnvironment["QA_PASSWORD"] = env["QA_PASSWORD"]
+        app.launchArguments = ["--qa-signout", "--qa-login-env", "--qa-request-counts", "--qa-push", "ProfileEdit",
+                               "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
         app.launch()
         let notifications = springboard.buttons["Allow"]
         if notifications.waitForExistence(timeout: 6) { notifications.tap() }
@@ -167,11 +185,39 @@ final class DeviceCameraTests: XCTestCase {
     }
 
     private func serverPhoto() throws -> String {
-        let token = try CarezaarAPI.login(env["QA_EMAIL"] ?? "", env["QA_PASSWORD"] ?? "")
-        return "\(try CarezaarAPI.me(token)["photo"] ?? "nil")"
+        guard let email = env["QA_EMAIL"], !email.isEmpty,
+              let password = env["QA_PASSWORD"], !password.isEmpty,
+              let clientID = env["QA_CLIENT_USER_ID"], !clientID.isEmpty,
+              let caregiverID = env["QA_CG_ID"], !caregiverID.isEmpty else {
+            throw XCTSkip("Exact authorized camera fixture identities and credentials required")
+        }
+        let token = try CarezaarAPI.login(email, password)
+        let user = try CarezaarAPI.me(token)
+        let role = user["role"] as? String ?? ""
+        let id = user["id"].map { String(describing: $0) } ?? ""
+        guard !token.isEmpty, (role == "client" && id == clientID) || (role == "caregiver" && id == caregiverID) else {
+            XCTFail("Refusing camera test outside the authorized exact role/identity pair")
+            throw URLError(.userAuthenticationRequired)
+        }
+        return "\(user["photo"] ?? "nil")"
+    }
+
+    private func assertNoPhotoWrites() {
+        let ledger = app.staticTexts["qa-request-counts"]
+        XCTAssertTrue(ledger.exists, "Native request ledger required to verify capture privacy")
+        for route in ["POST /api/users/profile", "PUT /api/users/profile", "PATCH /api/users/profile"] {
+            let line = ledger.label.split(separator: "\n").first { $0.hasPrefix(route + "=") }
+            let count = line.flatMap { Int($0.dropFirst(route.count + 1)) } ?? 0
+            XCTAssertEqual(count, 0, "Cancelled capture must not submit a profile write")
+        }
     }
 
     private func shot(_ name: String) {
+        if name.hasPrefix("cam-") {
+            let a = XCTAttachment(string: "Physical-camera checkpoint: \(name); image intentionally excluded.")
+            a.name = name; a.lifetime = .keepAlways; add(a)
+            return
+        }
         let a = XCTAttachment(screenshot: XCUIScreen.main.screenshot()); a.name = name; a.lifetime = .keepAlways; add(a)
     }
 }

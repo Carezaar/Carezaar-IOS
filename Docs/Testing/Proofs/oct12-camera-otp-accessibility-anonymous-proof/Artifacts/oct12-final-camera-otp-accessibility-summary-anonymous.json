@@ -1,0 +1,30 @@
+{
+  "productionSourceChanged": false,
+  "fullUnitTests": 110,
+  "fullUnitSeconds": 28.932,
+  "unitResult": "PASS",
+  "nativeRetryResult": "PASS",
+  "nativeRetrySeconds": 39.816,
+  "exposureTests": {
+    "caregiver": 105.562,
+    "client": 108.846
+  },
+  "strictAuditResults": {
+    "client": "FAIL4",
+    "caregiver": "FAIL5"
+  },
+  "original374CaseCounts": {
+    "PASS": 108,
+    "NOT RUN": 248,
+    "FAIL": 3,
+    "BLOCKED": 0,
+    "N/A": 15
+  },
+  "cameraCaseHardwareBlockRemoved": true,
+  "cameraCaseFullScopeStillPartial": true,
+  "cameraAndEndpointScopeIndependentlyReviewed": true,
+  "fullQAComplete": false,
+  "pixelMeasurementsDoNotReplaceFullAuditOrVoiceOver": true,
+  "appleAuditGuidance": "https://developer.apple.com/videos/play/wwdc2023/10035/?time=597",
+  "remainingOriginalRetryAndSmallLoginCauses": "UNCONFIRMED"
+}

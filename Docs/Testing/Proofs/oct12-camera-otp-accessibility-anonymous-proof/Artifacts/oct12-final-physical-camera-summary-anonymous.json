@@ -1,0 +1,34 @@
+{
+  "device": "physical iPhone 15",
+  "iOSVersion": "26.5.2",
+  "scenarios": [
+    {
+      "scenario": "denied-client-device",
+      "result": "PASS",
+      "seconds": 30.407
+    },
+    {
+      "scenario": "denied-caregiver-device",
+      "result": "PASS",
+      "seconds": 33.051
+    },
+    {
+      "scenario": "retake-crop-client-device",
+      "result": "PASS",
+      "seconds": 47.341
+    },
+    {
+      "scenario": "retake-crop-caregiver-device",
+      "result": "PASS",
+      "seconds": 49.417
+    }
+  ],
+  "captureRetakeCropGesturesAndCancelTestedBothRoles": true,
+  "profileWriteRequests": 0,
+  "serverPhotoUnchanged": true,
+  "physicalImageUploaded": false,
+  "frameworkGeneratedRawArtifactsRemainPrivate": true,
+  "cropJPEGDimensionsOrPersistedPhysicalPhotoNotVerified": true,
+  "originalFullCaseClosurePendingIndependentScopeReview": false,
+  "fullOriginalCameraCaseStatus": "NOT RUN (partial camera UI passed; saved output/upload excluded)"
+}

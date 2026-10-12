@@ -1,0 +1,112 @@
+[
+  {
+    "target": "A5-fully-exposed-matches-preferences-gray-on-role-panel",
+    "width": 1201,
+    "height": 713,
+    "backgroundRGB": [
+      237,
+      244,
+      252
+    ],
+    "foregroundCoreRGB": [
+      51,
+      51,
+      51
+    ],
+    "coreColorPixelCounts": [
+      771403,
+      67278
+    ],
+    "measuredCoreColorContrast": 11.399366245764817,
+    "sha256": "7dd86109c615ddd6b39088d646910083b244b1688aae881a846ea348f7213a19",
+    "scope": "Core glyph/background colors, not every antialiased edge or entire screen"
+  },
+  {
+    "target": "A5-fully-exposed-help-description-gray-on-white",
+    "width": 707,
+    "height": 1154,
+    "backgroundRGB": [
+      255,
+      255,
+      255
+    ],
+    "foregroundCoreRGB": [
+      89,
+      89,
+      89
+    ],
+    "coreColorPixelCounts": [
+      449426,
+      68373
+    ],
+    "measuredCoreColorContrast": 7.004729208035935,
+    "sha256": "e5771f5f517257842edf132488cf5a53a855d817c53e6fdcbf3605a91001ebb3",
+    "scope": "Core glyph/background colors, not every antialiased edge or entire screen"
+  },
+  {
+    "target": "A5-fully-exposed-satisfied-password-rule-dark-green-on-green",
+    "width": 888,
+    "height": 215,
+    "backgroundRGB": [
+      233,
+      248,
+      243
+    ],
+    "foregroundCoreRGB": [
+      4,
+      122,
+      90
+    ],
+    "coreColorPixelCounts": [
+      158703,
+      16504
+    ],
+    "measuredCoreColorContrast": 4.873707864431461,
+    "sha256": "e4772f21c2998bf3e817213c6ee97998a156fc8b84e2ed8505df4d8e620eb476",
+    "scope": "Core glyph/background colors, not every antialiased edge or entire screen"
+  },
+  {
+    "target": "A5-fully-exposed-empty-password-rule-gray-on-gray",
+    "width": 888,
+    "height": 215,
+    "backgroundRGB": [
+      243,
+      244,
+      246
+    ],
+    "foregroundCoreRGB": [
+      89,
+      89,
+      89
+    ],
+    "coreColorPixelCounts": [
+      158639,
+      16823
+    ],
+    "measuredCoreColorContrast": 6.364955577890367,
+    "sha256": "14954f213ada00a2eb3b959968a4da0405485bbbcd706950814de613d0418dad",
+    "scope": "Core glyph/background colors, not every antialiased edge or entire screen"
+  },
+  {
+    "target": "A5-fully-exposed-delete-warning-black-on-pink",
+    "width": 900,
+    "height": 329,
+    "backgroundRGB": [
+      253,
+      236,
+      236
+    ],
+    "foregroundCoreRGB": [
+      0,
+      0,
+      0
+    ],
+    "coreColorPixelCounts": [
+      254299,
+      34816
+    ],
+    "measuredCoreColorContrast": 18.385936176909585,
+    "sha256": "a75e012021b320332653119f67638c35e1f75d1c526f745a2c5dd96d3ddbbbc3",
+    "scope": "Core glyph/background colors, not every antialiased edge or entire screen"
+  }
+]

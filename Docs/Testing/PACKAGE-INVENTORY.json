@@ -1,5 +1,5 @@
 {
-  "status": "Client update implementation delivered to authorized main at9bbe0f262e7d5a9811167f6a7c34505d13cc06db; remote source/report proof verified, fresh clean build and both-role native smoke PASS. Full original QA remains incomplete.",
+  "status": "Physical camera UI and OTP endpoint verified; raw accessibility FAIL4/5 preserved. New test/evidence delivery follows final remote verification; full original QA remains incomplete.",
   "reports": [
     "IOS_TEST_EXECUTION_REPORT.md",
     "IOS-FUNCTIONAL-PARITY-MATRIX.md",
@@ -740,10 +740,49 @@
         "resourcesOpened": "None",
         "mutations": "Only this private verdict and candidate independentReviewed/independentReview."
       }
+    },
+    {
+      "index": "Proofs/oct12-camera-otp-accessibility-anonymous-proof/index.json",
+      "artifactCount": 27,
+      "bytes": 580381,
+      "reviewProvenance": {
+        "reviewer": "Independent QA verifier /root/cache_review",
+        "checkedAtUTC": "2026-10-12T14:03:15.169603+00:00",
+        "verdict": "PASS bounded 27-artifact evidence publication; full QA incomplete and no original PASS promotion",
+        "artifactCount": 27,
+        "allHashesVerified": true,
+        "privacyGate": "Ten PNGs show complete public copy only, with safe scalars/anonymous SDK/audit/camera/OTP summaries. Four client PNGs byte-identical to already viewed caregiver public-copy crops; distinct client Matches crop also viewed. Raw camera images/framework results and private labels/device identifiers excluded.",
+        "sourceGate": "All57 production Swift files and project/resources match committed login-storage baseline; only NetworkTests, DeviceCameraTests, ScreenSweepTests differ. OTP test now asserts APIError.server and managed-message suppression on500. Camera source has exact fixture guards/environment credentials/no profile writes/capture-retake-crop gestures-Cancel. Added25-line SDK diagnostic leaves auditCompleted=false on throw; strict audit final report-empty assertion unchanged.",
+        "actualResultsIndependentlyQueried": {
+          "caregiverUnitsAndExposure": "111 Passed/0fail/0skip:110 units28.932 plus exposure105.562",
+          "unitsAndRetry": "111 Passed/0fail/0skip:110 units28.762 plus strict Retry39.816",
+          "clientAuditAndExposure": "Failed:2 tests,1pass(exposure108.846),1fail(strict168.987/4findings)",
+          "caregiverStrictAudit": "Failed:1test,1fail149.155/5findings",
+          "physicalCamera": "Previous independent actual4xcresult Passed1 each:deniedclient30.407/caregiver33.051,capture-retake-crop-control-Cancelclient47.341/caregiver49.417"
+        },
+        "rasterAndSDKGate": "All10 native raster+10SDK candidate bytes match actual exports; independently recomputed both five-image coreRGB counts/dimensions/ratios exactly. Ratios11.399366/7.004729/4.873708/6.364956/18.385936 support these elements/states only. All10 diagnostics auditCompleted=true. Client targetcontrast counts Matches0/Help1/satisfiedrule0/emptyrule0/Delete0; caregiver0/0/0/0/1. AllSDK counts client1/1/1/1/1, caregiver0/1/0/1/2. No warning-always-disappears claim allowed.",
+        "caseScope": "Counts108PASS/248NOTRUN/3FAIL/0BLOCKED/15NA sum374. Only camera hardware blocker removed; P12-008 remains partial NOT RUN because physical crop output dimensions/save/upload not verified. No physical uploads authorized or performed. P17 strict failures and original Retry/Small causes remain open.",
+        "OTPscope": "Actual permitted live endpoint record supports1anonymous OTP POST204/empty acceptance for retained authorized fixture. No email printed, backend edits, inbox delivery or Yahoo-only/backend-cause attribution. User explicitly narrowed scope to endpoint acceptance.",
+        "adjudicationLimits": [
+          "Measured contrast/complete public-copy pixels are evidence for target-specific SDK heuristic disagreement, not whole-screen accessibility PASS.",
+          "Different client/caregiver residual targets demonstrate state/viewport sensitivity; no complete cause inferred.",
+          "Exposure method PASS means exposure/control assertions passed, not clean SDK audit; allSDK counts retained.",
+          "No actual VoiceOver listening/full roles/devices/screens/modal/localization/DynamicType growth approval.",
+          "Latest strict Retry PASS does not explain original stall.",
+          "Publication approval does not complete user fullQA request."
+        ],
+        "priorIndependentReviews": [
+          "oct12-physical-camera-scope-review-private.json",
+          "oct12-final-accessibility-adjudication-review-private.json"
+        ],
+        "provenance": "Root performed device/runtime/OTP actions and generated summaries. Independent reviewer read source/currentbaseline, all27candidate artifacts, actualnative exports byhash, logs and actualxcresults, viewed publicpixels and recomputedscalars. No device/API actions.",
+        "resourcesOpened": "None",
+        "mutations": "Only private finalgate and candidate independentReviewed/independentReview fields."
+      }
     }
   ],
-  "proofIndexCount": 66,
-  "indexedArtifactCount": 1051,
+  "proofIndexCount": 67,
+  "indexedArtifactCount": 1078,
   "originalEvidenceIntact": true,
   "excludedTypes": [
     "raw logs",
@@ -757,72 +796,72 @@
   "currentOriginalCaseCounts": {
     "total": 374,
     "PASS": 108,
-    "NOT RUN": 247,
+    "NOT RUN": 248,
     "FAIL": 3,
-    "BLOCKED": 1,
+    "BLOCKED": 0,
     "N/A": 15
   },
   "documents": [
     {
       "path": "IOS_TEST_EXECUTION_REPORT.md",
-      "bytes": 84839,
-      "sha256": "f5024960bd393f448b691f31c65dcee82d6e28f234bf573eb5a934c7eb3e9632"
+      "bytes": 87814,
+      "sha256": "5ac8d962f6a2b2c34723d83f2f19de6062bf2d8d5d8d2d3ef4d497e246399d42"
     },
     {
       "path": "IOS-FUNCTIONAL-PARITY-MATRIX.md",
-      "bytes": 83646,
-      "sha256": "13f35531f21ff7060ee3b582ebfb641de91e94ef0d89a22606e48ce0ae47aafd"
+      "bytes": 86621,
+      "sha256": "f1472d19e50b2a5295bc1f69335b5ebbb373bda505f2265a878e30ab1b490234"
     },
     {
       "path": "IOS-FIGMA-PARITY.md",
-      "bytes": 79687,
-      "sha256": "2ee0644b1d403208ff6b6093446be0fe0255ab29a48f9086c1bfcf9a9d69a9f5"
+      "bytes": 82662,
+      "sha256": "b2f80154c4658b5c4884a7791cb30835582774f132c72b6b2f5c5900127b0a98"
     },
     {
       "path": "BACKEND-ISSUES-FOR-CLIENT.md",
-      "bytes": 83135,
-      "sha256": "c67106897ebd12723ca38597461573658184138534124c09c43ec2afbc908fd3"
+      "bytes": 86110,
+      "sha256": "cc6ad37f9518365d8ff2e77cf0a4530e727e0cbafdd6389157017cab35d545a0"
     },
     {
       "path": "QA-CASE-MANIFEST.md",
-      "bytes": 524224,
-      "sha256": "efdb418b5b3999f8737814e73dc8916d28736e0e33124af33ad5765c0419da03"
+      "bytes": 527545,
+      "sha256": "a8daa9598077e39127d6066f67544898a9fafcfe924445b902db248108d048fe"
     },
     {
       "path": "EVIDENCE-COVERAGE-MAPPING.md",
-      "bytes": 691367,
-      "sha256": "2350fd21084ae9058c2d66210b6b7b515210ea33815f0076fb8c519d567592ac"
+      "bytes": 694342,
+      "sha256": "85b60320c3fd708834e26cd6653203970359a29f49acf19ef0e1e5c9e05cbb8e"
     },
     {
       "path": "ACCESSIBILITY-TRIAGE.md",
-      "bytes": 152700,
-      "sha256": "c2661be84fa14aa8bd39d2e4e751c107309300452a46f7e2b2b5d364ba9cabad"
+      "bytes": 155675,
+      "sha256": "60d1607fed8520c6f9b1c1da7400167df3dac9e56b586de3548132442be31c3e"
     },
     {
       "path": "NATIVE-SIGNUP-EXECUTION.md",
-      "bytes": 148690,
-      "sha256": "5f6005e1f68b442a2d2581ba20dc4b709e2de6d2f451fa7b527e6554c412294b"
+      "bytes": 151665,
+      "sha256": "370c59f908d5ff56f6a2d773f7e83b2e54f57c398f0c2a4c439b9df98f9d33cf"
     },
     {
       "path": "CROSS-ROLE-EXECUTION.md",
-      "bytes": 149932,
-      "sha256": "d6e255dac42d0147d0afdb1255160ee108070732652b0ff775bd504e00968643"
+      "bytes": 152907,
+      "sha256": "5fafe6b209b388e481d18368083e8d658099ae517b261f278d33ed6059731991"
     },
     {
       "path": "README.md",
-      "bytes": 45713,
-      "sha256": "3a692c129094125b7e742ac3abb7b6c55d685562abffa7d2795bceb3cc859e5e"
+      "bytes": 48688,
+      "sha256": "421a8a7ddef569e4f51d19ebc84738e899d6e14950b09f4dbec557cdff3682b5"
     },
     {
       "path": "CLIENT-UPDATE-HANDOFF.md",
-      "bytes": 3044,
-      "sha256": "b55e709c31388b5b32abe55a0b6666fe6ffca455774a72ab34493b96f382dc67"
+      "bytes": 6019,
+      "sha256": "b071229b48245dc5e21d9d40d004cedd0191e8468c281d519bd136b38ec9ac9b"
     }
   ],
   "readme": {
     "path": "README.md",
-    "bytes": 45713,
-    "sha256": "3a692c129094125b7e742ac3abb7b6c55d685562abffa7d2795bceb3cc859e5e"
+    "bytes": 48688,
+    "sha256": "421a8a7ddef569e4f51d19ebc84738e899d6e14950b09f4dbec557cdff3682b5"
   },
   "credentialGuardVerification": {
     "productionSourceChanged": true,
@@ -833,5 +872,24 @@
     "finalMainDeliveryPending": false,
     "implementationCommit": "9bbe0f262e7d5a9811167f6a7c34505d13cc06db",
     "postPushCleanBuildAndSmoke": "PASS"
+  },
+  "physicalCameraVerification": {
+    "device": "iPhone 15",
+    "iOS": "26.5.2",
+    "passingRoleScenarioRuns": 4,
+    "physicalImageUploaded": false,
+    "fullOriginalP12_008": "NOT RUN partial; hardware blocker removed"
+  },
+  "otpEndpointVerification": {
+    "httpStatus": 204,
+    "requests": 1,
+    "YahooDeliveryVerified": false,
+    "backendCodeOrConfigurationEdited": false
+  },
+  "currentStrictAccessibility": {
+    "clientFindingCount": 4,
+    "caregiverFindingCount": 5,
+    "rawAuditResult": "FAIL",
+    "fullOriginalP17Closed": false
   }
 }
