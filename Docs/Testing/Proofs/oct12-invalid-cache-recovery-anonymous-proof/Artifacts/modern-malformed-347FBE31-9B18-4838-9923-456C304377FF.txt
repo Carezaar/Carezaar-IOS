@@ -1,0 +1,2 @@
+variant=malformed-json
+preparedCacheSHA256=dc544a6e2c9e0109ab3a15814c74fe12a78a1189aad547d7054ce5ee75a48446

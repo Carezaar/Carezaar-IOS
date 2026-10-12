@@ -1,5 +1,5 @@
 {
-  "status": "Source commit d99543510d7dfcefd130511531d994d5b719050d pushed and remotely verified; post-push clean build and typed both-role smoke verified; final delivery reports included in this documentation-only update; full QA incomplete",
+  "status": "Production source commit d99543510d7dfcefd130511531d994d5b719050d remains delivered; added invalid-cache UI regression and reviewed online recovery proof included in this update; full QA incomplete",
   "reports": [
     "IOS_TEST_EXECUTION_REPORT.md",
     "IOS-FUNCTIONAL-PARITY-MATRIX.md",
@@ -329,83 +329,115 @@
       "artifactCount": 10,
       "bytes": 2740184,
       "reviewProvenance": "Independently viewed all4 existing-stock-asset Splash/Welcome screenshots and parsed both23line transport ledgers plus all4 anonymous JSONs; all10artifact hashes and both completed native log hashes match. Actual newly created isolated device/preinstall records show no installed app container (exit2) before first test installation; Modern69.383/Small73.878 nativePASS. Parsed both actual newly persisted schema3 caches:22datasets/allIDsunique/server tsCache1791657662/21advertised count matches; cache hashes match anonymous inspections, reasons14 is separately retained unadvertised. Native ledgers each contain exactly base/info+22datasets once; separate root read-only public infoGET verification is not counted as native transport. Loading screenshots show actual Splash; ready screenshots show Welcome/rolecards only, with enabled SignIn proved by AX but no tap/offscreen visual completeness claimed. Existing stock faces are app assets, not personal QA images; no private account/credential/path/profile/camera content found in anonymous proof. Exact original P01-001 clean-install successful bootstrap row is eligible for PASS with explicit shared-anonymous-preauth role rationale: same complete startup inventory before either role selection, not4authenticated allocations. This closes its prior clean-install gap only. P01-011 rapid navigation/lifecycle/cancellation and P01-012 actual immediate FAQ/media UI consumption/no deferred-fetch remain unclosed. Small Splash lower copy partly below viewport is retained under broader open P17; no universal layout/a11y pass. No manifest/status/source/API/UI mutation by reviewer; rootReviewed set per parent completed review authorization."
+    },
+    {
+      "index": "Proofs/oct12-invalid-cache-recovery-anonymous-proof/index.json",
+      "artifactCount": 28,
+      "bytes": 1060486,
+      "reviewProvenance": {
+        "reviewer": "Independent cache QA verifier /root/cache_review",
+        "checkedAtUTC": "2026-10-12T01:11:58.111582+00:00",
+        "verdict": "PASS for P01-006 online malformed/incomplete persisted-cache recovery only",
+        "scope": "Four actual native witnessed runs: Modern and Small, malformed JSON and valid JSON with one FAQ removed. Shared anonymous startup before role selection.",
+        "artifactCount": 28,
+        "actualPNGViewed": 8,
+        "textArtifactsRead": 8,
+        "jsonArtifactsRead": 12,
+        "allArtifactHashesMatched": true,
+        "allFourLogHashesAndDurationsMatched": true,
+        "allFourPreparedDigestWitnessBindingsMatched": true,
+        "preservedOriginalSnapshotDigestsVerified": true,
+        "incompleteFixtureOnlyRemovesOneFAQ": true,
+        "nativeExact23ReferenceGETLedgerVerifiedPerRun": true,
+        "actualNativeSignInTapAndPublicFieldExistenceVerifiedPerRun": true,
+        "repairedExactSchema3Dataset22Advertised21KeysCountsAndUniqueIDsVerifiedPerRun": true,
+        "serverCountsAndMarkerVerification": "Repaired snapshots match preserved read-only host inspection of fresh deployed base/info; reviewer made no new API calls.",
+        "privacy": "Eight viewed PNGs contain public loading branding/status and tight empty Sign In-control crops only; text/JSON contain anonymous request inventory/count/marker/digest proof, no account identity, credentials, message, relationship or personal media content.",
+        "scopeLimits": [
+          "Only P01-006 can close from this evidence.",
+          "Ordinary relaunch metadata completion, offline recovery, malformed/incomplete server responses and wider regression remain separate.",
+          "Small Splash heading cutoff remains within open P17; no accessibility promotion.",
+          "--qa-signout clears local TokenStore; no backend account/profile/message/relationship/media writes are represented."
+        ],
+        "resourcesOpened": "None; read-only local artifact viewing and proof metadata update only."
+      }
     }
   ],
-  "proofIndexCount": 53,
-  "indexedArtifactCount": 917,
+  "proofIndexCount": 54,
+  "indexedArtifactCount": 945,
   "originalEvidenceIntact": true,
   "excludedTypes": [
     "raw logs",
     "xcresults",
     "private fixtures/credentials",
-    "local DCIM/media",
-    "full-screen captures",
+    "local DCIM/personal media",
+    "unreviewed or private-data full-screen captures",
     "unindexed files",
     "two blank Modern caregiver coordinate-review crops"
   ],
   "currentOriginalCaseCounts": {
     "total": 374,
-    "NOT RUN": 251,
-    "PASS": 105,
-    "N/A": 15,
+    "PASS": 106,
+    "NOT RUN": 250,
+    "FAIL": 2,
     "BLOCKED": 1,
-    "FAIL": 2
+    "N/A": 15
   },
   "documents": [
     {
       "path": "IOS_TEST_EXECUTION_REPORT.md",
-      "bytes": 67410,
-      "sha256": "3c4880f4f3e10fbeb02b2a61a402041a72f31f17fc67e6b8f509cac13561f066"
+      "bytes": 71228,
+      "sha256": "c7d3de3be31a7eb553620a4158243d26a2ffcc34c3eb39b5900c54cde908e23a"
     },
     {
       "path": "IOS-FUNCTIONAL-PARITY-MATRIX.md",
-      "bytes": 68824,
-      "sha256": "a2ab047d798ced432b707559a922780df1f67e21808e03ea25326d9df45e7829"
+      "bytes": 71297,
+      "sha256": "dd195fbb2a75b0018c6b90be6acaede67ca0b9469fcf3d0a62a3c1f03ad31182"
     },
     {
       "path": "IOS-FIGMA-PARITY.md",
-      "bytes": 64865,
-      "sha256": "251c3e510cc64137311e4a79df8c8119e0c96b2484fb63c7af8e2894c342858d"
+      "bytes": 67338,
+      "sha256": "7e7f88971c1431e540e6ab2bfd99b7d583df68af124e70f5bfb58c60f5460620"
     },
     {
       "path": "BACKEND-ISSUES-FOR-CLIENT.md",
-      "bytes": 68313,
-      "sha256": "f8457e7354881ef6d6924c35a329fc80b3cf66f51acef6e22127baf0e0fa4fe2"
+      "bytes": 70786,
+      "sha256": "03f1a4871775d0ab95140dae0cf01561c216542144950d7adb3d7a3c4d47b1cd"
     },
     {
       "path": "QA-CASE-MANIFEST.md",
-      "bytes": 506316,
-      "sha256": "7f66565b6ea694e36b0a47ca0a83ce478aeb5ad254b32c22a388699806daf238"
+      "bytes": 509223,
+      "sha256": "bf9ef2e291fd3d2d67df256db61bda6add1d379b838051300c51d1c1d441421e"
     },
     {
       "path": "EVIDENCE-COVERAGE-MAPPING.md",
-      "bytes": 675319,
-      "sha256": "fdc67aa52a5266121719e6c4ca0674460aa67c55ffb800fd20be1e425f383fb9"
+      "bytes": 677792,
+      "sha256": "cad5bf02c1e8dccd127c7fa3279e5c1be0a4c4c5523a4de3c6bc54ef51aa27f7"
     },
     {
       "path": "ACCESSIBILITY-TRIAGE.md",
-      "bytes": 137878,
-      "sha256": "a85a91ccefcbfbfad4c9f21a1e5b8cd0932878e10571d8de8713b8df0539abeb"
+      "bytes": 140351,
+      "sha256": "9e773eb330475e40cf523d1786fc214c44d4dee28ca3d15e92ecd862500ca958"
     },
     {
       "path": "NATIVE-SIGNUP-EXECUTION.md",
-      "bytes": 133868,
-      "sha256": "8dda3a58d386360e79fca9a5895bf0bffe7ab82bbd7be3570f7d51b2e26afc63"
+      "bytes": 136341,
+      "sha256": "fd96a4ebcc9e1257ed340b71b078787d0ac33c87ad09620efaa06c5829af8d7d"
     },
     {
       "path": "CROSS-ROLE-EXECUTION.md",
-      "bytes": 135110,
-      "sha256": "0b8f1d2a166e1760d160eb19642be88435abeea6654fa4e0d174ab2b9de9e51b"
+      "bytes": 137583,
+      "sha256": "02f60989cd81e2d3c39677275df29dbed458a782c85cb8d9a7a920a2098f24e7"
     },
     {
       "path": "README.md",
-      "bytes": 30891,
-      "sha256": "fb7e6b8fcbe0161bd7f9d4c5bfeb831f9e29816a98c3ea0c05f325ba97534d0d"
+      "bytes": 33364,
+      "sha256": "5ada0eab5077d4a17a4e1e0420f8b72ab70693131d39d12f70d5d8a04740bbc2"
     }
   ],
   "readme": {
     "path": "README.md",
-    "bytes": 30891,
-    "sha256": "fb7e6b8fcbe0161bd7f9d4c5bfeb831f9e29816a98c3ea0c05f325ba97534d0d"
+    "bytes": 33364,
+    "sha256": "5ada0eab5077d4a17a4e1e0420f8b72ab70693131d39d12f70d5d8a04740bbc2"
   }
 }

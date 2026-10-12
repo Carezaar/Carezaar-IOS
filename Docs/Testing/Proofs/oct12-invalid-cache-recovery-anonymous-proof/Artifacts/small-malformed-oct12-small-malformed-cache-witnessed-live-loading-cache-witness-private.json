@@ -1,0 +1,9 @@
+{
+  "checkedAtUTC": "2026-10-12T01:05:16.851455+00:00",
+  "variant": "malformed-json",
+  "stage": "native-loading-attachment-recorded",
+  "currentCacheSHA256": "dc544a6e2c9e0109ab3a15814c74fe12a78a1189aad547d7054ce5ee75a48446",
+  "expectedPreparedCacheSHA256": "dc544a6e2c9e0109ab3a15814c74fe12a78a1189aad547d7054ce5ee75a48446",
+  "invalidCacheStillPresentAfterTestInstallationAndLaunch": true,
+  "exactDeviceAndAppContainerVerified": true
+}

@@ -1,0 +1,263 @@
+{
+  "title": "Native online recovery from malformed and incomplete persisted reference caches",
+  "case": "P01-006",
+  "baselineCommitSHA": "2f0e9af69a4c7fabb60247c1482106b9f4013715",
+  "testSourceSHA256": "3dcebf654bd4637b08c9aac2c31066055933842047a323e92565b5d9be9027fd",
+  "productionSourceUnchanged": true,
+  "results": [
+    {
+      "deviceSize": "modern",
+      "variant": "malformed-json",
+      "status": "PASS",
+      "durationSeconds": 39.836,
+      "logSHA256": "9df0c3046b8f1e04dbbc19db29321c861c0624155ed88b0f83b059ac735dac1f"
+    },
+    {
+      "deviceSize": "modern",
+      "variant": "incomplete-counts",
+      "status": "PASS",
+      "durationSeconds": 41.966,
+      "logSHA256": "ccbee3a2758f06c5881a141a8becc22fb05a9aa137926d7f7c9880955c6825d3"
+    },
+    {
+      "deviceSize": "small",
+      "variant": "malformed-json",
+      "status": "PASS",
+      "durationSeconds": 83.964,
+      "logSHA256": "08b03a8bc5396dc276998b9e0953f2d68a76f66031e65b930d5e9aae34b5278e"
+    },
+    {
+      "deviceSize": "small",
+      "variant": "incomplete-counts",
+      "status": "PASS",
+      "durationSeconds": 45.892,
+      "logSHA256": "2c3e49affdb443a1691c00db39fe2073683002597859f04191ab71aa604d2cbb"
+    }
+  ],
+  "nativeReferenceGETsPerRun": 23,
+  "datasetsPerRun": 22,
+  "advertisedCountChecksPerRun": 21,
+  "roleScope": "shared anonymous startup before either role selection; no authenticated role allocations",
+  "hostCacheWitnessAfterInstallationAndLaunch": true,
+  "requestDelaySeconds": 5,
+  "responses": "actual deployed backend, no synthesized success responses",
+  "nativeContinuation": "actual Sign in button tapped and public fields opened after recovery",
+  "localQASessionSetup": "--qa-signout clears local TokenStore; no backend account/profile/message/relationship/media writes",
+  "scopeLimits": [
+    "Ordinary relaunch metadata completion not covered by this method",
+    "Offline recovery and incomplete server response handling remain separate cases",
+    "Loading screenshots do not establish full small-screen accessibility",
+    "First non-witnessed Modern malformed invocation remains preserved but is not used for exact original-case closure",
+    "Physical camera untested; Yahoo backend-only unverified"
+  ],
+  "rootReviewed": true,
+  "independentReviewed": true,
+  "artifacts": [
+    {
+      "path": "Artifacts/modern-malformed-347FBE31-9B18-4838-9923-456C304377FF.txt",
+      "description": "invalid-cache-malformed-json-host-precondition_0_C31F4EC8-2728-4256-B354-FFF537439E44.txt",
+      "sha256": "625b90663f59199cf0cd908bf7fe6056003f30178c4012e480c9c1889faada24",
+      "packagedSha256": "625b90663f59199cf0cd908bf7fe6056003f30178c4012e480c9c1889faada24"
+    },
+    {
+      "path": "Artifacts/modern-malformed-CB71173A-981F-426E-9FC3-02C8283C7570.png",
+      "description": "invalid-cache-malformed-json-public-sign-in-control-only_0_9F7C9DDB-A3A6-4389-BF01-B9448A0CCC01.png",
+      "sha256": "ac90becb8e0855cec9a1eec90524a72745905688b1577d6c6345acc01e9df90f",
+      "packagedSha256": "ac90becb8e0855cec9a1eec90524a72745905688b1577d6c6345acc01e9df90f"
+    },
+    {
+      "path": "Artifacts/modern-malformed-09BBD21B-3B5F-4F8B-B009-6A5AFE1772C7.txt",
+      "description": "invalid-cache-malformed-json-recovered-transport-ledger_0_065ED228-E2FE-4589-BCE2-1BBE53351F56.txt",
+      "sha256": "42ccb0a0ed58d2ed6a7f758c38362961ad578e2a9ef7a17742e310b64be93deb",
+      "packagedSha256": "42ccb0a0ed58d2ed6a7f758c38362961ad578e2a9ef7a17742e310b64be93deb"
+    },
+    {
+      "path": "Artifacts/modern-malformed-2DB8E01A-3609-4073-9682-9213D768D795.png",
+      "description": "invalid-cache-malformed-json-loading-gate_0_0148C63D-4430-4772-9343-8ABB1A5D677E.png",
+      "sha256": "2409a15dda580a593fe4eaf0aad83479687c51058242705a22df0b3b2cd24e59",
+      "packagedSha256": "2409a15dda580a593fe4eaf0aad83479687c51058242705a22df0b3b2cd24e59"
+    },
+    {
+      "path": "Artifacts/modern-malformed-oct12-modern-malformed-cache-witnessed-repaired-cache-inspection-anonymous.json",
+      "description": "Actual repaired persisted cache and independent fresh public server marker/count inspection",
+      "sha256": "ccda677125d6046fea85d59037837c587d67a66867b43ba78a16def7f1455041",
+      "packagedSha256": "ccda677125d6046fea85d59037837c587d67a66867b43ba78a16def7f1455041"
+    },
+    {
+      "path": "Artifacts/modern-malformed-oct12-modern-malformed-cache-witnessed-live-loading-cache-witness-private.json",
+      "description": "Corrupt cache bytes still present during native loading after test installation and launch",
+      "sha256": "a9e08066a2a9dbf88964f801a705c893c747633df081930c9598a812edf2475c",
+      "packagedSha256": "a9e08066a2a9dbf88964f801a705c893c747633df081930c9598a812edf2475c"
+    },
+    {
+      "path": "Artifacts/modern-malformed-prepared-cache-anonymous.json",
+      "description": "Recorded host cache corruption with preserved valid snapshot and exact hash binding",
+      "sha256": "ae0208e383a07190809635a6b573341afa725a2f9431733a506139cd42718ddf",
+      "packagedSha256": "ae0208e383a07190809635a6b573341afa725a2f9431733a506139cd42718ddf"
+    },
+    {
+      "path": "Artifacts/modern-incomplete-49217852-247B-492E-833D-02F120E82A03.txt",
+      "description": "invalid-cache-incomplete-counts-host-precondition_0_1F8430B0-6F1E-4D93-9671-75EECAEF3244.txt",
+      "sha256": "0c971a18721f2be2da8d563ce0ae81154ad2cfee9d4661ebd6219874b5c71ecd",
+      "packagedSha256": "0c971a18721f2be2da8d563ce0ae81154ad2cfee9d4661ebd6219874b5c71ecd"
+    },
+    {
+      "path": "Artifacts/modern-incomplete-F3EB9753-35F5-4B67-89D1-DE35B600C937.png",
+      "description": "invalid-cache-incomplete-counts-public-sign-in-control-only_0_1237D5E0-9375-4EBF-85B1-1835EE4982CC.png",
+      "sha256": "ac90becb8e0855cec9a1eec90524a72745905688b1577d6c6345acc01e9df90f",
+      "packagedSha256": "ac90becb8e0855cec9a1eec90524a72745905688b1577d6c6345acc01e9df90f"
+    },
+    {
+      "path": "Artifacts/modern-incomplete-6F4CF65B-9103-4163-87CC-7659937CF814.txt",
+      "description": "invalid-cache-incomplete-counts-recovered-transport-ledger_0_93680919-631B-4C8C-95EB-E5988148D503.txt",
+      "sha256": "42ccb0a0ed58d2ed6a7f758c38362961ad578e2a9ef7a17742e310b64be93deb",
+      "packagedSha256": "42ccb0a0ed58d2ed6a7f758c38362961ad578e2a9ef7a17742e310b64be93deb"
+    },
+    {
+      "path": "Artifacts/modern-incomplete-A808B21F-E6DB-4347-B27D-381572E2AC1E.png",
+      "description": "invalid-cache-incomplete-counts-loading-gate_0_AAA600B1-9963-4914-9853-1CFFC9388392.png",
+      "sha256": "2409a15dda580a593fe4eaf0aad83479687c51058242705a22df0b3b2cd24e59",
+      "packagedSha256": "2409a15dda580a593fe4eaf0aad83479687c51058242705a22df0b3b2cd24e59"
+    },
+    {
+      "path": "Artifacts/modern-incomplete-oct12-modern-incomplete-cache-witnessed-repaired-cache-inspection-anonymous.json",
+      "description": "Actual repaired persisted cache and independent fresh public server marker/count inspection",
+      "sha256": "33b1ecada5d65fa64f221af76c70fa92feb81148fecff5d93560083dc948fb8a",
+      "packagedSha256": "33b1ecada5d65fa64f221af76c70fa92feb81148fecff5d93560083dc948fb8a"
+    },
+    {
+      "path": "Artifacts/modern-incomplete-oct12-modern-incomplete-cache-witnessed-live-loading-cache-witness-private.json",
+      "description": "Corrupt cache bytes still present during native loading after test installation and launch",
+      "sha256": "d8f4692e90f0298e8145a9cfa066ff226b1a4e13387f17f0d8cd76b748ad9836",
+      "packagedSha256": "d8f4692e90f0298e8145a9cfa066ff226b1a4e13387f17f0d8cd76b748ad9836"
+    },
+    {
+      "path": "Artifacts/modern-incomplete-prepared-cache-anonymous.json",
+      "description": "Recorded host cache corruption with preserved valid snapshot and exact hash binding",
+      "sha256": "305a5bec3a6e96355ad419342c47d7570116d4d595e4334ffba7ab536a6b9cf8",
+      "packagedSha256": "305a5bec3a6e96355ad419342c47d7570116d4d595e4334ffba7ab536a6b9cf8"
+    },
+    {
+      "path": "Artifacts/small-malformed-F4681EA4-14B5-47CA-99F5-CEE0E7E5FF3F.txt",
+      "description": "invalid-cache-malformed-json-host-precondition_0_7712BDCE-2909-4A83-8A68-D1609460D253.txt",
+      "sha256": "625b90663f59199cf0cd908bf7fe6056003f30178c4012e480c9c1889faada24",
+      "packagedSha256": "625b90663f59199cf0cd908bf7fe6056003f30178c4012e480c9c1889faada24"
+    },
+    {
+      "path": "Artifacts/small-malformed-BDCE30AD-BC64-42EE-914B-AA73BC4A8C1C.png",
+      "description": "invalid-cache-malformed-json-public-sign-in-control-only_0_385F6D88-002A-4E98-8BC9-9A80F0349B44.png",
+      "sha256": "1465c2415a6bd6d03bdc28cd27f74a19e91873396279336743cbd5c434073d6e",
+      "packagedSha256": "1465c2415a6bd6d03bdc28cd27f74a19e91873396279336743cbd5c434073d6e"
+    },
+    {
+      "path": "Artifacts/small-malformed-14DF3561-BCF6-4071-84B3-7E0054A314FC.txt",
+      "description": "invalid-cache-malformed-json-recovered-transport-ledger_0_4D041590-E1B5-4780-9E8A-51B0664D31E0.txt",
+      "sha256": "42ccb0a0ed58d2ed6a7f758c38362961ad578e2a9ef7a17742e310b64be93deb",
+      "packagedSha256": "42ccb0a0ed58d2ed6a7f758c38362961ad578e2a9ef7a17742e310b64be93deb"
+    },
+    {
+      "path": "Artifacts/small-malformed-EAFF5078-1479-41AF-BA6D-15A856E5B5A3.png",
+      "description": "invalid-cache-malformed-json-loading-gate_0_55F6CBDA-55B5-4D1E-ADDF-E0CF324B80F7.png",
+      "sha256": "f4f97e625a888063fbedf885ec4a717bc388efdfd8bde6716b523bb8ac161326",
+      "packagedSha256": "f4f97e625a888063fbedf885ec4a717bc388efdfd8bde6716b523bb8ac161326"
+    },
+    {
+      "path": "Artifacts/small-malformed-oct12-small-malformed-cache-witnessed-repaired-cache-inspection-anonymous.json",
+      "description": "Actual repaired persisted cache and independent fresh public server marker/count inspection",
+      "sha256": "380ae097bb70c2b82b38903cdbf512cc92b6f64524ff862a93238409c046d5a4",
+      "packagedSha256": "380ae097bb70c2b82b38903cdbf512cc92b6f64524ff862a93238409c046d5a4"
+    },
+    {
+      "path": "Artifacts/small-malformed-oct12-small-malformed-cache-witnessed-live-loading-cache-witness-private.json",
+      "description": "Corrupt cache bytes still present during native loading after test installation and launch",
+      "sha256": "d377378869d583be49f09e88bd9c4105c792ace889647972fae45b6b5f458c93",
+      "packagedSha256": "d377378869d583be49f09e88bd9c4105c792ace889647972fae45b6b5f458c93"
+    },
+    {
+      "path": "Artifacts/small-malformed-prepared-cache-anonymous.json",
+      "description": "Recorded host cache corruption with preserved valid snapshot and exact hash binding",
+      "sha256": "e307a2c52e6e1a809b1a04ebd7f4b8357bd7a4de6be990e1260e14677d30f982",
+      "packagedSha256": "e307a2c52e6e1a809b1a04ebd7f4b8357bd7a4de6be990e1260e14677d30f982"
+    },
+    {
+      "path": "Artifacts/small-incomplete-0FFCEEE3-5183-485A-B4CD-6DBF96C29F6F.txt",
+      "description": "invalid-cache-incomplete-counts-host-precondition_0_D0877159-72C1-4717-9A7C-A684E01B21C0.txt",
+      "sha256": "6af5c20c198bf87339fdd7c6e1e507e76f58603ac4f218f3465c607804daec33",
+      "packagedSha256": "6af5c20c198bf87339fdd7c6e1e507e76f58603ac4f218f3465c607804daec33"
+    },
+    {
+      "path": "Artifacts/small-incomplete-8C8B9E7A-F86F-4A2C-9596-53AB06CD677B.png",
+      "description": "invalid-cache-incomplete-counts-public-sign-in-control-only_0_53926236-FCA4-45E3-A7AB-D6F122D2A039.png",
+      "sha256": "1465c2415a6bd6d03bdc28cd27f74a19e91873396279336743cbd5c434073d6e",
+      "packagedSha256": "1465c2415a6bd6d03bdc28cd27f74a19e91873396279336743cbd5c434073d6e"
+    },
+    {
+      "path": "Artifacts/small-incomplete-E7D44BE4-D776-42CF-A96F-657A3DE176A5.txt",
+      "description": "invalid-cache-incomplete-counts-recovered-transport-ledger_0_C72292C9-9DFD-45E6-9CFC-9A535CF091ED.txt",
+      "sha256": "42ccb0a0ed58d2ed6a7f758c38362961ad578e2a9ef7a17742e310b64be93deb",
+      "packagedSha256": "42ccb0a0ed58d2ed6a7f758c38362961ad578e2a9ef7a17742e310b64be93deb"
+    },
+    {
+      "path": "Artifacts/small-incomplete-C30AB8DD-FDDF-4C12-AD98-BBF260E673B6.png",
+      "description": "invalid-cache-incomplete-counts-loading-gate_0_FA54441A-9F3B-479D-982A-D506D06D4407.png",
+      "sha256": "ae9a2aa72e36403a029f7cfa8e31396e7332f8700f5555a911d6ab64cbc5de37",
+      "packagedSha256": "ae9a2aa72e36403a029f7cfa8e31396e7332f8700f5555a911d6ab64cbc5de37"
+    },
+    {
+      "path": "Artifacts/small-incomplete-oct12-small-incomplete-cache-witnessed-repaired-cache-inspection-anonymous.json",
+      "description": "Actual repaired persisted cache and independent fresh public server marker/count inspection",
+      "sha256": "50ec26307da7acdd12e41c969993a7c3f7745a0fdb82a9d3c74536e11ebe9648",
+      "packagedSha256": "50ec26307da7acdd12e41c969993a7c3f7745a0fdb82a9d3c74536e11ebe9648"
+    },
+    {
+      "path": "Artifacts/small-incomplete-oct12-small-incomplete-cache-witnessed-live-loading-cache-witness-private.json",
+      "description": "Corrupt cache bytes still present during native loading after test installation and launch",
+      "sha256": "194b8cbbc99a405aa6f72349c0602c6b137c6fb9d1c8ff759aa8ff806a618915",
+      "packagedSha256": "194b8cbbc99a405aa6f72349c0602c6b137c6fb9d1c8ff759aa8ff806a618915"
+    },
+    {
+      "path": "Artifacts/small-incomplete-prepared-cache-anonymous.json",
+      "description": "Recorded host cache corruption with preserved valid snapshot and exact hash binding",
+      "sha256": "f402c8307b0932c7d51773a0c5645d3402f9deaafdaeda13c66e6b60e3b0b712",
+      "packagedSha256": "f402c8307b0932c7d51773a0c5645d3402f9deaafdaeda13c66e6b60e3b0b712"
+    }
+  ],
+  "independentReview": {
+    "reviewer": "Independent cache QA verifier /root/cache_review",
+    "checkedAtUTC": "2026-10-12T01:11:58.111582+00:00",
+    "verdict": "PASS for P01-006 online malformed/incomplete persisted-cache recovery only",
+    "scope": "Four actual native witnessed runs: Modern and Small, malformed JSON and valid JSON with one FAQ removed. Shared anonymous startup before role selection.",
+    "artifactCount": 28,
+    "actualPNGViewed": 8,
+    "textArtifactsRead": 8,
+    "jsonArtifactsRead": 12,
+    "allArtifactHashesMatched": true,
+    "allFourLogHashesAndDurationsMatched": true,
+    "allFourPreparedDigestWitnessBindingsMatched": true,
+    "preservedOriginalSnapshotDigestsVerified": true,
+    "incompleteFixtureOnlyRemovesOneFAQ": true,
+    "nativeExact23ReferenceGETLedgerVerifiedPerRun": true,
+    "actualNativeSignInTapAndPublicFieldExistenceVerifiedPerRun": true,
+    "repairedExactSchema3Dataset22Advertised21KeysCountsAndUniqueIDsVerifiedPerRun": true,
+    "serverCountsAndMarkerVerification": "Repaired snapshots match preserved read-only host inspection of fresh deployed base/info; reviewer made no new API calls.",
+    "privacy": "Eight viewed PNGs contain public loading branding/status and tight empty Sign In-control crops only; text/JSON contain anonymous request inventory/count/marker/digest proof, no account identity, credentials, message, relationship or personal media content.",
+    "scopeLimits": [
+      "Only P01-006 can close from this evidence.",
+      "Ordinary relaunch metadata completion, offline recovery, malformed/incomplete server responses and wider regression remain separate.",
+      "Small Splash heading cutoff remains within open P17; no accessibility promotion.",
+      "--qa-signout clears local TokenStore; no backend account/profile/message/relationship/media writes are represented."
+    ],
+    "resourcesOpened": "None; read-only local artifact viewing and proof metadata update only."
+  },
+  "rootReviewScope": "All28actualhashes/data records/native ledger/host bindings and all8PNG individually viewed; scoped P01-006 only, source and privacy verified",
+  "publicPackage": {
+    "rootReviewed": true,
+    "independentReviewed": true,
+    "originalEvidencePreserved": true,
+    "rawLogsIncluded": false,
+    "xcresultsIncluded": false,
+    "privateFixturesOrCredentialsIncluded": false,
+    "personalPhotosOrVideoIncluded": false,
+    "reviewedPublicLoadingScreensIncluded": true
+  }
+}

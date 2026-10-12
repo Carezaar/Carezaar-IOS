@@ -1,0 +1,14 @@
+{
+  "variant": "incomplete-counts",
+  "preparedCacheSHA256": "3ca853b1aa3b3f747cca879e7473805edf5cba9dfc4c4cd441e8378ccbb16374",
+  "preparedBytes": 1080255,
+  "invalidCondition": "FAQ row count differs from the unchanged server-advertised count",
+  "originalValidCacheSHA256": "a3d9bf2c40d0033d0fac9bcdc1250dd79711f05b54fefc37b1d7618e780a9fe5",
+  "templateWasExistingAppCache": true,
+  "templateWasPreviouslyPreservedActualNativeSnapshot": false,
+  "exactAppContainerVerified": true,
+  "cacheNotClearedByTest": true,
+  "physicalCameraUsed": false,
+  "noBackendAccountProfileMessageRelationshipMediaWrites": true,
+  "localQASessionSetup": "TokenStore cleared by --qa-signout; only regenerable reference cache deliberately corrupted"
+}

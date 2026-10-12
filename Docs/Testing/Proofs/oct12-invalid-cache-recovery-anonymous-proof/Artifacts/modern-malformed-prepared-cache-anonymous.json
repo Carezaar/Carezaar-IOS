@@ -1,0 +1,14 @@
+{
+  "variant": "malformed-json",
+  "preparedCacheSHA256": "dc544a6e2c9e0109ab3a15814c74fe12a78a1189aad547d7054ce5ee75a48446",
+  "preparedBytes": 28,
+  "invalidCondition": "JSON decoding fails",
+  "originalValidCacheSHA256": "4e95f7faab23aec2097431ac8c93c82becb2aa3cdb30c62fa729c4ec644de500",
+  "templateWasExistingAppCache": true,
+  "templateWasPreviouslyPreservedActualNativeSnapshot": false,
+  "exactAppContainerVerified": true,
+  "cacheNotClearedByTest": true,
+  "physicalCameraUsed": false,
+  "noBackendAccountProfileMessageRelationshipMediaWrites": true,
+  "localQASessionSetup": "TokenStore cleared by --qa-signout; only regenerable reference cache deliberately corrupted"
+}

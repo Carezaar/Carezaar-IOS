@@ -1,0 +1,9 @@
+{
+  "checkedAtUTC": "2026-10-12T01:07:39.923434+00:00",
+  "variant": "incomplete-counts",
+  "stage": "native-loading-attachment-recorded",
+  "currentCacheSHA256": "fdc9c33567e425f9cf2874f1582ca3a16018d510b5378fb91def32551ca5222d",
+  "expectedPreparedCacheSHA256": "fdc9c33567e425f9cf2874f1582ca3a16018d510b5378fb91def32551ca5222d",
+  "invalidCacheStillPresentAfterTestInstallationAndLaunch": true,
+  "exactDeviceAndAppContainerVerified": true
+}
