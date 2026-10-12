@@ -1,0 +1,38 @@
+{
+  "sourceCommitSHA": "7c9ad0dd23254683495de31499c35e0e56d726c9",
+  "cleanBuild": "PASS",
+  "cleanBuildLogSHA256": "fb1fdcd46fddf062b69d9694c28f2c3069eee141e3ce505c4e77e21aee34b71b",
+  "results": [
+    {
+      "method": "testUncachedOfflineBootstrapRecoversOnSameStoreWithoutPartialData",
+      "status": "PASS",
+      "seconds": 1.796
+    },
+    {
+      "method": "testUnchangedReferenceCacheSurvivesActualAppRelaunchWithoutDatasetDownloads",
+      "status": "PASS",
+      "seconds": 12.112
+    }
+  ],
+  "nativeLogSHA256": "5bfa2aeadf08291928a9312c1219d012e59b4b86b8b96a84a9bf8aa3c56ebcec",
+  "freshDerivedData": true,
+  "temporaryDiagnosticPrefixAbsentFromActualDebugBinary": true,
+  "productionSourceResourcesUnchanged": true,
+  "originalCaseCountsUnchanged": true,
+  "P01_008": "FAIL/open",
+  "physicalCamera": "UNTESTED",
+  "YahooBackendOnly": "UNVERIFIED",
+  "scope": "Focused current same-store unit plus native cached relaunch only; not original failed tap resolution",
+  "debugExecutableImagesChecked": [
+    {
+      "file": "Carezaar",
+      "sha256": "3fefaf19d95772b3c6c3389c8383c00200e94aea10dc484a26902028309bc5bd",
+      "temporaryDiagnosticPrefixAbsent": true
+    },
+    {
+      "file": "Carezaar.debug.dylib",
+      "sha256": "404997cd9f04c06e9f57e9435eb19b92304426fc2cbd4fc1e7dbd22e806ecc4e",
+      "temporaryDiagnosticPrefixAbsent": true
+    }
+  ]
+}

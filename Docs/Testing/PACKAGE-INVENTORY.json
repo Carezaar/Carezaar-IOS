@@ -1,5 +1,5 @@
 {
-  "status": "Retry forensics/three traced passes and current108-unit coverage independently verified; P01-008 remainsFAIL/open, test/report Git delivery pending",
+  "status": "Same-store regression/investigation evidence delivered at7c9ad0d;108units/freshcleanbuild/focusedunit/nativecachedrelaunch verified; P01-008 remainsFAIL/open and fullQA incomplete",
   "reports": [
     "IOS_TEST_EXECUTION_REPORT.md",
     "IOS-FUNCTIONAL-PARITY-MATRIX.md",
@@ -617,10 +617,36 @@
         ],
         "resourcesOpened": "None; read-only original artifacts and authorizedcandidate proofmetadata only."
       }
+    },
+    {
+      "index": "Proofs/oct12-same-store-postpush-anonymous-proof/index.json",
+      "artifactCount": 2,
+      "bytes": 1390,
+      "reviewProvenance": {
+        "reviewer": "Independent startup QA verifier /root/cache_review",
+        "checkedAtUTC": "2026-10-12T04:36:36.409793+00:00",
+        "verdict": "PASS for focused committed-source clean build/same-store unit/native cached OS relaunch evidence; P01-008 remainsFAIL/open",
+        "artifactCount": 2,
+        "bothArtifactAndBuildNativeLogHashesMatched": true,
+        "freshDerivedDataBuildAndNativePathMatched": true,
+        "sourceCommitSHA": "7c9ad0dd23254683495de31499c35e0e56d726c9",
+        "sourceScope": "BaseCacheTests and StartupGateUITests exactcurrentbytes matchlocal7c9ad0dd23254683495de31499c35e0e56d726c9; BaseCacheTests delta versus1b67 exactly46added/0removed lines. Productsource/resources untouched.",
+        "actualResults": "Same-store unitPASS1.796seconds; actual cached native process relaunchPASS12.112seconds. Reviewed test gates require enabledWelcome and metadataonce/zerodatasetdownloads; retained actualledger exactlyGET /api/base/info=1. No originalRetryfailure outcome inferred.",
+        "debugImages": "Independentlyread bothactual freshDebug executableimages Carezaar andCarezaar.debug.dylib; SHAvaluesmatchsummary and STARTUP_RETRY_DIAGNOSTIC absent from eachrawbinary.",
+        "privacy": "One-line publicGETledger and anonymoussummary contain only endpoint/count/build/test/digest/filename/scope metadata; no privateidentities/credentials/URLs/paths/media.",
+        "caseClosureApproved": false,
+        "originalCaseStatus": "P01-008 remainsFAIL/open; originalcasecounts unchanged by this evidence. No initialfailed-tap cause orproductfix proved.",
+        "limitations": [
+          "Controlledstubtransport service/diskunit plus sharedpreauthcachedOSrelaunch, no authenticatedrolepermutation claim.",
+          "No neworiginalcaseclosure/fullQA/physicalcamera/Yahoobackend attribution.",
+          "RootprovidedremoteSHA/expectedfileverification; reviewercheckedlocalcommittedtestbytes, actuallogs andbinaries."
+        ],
+        "resourcesOpened": "None."
+      }
     }
   ],
-  "proofIndexCount": 62,
-  "indexedArtifactCount": 1026,
+  "proofIndexCount": 63,
+  "indexedArtifactCount": 1028,
   "originalEvidenceIntact": true,
   "excludedTypes": [
     "raw logs",
@@ -642,58 +668,58 @@
   "documents": [
     {
       "path": "IOS_TEST_EXECUTION_REPORT.md",
-      "bytes": 79911,
-      "sha256": "ea3a8b93f851e8c323fe4cd2526067622d406b3ec761a7ce67872197eba7232f"
+      "bytes": 80463,
+      "sha256": "f3ca53064f699083197a12a7dc3a132e643477785e9a156e0668f9a195383404"
     },
     {
       "path": "IOS-FUNCTIONAL-PARITY-MATRIX.md",
-      "bytes": 79980,
-      "sha256": "31fd2dbdb2f36dd212d088b0ca18193eccebfb414bd7fc27fe85daa7b02b64e6"
+      "bytes": 80532,
+      "sha256": "09ca1b35290af577bf507732dae3f3a6dcf09c92e7d7a04d2bcb41f3d617dc55"
     },
     {
       "path": "IOS-FIGMA-PARITY.md",
-      "bytes": 76021,
-      "sha256": "1c02e575039fc2ab02f9445778f8bdb16579110cc4068735de87490fdecf476c"
+      "bytes": 76573,
+      "sha256": "6b112bcc9dacfa940d7aa2e86a88641da9f4316fee2b0148545ae5b89058bb54"
     },
     {
       "path": "BACKEND-ISSUES-FOR-CLIENT.md",
-      "bytes": 79469,
-      "sha256": "82128d560b152d23ca6401ed89b3e05b1d5116542b78c3e65da873e4c21dfaa1"
+      "bytes": 80021,
+      "sha256": "4248c2a717d9481317094a8ca354943fbb09d6a988b43860264d72fa9e90e1b0"
     },
     {
       "path": "QA-CASE-MANIFEST.md",
-      "bytes": 520000,
-      "sha256": "ea93545e7b49bd825f988e018eba65e6770afba257dac4ce57220e7015b51fd8"
+      "bytes": 520552,
+      "sha256": "aa6b28e43c8e49ca0fe4250ca03d3773eb9512c49efe9d4c59136596ecbee2f3"
     },
     {
       "path": "EVIDENCE-COVERAGE-MAPPING.md",
-      "bytes": 687701,
-      "sha256": "62058444d131f663829fcf32bfb9a41425fc3f89a1497b5eae14d411b3960f48"
+      "bytes": 688253,
+      "sha256": "c601460b25c493ca56c1e18faf57a58f6b09be5c63c319b6eac7c9a32aa3bc27"
     },
     {
       "path": "ACCESSIBILITY-TRIAGE.md",
-      "bytes": 149034,
-      "sha256": "399234cd98819e38af6db7e870d84a48b22ba4cd26de0f4dd44189d4b621cd15"
+      "bytes": 149586,
+      "sha256": "5a7d8388e856c19a03f520e9819d551d8f650397f99035272b70b77db7796044"
     },
     {
       "path": "NATIVE-SIGNUP-EXECUTION.md",
-      "bytes": 145024,
-      "sha256": "60f3ffb3da565724fcde1bf7513005100e091278181c1cc70b45ac7e6ccaaa4e"
+      "bytes": 145576,
+      "sha256": "10639fe7ca833bf18b7a4c2c147fe5d20b44afc4e1ef327b11567926c8396247"
     },
     {
       "path": "CROSS-ROLE-EXECUTION.md",
-      "bytes": 146266,
-      "sha256": "5ca5215045386e03a11d60ae1becaf350014bf8c0c92b9ece4eb9fed8ce5b627"
+      "bytes": 146818,
+      "sha256": "d4923bad08c7df9f43a11bdf3f840ed9b98d900ecd2517ad96ad0b37fb0448cb"
     },
     {
       "path": "README.md",
-      "bytes": 42047,
-      "sha256": "37132ab860b837493d5033c7f3446d0bfe942013058ecd39215d1f419bbcf926"
+      "bytes": 42599,
+      "sha256": "28bb8dc3be4a49ae9a62285668cc0c542ca76a069b27d3def2cc21b670c54242"
     }
   ],
   "readme": {
     "path": "README.md",
-    "bytes": 42047,
-    "sha256": "37132ab860b837493d5033c7f3446d0bfe942013058ecd39215d1f419bbcf926"
+    "bytes": 42599,
+    "sha256": "28bb8dc3be4a49ae9a62285668cc0c542ca76a069b27d3def2cc21b670c54242"
   }
 }

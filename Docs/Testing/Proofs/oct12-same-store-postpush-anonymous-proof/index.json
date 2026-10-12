@@ -1,0 +1,53 @@
+{
+  "title": "Committed same-store regression: post-push clean build and native cache smoke",
+  "sourceCommitSHA": "7c9ad0dd23254683495de31499c35e0e56d726c9",
+  "artifacts": [
+    {
+      "path": "Artifacts/native-cached-relaunch-reference-ledger.txt",
+      "description": "Actual native cached OS relaunch: metadata once, zero dataset downloads",
+      "sha256": "16cfc6c9c807812b013bae445a4dfd73e8404373a20f0d435d73bcdac0c6d54b",
+      "packagedSha256": "16cfc6c9c807812b013bae445a4dfd73e8404373a20f0d435d73bcdac0c6d54b"
+    },
+    {
+      "path": "Artifacts/postpush-same-store-and-native-cache-summary-anonymous.json",
+      "description": "Actual committed-source clean build, focused unit and native cache smoke results",
+      "sha256": "de8c17cdd7fd91a1c3ed38dfaa371dd27ca115101c7e61f3c4eab471f870a2ea",
+      "packagedSha256": "de8c17cdd7fd91a1c3ed38dfaa371dd27ca115101c7e61f3c4eab471f870a2ea"
+    }
+  ],
+  "rootReviewed": true,
+  "independentReviewed": true,
+  "rootReviewScope": "Actual completed two-method log, cleanbuild success, raw native one-metadata ledger and current Debug binary absence inspected",
+  "scopeLimits": [
+    "P01-008 remains FAIL/open; no failed tap cause or fix proven",
+    "No new original case closure or role-permutation claim",
+    "Shared preauth cached launch and controlled stub-transport service test; no physical camera or Yahoo attribution"
+  ],
+  "independentReview": {
+    "reviewer": "Independent startup QA verifier /root/cache_review",
+    "checkedAtUTC": "2026-10-12T04:36:36.409793+00:00",
+    "verdict": "PASS for focused committed-source clean build/same-store unit/native cached OS relaunch evidence; P01-008 remainsFAIL/open",
+    "artifactCount": 2,
+    "bothArtifactAndBuildNativeLogHashesMatched": true,
+    "freshDerivedDataBuildAndNativePathMatched": true,
+    "sourceCommitSHA": "7c9ad0dd23254683495de31499c35e0e56d726c9",
+    "sourceScope": "BaseCacheTests and StartupGateUITests exactcurrentbytes matchlocal7c9ad0dd23254683495de31499c35e0e56d726c9; BaseCacheTests delta versus1b67 exactly46added/0removed lines. Productsource/resources untouched.",
+    "actualResults": "Same-store unitPASS1.796seconds; actual cached native process relaunchPASS12.112seconds. Reviewed test gates require enabledWelcome and metadataonce/zerodatasetdownloads; retained actualledger exactlyGET /api/base/info=1. No originalRetryfailure outcome inferred.",
+    "debugImages": "Independentlyread bothactual freshDebug executableimages Carezaar andCarezaar.debug.dylib; SHAvaluesmatchsummary and STARTUP_RETRY_DIAGNOSTIC absent from eachrawbinary.",
+    "privacy": "One-line publicGETledger and anonymoussummary contain only endpoint/count/build/test/digest/filename/scope metadata; no privateidentities/credentials/URLs/paths/media.",
+    "caseClosureApproved": false,
+    "originalCaseStatus": "P01-008 remainsFAIL/open; originalcasecounts unchanged by this evidence. No initialfailed-tap cause orproductfix proved.",
+    "limitations": [
+      "Controlledstubtransport service/diskunit plus sharedpreauthcachedOSrelaunch, no authenticatedrolepermutation claim.",
+      "No neworiginalcaseclosure/fullQA/physicalcamera/Yahoobackend attribution.",
+      "RootprovidedremoteSHA/expectedfileverification; reviewercheckedlocalcommittedtestbytes, actuallogs andbinaries."
+    ],
+    "resourcesOpened": "None."
+  },
+  "publicPackage": {
+    "rootReviewed": true,
+    "independentReviewed": true,
+    "originalEvidencePreserved": true,
+    "rawLogsXCResultsFullScreenPhotosPrivateFixturesIncluded": false
+  }
+}
