@@ -18,7 +18,8 @@ struct SplashView: View {
         // The splash frame has a tap target onto Intro; routing here is driven by
         // the session check instead, so every action is swallowed.
         FigmaScreen(key: Self.sceneKey,
-                    binder: SceneBinder(handle: { _ in true }))
+                    binder: SceneBinder(handle: { _ in true }),
+                    compactVerticalGaps: true)
             .overlay {
                 if failed {
                     VStack(spacing: 14) {

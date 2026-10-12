@@ -29,6 +29,9 @@ struct FigmaScreen<Overlay: View>: View {
     /// Scale the whole frame into the visible height instead of scrolling, for
     /// frames whose only action sits at the bottom.
     var fitHeight = false
+    /// Short, noninteractive loading scenes can reclaim blank vertical gaps
+    /// while preserving their text sizes and artwork geometry.
+    var compactVerticalGaps = false
     /// Scrolls the frame back to its top whenever this value changes (a dialog drawn in
     /// the frame opening while the view is scrolled to a field lower down).
     var scrollTopTrigger: Bool = false
@@ -59,12 +62,15 @@ struct FigmaScreen<Overlay: View>: View {
     var body: some View {
         GeometryReader { geometry in
             if let node {
-                let scale = fitHeight ? min(geometry.size.width / node.width, geometry.size.height / node.height)
-                    : geometry.size.width / node.width
+                let widthScale = geometry.size.width / node.width
+                let display = compactVerticalGaps && widthScale > 0
+                    ? ViewportLayout.fitting(node, height: geometry.size.height / widthScale) : node
+                let scale = fitHeight ? min(geometry.size.width / display.width, geometry.size.height / display.height)
+                    : widthScale
                 ScrollViewReader { proxy in
                 ScrollView {
                     ZStack(alignment: .topLeading) {
-                        DesignElement(node: node, navigate: { _ in })
+                        DesignElement(node: display, navigate: { _ in })
                         // Positional identity: overlays are rebuilt on every render, and a
                         // fresh id each time would tear down (and unfocus) their fields.
                         ForEach(Array(overlays.enumerated()), id: \.offset) { _, item in
@@ -73,9 +79,9 @@ struct FigmaScreen<Overlay: View>: View {
                                 .offset(x: item.frame.minX, y: item.frame.minY)
                         }
                     }
-                        .frame(width: node.width, height: node.height, alignment: .topLeading)
+                        .frame(width: display.width, height: display.height, alignment: .topLeading)
                         .scaleEffect(scale, anchor: .topLeading)
-                        .frame(width: node.width * scale, height: node.height * scale, alignment: .topLeading)
+                        .frame(width: display.width * scale, height: display.height * scale, alignment: .topLeading)
                         .frame(width: geometry.size.width)
                         .id("scene-top")
                 }
@@ -112,8 +118,8 @@ struct FigmaScreen<Overlay: View>: View {
 }
 
 extension FigmaScreen where Overlay == EmptyView {
-    init(key: String, binder: SceneBinder, overlays: [SceneOverlay] = [], fitHeight: Bool = false, scrollTopTrigger: Bool = false) {
-        self.init(key: key, binder: binder, overlays: overlays, fitHeight: fitHeight, scrollTopTrigger: scrollTopTrigger) { EmptyView() }
+    init(key: String, binder: SceneBinder, overlays: [SceneOverlay] = [], fitHeight: Bool = false, compactVerticalGaps: Bool = false, scrollTopTrigger: Bool = false) {
+        self.init(key: key, binder: binder, overlays: overlays, fitHeight: fitHeight, compactVerticalGaps: compactVerticalGaps, scrollTopTrigger: scrollTopTrigger) { EmptyView() }
     }
 }
 

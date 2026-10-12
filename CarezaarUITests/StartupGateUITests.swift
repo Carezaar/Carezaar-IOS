@@ -1,6 +1,54 @@
 import XCTest
+import Vision
 
 final class StartupGateUITests: XCTestCase {
+    /// Public loading copy must fit before reference data permits navigation.
+    /// Only local reference data and QA session tokens are cleared; no API writes.
+    func testSplashLoadingCopyIsFullyInsideViewportWithoutScrolling() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["--qa-signout", "--qa-clear-reference-cache", "--qa-request-counts",
+                               "--qa-latency", "15", "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
+        app.launch()
+        defer { app.terminate() }
+        let copy = ["Welcome to", "our healthcare community", "Initialization may take a while. Please be patient..."]
+        // The Figma prototype exposes one composite scene button, rather than
+        // separate StaticText elements. Match its actual public label.
+        let scene = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", copy[2])).firstMatch
+        XCTAssertTrue(scene.waitForExistence(timeout: 8))
+        XCTAssertFalse(app.buttons["Sign in"].exists)
+        let captured = app.screenshot()
+        let screenshot = XCTAttachment(screenshot: captured)
+        screenshot.name = "splash-loading-public-full-viewport"
+        screenshot.lifetime = .keepAlways; add(screenshot)
+        let request = VNRecognizeTextRequest()
+        request.recognitionLevel = .accurate
+        request.recognitionLanguages = ["en-US"]
+        let cgImage = try XCTUnwrap(captured.image.cgImage)
+        try VNImageRequestHandler(cgImage: cgImage).perform([request])
+        let recognized = (request.results ?? []).compactMap { $0.topCandidates(1).first?.string }
+        let recognizedBounds = (request.results ?? []).compactMap { observation -> [String: Any]? in
+            guard let text = observation.topCandidates(1).first?.string else { return nil }
+            let box = observation.boundingBox
+            return ["text": text, "x": box.minX, "y": box.minY, "width": box.width, "height": box.height]
+        }
+        let visibleCopy = recognized.joined(separator: " ").lowercased()
+        let rows: [String: Any] = ["recognizedPublicLoadingText": recognized,
+            "recognizedNormalizedImageBounds": recognizedBounds,
+            "wholeSceneInsideViewport": app.frame.contains(scene.frame),
+            "sceneWidth": scene.frame.width, "sceneHeight": scene.frame.height]
+        let proof = XCTAttachment(data: try JSONSerialization.data(withJSONObject: rows, options: [.sortedKeys]),
+                                  uniformTypeIdentifier: "public.json")
+        proof.name = "splash-loading-copy-native-geometry"; proof.lifetime = .keepAlways; add(proof)
+        for text in copy {
+            let expected = text.replacingOccurrences(of: "...", with: "").lowercased()
+            XCTAssertTrue(visibleCopy.contains(expected), "Actual rendered loading copy must be complete: \(text)")
+        }
+        // Composite AX bounds include SourceText's extra drawing inset around
+        // the logo, so that diagnostic cannot substitute for visible glyphs.
+        // The full-copy OCR assertions above test actual rendered pixels.
+    }
+
     /// The host prepares and records an invalid cache in an isolated QA app
     /// container before launch. This method must not clear that file itself:
     /// doing so would test a missing cache rather than rejection and recovery.

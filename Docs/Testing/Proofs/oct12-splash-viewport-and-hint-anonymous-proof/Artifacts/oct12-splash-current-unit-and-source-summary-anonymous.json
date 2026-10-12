@@ -1,0 +1,13 @@
+{
+  "currentUnitTests": 107,
+  "currentUnitLogSHA256": "48b88dbccf86824adf3433baa5291176c093b95f252853f9f481753fa65cd06d",
+  "sourceFiles": {
+    "Carezaar/Features/Auth/SplashView.swift": "a1894cd8e9823059de38f296a1fcf25ba56ddede42639c87274c52ded608465a",
+    "Carezaar/Features/DesignSystem/FigmaScreen.swift": "94258ee9bb3cb5ef4c69e11bdaac22f16b5e59bb3b57b1f3fbd6b8bdf979561c",
+    "Carezaar/Resources/Scenes/v2-195-11749.json": "435c8409302a009d680e2115531d87730c2180cb430cde63c3695ae4e57ac069",
+    "CarezaarUITests/StartupGateUITests.swift": "eddcabadca0141a2d69d21383a05856fddfb6e2d42126cda47d213475bbb4044"
+  },
+  "rootSharedAnonymousStartupScope": true,
+  "accountProfileMessageRelationshipMediaWrites": false,
+  "physicalCameraUsed": false
+}

@@ -1,0 +1,13 @@
+{
+  "baselineSceneSHA256": "25872a027bb9833af52d7b4d54bb07876321592adb6082636eaee56c4637db46",
+  "updatedSceneSHA256": "435c8409302a009d680e2115531d87730c2180cb430cde63c3695ae4e57ac069",
+  "onlyChangedJSONPaths": [
+    "/children/0/children/2/fills/0/color/0",
+    "/children/0/children/2/fills/0/color/1",
+    "/children/0/children/2/fills/0/color/2"
+  ],
+  "oldRGB": "#7F7F7F",
+  "newRGB": "#595959",
+  "unchangedFontsArtworkAndGeometry": true,
+  "scope": "Initialization hint only; brand/tagline unchanged"
+}

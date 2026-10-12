@@ -1,0 +1,20 @@
+{
+  "runs": [
+    {
+      "deviceSize": "small",
+      "status": "PASS",
+      "seconds": 40.326,
+      "logSHA256": "8d05102fcc8cd9777386f176b47ce91029010b13e36369afbe9e4c003119ad9b",
+      "scope": "Full uncached native gate with one GET for all22 reference datasets; Small was before hint-only RGB change, with identical app Swift sources"
+    },
+    {
+      "deviceSize": "modern",
+      "status": "PASS",
+      "seconds": 40.698,
+      "logSHA256": "da77cb18bec85cc4c7aced1c83c369752d09ac4fde439998bc83757457f40336",
+      "scope": "Full uncached native gate with one GET for all22 reference datasets; Small was before hint-only RGB change, with identical app Swift sources"
+    }
+  ],
+  "noNewOriginalCasePromotion": true,
+  "noPhysicalCameraUsed": true
+}

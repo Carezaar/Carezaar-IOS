@@ -1,0 +1,223 @@
+{
+  "title": "Public Splash copy fully visible and initialization hint readable",
+  "baselineMainCommitSHA": "844b2e3b809d7aa0aedc7d605f50589462a7fa31",
+  "results": [
+    {
+      "allocation": "small-original-clipped-red",
+      "status": "FAILED",
+      "seconds": 5.76,
+      "logSHA256": "fd4e0ac984b52a6e286c33cb83c179aa3506d3736ada15c5ce036a75cc55a13b"
+    },
+    {
+      "allocation": "small-gap-only-original-gray",
+      "status": "PASSED",
+      "seconds": 6.013,
+      "logSHA256": "b46c59e9650830172292af736f1e9238a11cd68dc154ed7cad70c19b07259ed6"
+    },
+    {
+      "allocation": "small-large",
+      "status": "PASSED",
+      "seconds": 5.988,
+      "logSHA256": "e5a6c633ec12345955f80c9293ca5680810ba48bd723c3fa97cc42f706269615"
+    },
+    {
+      "allocation": "small-a5",
+      "status": "PASSED",
+      "seconds": 5.593,
+      "logSHA256": "2d8368bb52b14a1164b40c2a1ce53372f316a9d27ff277e29ce3ca85a4c2152c"
+    },
+    {
+      "allocation": "modern-large",
+      "status": "PASSED",
+      "seconds": 8.648,
+      "logSHA256": "883f6b5475fccd8dcd8657d4d5984063439b486c74523ff816be925abf1cdc87"
+    },
+    {
+      "allocation": "modern-a5",
+      "status": "PASSED",
+      "seconds": 5.432,
+      "logSHA256": "48b88dbccf86824adf3433baa5291176c093b95f252853f9f481753fa65cd06d"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "Artifacts/small-original-clipped-red-splash-loading-copy-native-geometry.json",
+      "description": "Actual native small-original-clipped-red splash-loading-copy-native-geometry",
+      "sha256": "69089ec5cd05024f274cb173d3230f85ad80317f658953bdf214c0006ed1c4e2",
+      "packagedSha256": "69089ec5cd05024f274cb173d3230f85ad80317f658953bdf214c0006ed1c4e2"
+    },
+    {
+      "path": "Artifacts/small-original-clipped-red-splash-loading-public-full-viewport.png",
+      "description": "Actual native small-original-clipped-red splash-loading-public-full-viewport",
+      "sha256": "c0cf15488b7f1b75c8826adec0a485636414b297bfb4dd93597e78894a5ef99b",
+      "packagedSha256": "c0cf15488b7f1b75c8826adec0a485636414b297bfb4dd93597e78894a5ef99b"
+    },
+    {
+      "path": "Artifacts/small-gap-only-original-gray-splash-loading-copy-native-geometry.json",
+      "description": "Actual native small-gap-only-original-gray splash-loading-copy-native-geometry",
+      "sha256": "ac13d42828c11df5b33331cc0c56b0a629fb08a9aa64f9b60760798d04735b30",
+      "packagedSha256": "ac13d42828c11df5b33331cc0c56b0a629fb08a9aa64f9b60760798d04735b30"
+    },
+    {
+      "path": "Artifacts/small-gap-only-original-gray-splash-loading-public-full-viewport.png",
+      "description": "Actual native small-gap-only-original-gray splash-loading-public-full-viewport",
+      "sha256": "7faca03834905ea5bf98708867afeed7155e9851cc88ec6a467f11852e1ff2e3",
+      "packagedSha256": "7faca03834905ea5bf98708867afeed7155e9851cc88ec6a467f11852e1ff2e3"
+    },
+    {
+      "path": "Artifacts/small-large-splash-loading-copy-native-geometry.json",
+      "description": "Actual native small-large splash-loading-copy-native-geometry",
+      "sha256": "0259a6c71128ba5af88b722f93668e2b25f1d0655020326dc3d2e8154be06048",
+      "packagedSha256": "0259a6c71128ba5af88b722f93668e2b25f1d0655020326dc3d2e8154be06048"
+    },
+    {
+      "path": "Artifacts/small-large-splash-loading-public-full-viewport.png",
+      "description": "Actual native small-large splash-loading-public-full-viewport",
+      "sha256": "5f8ffbf7d33ccf0c0cab06e41ad93abf89a2939c9a451b15a57443f5e379be9f",
+      "packagedSha256": "5f8ffbf7d33ccf0c0cab06e41ad93abf89a2939c9a451b15a57443f5e379be9f"
+    },
+    {
+      "path": "Artifacts/small-a5-splash-loading-copy-native-geometry.json",
+      "description": "Actual native small-a5 splash-loading-copy-native-geometry",
+      "sha256": "267517e19e6a91a78fb5ef8b96a7d8522ae5b3c388767cf3ac1f8ab441fb4861",
+      "packagedSha256": "267517e19e6a91a78fb5ef8b96a7d8522ae5b3c388767cf3ac1f8ab441fb4861"
+    },
+    {
+      "path": "Artifacts/small-a5-splash-loading-public-full-viewport.png",
+      "description": "Actual native small-a5 splash-loading-public-full-viewport",
+      "sha256": "78870317404c3183034f8f28c54e54dfe11fd24cb44a3680d9d997a4bff7c4ef",
+      "packagedSha256": "78870317404c3183034f8f28c54e54dfe11fd24cb44a3680d9d997a4bff7c4ef"
+    },
+    {
+      "path": "Artifacts/modern-large-splash-loading-copy-native-geometry.json",
+      "description": "Actual native modern-large splash-loading-copy-native-geometry",
+      "sha256": "4428c7b746bddae7edfeb9048105b0c8754a56edfb6401857eb71713a9ee115d",
+      "packagedSha256": "4428c7b746bddae7edfeb9048105b0c8754a56edfb6401857eb71713a9ee115d"
+    },
+    {
+      "path": "Artifacts/modern-large-splash-loading-public-full-viewport.png",
+      "description": "Actual native modern-large splash-loading-public-full-viewport",
+      "sha256": "d2d1a36b9ca06d5691f9507110ad72ba7a07a28ca71c9336806236d8e0f5a5e1",
+      "packagedSha256": "d2d1a36b9ca06d5691f9507110ad72ba7a07a28ca71c9336806236d8e0f5a5e1"
+    },
+    {
+      "path": "Artifacts/modern-a5-splash-loading-copy-native-geometry.json",
+      "description": "Actual native modern-a5 splash-loading-copy-native-geometry",
+      "sha256": "4428c7b746bddae7edfeb9048105b0c8754a56edfb6401857eb71713a9ee115d",
+      "packagedSha256": "4428c7b746bddae7edfeb9048105b0c8754a56edfb6401857eb71713a9ee115d"
+    },
+    {
+      "path": "Artifacts/modern-a5-splash-loading-public-full-viewport.png",
+      "description": "Actual native modern-a5 splash-loading-public-full-viewport",
+      "sha256": "d2d1a36b9ca06d5691f9507110ad72ba7a07a28ca71c9336806236d8e0f5a5e1",
+      "packagedSha256": "d2d1a36b9ca06d5691f9507110ad72ba7a07a28ca71c9336806236d8e0f5a5e1"
+    },
+    {
+      "path": "Artifacts/oct12-splash-hint-raster-contrast-anonymous.json",
+      "description": "Four actual initialization hint text rasters plus preserved before-color-fix comparison",
+      "sha256": "0fed87fb9ad0629e109058f6356e71455e87258be11f58c97883904d96992363",
+      "packagedSha256": "0fed87fb9ad0629e109058f6356e71455e87258be11f58c97883904d96992363"
+    },
+    {
+      "path": "Artifacts/splash-hint-only-source-color-diff-anonymous.json",
+      "description": "Only three RGB channels changed; fonts, geometry and other scene fields preserved",
+      "sha256": "6d6fedfdbc23c884f9d86ae6276fdca63e90af3f8e7b559f5c051caeedff990e",
+      "packagedSha256": "6d6fedfdbc23c884f9d86ae6276fdca63e90af3f8e7b559f5c051caeedff990e"
+    },
+    {
+      "path": "Artifacts/oct12-splash-current-unit-and-source-summary-anonymous.json",
+      "description": "Fresh107-unit result bound to current source and scene fingerprints",
+      "sha256": "496b003bce5570cceb459c560751530a9058881dfc70540f957ed09d6ae5b449",
+      "packagedSha256": "496b003bce5570cceb459c560751530a9058881dfc70540f957ed09d6ae5b449"
+    },
+    {
+      "path": "Artifacts/oct12-splash-release-exclusions-anonymous.json",
+      "description": "Current Simulator Release exclusion verification",
+      "sha256": "c16fe676783b854400d6c87fcf707949a13603113950c224dc5147a14a252a0c",
+      "packagedSha256": "c16fe676783b854400d6c87fcf707949a13603113950c224dc5147a14a252a0c"
+    },
+    {
+      "path": "Artifacts/oct12-splash-complete-startup-summary-anonymous.json",
+      "description": "Actual full-reference native startup regression outcomes",
+      "sha256": "2f241b25acd7e10939a79ec6e3262954e2b06c82e846e12b3752f6b950d27f98",
+      "packagedSha256": "2f241b25acd7e10939a79ec6e3262954e2b06c82e846e12b3752f6b950d27f98"
+    }
+  ],
+  "rootReviewed": true,
+  "independentReviewed": true,
+  "scope": "Shared anonymous English loading scene, before either role choice; Modern and Small at actual OS Large and A5",
+  "originalCaseCountsUnchanged": true,
+  "scopeLimits": [
+    "Original P17-001/P17-003 remain FAIL; no full accessibility/VoiceOver/localization or extreme-height claim",
+    "Source scene text keeps its original design font sizes; A5 setting does not prove all text dynamically scales",
+    "Composite AX bounds include SourceText drawing insets and remain diagnostically outside viewport; actual full-copy OCR and reviewed pixels establish this fix",
+    "Initial StaticText-selector failure retained privately as harness failure; actual rendered-copy RED and gray contrast RED also retained",
+    "Public full loading screenshots only; raw logs/xcresults/private fixtures/local gallery/recordings excluded"
+  ],
+  "rootReview": "All15artifact hashes/data reviewed; original clipping, gap-only gray hint, and final both-size loading pixels inspected. Complete words/no overlapping text/art; fonts/art unchanged. A5 pixels keep source fonts and do not prove text growth; scope remains narrow.",
+  "previous15ArtifactIndependentReview": {
+    "reviewer": "Independent cache and Splash QA verifier /root/cache_review",
+    "checkedAtUTC": "2026-10-12T03:17:14.564687+00:00",
+    "verdict": "PASS for focused public English Splash viewport and Initialization hint contrast fix only",
+    "gateVerdicts": {
+      "causeAndScope": "PASS: baseline actual Small screenshot clips lower Info text; actual OCR RED5.760seconds lacks community/hint copy. Width-only917pt scene exceeds short viewport; Splash-only opt-in blank-gap fitting preserves source fonts/art/internal geometry. Defaultfalse retains other callers/fitHeight behavior.",
+      "actualRenderedCopy": "PASS: viewed six actual loading PNGs, preserved original clipped/gap-only states and four final Modern/Small Large/A5 allocations. Four final OCRmethodsPASS5.988/5.593/8.648/5.432seconds; both headings and full initialization line visible with no apparent overlap. Composite AX remains outside dueSourceTextdrawinsets and is retained diagnostically.",
+      "contrast": "PASS: independently re-counted allfour exact Initialization ROIs: RGB89 cores281Small/1902Modern onRGB255white yield7.004729208035935. Preserved sameSmallROI RGB127core290 yields4.0041069566148515. Source pair corroborated by actual raster cores; anti-aliased edges not used as normative foreground.",
+      "sourceAssetDiff": "PASS: recursive baseline/current scene comparison finds exactly threeInitialization fills RGBchannelpaths changed; node221:11986 coloronly. Allother scene fields/fonts/art/positions/sizes/tagline preserved. SourceModel unchanged.",
+      "fingerprintsAndRegression": "PASS: all15artifactSHA256values and6actualmethodloghashes match; current107unitlog27.168seconds and sourceSwift2/scene/testfingerprints match current files. Prior107unit27.421 result predates colorfix and is not substituted.",
+      "startupAndRelease": "PASS within observed logs: full uncached native Startup method passes Small40.326 andModern40.698seconds. Release BUILD SUCCEEDED and ANALYZE SUCCEEDED observed; current32QAmarker binaryinspection was pending and is not certified by this review.",
+      "privacy": "PASS: six public loading screenshots andnine anonymousJSON artifacts contain public brand/copy/status/layout/OCR/colors/digests/source/test metadata only; no account identity/credentials/privatepath/profile/chat/relationship/personalmedia content."
+    },
+    "artifactCount": 15,
+    "pngCount": 6,
+    "jsonCount": 9,
+    "sourcePairContrast": 7.004729208035935,
+    "preservedBeforeSourcePairContrast": 4.0041069566148515,
+    "scopeLimits": [
+      "No original case promotion; P17-001 andP17-003 remainFAIL.",
+      "Shared anonymous English loading scene before either role selection; nofourauthenticatedrole claim.",
+      "Original sourcefont sizes unchanged. OS A5 execution is visibility evidence, not DynamicType growth or universal accessibility evidence.",
+      "No VoiceOver/localization/extreme-height/full-screencontrast/productionreadiness claim.",
+      "InitialStaticText-selector failure remains harness history; actualclipping/OCR RED and originalgraycontrast remainpreserved.",
+      "Release32QAmarkerinspection not covered by thisreview."
+    ],
+    "resourcesOpened": "None; local artifact inspection and authorized proof metadata update only."
+  },
+  "independentReview": {
+    "reviewer": "Independent cache and Splash QA verifier /root/cache_review",
+    "checkedAtUTC": "2026-10-12T03:36:01.377301+00:00",
+    "verdict": "PASS for focused public English Splash viewport and Initialization hint contrast fix only",
+    "gateVerdicts": {
+      "causeAndScope": "PASS: baseline actual Small screenshot clips lower Info text; actual OCR RED5.760seconds lacks community/hint copy. Width-only917pt scene exceeds short viewport; Splash-only opt-in blank-gap fitting preserves source fonts/art/internal geometry. Defaultfalse retains other callers/fitHeight behavior.",
+      "actualRenderedCopy": "PASS: viewed six actual loading PNGs, preserved original clipped/gap-only states and four final Modern/Small Large/A5 allocations. Four final OCRmethodsPASS5.988/5.593/8.648/5.432seconds; both headings and full initialization line visible with no apparent overlap. Composite AX remains outside dueSourceTextdrawinsets and is retained diagnostically.",
+      "contrast": "PASS: independently re-counted allfour exact Initialization ROIs: RGB89 cores281Small/1902Modern onRGB255white yield7.004729208035935. Preserved sameSmallROI RGB127core290 yields4.0041069566148515. Source pair corroborated by actual raster cores; anti-aliased edges not used as normative foreground.",
+      "sourceAssetDiff": "PASS: recursive baseline/current scene comparison finds exactly threeInitialization fills RGBchannelpaths changed; node221:11986 coloronly. Allother scene fields/fonts/art/positions/sizes/tagline preserved. SourceModel unchanged.",
+      "fingerprintsAndRegression": "PASS: all15artifactSHA256values and6actualmethodloghashes match; current107unitlog27.168seconds and sourceSwift2/scene/testfingerprints match current files. Prior107unit27.421 result predates colorfix and is not substituted.",
+      "startupAndRelease": "PASS: independently verified actual current Simulator Release binary SHA, all32exact exclusion marker names absent from rawbytes and extractedstrings, CAREZAAR_API_BASE_URL override name absent, bundled Scenes/v2-195-11749.json byte-identical to current projectscene SHA435c8409302a009d680e2115531d87730c2180cb430cde63c3695ae4e57ac069; Releasebuild/analyze log hash and completed success markers match. Native full-uncached startup logs independently hash-verified Small40.326/Modern40.698PASS. Small run predates hint-onlyRGBchange with same appSwift; does not substitute for a final-color Small startup run.",
+      "privacy": "PASS: six public loading screenshots andnine anonymousJSON artifacts contain public brand/copy/status/layout/OCR/colors/digests/source/test metadata only; no account identity/credentials/privatepath/profile/chat/relationship/personalmedia content.",
+      "incrementalTwoArtifacts": "PASS: both added anonymous JSON SHA values match; metadata contains Release configuration/result/count/digests/boolean scope and anonymous startup durations only, no private identities/credentials/paths/media."
+    },
+    "artifactCount": 17,
+    "pngCount": 6,
+    "jsonCount": 11,
+    "sourcePairContrast": 7.004729208035935,
+    "preservedBeforeSourcePairContrast": 4.0041069566148515,
+    "scopeLimits": [
+      "No original case promotion; P17-001 andP17-003 remainFAIL.",
+      "Shared anonymous English loading scene before either role selection; nofourauthenticatedrole claim.",
+      "Original sourcefont sizes unchanged. OS A5 execution is visibility evidence, not DynamicType growth or universal accessibility evidence.",
+      "No VoiceOver/localization/extreme-height/full-screencontrast/productionreadiness claim.",
+      "InitialStaticText-selector failure remains harness history; actualclipping/OCR RED and originalgraycontrast remainpreserved.",
+      "Simulator Release build/static exclusion/bundled-resource checks do not prove physical signing/distribution or Release runtime.",
+      "Small complete-startup40.326 predates hint-onlyRGBchange; finalSmall loading text/color has separate reviewedpixel evidence."
+    ],
+    "resourcesOpened": "None; local artifact inspection and authorized proof metadata update only.",
+    "previousReviewReference": "previous15ArtifactIndependentReview: preserved independent review of first15artifacts, actual6PNG/OCR/color/source/current107units checks; first15hashes reverified unchanged in this incremental review."
+  },
+  "publicPackage": {
+    "rootReviewed": true,
+    "independentReviewed": true,
+    "originalEvidencePreserved": true,
+    "rawLogsXCResultsFullScreenPhotosPrivateFixturesIncluded": false
+  }
+}

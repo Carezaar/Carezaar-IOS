@@ -1,0 +1,15 @@
+{
+  "checkedAtUTC": "2026-10-12T03:16:58.659876+00:00",
+  "configuration": "Release",
+  "platform": "iOS Simulator",
+  "build": "PASS",
+  "analyze": "PASS",
+  "binarySHA256": "df1947878e0c67ad16171806cd480cf7d506098941d2ffb50cae503fa5b644a3",
+  "requiredExcludedMarkerCount": 32,
+  "allMarkersAbsentFromRawBinaryAndStrings": true,
+  "debugAPIOverrideNameAbsent": true,
+  "updatedSplashResourceBundledAndMatchesSource": true,
+  "releaseSceneResourceSHA256": "435c8409302a009d680e2115531d87730c2180cb430cde63c3695ae4e57ac069",
+  "logSHA256": "1e234d7ba27e399b8fd75273727644db35413de90b5360b6742a4455777b8c85",
+  "physicalSigningDistributionAndReleaseRuntimeVerified": false
+}

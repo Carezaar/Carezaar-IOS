@@ -1,5 +1,5 @@
 {
-  "status": "Offline saved-session regression commit 27e7078e552b28f0053cb84539d19ffa1ef845c0 pushed and remotely verified; required post-push fresh clean build and both-role typed Sign In smoke passed; this final documentation-only follow-up records verification; full QA remains incomplete",
+  "status": "Focused Splash viewport and hint contrast correction independently verified locally; source/report delivery pending; full original QA remains incomplete and case counts unchanged",
   "reports": [
     "IOS_TEST_EXECUTION_REPORT.md",
     "IOS-FUNCTIONAL-PARITY-MATRIX.md",
@@ -459,10 +459,46 @@
         "sourceCommitSHA": "27e7078e552b28f0053cb84539d19ffa1ef845c0",
         "resourcesOpened": "None."
       }
+    },
+    {
+      "index": "Proofs/oct12-splash-viewport-and-hint-anonymous-proof/index.json",
+      "artifactCount": 17,
+      "bytes": 1373446,
+      "reviewProvenance": {
+        "reviewer": "Independent cache and Splash QA verifier /root/cache_review",
+        "checkedAtUTC": "2026-10-12T03:36:01.377301+00:00",
+        "verdict": "PASS for focused public English Splash viewport and Initialization hint contrast fix only",
+        "gateVerdicts": {
+          "causeAndScope": "PASS: baseline actual Small screenshot clips lower Info text; actual OCR RED5.760seconds lacks community/hint copy. Width-only917pt scene exceeds short viewport; Splash-only opt-in blank-gap fitting preserves source fonts/art/internal geometry. Defaultfalse retains other callers/fitHeight behavior.",
+          "actualRenderedCopy": "PASS: viewed six actual loading PNGs, preserved original clipped/gap-only states and four final Modern/Small Large/A5 allocations. Four final OCRmethodsPASS5.988/5.593/8.648/5.432seconds; both headings and full initialization line visible with no apparent overlap. Composite AX remains outside dueSourceTextdrawinsets and is retained diagnostically.",
+          "contrast": "PASS: independently re-counted allfour exact Initialization ROIs: RGB89 cores281Small/1902Modern onRGB255white yield7.004729208035935. Preserved sameSmallROI RGB127core290 yields4.0041069566148515. Source pair corroborated by actual raster cores; anti-aliased edges not used as normative foreground.",
+          "sourceAssetDiff": "PASS: recursive baseline/current scene comparison finds exactly threeInitialization fills RGBchannelpaths changed; node221:11986 coloronly. Allother scene fields/fonts/art/positions/sizes/tagline preserved. SourceModel unchanged.",
+          "fingerprintsAndRegression": "PASS: all15artifactSHA256values and6actualmethodloghashes match; current107unitlog27.168seconds and sourceSwift2/scene/testfingerprints match current files. Prior107unit27.421 result predates colorfix and is not substituted.",
+          "startupAndRelease": "PASS: independently verified actual current Simulator Release binary SHA, all32exact exclusion marker names absent from rawbytes and extractedstrings, CAREZAAR_API_BASE_URL override name absent, bundled Scenes/v2-195-11749.json byte-identical to current projectscene SHA435c8409302a009d680e2115531d87730c2180cb430cde63c3695ae4e57ac069; Releasebuild/analyze log hash and completed success markers match. Native full-uncached startup logs independently hash-verified Small40.326/Modern40.698PASS. Small run predates hint-onlyRGBchange with same appSwift; does not substitute for a final-color Small startup run.",
+          "privacy": "PASS: six public loading screenshots andnine anonymousJSON artifacts contain public brand/copy/status/layout/OCR/colors/digests/source/test metadata only; no account identity/credentials/privatepath/profile/chat/relationship/personalmedia content.",
+          "incrementalTwoArtifacts": "PASS: both added anonymous JSON SHA values match; metadata contains Release configuration/result/count/digests/boolean scope and anonymous startup durations only, no private identities/credentials/paths/media."
+        },
+        "artifactCount": 17,
+        "pngCount": 6,
+        "jsonCount": 11,
+        "sourcePairContrast": 7.004729208035935,
+        "preservedBeforeSourcePairContrast": 4.0041069566148515,
+        "scopeLimits": [
+          "No original case promotion; P17-001 andP17-003 remainFAIL.",
+          "Shared anonymous English loading scene before either role selection; nofourauthenticatedrole claim.",
+          "Original sourcefont sizes unchanged. OS A5 execution is visibility evidence, not DynamicType growth or universal accessibility evidence.",
+          "No VoiceOver/localization/extreme-height/full-screencontrast/productionreadiness claim.",
+          "InitialStaticText-selector failure remains harness history; actualclipping/OCR RED and originalgraycontrast remainpreserved.",
+          "Simulator Release build/static exclusion/bundled-resource checks do not prove physical signing/distribution or Release runtime.",
+          "Small complete-startup40.326 predates hint-onlyRGBchange; finalSmall loading text/color has separate reviewedpixel evidence."
+        ],
+        "resourcesOpened": "None; local artifact inspection and authorized proof metadata update only.",
+        "previousReviewReference": "previous15ArtifactIndependentReview: preserved independent review of first15artifacts, actual6PNG/OCR/color/source/current107units checks; first15hashes reverified unchanged in this incremental review."
+      }
     }
   ],
-  "proofIndexCount": 57,
-  "indexedArtifactCount": 983,
+  "proofIndexCount": 58,
+  "indexedArtifactCount": 1000,
   "originalEvidenceIntact": true,
   "excludedTypes": [
     "raw logs",
@@ -484,58 +520,58 @@
   "documents": [
     {
       "path": "IOS_TEST_EXECUTION_REPORT.md",
-      "bytes": 74624,
-      "sha256": "4a2adb78d89c216442ecbba8c7c922ff6ef2ca89275218915f5c773cb715ed9e"
+      "bytes": 76292,
+      "sha256": "466aa7c549236aa074194e39ca1e20b77b5fbdb79c73ce054713ff50145a136d"
     },
     {
       "path": "IOS-FUNCTIONAL-PARITY-MATRIX.md",
-      "bytes": 74693,
-      "sha256": "037a2fea7a547e98b8573bf9f6338dfdf517d22fe9601e395978e4d57532f1ca"
+      "bytes": 76361,
+      "sha256": "776fca4eea0c7a9ce06ce30625ed97275b0fea1015fffdcfba0776eb65cc5824"
     },
     {
       "path": "IOS-FIGMA-PARITY.md",
-      "bytes": 70734,
-      "sha256": "2b44ff94b63f5761918740960d755f7ceb3780f4e06d9cc63538865264932159"
+      "bytes": 72402,
+      "sha256": "c45e277ad64b9d74d7099730deec22aaf718aa2e8dc3c21c31ad71da3b27f33a"
     },
     {
       "path": "BACKEND-ISSUES-FOR-CLIENT.md",
-      "bytes": 74182,
-      "sha256": "f6a6b8d2dc5a9218eafec6dd3017e67441e8bc1ac4c70f1f81ce659c11ff450d"
+      "bytes": 75850,
+      "sha256": "4dfd6352e77b87c0ee7b442e74c38c45483ad236f1d8db83ab86fbe04c56c89b"
     },
     {
       "path": "QA-CASE-MANIFEST.md",
-      "bytes": 513445,
-      "sha256": "3cdcc7e9e69af9ee9e010004f08ee34f644d24d1c4514308945bde9f31a98dcd"
+      "bytes": 515641,
+      "sha256": "1fa3b698330457e7ac4d7806eecb9a443a124d5b07164b0b5a704a061cc1d61d"
     },
     {
       "path": "EVIDENCE-COVERAGE-MAPPING.md",
-      "bytes": 682414,
-      "sha256": "ce83907f4a42ca24cbab8046857243e135d940d3b3ee063bf2758c109116fbc5"
+      "bytes": 684082,
+      "sha256": "17f658809d5cb70defd56e5e98bec7618a7d45d5f33f7d549ce3626930b6b5db"
     },
     {
       "path": "ACCESSIBILITY-TRIAGE.md",
-      "bytes": 143747,
-      "sha256": "15ff87ef7ad1470383d77ddf4d5d7833c4455f4a86de898dad715e2567243f31"
+      "bytes": 145415,
+      "sha256": "431013385c562673b8ebbdf0d0bf1027960a0728bbd8fb85460a2358472fa2ce"
     },
     {
       "path": "NATIVE-SIGNUP-EXECUTION.md",
-      "bytes": 139737,
-      "sha256": "b65980a338b8294ee40724621244b67f11b5ba62c76e8aef633f8e30e73eec7a"
+      "bytes": 141405,
+      "sha256": "349c23b0eab739d9722040fd6db4c19f2741ab080695e87aa577146fecc4896c"
     },
     {
       "path": "CROSS-ROLE-EXECUTION.md",
-      "bytes": 140979,
-      "sha256": "bd037c44d6afff66d36529818e722f1ca0ee21aff1631a45605cb02c5b1c7d08"
+      "bytes": 142647,
+      "sha256": "96638dce86d08be855bbd373bff9a3dfe1a5cf2d9065957ecae76608ed01d6a1"
     },
     {
       "path": "README.md",
-      "bytes": 36760,
-      "sha256": "269666e4c7bd1afe1d134cc7c86211fe24d4f6e7c2beb7c7b481159c6f115895"
+      "bytes": 38428,
+      "sha256": "61b156d1a51b29c9bad2ce63cce7876bf885074b3ed5d8fe7188820b92961775"
     }
   ],
   "readme": {
     "path": "README.md",
-    "bytes": 36760,
-    "sha256": "269666e4c7bd1afe1d134cc7c86211fe24d4f6e7c2beb7c7b481159c6f115895"
+    "bytes": 38428,
+    "sha256": "61b156d1a51b29c9bad2ce63cce7876bf885074b3ed5d8fe7188820b92961775"
   }
 }
