@@ -1,0 +1,70 @@
+{
+  "reviewer": "Independent startup QA verifier",
+  "checkedAtUTC": "2026-10-12T04:23:34.423328+00:00",
+  "finding": "Original failed invocation synthesized tap inside observed Retry control and at its center within AX printed-frame rounding; no wrong-coordinate/orientation proof. Root cause remains unconfirmed.",
+  "originalSynthesizedEvent": {
+    "type": "tap",
+    "targetProcessID": 37864,
+    "orientationCode": 1,
+    "parentWindowSizePoints": {
+      "width": 440.0,
+      "height": 956.0
+    },
+    "pointerEvents": [
+      {
+        "eventType": 1,
+        "x": 220.0,
+        "y": 512.3333333333333,
+        "offsetSeconds": 0.0
+      },
+      {
+        "eventType": 3,
+        "x": 220.0,
+        "y": 512.3333333333333,
+        "offsetSeconds": 0.05
+      }
+    ]
+  },
+  "observedRetryGeometryPoints": {
+    "x": 80.0,
+    "y": 486.3,
+    "width": 280.0,
+    "height": 52.0,
+    "centerX": 220.0,
+    "centerY": 512.3,
+    "evidenceSurface": "Retained final failure UI hierarchy; pre-tap snapshot archive includes only root dimensions and no children",
+    "printedFramePrecisionDecimalPlaces": 1,
+    "tapInsidePrintedFrame": true,
+    "tapWithinPrintedCenterRounding": true
+  },
+  "overlappingPrototypeGeometryPoints": {
+    "x": -56.2,
+    "y": 45.4,
+    "width": 550.0,
+    "height": 947.0,
+    "containsRetryTapPoint": true,
+    "hitInterceptionProven": false
+  },
+  "errorScreenshotComparison": {
+    "byteIdenticalOriginalAndSuccessfulFinalModern": true,
+    "sha256": "407ec77c08f87416bb14808040fca8224a2fc27c18eac370c47a970243f55132",
+    "scope": "Manual public error attachment before Retry; does not prove pixel state at exact tap moment"
+  },
+  "activityComparison": {
+    "bothPortrait": true,
+    "bothFindCheckInterruptSynthesizeSequence": true,
+    "noRecordedDismissalRotationOrBackgroundInterruptionAction": true,
+    "successfulGeneratedTapEventAndSnapshotRetained": false,
+    "unavailabilityReason": "Successful activity attachments have deleteOnSuccess lifetime; actual final successful coordinate cannot be extracted from retained result."
+  },
+  "originalPreTapSnapshot": {
+    "rootWidth": 440.0,
+    "rootHeight": 956.0,
+    "childTreeRetained": false,
+    "limits": "Cannot identify the UIKit/SwiftUI hit-view winner from this root-only snapshot."
+  },
+  "recommendedNextObservation": "Compare secret-free prototype-action-swallowed and Retry-action-entry markers for a reproduced stalled tap, then bootstrap/API markers. No product hit-testing or task fix established.",
+  "originalFailureSeconds": 147.669,
+  "originalCaseStatus": "P01-008 FAIL/open; initial core Retry failure remains unresolved.",
+  "privateIdentitiesCredentialsURLsOrPathsIncluded": false
+}

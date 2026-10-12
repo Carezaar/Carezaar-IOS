@@ -1,0 +1,57 @@
+{
+  "results": [
+    {
+      "allocation": "Modern trace 1",
+      "seconds": 44.634,
+      "nativeLogSHA256": "2c2ac5dd69e47b9c21db30550746f8f62778a1fa35aab62fb3bf3147776cbf43",
+      "traceLogSHA256": "28d6f6cd60bfe29fb9958638f7ef74b3b68b1688ac444459eaccdd5bbbdfd789",
+      "observedEvents": [
+        "bootstrap-entry running=false cancelled=false failed=false",
+        "info-request-build cancelled=false",
+        "bootstrap-finished failed=true ready=false",
+        "retry-action failed=true ready=false",
+        "retry-task cancelled=false failed=true",
+        "bootstrap-entry running=false cancelled=false failed=true",
+        "info-request-build cancelled=false",
+        "bootstrap-finished failed=false ready=true"
+      ],
+      "prototypeActionsObserved": 0
+    },
+    {
+      "allocation": "Modern trace 2",
+      "seconds": 37.58,
+      "nativeLogSHA256": "735fc33f6c3b900c23d6a78cd0e1b46593e675116ab65f8052daeccc3aecd1b5",
+      "traceLogSHA256": "b43a596c759aba869bc8a94a6faa1c14bc5587e15b9f61ff3ed9e7ab050bf74a",
+      "observedEvents": [
+        "bootstrap-entry running=false cancelled=false failed=false",
+        "info-request-build cancelled=false",
+        "bootstrap-finished failed=true ready=false",
+        "retry-action failed=true ready=false",
+        "retry-task cancelled=false failed=true",
+        "bootstrap-entry running=false cancelled=false failed=true",
+        "info-request-build cancelled=false",
+        "bootstrap-finished failed=false ready=true"
+      ],
+      "prototypeActionsObserved": 0
+    },
+    {
+      "allocation": "Modern trace 3",
+      "seconds": 37.736,
+      "nativeLogSHA256": "67b8e479ff2ae39292940a5bd69e1f8eacd0d891e20e2792b07b39a08eea8080",
+      "traceLogSHA256": "75c8eddf1cec6ab29f71bb92778958b90272fcd62254b193671af4d2a31ed5b4",
+      "observedEvents": [
+        "bootstrap-entry running=false cancelled=false failed=false",
+        "info-request-build cancelled=false",
+        "bootstrap-finished failed=true ready=false",
+        "retry-action failed=true ready=false",
+        "retry-task cancelled=false failed=true",
+        "bootstrap-entry running=false cancelled=false failed=true",
+        "info-request-build cancelled=false",
+        "bootstrap-finished failed=false ready=true"
+      ],
+      "prototypeActionsObserved": 0
+    }
+  ],
+  "scope": "Only these three traced successful runs; original core failure cause remains unconfirmed",
+  "diagnosticsRemoved": true
+}

@@ -34,6 +34,52 @@ final class BaseCacheTests: XCTestCase {
         XCTAssertEqual(paths.count, downloaded + 1, "Unchanged snapshot should request only base/info")
     }
 
+    func testUncachedOfflineBootstrapRecoversOnSameStoreWithoutPartialData() async throws {
+        let lock = NSLock()
+        var paths: [String] = []
+        StubHTTP.handler = { request in
+            lock.lock(); paths.append(request.url!.lastPathComponent); lock.unlock()
+            throw URLError(.notConnectedToInternet)
+        }
+        let url = folder.appendingPathComponent("base.json")
+        let service = BaseService(client: APIClient(session: StubHTTP.session()))
+        let store = BaseDataStore(service: service, cacheURL: url)
+        await store.bootstrap()
+        XCTAssertFalse(store.isReady)
+        XCTAssertTrue(store.failed)
+        XCTAssertTrue(store.tables.isEmpty)
+        XCTAssertTrue(store.languages.isEmpty && store.media.isEmpty && store.faqs.isEmpty)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: url.path))
+        XCTAssertEqual(paths, ["info", "info", "info", "info"])
+
+        StubHTTP.handler = { request in
+            let path = request.url!.lastPathComponent
+            lock.lock(); paths.append(path); lock.unlock()
+            return (200, Self.response(path: path, stamp: 10))
+        }
+        // Keep the same public store instance: reconstructing it would hide a
+        // stale in-flight bootstrap task left behind by the failed attempt.
+        await store.bootstrap()
+        XCTAssertTrue(store.isReady)
+        XCTAssertFalse(store.failed)
+        let datasets = ["careconditions", "caredays", "carespecials", "certifications",
+                        "clienttypes", "commutes", "contents", "countries", "experiences",
+                        "genders", "issuetypes", "languageskills", "reasons", "roles",
+                        "shifts", "subjects", "worktypes", "languages", "states", "media",
+                        "faqs", "faq_categories"]
+        XCTAssertEqual(paths.filter { $0 == "info" }.count, 5)
+        XCTAssertEqual(paths.filter { $0 != "info" }.sorted(), datasets.sorted())
+        let saved = try Data(contentsOf: url)
+        let reopened = BaseDataStore(service: service, cacheURL: url)
+        XCTAssertFalse(reopened.isReady, "Loaded disk data must still pass the bootstrap readiness gate")
+        XCTAssertFalse(reopened.tables.isEmpty, "The validated snapshot must be restored from disk")
+        await reopened.bootstrap()
+        XCTAssertTrue(reopened.isReady)
+        XCTAssertEqual(paths.filter { $0 == "info" }.count, 6)
+        XCTAssertEqual(paths.filter { $0 != "info" }.sorted(), datasets.sorted())
+        XCTAssertEqual(try Data(contentsOf: url), saved)
+    }
+
     func testChangedMarkerReplacesEveryDatasetAndPersistsNewSnapshot() async throws {
         var stamp = 10
         StubHTTP.handler = { request in (200, Self.response(path: request.url!.lastPathComponent, stamp: stamp)) }

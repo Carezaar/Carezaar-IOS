@@ -1,5 +1,5 @@
 {
-  "status": "Uncached offline Retry regression/evidence delivered at0ac5c43; fresh clean build and postpush native40.396 PASS; P01-008 remainsFAIL/open and fullQA incomplete",
+  "status": "Retry forensics/three traced passes and current108-unit coverage independently verified; P01-008 remainsFAIL/open, test/report Git delivery pending",
   "reports": [
     "IOS_TEST_EXECUTION_REPORT.md",
     "IOS-FUNCTIONAL-PARITY-MATRIX.md",
@@ -587,10 +587,40 @@
         ],
         "resourcesOpened": "None."
       }
+    },
+    {
+      "index": "Proofs/oct12-retry-forensics-and-same-store-anonymous-proof/index.json",
+      "artifactCount": 3,
+      "bytes": 5873,
+      "reviewProvenance": {
+        "reviewer": "Independent startup QA verifier /root/cache_review",
+        "checkedAtUTC": "2026-10-12T04:27:39.833695+00:00",
+        "verdict": "PASS for evidence and same-store regression; P01-008 remainsFAIL/open without established originalcause or productfix",
+        "artifactCount": 3,
+        "allArtifactHashesMatched": true,
+        "currentUnitTests": 108,
+        "currentUnitDurationSeconds": 28.702,
+        "newSameStoreTestSeconds": 1.795,
+        "newUnitSourceSHA256": "971dbf5892cefe533e7026f30f32371c538fae2d250c73cf43c70c29d463daf4",
+        "sourceGate": "New46lineBaseCacheTests method uses same store through offline4metadata retries\u2192onlineinfo5+22datasets once, then reopens diskunreadywithtables andbootstrapsready/info6withoutredownload or diskchange. CurrenttestSHA matches; all57productionSwift files unchanged againstbaselinecommit; temporarydiagnostics removed.",
+        "traceGate": "Allthree actualnativePASS44.634/37.580/37.736logs andtracehashes match; eachretainedfilteredtrace has exact8listed initialfailure\u2192Retryaction/task\u2192newuncancelledbootstrap/infoBuild\u2192ready events,0observedprototype markers. Only successfulrunswerecaptured. No retainedoldtracebinary/negativebranch guarantee or failing-tap attribution isclaimed.",
+        "forensicGate": "Copiedforensic JSON exactly matches independentlycreated originaldecodedtap/screenshot/hierarchy record. Exacttap220,512.333 and440x956portrait insideprintedRetryframe, withinAXrounding; initial/finalerrorPNGhash equality and unavailabledeleteOnSuccess successfulevent snapshots remain explicitlimits.",
+        "preservedHarnessFailure": "First108unitrunfailed incorrectprebootstrap constructorreadinessassertion atline74; rawfailedlogSHA verified. Correctedtestexpectationmodels actualinitcontract andcurrent108unitrunpasses without productchange. This unittestharnesserror doesnotexplain originalnative147.669FAIL.",
+        "privacy": "ThreeJSON filescontainanonymous testcase/eventgeometry/digest/count/result metadata only; no accountidentity/credentials/URLs/privatepaths/personalmedia.",
+        "caseClosureApproved": false,
+        "originalCaseStatus": "P01-008 remainsFAIL/open. Three traced successes anddeterministicpublic service/disk seam recovery donotestablish originalfailurecause orfix.",
+        "limitations": [
+          "No originalcasepromotion or broaderreliability/fullQA claim.",
+          "Successfultrace noobservedprototypeaction isnotproof prototypeinterception neverhappens; no originalfailedbranch captured.",
+          "Service/diskunit doesnotexercise nativeSwiftUIhitdelivery.",
+          "PhysicalcameraUNTESTED;Yahoobackend-onlyUNVERIFIED."
+        ],
+        "resourcesOpened": "None; read-only original artifacts and authorizedcandidate proofmetadata only."
+      }
     }
   ],
-  "proofIndexCount": 61,
-  "indexedArtifactCount": 1023,
+  "proofIndexCount": 62,
+  "indexedArtifactCount": 1026,
   "originalEvidenceIntact": true,
   "excludedTypes": [
     "raw logs",
@@ -612,58 +642,58 @@
   "documents": [
     {
       "path": "IOS_TEST_EXECUTION_REPORT.md",
-      "bytes": 78337,
-      "sha256": "cb277afe4d93b0175e1e4e610b2566f1084fb5c13e028930644af626f4e5f59e"
+      "bytes": 79911,
+      "sha256": "ea3a8b93f851e8c323fe4cd2526067622d406b3ec761a7ce67872197eba7232f"
     },
     {
       "path": "IOS-FUNCTIONAL-PARITY-MATRIX.md",
-      "bytes": 78406,
-      "sha256": "3e123f1fc64a24dd04f91d09613ef2b86cde461608310e2e7cb538a02ae702b4"
+      "bytes": 79980,
+      "sha256": "31fd2dbdb2f36dd212d088b0ca18193eccebfb414bd7fc27fe85daa7b02b64e6"
     },
     {
       "path": "IOS-FIGMA-PARITY.md",
-      "bytes": 74447,
-      "sha256": "26fab00c11f9f01755c8c1cf7948c341c52ba0ef1552a980c3bbe05f5a86d8d3"
+      "bytes": 76021,
+      "sha256": "1c02e575039fc2ab02f9445778f8bdb16579110cc4068735de87490fdecf476c"
     },
     {
       "path": "BACKEND-ISSUES-FOR-CLIENT.md",
-      "bytes": 77895,
-      "sha256": "306d7c0f56b338d200085dcc4aa2c2207b868a60816dbe1468a54127d87a9644"
+      "bytes": 79469,
+      "sha256": "82128d560b152d23ca6401ed89b3e05b1d5116542b78c3e65da873e4c21dfaa1"
     },
     {
       "path": "QA-CASE-MANIFEST.md",
-      "bytes": 518122,
-      "sha256": "07e735b99c8fbbff1b55992b2a4769992c31e315fa29e32d0697bdf1b6d60719"
+      "bytes": 520000,
+      "sha256": "ea93545e7b49bd825f988e018eba65e6770afba257dac4ce57220e7015b51fd8"
     },
     {
       "path": "EVIDENCE-COVERAGE-MAPPING.md",
-      "bytes": 686127,
-      "sha256": "f9e98e3388b20e225af4ddd17bdb611d4198690507b02db579bae78ade62fa3d"
+      "bytes": 687701,
+      "sha256": "62058444d131f663829fcf32bfb9a41425fc3f89a1497b5eae14d411b3960f48"
     },
     {
       "path": "ACCESSIBILITY-TRIAGE.md",
-      "bytes": 147460,
-      "sha256": "489a7c6262067f418d953d421138560c214ca86c2f1193d341a5a12f96f4e0a0"
+      "bytes": 149034,
+      "sha256": "399234cd98819e38af6db7e870d84a48b22ba4cd26de0f4dd44189d4b621cd15"
     },
     {
       "path": "NATIVE-SIGNUP-EXECUTION.md",
-      "bytes": 143450,
-      "sha256": "38919d409d9aebffda1ba2ac9870eee07b60ede85851e95c66678a5e2bb008aa"
+      "bytes": 145024,
+      "sha256": "60f3ffb3da565724fcde1bf7513005100e091278181c1cc70b45ac7e6ccaaa4e"
     },
     {
       "path": "CROSS-ROLE-EXECUTION.md",
-      "bytes": 144692,
-      "sha256": "b46eb7f8b25f7681fb5de7b93060e763323b9e38cbf41f001529f7a3bb52c557"
+      "bytes": 146266,
+      "sha256": "5ca5215045386e03a11d60ae1becaf350014bf8c0c92b9ece4eb9fed8ce5b627"
     },
     {
       "path": "README.md",
-      "bytes": 40473,
-      "sha256": "add96c0e4ffda670a90ec5d09f12b792df2492dd272d383ace2f98e37349488c"
+      "bytes": 42047,
+      "sha256": "37132ab860b837493d5033c7f3446d0bfe942013058ecd39215d1f419bbcf926"
     }
   ],
   "readme": {
     "path": "README.md",
-    "bytes": 40473,
-    "sha256": "add96c0e4ffda670a90ec5d09f12b792df2492dd272d383ace2f98e37349488c"
+    "bytes": 42047,
+    "sha256": "37132ab860b837493d5033c7f3446d0bfe942013058ecd39215d1f419bbcf926"
   }
 }

@@ -1,0 +1,13 @@
+{
+  "currentUnitTests": 108,
+  "currentUnitDurationSeconds": 28.702,
+  "newSameStoreTestSeconds": 1.795,
+  "unitLogSHA256": "f2621d8b9032691fe1c83bedd188adb5f1aebeaa2dfceb8403effbe5fafa4464",
+  "newTestFileSHA256": "971dbf5892cefe533e7026f30f32371c538fae2d250c73cf43c70c29d463daf4",
+  "all57ProductionSwiftFingerprintsUnchanged": true,
+  "priorInitialUnitFailure": "Incorrect test expectation that constructor setsready; retained separately and corrected to require readinessonlyafterbootstrap",
+  "priorFailedUnitLogSHA256": "3446cc7c9f65b25f5b62c56b623f44555636f3edfb71a9da9fb3d7d17d92b57f",
+  "coreNativeRetryFailureRemainsOpen": true,
+  "physicalCamera": "UNTESTED",
+  "YahooBackendOnly": "UNVERIFIED"
+}

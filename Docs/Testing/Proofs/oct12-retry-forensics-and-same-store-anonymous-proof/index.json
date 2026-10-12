@@ -1,0 +1,65 @@
+{
+  "title": "Open native Retry failure: original tap forensics and same-store regression",
+  "baselineMainCommitSHA": "1b67c678044906192be2aa0d42e395e947133c3e",
+  "artifacts": [
+    {
+      "path": "Artifacts/original-retry-tap-forensics-anonymous.json",
+      "description": "Original exact tap/window/frame and byte-identical public error pixels; retention limits",
+      "sha256": "01d37e0b383ddaace7e9452f76cfbfba88b8a9d1bb15558fddc245102eeada21",
+      "packagedSha256": "01d37e0b383ddaace7e9452f76cfbfba88b8a9d1bb15558fddc245102eeada21"
+    },
+    {
+      "path": "Artifacts/three-successful-native-traces-anonymous.json",
+      "description": "Only three actual successful trace event sequences; no original failure attribution",
+      "sha256": "e3b6bd2e4d2b7c117328450ff0d0fb560403dcc2831561a2e21080600211ca54",
+      "packagedSha256": "e3b6bd2e4d2b7c117328450ff0d0fb560403dcc2831561a2e21080600211ca54"
+    },
+    {
+      "path": "Artifacts/same-store-retry-current-unit-summary-anonymous.json",
+      "description": "Current108-unit result and public same-store/cache recovery regression; failed harness history retained",
+      "sha256": "4bac5d55c937bd119c8d30d7496c38db685b6588a458c2261414ff05eef3a0c8",
+      "packagedSha256": "4bac5d55c937bd119c8d30d7496c38db685b6588a458c2261414ff05eef3a0c8"
+    }
+  ],
+  "rootReviewed": true,
+  "independentReviewed": true,
+  "rootReviewScope": "Original raw failure event/tree/PNG facts, three completed native logs/traces, corrected108-unit run and current46-line test diff inspected; no original failure fix inferred",
+  "scopeLimits": [
+    "P01-008 remains FAIL/open; no initialfailure cause or fix proven",
+    "Three successful traced runs only; marker absence is observed in retained log, no failed tap branch captured",
+    "Firstunit failure was incorrectconstructor-readiness test expectation; correctedwithout productcodechange and rawfailure preserved",
+    "All57 production Swift hashes unchanged; temporarydiagnosticsremoved",
+    "No neworiginalcaseclosure, physicalcamera, Yahoo backend-only orfullQA claim"
+  ],
+  "independentReview": {
+    "reviewer": "Independent startup QA verifier /root/cache_review",
+    "checkedAtUTC": "2026-10-12T04:27:39.833695+00:00",
+    "verdict": "PASS for evidence and same-store regression; P01-008 remainsFAIL/open without established originalcause or productfix",
+    "artifactCount": 3,
+    "allArtifactHashesMatched": true,
+    "currentUnitTests": 108,
+    "currentUnitDurationSeconds": 28.702,
+    "newSameStoreTestSeconds": 1.795,
+    "newUnitSourceSHA256": "971dbf5892cefe533e7026f30f32371c538fae2d250c73cf43c70c29d463daf4",
+    "sourceGate": "New46lineBaseCacheTests method uses same store through offline4metadata retries\u2192onlineinfo5+22datasets once, then reopens diskunreadywithtables andbootstrapsready/info6withoutredownload or diskchange. CurrenttestSHA matches; all57productionSwift files unchanged againstbaselinecommit; temporarydiagnostics removed.",
+    "traceGate": "Allthree actualnativePASS44.634/37.580/37.736logs andtracehashes match; eachretainedfilteredtrace has exact8listed initialfailure\u2192Retryaction/task\u2192newuncancelledbootstrap/infoBuild\u2192ready events,0observedprototype markers. Only successfulrunswerecaptured. No retainedoldtracebinary/negativebranch guarantee or failing-tap attribution isclaimed.",
+    "forensicGate": "Copiedforensic JSON exactly matches independentlycreated originaldecodedtap/screenshot/hierarchy record. Exacttap220,512.333 and440x956portrait insideprintedRetryframe, withinAXrounding; initial/finalerrorPNGhash equality and unavailabledeleteOnSuccess successfulevent snapshots remain explicitlimits.",
+    "preservedHarnessFailure": "First108unitrunfailed incorrectprebootstrap constructorreadinessassertion atline74; rawfailedlogSHA verified. Correctedtestexpectationmodels actualinitcontract andcurrent108unitrunpasses without productchange. This unittestharnesserror doesnotexplain originalnative147.669FAIL.",
+    "privacy": "ThreeJSON filescontainanonymous testcase/eventgeometry/digest/count/result metadata only; no accountidentity/credentials/URLs/privatepaths/personalmedia.",
+    "caseClosureApproved": false,
+    "originalCaseStatus": "P01-008 remainsFAIL/open. Three traced successes anddeterministicpublic service/disk seam recovery donotestablish originalfailurecause orfix.",
+    "limitations": [
+      "No originalcasepromotion or broaderreliability/fullQA claim.",
+      "Successfultrace noobservedprototypeaction isnotproof prototypeinterception neverhappens; no originalfailedbranch captured.",
+      "Service/diskunit doesnotexercise nativeSwiftUIhitdelivery.",
+      "PhysicalcameraUNTESTED;Yahoobackend-onlyUNVERIFIED."
+    ],
+    "resourcesOpened": "None; read-only original artifacts and authorizedcandidate proofmetadata only."
+  },
+  "publicPackage": {
+    "rootReviewed": true,
+    "independentReviewed": true,
+    "originalEvidencePreserved": true,
+    "rawLogsXCResultsFullScreenPhotosPrivateFixturesIncluded": false
+  }
+}
