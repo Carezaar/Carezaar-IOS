@@ -1,0 +1,107 @@
+{
+  "title": "Committed Splash fix: clean build and native role/loading smoke",
+  "sourceCommitSHA": "e60e3f1eec841741461516e528cc82779114c266",
+  "artifacts": [
+    {
+      "path": "Artifacts/client-D92A52E4-8830-4574-9755-353776A4331F.json",
+      "description": "P02-012-typed-login-role-list-loaded-client_0_853CDB8D-F874-420D-B2A9-7731F3C9B231.json",
+      "sha256": "70ae2deb3b10da0a8d2a8878976888f93ccee043465035916705cbd627c6b598",
+      "packagedSha256": "70ae2deb3b10da0a8d2a8878976888f93ccee043465035916705cbd627c6b598"
+    },
+    {
+      "path": "Artifacts/client-54DA3335-5BE9-408D-841F-4BC615824BC9.json",
+      "description": "P02-012-public-sign-in-ready-client_0_EBBA1CA0-AAAD-4416-9ADD-4D1554C05D64.json",
+      "sha256": "aeea1cf1a92d5c2fc751544a26507d93ce16c94d062231874b4142e5856224c4",
+      "packagedSha256": "aeea1cf1a92d5c2fc751544a26507d93ce16c94d062231874b4142e5856224c4"
+    },
+    {
+      "path": "Artifacts/caregiver-D86B96A4-51A3-4CBD-A5CD-AA186EC6A0DD.json",
+      "description": "P02-012-typed-login-role-list-loaded-caregiver_0_1D582F30-45A8-47E8-A375-2AF694259B1D.json",
+      "sha256": "07c5040106ca935c6ad8c039ef82fff46f4747af1be88a33aff259b7ea3c6da7",
+      "packagedSha256": "07c5040106ca935c6ad8c039ef82fff46f4747af1be88a33aff259b7ea3c6da7"
+    },
+    {
+      "path": "Artifacts/caregiver-77AB4526-5D55-4807-A34F-DBBE49C88FD3.json",
+      "description": "P02-012-public-sign-in-ready-caregiver_0_8406E17C-76E9-44C0-95E4-81A55F4122FA.json",
+      "sha256": "3e5a92c4bbb682374639554bb37ed022525d263f480e4bb0847b214c2518a3e0",
+      "packagedSha256": "3e5a92c4bbb682374639554bb37ed022525d263f480e4bb0847b214c2518a3e0"
+    },
+    {
+      "path": "Artifacts/splash-206551E0-D2B7-4204-8127-14F36440058C.json",
+      "description": "splash-loading-copy-native-geometry_0_649133A4-0A67-42AA-810E-5744D3D46418.json",
+      "sha256": "4428c7b746bddae7edfeb9048105b0c8754a56edfb6401857eb71713a9ee115d",
+      "packagedSha256": "4428c7b746bddae7edfeb9048105b0c8754a56edfb6401857eb71713a9ee115d"
+    },
+    {
+      "path": "Artifacts/splash-E1E35D88-42EA-45B4-B223-7E13338DFE5A.png",
+      "description": "splash-loading-public-full-viewport_0_D403FC72-CF31-47E0-A007-20F482A37B30.png",
+      "sha256": "d2d1a36b9ca06d5691f9507110ad72ba7a07a28ca71c9336806236d8e0f5a5e1",
+      "packagedSha256": "d2d1a36b9ca06d5691f9507110ad72ba7a07a28ca71c9336806236d8e0f5a5e1"
+    },
+    {
+      "path": "Artifacts/oct12-splash-postpush-summary-anonymous.json",
+      "description": "Fresh clean build and native role/loading smoke summary",
+      "sha256": "72fd1d1433c568e0363e5aebcb2f6fdb45fc565626d250c00ba41d589341f327",
+      "packagedSha256": "72fd1d1433c568e0363e5aebcb2f6fdb45fc565626d250c00ba41d589341f327"
+    }
+  ],
+  "results": [
+    {
+      "role": "client",
+      "status": "PASS",
+      "seconds": 28.327,
+      "logSHA256": "920cec1e96577a2b301c3c0f1513eaa723c22749e85287318595b5da4572cc5b"
+    },
+    {
+      "role": "caregiver",
+      "status": "PASS",
+      "seconds": 26.698,
+      "logSHA256": "ba2a034543f01a016968a7551fa404106e2ae200c279317bb3fe43caf5d9f883"
+    },
+    {
+      "role": "splash",
+      "status": "PASS",
+      "seconds": 5.742,
+      "logSHA256": "e6e0a682ed26d14569e572298e71916b44296fb84effb5fae912ca6f9d25e38a"
+    }
+  ],
+  "rootReviewed": true,
+  "independentReviewed": true,
+  "scopeLimits": [
+    "No new original case closure; broader QA remains incomplete",
+    "Setup API authentication separate from native counts; no list deduplication claim",
+    "Shared English Splash at Modern Large; earlier separately reviewed proof covers Small/Modern Large/A5",
+    "Physical camera and Yahoo backend-only attribution remain unverified"
+  ],
+  "rootReviewScope": "Actual six anonymous native role/OCR/summary JSONs and one public full-viewport loading PNG inspected; complete copy visible; composite AX inset diagnostics retained; no private identities or media",
+  "independentReview": {
+    "reviewer": "Independent cache and Splash QA verifier /root/cache_review",
+    "checkedAtUTC": "2026-10-12T03:48:23.855794+00:00",
+    "verdict": "PASS for committed-source clean build and both-role typed Sign In/Modern Large public Splash smoke only",
+    "scope": "Seven artifacts: six anonymous JSONs and one actual public loading PNG; completed clean build/client28.327/caregiver26.698/splash5.742 logs and relevant committed source/tests verified.",
+    "artifactCount": 7,
+    "allArtifactHashesMatched": true,
+    "cleanBuildAndThreeCompletedLogHashesMatched": true,
+    "localSourceAndBothExecutedUITestFilesMatchCommit": true,
+    "sourceCommitSHA": "e60e3f1eec841741461516e528cc82779114c266",
+    "nativeCounters": "Before submit all native auth/login/refresh/role-list counts zero. After one native Sign In tap each role: exactly1login/1auth-info,0refresh,0opposite-role listGET; clientcorrectlist2/caregiver1, no dedup claim.",
+    "loadingPixels": "Viewed actual1320x2868 ModernLarge loading PNG: public three fullcopystrings visible without apparent overlap; OCR proof agrees. CompositeAXoutside dueSourceTextdrawinginsets remainsdiagnostic, not universalcontainment/a11y claim.",
+    "privacy": "Six JSONs and publicloadingPNG contain public brand/copy/status/OCR geometry plus anonymous case/role/count/build/hash metadata only; no private identities/credentials/paths/profile/chat/relationship/personalmedia.",
+    "limitations": [
+      "No new originalcase promotion or widerfullQA/accessibility claim.",
+      "Role fixture authentication/identitychecks occur in runner separately from native counts.",
+      "No listdeduplication claim; clientcorrectlistcount2.",
+      "This postpushSplash allocation is ModernLarge only; separatelyreviewed earlier evidence covers Small/ModernLarge/A5.",
+      "Sourcefontsremainfixed; noDynamicTypegrowth claim.",
+      "Root supplied remotepush/sixfile verification; reviewer checked localcommitted relevant source/test bytes and actual native logs/artifacts.",
+      "Physicalcamera andYahoo backend-only attribution remainunverified."
+    ],
+    "resourcesOpened": "None."
+  },
+  "publicPackage": {
+    "rootReviewed": true,
+    "independentReviewed": true,
+    "originalEvidencePreserved": true,
+    "rawLogsXCResultsFullScreenPhotosPrivateFixturesIncluded": false
+  }
+}

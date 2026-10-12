@@ -1,5 +1,5 @@
 {
-  "status": "Focused Splash viewport and hint contrast correction independently verified locally; source/report delivery pending; full original QA remains incomplete and case counts unchanged",
+  "status": "Splash fix delivered at e60e3f1; post-push clean build and both-role Sign In plus rendered loading smoke verified; full original QA incomplete",
   "reports": [
     "IOS_TEST_EXECUTION_REPORT.md",
     "IOS-FUNCTIONAL-PARITY-MATRIX.md",
@@ -495,10 +495,39 @@
         "resourcesOpened": "None; local artifact inspection and authorized proof metadata update only.",
         "previousReviewReference": "previous15ArtifactIndependentReview: preserved independent review of first15artifacts, actual6PNG/OCR/color/source/current107units checks; first15hashes reverified unchanged in this incremental review."
       }
+    },
+    {
+      "index": "Proofs/oct12-splash-postpush-smoke-anonymous-proof/index.json",
+      "artifactCount": 7,
+      "bytes": 366307,
+      "reviewProvenance": {
+        "reviewer": "Independent cache and Splash QA verifier /root/cache_review",
+        "checkedAtUTC": "2026-10-12T03:48:23.855794+00:00",
+        "verdict": "PASS for committed-source clean build and both-role typed Sign In/Modern Large public Splash smoke only",
+        "scope": "Seven artifacts: six anonymous JSONs and one actual public loading PNG; completed clean build/client28.327/caregiver26.698/splash5.742 logs and relevant committed source/tests verified.",
+        "artifactCount": 7,
+        "allArtifactHashesMatched": true,
+        "cleanBuildAndThreeCompletedLogHashesMatched": true,
+        "localSourceAndBothExecutedUITestFilesMatchCommit": true,
+        "sourceCommitSHA": "e60e3f1eec841741461516e528cc82779114c266",
+        "nativeCounters": "Before submit all native auth/login/refresh/role-list counts zero. After one native Sign In tap each role: exactly1login/1auth-info,0refresh,0opposite-role listGET; clientcorrectlist2/caregiver1, no dedup claim.",
+        "loadingPixels": "Viewed actual1320x2868 ModernLarge loading PNG: public three fullcopystrings visible without apparent overlap; OCR proof agrees. CompositeAXoutside dueSourceTextdrawinginsets remainsdiagnostic, not universalcontainment/a11y claim.",
+        "privacy": "Six JSONs and publicloadingPNG contain public brand/copy/status/OCR geometry plus anonymous case/role/count/build/hash metadata only; no private identities/credentials/paths/profile/chat/relationship/personalmedia.",
+        "limitations": [
+          "No new originalcase promotion or widerfullQA/accessibility claim.",
+          "Role fixture authentication/identitychecks occur in runner separately from native counts.",
+          "No listdeduplication claim; clientcorrectlistcount2.",
+          "This postpushSplash allocation is ModernLarge only; separatelyreviewed earlier evidence covers Small/ModernLarge/A5.",
+          "Sourcefontsremainfixed; noDynamicTypegrowth claim.",
+          "Root supplied remotepush/sixfile verification; reviewer checked localcommitted relevant source/test bytes and actual native logs/artifacts.",
+          "Physicalcamera andYahoo backend-only attribution remainunverified."
+        ],
+        "resourcesOpened": "None."
+      }
     }
   ],
-  "proofIndexCount": 58,
-  "indexedArtifactCount": 1000,
+  "proofIndexCount": 59,
+  "indexedArtifactCount": 1007,
   "originalEvidenceIntact": true,
   "excludedTypes": [
     "raw logs",
@@ -520,53 +549,53 @@
   "documents": [
     {
       "path": "IOS_TEST_EXECUTION_REPORT.md",
-      "bytes": 76292,
-      "sha256": "466aa7c549236aa074194e39ca1e20b77b5fbdb79c73ce054713ff50145a136d"
+      "bytes": 76876,
+      "sha256": "dffc9803557346ebec347f1514501ca85b88b516f74e3e2e18a1308282cb0b01"
     },
     {
       "path": "IOS-FUNCTIONAL-PARITY-MATRIX.md",
-      "bytes": 76361,
-      "sha256": "776fca4eea0c7a9ce06ce30625ed97275b0fea1015fffdcfba0776eb65cc5824"
+      "bytes": 76945,
+      "sha256": "191afa528c628767c5f7d76ddd6faf95154070395e1a0768da8a6c3a80776878"
     },
     {
       "path": "IOS-FIGMA-PARITY.md",
-      "bytes": 72402,
-      "sha256": "c45e277ad64b9d74d7099730deec22aaf718aa2e8dc3c21c31ad71da3b27f33a"
+      "bytes": 72986,
+      "sha256": "4eda29b6fca91c605577d33f2614b18804e5265199512180903e0fe154d2cfda"
     },
     {
       "path": "BACKEND-ISSUES-FOR-CLIENT.md",
-      "bytes": 75850,
-      "sha256": "4dfd6352e77b87c0ee7b442e74c38c45483ad236f1d8db83ab86fbe04c56c89b"
+      "bytes": 76434,
+      "sha256": "22c47d8f1510062522b0d51ad8a66ee856487247a6203ddfa4704225be4aeaf9"
     },
     {
       "path": "QA-CASE-MANIFEST.md",
-      "bytes": 515641,
-      "sha256": "1fa3b698330457e7ac4d7806eecb9a443a124d5b07164b0b5a704a061cc1d61d"
+      "bytes": 516225,
+      "sha256": "18f4cacd8782cd397f6341e66dcd6dce2d82ad7af572bd010a1af0a76782b17b"
     },
     {
       "path": "EVIDENCE-COVERAGE-MAPPING.md",
-      "bytes": 684082,
-      "sha256": "17f658809d5cb70defd56e5e98bec7618a7d45d5f33f7d549ce3626930b6b5db"
+      "bytes": 684666,
+      "sha256": "b167a08157d85145b315f7eda61e5642811963a1887d9de68ae34a4983050baa"
     },
     {
       "path": "ACCESSIBILITY-TRIAGE.md",
-      "bytes": 145415,
-      "sha256": "431013385c562673b8ebbdf0d0bf1027960a0728bbd8fb85460a2358472fa2ce"
+      "bytes": 145999,
+      "sha256": "2d9ab22e2d8c75b7229c23d2f6d02043e0ac5830f7441f47099ffb4d5d507fd2"
     },
     {
       "path": "NATIVE-SIGNUP-EXECUTION.md",
-      "bytes": 141405,
-      "sha256": "349c23b0eab739d9722040fd6db4c19f2741ab080695e87aa577146fecc4896c"
+      "bytes": 141989,
+      "sha256": "c6634ccfb3f75112c10bf82ed2f6fdad93f721a071113194793ab095b110a4e9"
     },
     {
       "path": "CROSS-ROLE-EXECUTION.md",
-      "bytes": 142647,
-      "sha256": "96638dce86d08be855bbd373bff9a3dfe1a5cf2d9065957ecae76608ed01d6a1"
+      "bytes": 143231,
+      "sha256": "82f9c03b508c0be7525892f908af41013ab3e8b80acab11198253c1884a3f30f"
     },
     {
       "path": "README.md",
-      "bytes": 38428,
-      "sha256": "61b156d1a51b29c9bad2ce63cce7876bf885074b3ed5d8fe7188820b92961775"
+      "bytes": 39012,
+      "sha256": "634cf4140e64006935c02d876c167abf29b0a00a19ee5bccbd302c3734f44032"
     }
   ],
   "readme": {

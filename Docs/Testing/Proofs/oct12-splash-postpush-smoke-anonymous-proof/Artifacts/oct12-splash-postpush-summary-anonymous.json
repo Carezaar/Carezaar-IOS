@@ -1,0 +1,30 @@
+{
+  "sourceCommitSHA": "e60e3f1eec841741461516e528cc82779114c266",
+  "cleanBuild": "PASS",
+  "cleanBuildLogSHA256": "04062a01b51736d3cdfbb620333b3c9e7c3088c1ebb32a554dedb87832ff30ec",
+  "results": [
+    {
+      "role": "client",
+      "status": "PASS",
+      "seconds": 28.327,
+      "logSHA256": "920cec1e96577a2b301c3c0f1513eaa723c22749e85287318595b5da4572cc5b"
+    },
+    {
+      "role": "caregiver",
+      "status": "PASS",
+      "seconds": 26.698,
+      "logSHA256": "ba2a034543f01a016968a7551fa404106e2ae200c279317bb3fe43caf5d9f883"
+    },
+    {
+      "role": "splash",
+      "status": "PASS",
+      "seconds": 5.742,
+      "logSHA256": "e6e0a682ed26d14569e572298e71916b44296fb84effb5fae912ca6f9d25e38a"
+    }
+  ],
+  "freshDerivedData": true,
+  "setupAuthenticationSeparate": true,
+  "originalCaseCountsUnchanged": true,
+  "physicalCamera": "UNTESTED",
+  "YahooBackendOnly": "UNVERIFIED"
+}
