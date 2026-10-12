@@ -1,0 +1,86 @@
+{
+  "title": "Committed corrupted-cache regression: post-push clean build and both-role Sign In smoke",
+  "sourceCommitSHA": "3c4d75fd641efea0a68c4f4e93ad578e013801cd",
+  "rootReviewed": true,
+  "independentReviewed": true,
+  "rootReviewScope": "Four actual anonymous native JSONs and actual completed build/role logs inspected; no pixel or broader QA claim",
+  "artifacts": [
+    {
+      "path": "Artifacts/client-EA576189-0209-4899-A25F-CDFC0FDCD8AE.json",
+      "description": "P02-012-typed-login-role-list-loaded-client_0_893ADBFA-C137-481C-8D2D-E199BC7C5F39.json",
+      "sha256": "70ae2deb3b10da0a8d2a8878976888f93ccee043465035916705cbd627c6b598",
+      "packagedSha256": "70ae2deb3b10da0a8d2a8878976888f93ccee043465035916705cbd627c6b598"
+    },
+    {
+      "path": "Artifacts/client-EA736FF0-AA45-42E5-BB50-D14EB61FFA26.json",
+      "description": "P02-012-public-sign-in-ready-client_0_170F4D63-0E66-4523-9D9F-7F6677795FA0.json",
+      "sha256": "aeea1cf1a92d5c2fc751544a26507d93ce16c94d062231874b4142e5856224c4",
+      "packagedSha256": "aeea1cf1a92d5c2fc751544a26507d93ce16c94d062231874b4142e5856224c4"
+    },
+    {
+      "path": "Artifacts/caregiver-79E3BA67-AE2B-4F13-BA2B-C553ED97B382.json",
+      "description": "P02-012-typed-login-role-list-loaded-caregiver_0_E284B95E-6680-489D-A57F-8A3954E1721E.json",
+      "sha256": "07c5040106ca935c6ad8c039ef82fff46f4747af1be88a33aff259b7ea3c6da7",
+      "packagedSha256": "07c5040106ca935c6ad8c039ef82fff46f4747af1be88a33aff259b7ea3c6da7"
+    },
+    {
+      "path": "Artifacts/caregiver-D84F89E5-1CE5-402C-ACE2-EE40E690A575.json",
+      "description": "P02-012-public-sign-in-ready-caregiver_0_CF95D89D-AD80-48A2-9B6C-4A21754715F5.json",
+      "sha256": "3e5a92c4bbb682374639554bb37ed022525d263f480e4bb0847b214c2518a3e0",
+      "packagedSha256": "3e5a92c4bbb682374639554bb37ed022525d263f480e4bb0847b214c2518a3e0"
+    },
+    {
+      "path": "Artifacts/postpush-build-and-role-smoke-summary-anonymous.json",
+      "description": "Actual clean build and both completed role smoke outcomes against remotely verified committed source",
+      "sha256": "9828b32c51168a18fc98e94655575007525d3fcb1eba9bb3b635b95f7241e839",
+      "packagedSha256": "9828b32c51168a18fc98e94655575007525d3fcb1eba9bb3b635b95f7241e839"
+    }
+  ],
+  "roleResults": [
+    {
+      "role": "client",
+      "status": "PASS",
+      "seconds": 28.326,
+      "logSHA256": "1465317370f5d122c38bc4eda4b0462a348a33f60f1372f25f76704ea10097c7"
+    },
+    {
+      "role": "caregiver",
+      "status": "PASS",
+      "seconds": 27.19,
+      "logSHA256": "15ccb83f7b8196868ddaea3b741abde3a9bbff5d93ec1f1d5198893b68425468"
+    }
+  ],
+  "originalCaseCountsUnchanged": true,
+  "scopeLimitations": "No new original case closure; physical camera and broader QA remain unverified",
+  "independentReview": {
+    "reviewer": "Independent cache QA verifier /root/cache_review",
+    "checkedAtUTC": "2026-10-12T01:38:54.498243+00:00",
+    "verdict": "PASS for committed-source clean Debug test build and both-role native typed Sign In smoke only",
+    "scope": "Five anonymous JSON artifacts, completed clean-build log, both actual typed-sign-in logs and NativeLoginRoleUITests source; no pixels reviewed or claimed.",
+    "artifactCount": 5,
+    "allArtifactHashesMatched": true,
+    "buildAndBothRoleLogHashesMatched": true,
+    "nativePreTapAuthInfoLoginRefreshAndBothRoleListCountsZero": true,
+    "nativeOneLoginPerRoleCorrectRoleListNoOppositeListAndZeroRefresh": true,
+    "correctRoleListAttempts": {
+      "client": 2,
+      "caregiver": 1
+    },
+    "setupAuthentication": "Separate test-runner API fixture login/me validates exact owned role/ID before launch and is outside native transport ledger.",
+    "privacy": "All five JSON files contain anonymous case/stage/role/counter/hash/source-commit/build-result metadata only; no identity, credentials, private paths, profile/message/relationship/personal-media content.",
+    "limitations": [
+      "No new original case closure.",
+      "Client correct-role list was requested twice; this smoke asserts at least one correct-role load and does not prove list de-duplication.",
+      "Loaded card/managed empty-state and navigation gates passed in native test; no pixel/a11y/full-screen rendering review represented.",
+      "Physical camera, Yahoo backend-only attribution and wider QA remain unverified."
+    ],
+    "sourceCommitSHA": "3c4d75fd641efea0a68c4f4e93ad578e013801cd",
+    "resourcesOpened": "None."
+  },
+  "publicPackage": {
+    "rootReviewed": true,
+    "independentReviewed": true,
+    "originalEvidencePreserved": true,
+    "rawLogsXCResultsFullScreenPhotosPrivateFixturesIncluded": false
+  }
+}

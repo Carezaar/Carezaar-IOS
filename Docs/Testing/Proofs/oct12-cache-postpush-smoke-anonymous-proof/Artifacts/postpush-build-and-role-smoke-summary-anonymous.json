@@ -1,0 +1,23 @@
+{
+  "sourceCommitSHA": "3c4d75fd641efea0a68c4f4e93ad578e013801cd",
+  "cleanBuild": "PASS",
+  "cleanBuildLogSHA256": "9394a76b766cee0fe8b3d4410853aa10f793cf8ae056b040fc8040da69c08afc",
+  "roleResults": [
+    {
+      "role": "client",
+      "status": "PASS",
+      "seconds": 28.326,
+      "logSHA256": "1465317370f5d122c38bc4eda4b0462a348a33f60f1372f25f76704ea10097c7"
+    },
+    {
+      "role": "caregiver",
+      "status": "PASS",
+      "seconds": 27.19,
+      "logSHA256": "15ccb83f7b8196868ddaea3b741abde3a9bbff5d93ec1f1d5198893b68425468"
+    }
+  ],
+  "scope": "Committed native source; real typed public Sign In, one native login per role, correct role loaded, no hidden login or refresh; setup API authentication separate",
+  "productionReady": false,
+  "physicalCamera": "UNTESTED",
+  "YahooBackendOnly": "UNVERIFIED"
+}

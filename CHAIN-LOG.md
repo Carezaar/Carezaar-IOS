@@ -292,3 +292,5 @@ The native Swift checkout is the delivery project. The client brief takes preced
 
 | Oct12-cache-recovery | iterate-until-verified | Actual corrupt-file witnesses, four native online recovery passes and 28 independently reviewed artifacts close only P01-006; source57 hashes unchanged; broader QA remains open | CarezaarUITests/StartupGateUITests.swift; Docs/Testing reports/proof/inventory; private QA helpers/evidence |
 | Oct12-cache-report | humanizer | Applied embedded prose rewrite: outcome first, exact observed checks/counts and limits, preserved historical findings without invented broader passes | 19 governing report sections and package document hashes |
+
+| Oct12-cache-postpush | iterate-until-verified + humanizer | Actual committed clean build and native client28.326/caregiver27.190 sign-in passes verified with five reviewed anonymous records; existing source/tests unchanged for final docs update; open cases retained | Docs/Testing reports/proof/inventory; private build, native results and cleanup record |

@@ -1,5 +1,5 @@
 {
-  "status": "Production source commit d99543510d7dfcefd130511531d994d5b719050d remains delivered; added invalid-cache UI regression and reviewed online recovery proof included in this update; full QA incomplete",
+  "status": "Production source remains unchanged; invalid-cache regression commit3c4d75fd641efea0a68c4f4e93ad578e013801cd pushed and remotely verified; required post-push clean build and both-role typed smoke passed; these final verification reports are included in this documentation-only update; full QA remains incomplete",
   "reports": [
     "IOS_TEST_EXECUTION_REPORT.md",
     "IOS-FUNCTIONAL-PARITY-MATRIX.md",
@@ -361,10 +361,40 @@
         ],
         "resourcesOpened": "None; read-only local artifact viewing and proof metadata update only."
       }
+    },
+    {
+      "index": "Proofs/oct12-cache-postpush-smoke-anonymous-proof/index.json",
+      "artifactCount": 5,
+      "bytes": 2008,
+      "reviewProvenance": {
+        "reviewer": "Independent cache QA verifier /root/cache_review",
+        "checkedAtUTC": "2026-10-12T01:38:54.498243+00:00",
+        "verdict": "PASS for committed-source clean Debug test build and both-role native typed Sign In smoke only",
+        "scope": "Five anonymous JSON artifacts, completed clean-build log, both actual typed-sign-in logs and NativeLoginRoleUITests source; no pixels reviewed or claimed.",
+        "artifactCount": 5,
+        "allArtifactHashesMatched": true,
+        "buildAndBothRoleLogHashesMatched": true,
+        "nativePreTapAuthInfoLoginRefreshAndBothRoleListCountsZero": true,
+        "nativeOneLoginPerRoleCorrectRoleListNoOppositeListAndZeroRefresh": true,
+        "correctRoleListAttempts": {
+          "client": 2,
+          "caregiver": 1
+        },
+        "setupAuthentication": "Separate test-runner API fixture login/me validates exact owned role/ID before launch and is outside native transport ledger.",
+        "privacy": "All five JSON files contain anonymous case/stage/role/counter/hash/source-commit/build-result metadata only; no identity, credentials, private paths, profile/message/relationship/personal-media content.",
+        "limitations": [
+          "No new original case closure.",
+          "Client correct-role list was requested twice; this smoke asserts at least one correct-role load and does not prove list de-duplication.",
+          "Loaded card/managed empty-state and navigation gates passed in native test; no pixel/a11y/full-screen rendering review represented.",
+          "Physical camera, Yahoo backend-only attribution and wider QA remain unverified."
+        ],
+        "sourceCommitSHA": "3c4d75fd641efea0a68c4f4e93ad578e013801cd",
+        "resourcesOpened": "None."
+      }
     }
   ],
-  "proofIndexCount": 54,
-  "indexedArtifactCount": 945,
+  "proofIndexCount": 55,
+  "indexedArtifactCount": 950,
   "originalEvidenceIntact": true,
   "excludedTypes": [
     "raw logs",
@@ -386,58 +416,58 @@
   "documents": [
     {
       "path": "IOS_TEST_EXECUTION_REPORT.md",
-      "bytes": 71228,
-      "sha256": "c7d3de3be31a7eb553620a4158243d26a2ffcc34c3eb39b5900c54cde908e23a"
+      "bytes": 72773,
+      "sha256": "0455fd35446b06a23bc6a68396bf4530487389c80ba75908ab4a1a8e75f9eb61"
     },
     {
       "path": "IOS-FUNCTIONAL-PARITY-MATRIX.md",
-      "bytes": 71297,
-      "sha256": "dd195fbb2a75b0018c6b90be6acaede67ca0b9469fcf3d0a62a3c1f03ad31182"
+      "bytes": 72842,
+      "sha256": "03c9242ccbc3f403888f3fe394404757c478ed0e2c93229018301e418674bec5"
     },
     {
       "path": "IOS-FIGMA-PARITY.md",
-      "bytes": 67338,
-      "sha256": "7e7f88971c1431e540e6ab2bfd99b7d583df68af124e70f5bfb58c60f5460620"
+      "bytes": 68883,
+      "sha256": "c42f5d42ff85e8cc6e3f37ea5a5fcb7385d906e241400fc9410a444b394afdd9"
     },
     {
       "path": "BACKEND-ISSUES-FOR-CLIENT.md",
-      "bytes": 70786,
-      "sha256": "03f1a4871775d0ab95140dae0cf01561c216542144950d7adb3d7a3c4d47b1cd"
+      "bytes": 72331,
+      "sha256": "f7c24c112510c55670dc74593337d47b810f43eb60dfb61aa1687268ab70c27f"
     },
     {
       "path": "QA-CASE-MANIFEST.md",
-      "bytes": 509223,
-      "sha256": "bf9ef2e291fd3d2d67df256db61bda6add1d379b838051300c51d1c1d441421e"
+      "bytes": 510768,
+      "sha256": "945d068bdc4cbea4d6c7cac98cb5b0ab6a01e35bb0abda40f3ebd46df4843c31"
     },
     {
       "path": "EVIDENCE-COVERAGE-MAPPING.md",
-      "bytes": 677792,
-      "sha256": "cad5bf02c1e8dccd127c7fa3279e5c1be0a4c4c5523a4de3c6bc54ef51aa27f7"
+      "bytes": 679337,
+      "sha256": "df034a947d7647ba042ec2511bcc7c0e8dfdfff84fef64d9ae9a46904cb6d175"
     },
     {
       "path": "ACCESSIBILITY-TRIAGE.md",
-      "bytes": 140351,
-      "sha256": "9e773eb330475e40cf523d1786fc214c44d4dee28ca3d15e92ecd862500ca958"
+      "bytes": 141896,
+      "sha256": "64f30b6b6f52335c22eb67b942184bac4e12bf805b6cd5254a9b1c313b0f2f3a"
     },
     {
       "path": "NATIVE-SIGNUP-EXECUTION.md",
-      "bytes": 136341,
-      "sha256": "fd96a4ebcc9e1257ed340b71b078787d0ac33c87ad09620efaa06c5829af8d7d"
+      "bytes": 137886,
+      "sha256": "164b13ac0e4d11f688e036c230d292b212bb47aea00aeae52aa37cadd6c2ee79"
     },
     {
       "path": "CROSS-ROLE-EXECUTION.md",
-      "bytes": 137583,
-      "sha256": "02f60989cd81e2d3c39677275df29dbed458a782c85cb8d9a7a920a2098f24e7"
+      "bytes": 139128,
+      "sha256": "f6b4af36491ee36a7888ea41a3429ba83bd61610ba623793b5a8788f51b87db2"
     },
     {
       "path": "README.md",
-      "bytes": 33364,
-      "sha256": "5ada0eab5077d4a17a4e1e0420f8b72ab70693131d39d12f70d5d8a04740bbc2"
+      "bytes": 34909,
+      "sha256": "406685f54e59187caced4aa79f5caa37950476e85185f158565c794918550744"
     }
   ],
   "readme": {
     "path": "README.md",
-    "bytes": 33364,
-    "sha256": "5ada0eab5077d4a17a4e1e0420f8b72ab70693131d39d12f70d5d8a04740bbc2"
+    "bytes": 34909,
+    "sha256": "406685f54e59187caced4aa79f5caa37950476e85185f158565c794918550744"
   }
 }
