@@ -1,0 +1,50 @@
+{
+  "nativeExit": 0,
+  "stages": {
+    "failed": {
+      "nativeStageAttachmentObserved": true,
+      "actualCacheFileAbsent": true,
+      "checkedAtUTC": "2026-10-12T04:04:05.098190+00:00",
+      "capturedBeforeTermination": true
+    },
+    "recovered": {
+      "nativeStageAttachmentObserved": true,
+      "schemaVersion": 3,
+      "completeUniqueDatasets": 22,
+      "advertisedCountsChecked": 21,
+      "serverMarker": 1791657662,
+      "checkedAtUTC": "2026-10-12T04:04:35.075950+00:00",
+      "capturedBeforeTermination": true,
+      "cacheSHA256": "62bbc47d0dfa52f64a55dd652b86b2497d6a5fbfb0d991fd9750a7ad187c502c",
+      "counts": {
+        "carespecials": 12,
+        "careconditions": 21,
+        "contents": 515,
+        "experiences": 4,
+        "roles": 6,
+        "genders": 2,
+        "clienttypes": 4,
+        "caredays": 7,
+        "shifts": 7,
+        "worktypes": 5,
+        "languageskills": 11,
+        "issuetypes": 6,
+        "reasons": 14,
+        "commutes": 4,
+        "certifications": 3,
+        "countries": 1,
+        "subjects": 5,
+        "languages": 8,
+        "states": 52,
+        "media": 3,
+        "faqs": 14,
+        "faq_categories": 6
+      }
+    }
+  },
+  "fault": "Debug connection-refused port then same-process native Retry; physical network unchanged",
+  "sharedAnonymousBeforeRoleChoice": true,
+  "accountProfileMessageRelationshipMediaWrites": false,
+  "physicalCameraUsed": false,
+  "failedCacheAbsenceBeforeActualRetryTap": true
+}

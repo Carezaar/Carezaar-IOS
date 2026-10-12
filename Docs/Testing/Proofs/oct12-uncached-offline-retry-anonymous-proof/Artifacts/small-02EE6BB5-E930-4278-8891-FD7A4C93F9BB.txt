@@ -1,0 +1,7 @@
+GET /api/base/careconditions=1
+GET /api/base/caredays=1
+GET /api/base/carespecials=1
+GET /api/base/certifications=1
+GET /api/base/clienttypes=1
+GET /api/base/commutes=1
+GET /api/base/info=5

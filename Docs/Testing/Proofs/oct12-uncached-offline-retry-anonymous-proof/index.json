@@ -1,0 +1,155 @@
+{
+  "title": "Uncached offline startup: native Retry recovery with actual cache witnesses",
+  "results": [
+    {
+      "allocation": "modern",
+      "status": "PASS",
+      "seconds": 39.882,
+      "logSHA256": "8c6f321bb90612407afa4d907dce01a4ac51709aa55f0927fef490abb849d14d"
+    },
+    {
+      "allocation": "small",
+      "status": "PASS",
+      "seconds": 40.365,
+      "logSHA256": "2267ef7d73307dfc98cb6fbc1aafd580bc4f80a17b361a8af6212f77fe99ec92"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "Artifacts/modern-DE2AF22D-F0C4-4B14-88CF-A97D391E3C0C.png",
+      "description": "uncached-offline-retry-public-sign-in-control_0_9A86B636-A2E6-4B7A-85C3-AEBACCEF7713.png",
+      "sha256": "ac90becb8e0855cec9a1eec90524a72745905688b1577d6c6345acc01e9df90f",
+      "packagedSha256": "ac90becb8e0855cec9a1eec90524a72745905688b1577d6c6345acc01e9df90f"
+    },
+    {
+      "path": "Artifacts/modern-1DE355D7-8315-4990-82A2-07B7577C944C.txt",
+      "description": "uncached-offline-retry-complete-reference-ledger_0_DB2A833E-6235-4D34-9EB2-B029D533C198.txt",
+      "sha256": "bb1199387631dabd8596ccf3d771bb356cab244121888f4c590c7f8f2e71622d",
+      "packagedSha256": "bb1199387631dabd8596ccf3d771bb356cab244121888f4c590c7f8f2e71622d"
+    },
+    {
+      "path": "Artifacts/modern-AC31B319-FAEA-44F7-B718-5E7849B8ECAB.txt",
+      "description": "uncached-offline-post-retry-dispatch-ledger_0_73C7F34E-2432-42C2-B690-9F374A3FBA98.txt",
+      "sha256": "aa7c69d3174340adb1e5744d7dbf3dae74a5d62c6d3824a0c1387bf777b1960d",
+      "packagedSha256": "aa7c69d3174340adb1e5744d7dbf3dae74a5d62c6d3824a0c1387bf777b1960d"
+    },
+    {
+      "path": "Artifacts/modern-69BDA135-4E1F-4EE4-A402-03EFC42242FA.png",
+      "description": "uncached-offline-native-retry-error_0_334BEE7F-CE89-431C-9B91-7A137348454D.png",
+      "sha256": "407ec77c08f87416bb14808040fca8224a2fc27c18eac370c47a970243f55132",
+      "packagedSha256": "407ec77c08f87416bb14808040fca8224a2fc27c18eac370c47a970243f55132"
+    },
+    {
+      "path": "Artifacts/modern-07C0AA5F-BDB4-4173-836C-2C05A6A82339.txt",
+      "description": "uncached-offline-failed-reference-ledger_0_8A467430-CFA1-47E1-BA2D-68E8CC48F86C.txt",
+      "sha256": "66d0e88c83805cfbe4a30c5a57154e230d42a5fa9117ce0b6fbc44d129d7ef43",
+      "packagedSha256": "66d0e88c83805cfbe4a30c5a57154e230d42a5fa9117ce0b6fbc44d129d7ef43"
+    },
+    {
+      "path": "Artifacts/modern-cache-witness-anonymous.json",
+      "description": "Actual native failed/recovered cache phase witnesses",
+      "sha256": "b259ab186811e248f4c4f43b3b308412ad89063dd842f5e638c49f525e745f20",
+      "packagedSha256": "b259ab186811e248f4c4f43b3b308412ad89063dd842f5e638c49f525e745f20"
+    },
+    {
+      "path": "Artifacts/small-FF22E1A8-38D8-4792-86C7-109A4B1CED90.png",
+      "description": "uncached-offline-retry-public-sign-in-control_0_BA5DF869-D2DF-4755-8261-A82A4D11597E.png",
+      "sha256": "1465c2415a6bd6d03bdc28cd27f74a19e91873396279336743cbd5c434073d6e",
+      "packagedSha256": "1465c2415a6bd6d03bdc28cd27f74a19e91873396279336743cbd5c434073d6e"
+    },
+    {
+      "path": "Artifacts/small-2E6BF61C-06B3-45EC-B584-FA49AF8013A5.txt",
+      "description": "uncached-offline-retry-complete-reference-ledger_0_1E1F8F78-A220-4C73-89B8-270D9EFBD623.txt",
+      "sha256": "bb1199387631dabd8596ccf3d771bb356cab244121888f4c590c7f8f2e71622d",
+      "packagedSha256": "bb1199387631dabd8596ccf3d771bb356cab244121888f4c590c7f8f2e71622d"
+    },
+    {
+      "path": "Artifacts/small-02EE6BB5-E930-4278-8891-FD7A4C93F9BB.txt",
+      "description": "uncached-offline-post-retry-dispatch-ledger_0_B0CE72F8-66C3-426A-AA5B-8CF545C8200A.txt",
+      "sha256": "de29add12ad7eb520934db8e0e2a1a1dfe5d6cfc1809fe912f02f91905a2fe57",
+      "packagedSha256": "de29add12ad7eb520934db8e0e2a1a1dfe5d6cfc1809fe912f02f91905a2fe57"
+    },
+    {
+      "path": "Artifacts/small-433C14FD-A0ED-42E6-BC84-D3BF99B94229.png",
+      "description": "uncached-offline-native-retry-error_0_EE23E7EE-B020-42DB-8DC4-5947B9BCEA02.png",
+      "sha256": "668d0404425cfad928953d1a9896727b1f1850183c860ff1a63efc442d29b167",
+      "packagedSha256": "668d0404425cfad928953d1a9896727b1f1850183c860ff1a63efc442d29b167"
+    },
+    {
+      "path": "Artifacts/small-9FF081A5-DA2A-4E25-A611-E6CC633AA7AB.txt",
+      "description": "uncached-offline-failed-reference-ledger_0_716857C3-0CA9-4952-9603-A24BCCAC144C.txt",
+      "sha256": "66d0e88c83805cfbe4a30c5a57154e230d42a5fa9117ce0b6fbc44d129d7ef43",
+      "packagedSha256": "66d0e88c83805cfbe4a30c5a57154e230d42a5fa9117ce0b6fbc44d129d7ef43"
+    },
+    {
+      "path": "Artifacts/small-cache-witness-anonymous.json",
+      "description": "Actual native failed/recovered cache phase witnesses",
+      "sha256": "3efc498503978d0c1b7da91e5f8f8c2c5604ab1eab1f7b48f4803b223b2603e4",
+      "packagedSha256": "3efc498503978d0c1b7da91e5f8f8c2c5604ab1eab1f7b48f4803b223b2603e4"
+    },
+    {
+      "path": "Artifacts/initial-failure-813BFCA6-057C-4D41-AD40-F9421BC317BB.png",
+      "description": "uncached-offline-native-retry-error_0_82629460-F224-49AD-B973-CA91A9220F27.png",
+      "sha256": "407ec77c08f87416bb14808040fca8224a2fc27c18eac370c47a970243f55132",
+      "packagedSha256": "407ec77c08f87416bb14808040fca8224a2fc27c18eac370c47a970243f55132"
+    },
+    {
+      "path": "Artifacts/initial-failure-C956005D-915E-44E2-8C9B-ED791D8899C4.txt",
+      "description": "uncached-offline-failed-reference-ledger_0_D81CF35E-BB0D-4E40-BA6C-9C861B93E5D0.txt",
+      "sha256": "66d0e88c83805cfbe4a30c5a57154e230d42a5fa9117ce0b6fbc44d129d7ef43",
+      "packagedSha256": "66d0e88c83805cfbe4a30c5a57154e230d42a5fa9117ce0b6fbc44d129d7ef43"
+    },
+    {
+      "path": "Artifacts/oct12-uncached-offline-retry-anonymous-proof-summary-anonymous.json",
+      "description": "Actual final outcomes and preserved initial failure scope",
+      "sha256": "2bc117c360fd6c986ed09b83657f63ce432e200c958b52bf71a75771c9a64fe2",
+      "packagedSha256": "2bc117c360fd6c986ed09b83657f63ce432e200c958b52bf71a75771c9a64fe2"
+    }
+  ],
+  "rootReviewed": true,
+  "independentReviewed": true,
+  "initialFailurePreservedCauseUnconfirmed": true,
+  "scopeLimits": [
+    "Shared anonymous startup before role selection; no authenticated four-role claim",
+    "Debug connection-refused transport fault; no physical Wi-Fi toggle",
+    "Initial147.669second failure preserved and cause unconfirmed",
+    "No physical camera, Yahoo delivery or full QA claim"
+  ],
+  "rootReviewScope": "Actual final/failure public loading and disabled Sign In control PNGs, native reference ledgers and two timed real cache witnesses inspected; initialfailure retainedcauseunconfirmed; product files matchHEAD",
+  "independentReview": {
+    "reviewer": "Independent cache and startup QA verifier /root/cache_review",
+    "checkedAtUTC": "2026-10-12T04:08:04.510031+00:00",
+    "verdict": "PASS for reviewed evidence of latest nondiagnostic executions; original P01-008 remains OPEN/FAIL due unresolved core Retry failure",
+    "caseClosureApproved": false,
+    "recommendedOriginalCaseStatus": "FAIL/open: scenario executed; initial core recovery failure retained, latest repeats PASS but no product fix or confirmed cause",
+    "caseClosureReason": "Original147.669second failure occurred in the core P01-008 recovery outcome: synthesized native Retry tap produced no fifth metadata transport and Welcome never appeared. Product unchanged and failure cause remainsUNCONFIRMED. Two passing repeats establish latest successes, not resolution/reliable recovery of the prior core failure. Masterbrief\u00a720 requires root-cause investigation for failed checks.",
+    "gateVerdicts": {
+      "latestNativeExecutions": "PASS: Modern39.882/Small40.365seconds, loghashes match, one appLaunch per method. Failedcache gate before realRetry tap, fifthmetadata dispatch within10s, same-process fullrecovery and actual Sign in navigation with exact finalledger.",
+      "cacheAndTransport": "PASS: independently correlated actual failedcacheabsenceUTC with nativeStartTest\u2192Retrytap times: failed4.325/6.705s beforetap25.21/27.37. Recovered captures36.143/36.683s aftertap and beforetermination; preserved schema3cachehashes/exact22dataset21advertised keysets/counts/marker/uniqueIDs verified. Initial ledgerinfo4 only; finalinfo5+all22datasetGETonce.",
+      "source": "PASS: current testSHA matches private sourceinventory; only new70line method plusCHAINdelta; product/source/resources matchHEAD and temporarydiagnostics removed.",
+      "privacyAndPixels": "PASS: all15artifacthashes verified; viewed publicModern/SmallerrorRetry panels and emptySignIncontrol crops plus retained initialfailure image. Files contain publiccopy/count/digest/schema/timing metadata only; no privateidentities/credentials/paths/profile/messages/relationships/personalmedia.",
+      "failurePreservation": "PASS: original147.669FAIL loghash and error/ledger artifacts preserved; diagnosticlog/tracehashes match. DiagnosticPASS didnotidentify originalfailurecause and doesnotconstitute productfix.",
+      "originalCaseClosure": "NOT APPROVED: latestscenario observations pass but coreinitialRetry failure remains unresolved; do not promote P01-008 solely from repeats."
+    },
+    "artifactCount": 15,
+    "pngCount": 5,
+    "textCount": 7,
+    "jsonCount": 3,
+    "newUITestSHA256": "30a54f4ed2bd44f731cb28a069c3dee4625229b54613458a59eee2e83c5cd8ce",
+    "scopeLimits": [
+      "Sharedanonymousstartup beforeeitherrole choice onModern+Small; nofourauthenticatedroleclaim.",
+      "No physicalWiFi switching; controlled connectionrefusedwindow.",
+      "No PASS promotion approved. Recording executed original P01-008 asFAIL/open preserves unresolved core failure.",
+      "No broaderaccessibility/camera/Yahoodelivery/fullQA/reliability claim."
+    ],
+    "resourcesOpened": "None; read-only artifacts and authorized proofmetadata update only.",
+    "caseInventoryTransition": "Root records original P01-008 NOT RUN\u2192FAIL, not PASS. Artifact collector did not mutate counts; originalCaseCountsUnchanged in preserved summary refers to collection stage only and does not describe final case inventory.",
+    "collectorDidNotMutateCaseCounts": true
+  },
+  "publicPackage": {
+    "rootReviewed": true,
+    "independentReviewed": true,
+    "originalEvidencePreserved": true,
+    "rawLogsXCResultsFullScreenPhotosPrivateFixturesIncluded": false
+  }
+}

@@ -49,6 +49,76 @@ final class StartupGateUITests: XCTestCase {
         // The full-copy OCR assertions above test actual rendered pixels.
     }
 
+    /// P01-008: no cached data may unlock onboarding during a connection loss.
+    /// The fault redirects transport to a closed local port, then expires in the
+    /// same native process so the real Retry control can recover against the API.
+    func testUncachedOfflineStartupRecoversThroughNativeRetry() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["--qa-signout", "--qa-clear-reference-cache", "--qa-request-counts",
+                               "--qa-offline", "0", "20",
+                               "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
+        app.launch()
+        defer { app.terminate() }
+        let ledger = app.staticTexts["qa-request-counts"]
+        let retry = app.buttons["Try Again"].firstMatch
+        let signIn = app.buttons["Sign in"].firstMatch
+        XCTAssertTrue(retry.waitForExistence(timeout: 18), "Uncached connection loss must show a recoverable reference error")
+        XCTAssertTrue(retry.isEnabled && retry.isHittable)
+        XCTAssertTrue(app.staticTexts["Cannot communicate with server."].exists)
+        XCTAssertFalse(signIn.exists, "Incomplete reference data must not expose onboarding continuation")
+        XCTAssertFalse(app.buttons["Messages"].exists)
+        func references() -> [String] {
+            ledger.label.split(separator: "\n").map(String.init)
+                .filter { $0.contains(" /api/base/") }.sorted()
+        }
+        XCTAssertEqual(references(), ["GET /api/base/info=4"],
+                       "Failed metadata must exhaust only its bounded connection retries, without partial datasets")
+        let failed = XCTAttachment(string: ledger.label)
+        failed.name = "uncached-offline-failed-reference-ledger"; failed.lifetime = .keepAlways; add(failed)
+        let error = XCTAttachment(screenshot: app.screenshot())
+        error.name = "uncached-offline-native-retry-error"; error.lifetime = .keepAlways; add(error)
+        // Wait beyond the fault window from this observed failure. The process
+        // remains alive; a relaunch must not substitute for tapping Retry.
+        let reconnectAt = Date().addingTimeInterval(21)
+        let reconnected = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in Date() >= reconnectAt }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [reconnected], timeout: 24), .completed)
+        XCTAssertTrue(retry.exists && retry.isHittable)
+        XCTAssertEqual(references(), ["GET /api/base/info=4"], "No hidden background bootstrap should bypass Retry")
+        retry.tap()
+        let dispatched = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            references().contains("GET /api/base/info=5")
+        }, object: nil)
+        let dispatchResult = XCTWaiter.wait(for: [dispatched], timeout: 10)
+        let tapped = XCTAttachment(string: ledger.label)
+        tapped.name = "uncached-offline-post-retry-dispatch-ledger"; tapped.lifetime = .keepAlways; add(tapped)
+        XCTAssertEqual(dispatchResult, .completed, "Actual Retry must dispatch the metadata request")
+        XCTAssertTrue(signIn.waitForExistence(timeout: 120))
+        XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "isEnabled == true"), object: signIn)], timeout: 120), .completed)
+        let datasets = ["careconditions", "caredays", "carespecials", "certifications",
+                        "clienttypes", "commutes", "contents", "countries", "experiences",
+                        "genders", "issuetypes", "languageskills", "reasons", "roles",
+                        "shifts", "subjects", "worktypes", "languages", "states", "media",
+                        "faqs", "faq_categories"]
+        let expected = (["GET /api/base/info=5"] + datasets.map { "GET /api/base/\($0)=1" }).sorted()
+        XCTAssertEqual(references(), expected)
+        XCTAssertFalse(retry.exists)
+        let recovered = XCTAttachment(string: ledger.label)
+        recovered.name = "uncached-offline-retry-complete-reference-ledger"; recovered.lifetime = .keepAlways; add(recovered)
+        for _ in 0..<8 {
+            if signIn.isHittable { break }
+            app.swipeUp(velocity: .slow)
+        }
+        XCTAssertTrue(signIn.isHittable)
+        signIn.tap()
+        XCTAssertTrue(app.textFields["Enter your email address..."].waitForExistence(timeout: 20))
+        XCTAssertTrue(app.secureTextFields["Enter your password..."].exists)
+        XCTAssertEqual(references(), expected, "Continuation must retain the complete reference snapshot")
+        let continued = XCTAttachment(screenshot: app.buttons["Sign In"].firstMatch.screenshot())
+        continued.name = "uncached-offline-retry-public-sign-in-control"; continued.lifetime = .keepAlways; add(continued)
+    }
+
     /// The host prepares and records an invalid cache in an isolated QA app
     /// container before launch. This method must not clear that file itself:
     /// doing so would test a missing cache rather than rejection and recovery.

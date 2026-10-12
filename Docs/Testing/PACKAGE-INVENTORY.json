@@ -1,5 +1,5 @@
 {
-  "status": "Splash fix delivered at e60e3f1; post-push clean build and both-role Sign In plus rendered loading smoke verified; full original QA incomplete",
+  "status": "Uncached offline Retry regression/evidence verified; initial core Retry failure unresolved, P01-008 FAIL/open; Git delivery pending",
   "reports": [
     "IOS_TEST_EXECUTION_REPORT.md",
     "IOS-FUNCTIONAL-PARITY-MATRIX.md",
@@ -524,10 +524,45 @@
         ],
         "resourcesOpened": "None."
       }
+    },
+    {
+      "index": "Proofs/oct12-uncached-offline-retry-anonymous-proof/index.json",
+      "artifactCount": 15,
+      "bytes": 1324194,
+      "reviewProvenance": {
+        "reviewer": "Independent cache and startup QA verifier /root/cache_review",
+        "checkedAtUTC": "2026-10-12T04:08:04.510031+00:00",
+        "verdict": "PASS for reviewed evidence of latest nondiagnostic executions; original P01-008 remains OPEN/FAIL due unresolved core Retry failure",
+        "caseClosureApproved": false,
+        "recommendedOriginalCaseStatus": "FAIL/open: scenario executed; initial core recovery failure retained, latest repeats PASS but no product fix or confirmed cause",
+        "caseClosureReason": "Original147.669second failure occurred in the core P01-008 recovery outcome: synthesized native Retry tap produced no fifth metadata transport and Welcome never appeared. Product unchanged and failure cause remainsUNCONFIRMED. Two passing repeats establish latest successes, not resolution/reliable recovery of the prior core failure. Masterbrief\u00a720 requires root-cause investigation for failed checks.",
+        "gateVerdicts": {
+          "latestNativeExecutions": "PASS: Modern39.882/Small40.365seconds, loghashes match, one appLaunch per method. Failedcache gate before realRetry tap, fifthmetadata dispatch within10s, same-process fullrecovery and actual Sign in navigation with exact finalledger.",
+          "cacheAndTransport": "PASS: independently correlated actual failedcacheabsenceUTC with nativeStartTest\u2192Retrytap times: failed4.325/6.705s beforetap25.21/27.37. Recovered captures36.143/36.683s aftertap and beforetermination; preserved schema3cachehashes/exact22dataset21advertised keysets/counts/marker/uniqueIDs verified. Initial ledgerinfo4 only; finalinfo5+all22datasetGETonce.",
+          "source": "PASS: current testSHA matches private sourceinventory; only new70line method plusCHAINdelta; product/source/resources matchHEAD and temporarydiagnostics removed.",
+          "privacyAndPixels": "PASS: all15artifacthashes verified; viewed publicModern/SmallerrorRetry panels and emptySignIncontrol crops plus retained initialfailure image. Files contain publiccopy/count/digest/schema/timing metadata only; no privateidentities/credentials/paths/profile/messages/relationships/personalmedia.",
+          "failurePreservation": "PASS: original147.669FAIL loghash and error/ledger artifacts preserved; diagnosticlog/tracehashes match. DiagnosticPASS didnotidentify originalfailurecause and doesnotconstitute productfix.",
+          "originalCaseClosure": "NOT APPROVED: latestscenario observations pass but coreinitialRetry failure remains unresolved; do not promote P01-008 solely from repeats."
+        },
+        "artifactCount": 15,
+        "pngCount": 5,
+        "textCount": 7,
+        "jsonCount": 3,
+        "newUITestSHA256": "30a54f4ed2bd44f731cb28a069c3dee4625229b54613458a59eee2e83c5cd8ce",
+        "scopeLimits": [
+          "Sharedanonymousstartup beforeeitherrole choice onModern+Small; nofourauthenticatedroleclaim.",
+          "No physicalWiFi switching; controlled connectionrefusedwindow.",
+          "No PASS promotion approved. Recording executed original P01-008 asFAIL/open preserves unresolved core failure.",
+          "No broaderaccessibility/camera/Yahoodelivery/fullQA/reliability claim."
+        ],
+        "resourcesOpened": "None; read-only artifacts and authorized proofmetadata update only.",
+        "caseInventoryTransition": "Root records original P01-008 NOT RUN\u2192FAIL, not PASS. Artifact collector did not mutate counts; originalCaseCountsUnchanged in preserved summary refers to collection stage only and does not describe final case inventory.",
+        "collectorDidNotMutateCaseCounts": true
+      }
     }
   ],
-  "proofIndexCount": 59,
-  "indexedArtifactCount": 1007,
+  "proofIndexCount": 60,
+  "indexedArtifactCount": 1022,
   "originalEvidenceIntact": true,
   "excludedTypes": [
     "raw logs",
@@ -541,61 +576,61 @@
   "currentOriginalCaseCounts": {
     "total": 374,
     "PASS": 108,
-    "NOT RUN": 248,
-    "FAIL": 2,
+    "NOT RUN": 247,
+    "FAIL": 3,
     "BLOCKED": 1,
     "N/A": 15
   },
   "documents": [
     {
       "path": "IOS_TEST_EXECUTION_REPORT.md",
-      "bytes": 76876,
-      "sha256": "dffc9803557346ebec347f1514501ca85b88b516f74e3e2e18a1308282cb0b01"
+      "bytes": 78327,
+      "sha256": "c8695ffdc11a0c8025d01d9172243684bcfb88ad0e030e3d9c794fcea3ff1b8d"
     },
     {
       "path": "IOS-FUNCTIONAL-PARITY-MATRIX.md",
-      "bytes": 76945,
-      "sha256": "191afa528c628767c5f7d76ddd6faf95154070395e1a0768da8a6c3a80776878"
+      "bytes": 78396,
+      "sha256": "622484302ad9ff7a93f6b4116a3d756c45f8d4dc3f065d08570e20cdecbfe162"
     },
     {
       "path": "IOS-FIGMA-PARITY.md",
-      "bytes": 72986,
-      "sha256": "4eda29b6fca91c605577d33f2614b18804e5265199512180903e0fe154d2cfda"
+      "bytes": 74437,
+      "sha256": "63ffe35ef6cb2a33612192577e0a05cfd4c2a65a39e75b84cd0ee4758f60d98e"
     },
     {
       "path": "BACKEND-ISSUES-FOR-CLIENT.md",
-      "bytes": 76434,
-      "sha256": "22c47d8f1510062522b0d51ad8a66ee856487247a6203ddfa4704225be4aeaf9"
+      "bytes": 77885,
+      "sha256": "4a12aca1df39e904feb0f1469f894413fa888c2c49fd752168f698c8756358fe"
     },
     {
       "path": "QA-CASE-MANIFEST.md",
-      "bytes": 516225,
-      "sha256": "18f4cacd8782cd397f6341e66dcd6dce2d82ad7af572bd010a1af0a76782b17b"
+      "bytes": 518112,
+      "sha256": "a642464eb806f744a651bc0671ecea64791d10ffc9ebbd0dea5cb152ef18349f"
     },
     {
       "path": "EVIDENCE-COVERAGE-MAPPING.md",
-      "bytes": 684666,
-      "sha256": "b167a08157d85145b315f7eda61e5642811963a1887d9de68ae34a4983050baa"
+      "bytes": 686117,
+      "sha256": "b46b9eac902a5475e0200c42dcbfb4bde3aafa3710c2a9029a319a8ca9b9d70e"
     },
     {
       "path": "ACCESSIBILITY-TRIAGE.md",
-      "bytes": 145999,
-      "sha256": "2d9ab22e2d8c75b7229c23d2f6d02043e0ac5830f7441f47099ffb4d5d507fd2"
+      "bytes": 147450,
+      "sha256": "e3f72e1ecee4fba7b59e44fe58abd4bd21430bd3f74dce16a95beb86a98dc4f6"
     },
     {
       "path": "NATIVE-SIGNUP-EXECUTION.md",
-      "bytes": 141989,
-      "sha256": "c6634ccfb3f75112c10bf82ed2f6fdad93f721a071113194793ab095b110a4e9"
+      "bytes": 143440,
+      "sha256": "c1908a50de7296ed91434c6ced1a6e4ed739f56cc1639f2d41df2febe8ecbb1f"
     },
     {
       "path": "CROSS-ROLE-EXECUTION.md",
-      "bytes": 143231,
-      "sha256": "82f9c03b508c0be7525892f908af41013ab3e8b80acab11198253c1884a3f30f"
+      "bytes": 144682,
+      "sha256": "6101f44d9ceea899b280611a8bb1a2e081e34cfe406b9bfec891c6ac0106a867"
     },
     {
       "path": "README.md",
-      "bytes": 39012,
-      "sha256": "634cf4140e64006935c02d876c167abf29b0a00a19ee5bccbd302c3734f44032"
+      "bytes": 40463,
+      "sha256": "e42fc32b9abda113128cc4255f9cbb4447d8befb124f778bf7f215dd2a23b4d0"
     }
   ],
   "readme": {

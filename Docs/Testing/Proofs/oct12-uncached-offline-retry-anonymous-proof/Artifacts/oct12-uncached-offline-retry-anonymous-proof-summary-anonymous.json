@@ -1,0 +1,26 @@
+{
+  "results": [
+    {
+      "allocation": "modern",
+      "status": "PASS",
+      "seconds": 39.882,
+      "logSHA256": "8c6f321bb90612407afa4d907dce01a4ac51709aa55f0927fef490abb849d14d"
+    },
+    {
+      "allocation": "small",
+      "status": "PASS",
+      "seconds": 40.365,
+      "logSHA256": "2267ef7d73307dfc98cb6fbc1aafd580bc4f80a17b361a8af6212f77fe99ec92"
+    }
+  ],
+  "initialModernFailureSeconds": 147.669,
+  "initialFailureCause": "UNCONFIRMED: no fifth transport after synthesized Retry tap; diagnostic and final uninstrumented repeats passed",
+  "initialFailureLogSHA256": "4cb4136be2a510384a1348bf988a317ad003f500b15bde090f23b219635114db",
+  "diagnosticLogSHA256": "fa793e8e67d58ae519a56a635d8e436a196af9dadcc3bfe73bc2e0f5cc66a69c",
+  "diagnosticTraceSHA256": "9ef0ff50cb70519e469cf6f0bf51151d943d1cba496e83c4daf484eb2b77b804",
+  "productionSourcesUnchanged": true,
+  "temporaryDiagnosticsRemoved": true,
+  "sharedAnonymousBeforeRoleChoice": true,
+  "physicalNetworkSwitching": false,
+  "originalCaseCountsUnchanged": true
+}
