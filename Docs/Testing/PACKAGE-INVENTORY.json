@@ -1,5 +1,5 @@
 {
-  "status": "Uncached offline Retry regression/evidence verified; initial core Retry failure unresolved, P01-008 FAIL/open; Git delivery pending",
+  "status": "Uncached offline Retry regression/evidence delivered at0ac5c43; fresh clean build and postpush native40.396 PASS; P01-008 remainsFAIL/open and fullQA incomplete",
   "reports": [
     "IOS_TEST_EXECUTION_REPORT.md",
     "IOS-FUNCTIONAL-PARITY-MATRIX.md",
@@ -559,10 +559,38 @@
         "caseInventoryTransition": "Root records original P01-008 NOT RUN\u2192FAIL, not PASS. Artifact collector did not mutate counts; originalCaseCountsUnchanged in preserved summary refers to collection stage only and does not describe final case inventory.",
         "collectorDidNotMutateCaseCounts": true
       }
+    },
+    {
+      "index": "Proofs/oct12-uncached-retry-postpush-anonymous-proof/index.json",
+      "artifactCount": 1,
+      "bytes": 2012,
+      "reviewProvenance": {
+        "reviewer": "Independent cache and startup QA verifier /root/cache_review",
+        "checkedAtUTC": "2026-10-12T04:12:59.878167+00:00",
+        "verdict": "PASS for metadata-only committed-source postpush build/native execution evidence; P01-008 remainsFAIL/open",
+        "scope": "One anonymous summary artifact; actual fresh clean build/native40.396second log and actual timedhostcachewitness/savedrecoveredcache inspected. No newpixels or originalcaseclosure.",
+        "artifactCount": 1,
+        "artifactBuildNativeAndWitnessHashesMatched": true,
+        "freshDerivedDataBuildAndNativePathMatched": true,
+        "exactExecutedTestMatchesLocalCommittedSource": true,
+        "sourceCommitSHA": "0ac5c43f12ea4a453e59b1ee7a287dd8c4bb25bb",
+        "productionUnchangedInCommit": true,
+        "cacheEvidence": "Failedcacheabsence capture precedes actualRetrytap; recovered schema3completeunique22datasets21advertised counts captured aftertap beforetermination, hashmatches savedfile. Same-process nativeRetry/SignIn assertionmethod completedPASS.",
+        "originalCaseStatus": "P01-008 remainsFAIL/open.374inventory108PASS247NOTRUN3FAIL1BLOCKED15NA checked. Original147.669coreRetryfailure causeUNCONFIRMED; postpushPASS doesnotestablishfix.",
+        "privacy": "Only anonymous build/result/count/marker/timestamp/digest/scope metadata included; no privateidentity/credentials/paths/media/rawlogs/xcresults/screenshots/cachebody in candidateartifact.",
+        "limitations": [
+          "No newcaseclosure or productionfix claim.",
+          "PostpushModernnative run only; separate earlierModern/Small latestsuccesses remainevidence.",
+          "Controlledconnectionrefusedfault; no physicalWiFi switching.",
+          "PhysicalcameraUNTESTED andYahoo backend-only UNVERIFIED.",
+          "RemoteSHA/fileverification supplied byroot; reviewer checked localcommitted test/productdelta and actual native evidence."
+        ],
+        "resourcesOpened": "None."
+      }
     }
   ],
-  "proofIndexCount": 60,
-  "indexedArtifactCount": 1022,
+  "proofIndexCount": 61,
+  "indexedArtifactCount": 1023,
   "originalEvidenceIntact": true,
   "excludedTypes": [
     "raw logs",
@@ -584,58 +612,58 @@
   "documents": [
     {
       "path": "IOS_TEST_EXECUTION_REPORT.md",
-      "bytes": 78327,
-      "sha256": "c8695ffdc11a0c8025d01d9172243684bcfb88ad0e030e3d9c794fcea3ff1b8d"
+      "bytes": 78337,
+      "sha256": "cb277afe4d93b0175e1e4e610b2566f1084fb5c13e028930644af626f4e5f59e"
     },
     {
       "path": "IOS-FUNCTIONAL-PARITY-MATRIX.md",
-      "bytes": 78396,
-      "sha256": "622484302ad9ff7a93f6b4116a3d756c45f8d4dc3f065d08570e20cdecbfe162"
+      "bytes": 78406,
+      "sha256": "3e123f1fc64a24dd04f91d09613ef2b86cde461608310e2e7cb538a02ae702b4"
     },
     {
       "path": "IOS-FIGMA-PARITY.md",
-      "bytes": 74437,
-      "sha256": "63ffe35ef6cb2a33612192577e0a05cfd4c2a65a39e75b84cd0ee4758f60d98e"
+      "bytes": 74447,
+      "sha256": "26fab00c11f9f01755c8c1cf7948c341c52ba0ef1552a980c3bbe05f5a86d8d3"
     },
     {
       "path": "BACKEND-ISSUES-FOR-CLIENT.md",
-      "bytes": 77885,
-      "sha256": "4a12aca1df39e904feb0f1469f894413fa888c2c49fd752168f698c8756358fe"
+      "bytes": 77895,
+      "sha256": "306d7c0f56b338d200085dcc4aa2c2207b868a60816dbe1468a54127d87a9644"
     },
     {
       "path": "QA-CASE-MANIFEST.md",
-      "bytes": 518112,
-      "sha256": "a642464eb806f744a651bc0671ecea64791d10ffc9ebbd0dea5cb152ef18349f"
+      "bytes": 518122,
+      "sha256": "07e735b99c8fbbff1b55992b2a4769992c31e315fa29e32d0697bdf1b6d60719"
     },
     {
       "path": "EVIDENCE-COVERAGE-MAPPING.md",
-      "bytes": 686117,
-      "sha256": "b46b9eac902a5475e0200c42dcbfb4bde3aafa3710c2a9029a319a8ca9b9d70e"
+      "bytes": 686127,
+      "sha256": "f9e98e3388b20e225af4ddd17bdb611d4198690507b02db579bae78ade62fa3d"
     },
     {
       "path": "ACCESSIBILITY-TRIAGE.md",
-      "bytes": 147450,
-      "sha256": "e3f72e1ecee4fba7b59e44fe58abd4bd21430bd3f74dce16a95beb86a98dc4f6"
+      "bytes": 147460,
+      "sha256": "489a7c6262067f418d953d421138560c214ca86c2f1193d341a5a12f96f4e0a0"
     },
     {
       "path": "NATIVE-SIGNUP-EXECUTION.md",
-      "bytes": 143440,
-      "sha256": "c1908a50de7296ed91434c6ced1a6e4ed739f56cc1639f2d41df2febe8ecbb1f"
+      "bytes": 143450,
+      "sha256": "38919d409d9aebffda1ba2ac9870eee07b60ede85851e95c66678a5e2bb008aa"
     },
     {
       "path": "CROSS-ROLE-EXECUTION.md",
-      "bytes": 144682,
-      "sha256": "6101f44d9ceea899b280611a8bb1a2e081e34cfe406b9bfec891c6ac0106a867"
+      "bytes": 144692,
+      "sha256": "b46eb7f8b25f7681fb5de7b93060e763323b9e38cbf41f001529f7a3bb52c557"
     },
     {
       "path": "README.md",
-      "bytes": 40463,
-      "sha256": "e42fc32b9abda113128cc4255f9cbb4447d8befb124f778bf7f215dd2a23b4d0"
+      "bytes": 40473,
+      "sha256": "add96c0e4ffda670a90ec5d09f12b792df2492dd272d383ace2f98e37349488c"
     }
   ],
   "readme": {
     "path": "README.md",
-    "bytes": 38428,
-    "sha256": "61b156d1a51b29c9bad2ce63cce7876bf885074b3ed5d8fe7188820b92961775"
+    "bytes": 40473,
+    "sha256": "add96c0e4ffda670a90ec5d09f12b792df2492dd272d383ace2f98e37349488c"
   }
 }

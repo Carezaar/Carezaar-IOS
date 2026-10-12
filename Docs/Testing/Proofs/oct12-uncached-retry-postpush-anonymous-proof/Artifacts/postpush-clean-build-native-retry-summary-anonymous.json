@@ -1,0 +1,60 @@
+{
+  "sourceCommitSHA": "0ac5c43f12ea4a453e59b1ee7a287dd8c4bb25bb",
+  "cleanBuild": "PASS",
+  "cleanBuildLogSHA256": "78782ea1e8d4b243c8b0bcd15dc7e2db6ebffbf4fe73479d3d46d2952f7ef546",
+  "nativeMethod": "testUncachedOfflineStartupRecoversThroughNativeRetry",
+  "nativeStatus": "PASS",
+  "nativeSeconds": 40.396,
+  "nativeLogSHA256": "d11053938c84c1020d9bf51c05c8d81940fa958e56cc986cbeffbfbfc2202bd0",
+  "cacheWitnessSHA256": "d0d2544e3703b55c839aff3d1c74e31041bf29f93dc3b8c39d8735d4585ba6d8",
+  "cacheStages": {
+    "failed": {
+      "nativeStageAttachmentObserved": true,
+      "actualCacheFileAbsent": true,
+      "checkedAtUTC": "2026-10-12T04:11:08.136240+00:00",
+      "capturedBeforeTermination": true
+    },
+    "recovered": {
+      "nativeStageAttachmentObserved": true,
+      "schemaVersion": 3,
+      "completeUniqueDatasets": 22,
+      "advertisedCountsChecked": 21,
+      "serverMarker": 1791657662,
+      "checkedAtUTC": "2026-10-12T04:11:38.876151+00:00",
+      "capturedBeforeTermination": true,
+      "cacheSHA256": "7edaec633f5d220d6f2f8bd53acdf8b475ca1671bbcd8db7f3216ae2c78bd638",
+      "counts": {
+        "roles": 6,
+        "clienttypes": 4,
+        "contents": 515,
+        "carespecials": 12,
+        "subjects": 5,
+        "worktypes": 5,
+        "languageskills": 11,
+        "issuetypes": 6,
+        "caredays": 7,
+        "experiences": 4,
+        "reasons": 14,
+        "commutes": 4,
+        "genders": 2,
+        "countries": 1,
+        "careconditions": 21,
+        "shifts": 7,
+        "certifications": 3,
+        "languages": 8,
+        "states": 52,
+        "media": 3,
+        "faqs": 14,
+        "faq_categories": 6
+      }
+    }
+  },
+  "freshDerivedData": true,
+  "sharedAnonymousBeforeRoleChoice": true,
+  "physicalNetworkSwitching": false,
+  "productionSourcesUnchanged": true,
+  "originalCase": "P01-008 remains FAIL/open",
+  "initialFailureCause": "UNCONFIRMED; postpush pass does not establish fix",
+  "physicalCamera": "UNTESTED",
+  "YahooBackendOnly": "UNVERIFIED"
+}

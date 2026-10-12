@@ -1,0 +1,49 @@
+{
+  "title": "Committed uncached offline Retry regression: post-push clean build and native check",
+  "sourceCommitSHA": "0ac5c43f12ea4a453e59b1ee7a287dd8c4bb25bb",
+  "artifacts": [
+    {
+      "path": "Artifacts/postpush-clean-build-native-retry-summary-anonymous.json",
+      "description": "Anonymous actual clean-build/native-result/cache-witness summary only",
+      "sha256": "9d22d50b9258ce1662ea26ca34687c14f5bc227043e05b1079f5e9da7685a492",
+      "packagedSha256": "9d22d50b9258ce1662ea26ca34687c14f5bc227043e05b1079f5e9da7685a492"
+    }
+  ],
+  "rootReviewed": true,
+  "independentReviewed": true,
+  "rootReviewScope": "Actual completed native log and real timed cache witness inspected; metadata-only summary, no new pixel claim",
+  "scopeLimits": [
+    "P01-008 remains FAIL/open due original unresolved core Retry failure",
+    "No new case closure, no physical Wi-Fi/camera or Yahoo attribution",
+    "Raw logs/xcresults/native screenshots/cache files remain private; only anonymous summary selected"
+  ],
+  "independentReview": {
+    "reviewer": "Independent cache and startup QA verifier /root/cache_review",
+    "checkedAtUTC": "2026-10-12T04:12:59.878167+00:00",
+    "verdict": "PASS for metadata-only committed-source postpush build/native execution evidence; P01-008 remainsFAIL/open",
+    "scope": "One anonymous summary artifact; actual fresh clean build/native40.396second log and actual timedhostcachewitness/savedrecoveredcache inspected. No newpixels or originalcaseclosure.",
+    "artifactCount": 1,
+    "artifactBuildNativeAndWitnessHashesMatched": true,
+    "freshDerivedDataBuildAndNativePathMatched": true,
+    "exactExecutedTestMatchesLocalCommittedSource": true,
+    "sourceCommitSHA": "0ac5c43f12ea4a453e59b1ee7a287dd8c4bb25bb",
+    "productionUnchangedInCommit": true,
+    "cacheEvidence": "Failedcacheabsence capture precedes actualRetrytap; recovered schema3completeunique22datasets21advertised counts captured aftertap beforetermination, hashmatches savedfile. Same-process nativeRetry/SignIn assertionmethod completedPASS.",
+    "originalCaseStatus": "P01-008 remainsFAIL/open.374inventory108PASS247NOTRUN3FAIL1BLOCKED15NA checked. Original147.669coreRetryfailure causeUNCONFIRMED; postpushPASS doesnotestablishfix.",
+    "privacy": "Only anonymous build/result/count/marker/timestamp/digest/scope metadata included; no privateidentity/credentials/paths/media/rawlogs/xcresults/screenshots/cachebody in candidateartifact.",
+    "limitations": [
+      "No newcaseclosure or productionfix claim.",
+      "PostpushModernnative run only; separate earlierModern/Small latestsuccesses remainevidence.",
+      "Controlledconnectionrefusedfault; no physicalWiFi switching.",
+      "PhysicalcameraUNTESTED andYahoo backend-only UNVERIFIED.",
+      "RemoteSHA/fileverification supplied byroot; reviewer checked localcommitted test/productdelta and actual native evidence."
+    ],
+    "resourcesOpened": "None."
+  },
+  "publicPackage": {
+    "rootReviewed": true,
+    "independentReviewed": true,
+    "originalEvidencePreserved": true,
+    "rawLogsXCResultsFullScreenPhotosPrivateFixturesIncluded": false
+  }
+}
