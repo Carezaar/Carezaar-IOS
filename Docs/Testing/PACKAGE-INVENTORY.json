@@ -1,5 +1,5 @@
 {
-  "status": "Four-allocation offline saved-session regression independently verified locally, pending Git delivery; previous engineering delivery preserved; full QA remains incomplete",
+  "status": "Offline saved-session regression commit 27e7078e552b28f0053cb84539d19ffa1ef845c0 pushed and remotely verified; required post-push fresh clean build and both-role typed Sign In smoke passed; this final documentation-only follow-up records verification; full QA remains incomplete",
   "reports": [
     "IOS_TEST_EXECUTION_REPORT.md",
     "IOS-FUNCTIONAL-PARITY-MATRIX.md",
@@ -428,10 +428,41 @@
         ],
         "resourcesOpened": "None; local read-only artifact inspection and authorized proof metadata update only."
       }
+    },
+    {
+      "index": "Proofs/oct12-offline-postpush-smoke-anonymous-proof/index.json",
+      "artifactCount": 5,
+      "bytes": 2012,
+      "reviewProvenance": {
+        "reviewer": "Independent cache QA verifier /root/cache_review",
+        "checkedAtUTC": "2026-10-12T02:17:59.792466+00:00",
+        "verdict": "PASS for committed-source clean Debug test build and both-role native typed Sign In smoke only",
+        "scope": "Five anonymous JSON artifacts; actual fresh clean build log, both completed role logs, and NativeLoginRoleUITests source matching local commit27e7078e552b28f0053cb84539d19ffa1ef845c0. No pixels or new original case closure.",
+        "artifactCount": 5,
+        "allArtifactHashesMatched": true,
+        "buildAndBothRoleLogHashesMatched": true,
+        "buildAndRoleRunsUseFreshDerivedData": true,
+        "nativePreTapAuthInfoLoginRefreshAndBothRoleListCountsZero": true,
+        "nativeOneLoginOneAuthInfoPerRoleCorrectRoleListNoOppositeListAndZeroRefresh": true,
+        "correctRoleListAttempts": {
+          "client": 2,
+          "caregiver": 1
+        },
+        "setupAuthentication": "Separate runner API login/me checks exact retained role/ID; outside native transport ledger. Native test types owned credentials through public fields and taps Sign In.",
+        "privacy": "Five files contain anonymous case/stage/role/counter/source-commit/build-result/digest metadata only; no identities, credentials, private paths, profile/messages/relationships/personalmedia.",
+        "limitations": [
+          "No list deduplication claim: client correct-role list count is2.",
+          "No new original case closure or full rendered-screen/accessibility claim.",
+          "Physical camera and Yahoo backend-only attribution remain unverified.",
+          "Remote verification supplied by root; reviewer verified local committed test bytes and actual native build/log/artifact evidence."
+        ],
+        "sourceCommitSHA": "27e7078e552b28f0053cb84539d19ffa1ef845c0",
+        "resourcesOpened": "None."
+      }
     }
   ],
-  "proofIndexCount": 56,
-  "indexedArtifactCount": 978,
+  "proofIndexCount": 57,
+  "indexedArtifactCount": 983,
   "originalEvidenceIntact": true,
   "excludedTypes": [
     "raw logs",
@@ -453,58 +484,58 @@
   "documents": [
     {
       "path": "IOS_TEST_EXECUTION_REPORT.md",
-      "bytes": 74301,
-      "sha256": "100b5f2573b9f2d295fedd5fdded7411f33cb40c11fe871fd41d52e02f45f6ab"
+      "bytes": 74624,
+      "sha256": "4a2adb78d89c216442ecbba8c7c922ff6ef2ca89275218915f5c773cb715ed9e"
     },
     {
       "path": "IOS-FUNCTIONAL-PARITY-MATRIX.md",
-      "bytes": 74370,
-      "sha256": "d661dd56f5a16699e2b27c0d899c4086138b5fd5139a1bc473dfb2a65b1b893f"
+      "bytes": 74693,
+      "sha256": "037a2fea7a547e98b8573bf9f6338dfdf517d22fe9601e395978e4d57532f1ca"
     },
     {
       "path": "IOS-FIGMA-PARITY.md",
-      "bytes": 70411,
-      "sha256": "8a1ef81aa69b0bff9c6fec2ff3c7049b9c41ba472d1b155b300823d9666ad445"
+      "bytes": 70734,
+      "sha256": "2b44ff94b63f5761918740960d755f7ceb3780f4e06d9cc63538865264932159"
     },
     {
       "path": "BACKEND-ISSUES-FOR-CLIENT.md",
-      "bytes": 73859,
-      "sha256": "1fc3364f8d3e7a78b58dbc7592bd61a91c48241b99dfcb08f8cb42fecc8d5f15"
+      "bytes": 74182,
+      "sha256": "f6a6b8d2dc5a9218eafec6dd3017e67441e8bc1ac4c70f1f81ce659c11ff450d"
     },
     {
       "path": "QA-CASE-MANIFEST.md",
-      "bytes": 513122,
-      "sha256": "80cd9da3d963d13cc211cdaf55463b5b74345e118e529879a18b9e3200aaf8ab"
+      "bytes": 513445,
+      "sha256": "3cdcc7e9e69af9ee9e010004f08ee34f644d24d1c4514308945bde9f31a98dcd"
     },
     {
       "path": "EVIDENCE-COVERAGE-MAPPING.md",
-      "bytes": 682091,
-      "sha256": "0a7e9d67a315bf2c612c95483a1c772b56f8b5c88a2ceafda88e2edf087f63dd"
+      "bytes": 682414,
+      "sha256": "ce83907f4a42ca24cbab8046857243e135d940d3b3ee063bf2758c109116fbc5"
     },
     {
       "path": "ACCESSIBILITY-TRIAGE.md",
-      "bytes": 143424,
-      "sha256": "02f231eeb3f370b12f0d5e72fc4e2a7d133c877d252e04a70dec2db088601020"
+      "bytes": 143747,
+      "sha256": "15ff87ef7ad1470383d77ddf4d5d7833c4455f4a86de898dad715e2567243f31"
     },
     {
       "path": "NATIVE-SIGNUP-EXECUTION.md",
-      "bytes": 139414,
-      "sha256": "ee54d387c90308c7f00c9a36a5bbeb1dda5c6e016589a327c51a672bcf4838cd"
+      "bytes": 139737,
+      "sha256": "b65980a338b8294ee40724621244b67f11b5ba62c76e8aef633f8e30e73eec7a"
     },
     {
       "path": "CROSS-ROLE-EXECUTION.md",
-      "bytes": 140656,
-      "sha256": "f835a8d4227195c55ee9555bb5d3aca817790de996ccb97cc92df73ac874b2e1"
+      "bytes": 140979,
+      "sha256": "bd037c44d6afff66d36529818e722f1ca0ee21aff1631a45605cb02c5b1c7d08"
     },
     {
       "path": "README.md",
-      "bytes": 36437,
-      "sha256": "225dade7a3ebe2e46d53bef9a849fad9ef87d8cecaecbce549f02eac806c8e8c"
+      "bytes": 36760,
+      "sha256": "269666e4c7bd1afe1d134cc7c86211fe24d4f6e7c2beb7c7b481159c6f115895"
     }
   ],
   "readme": {
     "path": "README.md",
-    "bytes": 36437,
-    "sha256": "225dade7a3ebe2e46d53bef9a849fad9ef87d8cecaecbce549f02eac806c8e8c"
+    "bytes": 36760,
+    "sha256": "269666e4c7bd1afe1d134cc7c86211fe24d4f6e7c2beb7c7b481159c6f115895"
   }
 }

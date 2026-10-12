@@ -1,0 +1,26 @@
+{
+  "sourceCommitSHA": "27e7078e552b28f0053cb84539d19ffa1ef845c0",
+  "cleanBuild": "PASS",
+  "buildLogSHA256": "9c37ff12cb32d7528ca60f2aea0cd3c43c5eede6214373608aa5b496760148fa",
+  "roleResults": [
+    {
+      "role": "client",
+      "status": "PASS",
+      "seconds": 30.548,
+      "logSHA256": "a8c93e89aa1339681f4a219967d78c3d61c985f83964cd3fe99b953f05d4e3be"
+    },
+    {
+      "role": "caregiver",
+      "status": "PASS",
+      "seconds": 28.302,
+      "logSHA256": "714e8330d68a09492d8f93bb1380ec69d5ad36cb1c96f7410ddb9eadb1185bd7"
+    }
+  ],
+  "oneNativeLoginPerRole": true,
+  "oppositeRoleGETsPerRole": 0,
+  "refreshesPerRole": 0,
+  "setupAPIAuthenticationSeparate": true,
+  "originalCaseCountsUnchanged": true,
+  "sourceCommitRemotelyVerified": true,
+  "scope": "Typed Sign In smoke, not list deduplication or full QA"
+}

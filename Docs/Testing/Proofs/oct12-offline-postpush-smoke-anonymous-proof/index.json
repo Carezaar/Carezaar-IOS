@@ -1,0 +1,87 @@
+{
+  "title": "Committed offline saved-session regression: post-push clean build and both-role typed Sign In smoke",
+  "sourceCommitSHA": "27e7078e552b28f0053cb84539d19ffa1ef845c0",
+  "rootReviewed": true,
+  "independentReviewed": true,
+  "rootReviewScope": "Four actual anonymous native JSONs, clean-build and completed role logs inspected; no pixels or new case closure claimed",
+  "artifacts": [
+    {
+      "path": "Artifacts/client-827A4A89-EFC7-4283-A86F-E3FA6A38655F.json",
+      "description": "P02-012-typed-login-role-list-loaded-client_0_B68A3157-F6A7-4D4D-9322-172B5303D5A3.json",
+      "sha256": "70ae2deb3b10da0a8d2a8878976888f93ccee043465035916705cbd627c6b598",
+      "packagedSha256": "70ae2deb3b10da0a8d2a8878976888f93ccee043465035916705cbd627c6b598"
+    },
+    {
+      "path": "Artifacts/client-3F8474EC-3303-4DF4-94B1-1476E54F715F.json",
+      "description": "P02-012-public-sign-in-ready-client_0_48907F90-6BFC-4018-B9DE-E27C00AA54F1.json",
+      "sha256": "aeea1cf1a92d5c2fc751544a26507d93ce16c94d062231874b4142e5856224c4",
+      "packagedSha256": "aeea1cf1a92d5c2fc751544a26507d93ce16c94d062231874b4142e5856224c4"
+    },
+    {
+      "path": "Artifacts/caregiver-EAC6F0C7-4064-4BE9-A9D2-9310F884E188.json",
+      "description": "P02-012-typed-login-role-list-loaded-caregiver_0_E17363D8-EE33-4BE9-B976-66FA77FFF7A7.json",
+      "sha256": "07c5040106ca935c6ad8c039ef82fff46f4747af1be88a33aff259b7ea3c6da7",
+      "packagedSha256": "07c5040106ca935c6ad8c039ef82fff46f4747af1be88a33aff259b7ea3c6da7"
+    },
+    {
+      "path": "Artifacts/caregiver-43650245-10F3-4896-856F-85089697239C.json",
+      "description": "P02-012-public-sign-in-ready-caregiver_0_8941722C-A3FB-453F-9B2B-2CAE09CD0C43.json",
+      "sha256": "3e5a92c4bbb682374639554bb37ed022525d263f480e4bb0847b214c2518a3e0",
+      "packagedSha256": "3e5a92c4bbb682374639554bb37ed022525d263f480e4bb0847b214c2518a3e0"
+    },
+    {
+      "path": "Artifacts/postpush-build-and-role-smoke-summary-anonymous.json",
+      "description": "Actual fresh clean build and both completed role smoke outcomes",
+      "sha256": "fe160d0c1456a96eebf1775c9eb2f5541b07aea63f46ae45e025e3a6b2f9fe0f",
+      "packagedSha256": "fe160d0c1456a96eebf1775c9eb2f5541b07aea63f46ae45e025e3a6b2f9fe0f"
+    }
+  ],
+  "roleResults": [
+    {
+      "role": "client",
+      "status": "PASS",
+      "seconds": 30.548,
+      "logSHA256": "a8c93e89aa1339681f4a219967d78c3d61c985f83964cd3fe99b953f05d4e3be"
+    },
+    {
+      "role": "caregiver",
+      "status": "PASS",
+      "seconds": 28.302,
+      "logSHA256": "714e8330d68a09492d8f93bb1380ec69d5ad36cb1c96f7410ddb9eadb1185bd7"
+    }
+  ],
+  "originalCaseCountsUnchanged": true,
+  "scopeLimitations": "No list deduplication, full QA, camera or Yahoo backend-only claim",
+  "independentReview": {
+    "reviewer": "Independent cache QA verifier /root/cache_review",
+    "checkedAtUTC": "2026-10-12T02:17:59.792466+00:00",
+    "verdict": "PASS for committed-source clean Debug test build and both-role native typed Sign In smoke only",
+    "scope": "Five anonymous JSON artifacts; actual fresh clean build log, both completed role logs, and NativeLoginRoleUITests source matching local commit27e7078e552b28f0053cb84539d19ffa1ef845c0. No pixels or new original case closure.",
+    "artifactCount": 5,
+    "allArtifactHashesMatched": true,
+    "buildAndBothRoleLogHashesMatched": true,
+    "buildAndRoleRunsUseFreshDerivedData": true,
+    "nativePreTapAuthInfoLoginRefreshAndBothRoleListCountsZero": true,
+    "nativeOneLoginOneAuthInfoPerRoleCorrectRoleListNoOppositeListAndZeroRefresh": true,
+    "correctRoleListAttempts": {
+      "client": 2,
+      "caregiver": 1
+    },
+    "setupAuthentication": "Separate runner API login/me checks exact retained role/ID; outside native transport ledger. Native test types owned credentials through public fields and taps Sign In.",
+    "privacy": "Five files contain anonymous case/stage/role/counter/source-commit/build-result/digest metadata only; no identities, credentials, private paths, profile/messages/relationships/personalmedia.",
+    "limitations": [
+      "No list deduplication claim: client correct-role list count is2.",
+      "No new original case closure or full rendered-screen/accessibility claim.",
+      "Physical camera and Yahoo backend-only attribution remain unverified.",
+      "Remote verification supplied by root; reviewer verified local committed test bytes and actual native build/log/artifact evidence."
+    ],
+    "sourceCommitSHA": "27e7078e552b28f0053cb84539d19ffa1ef845c0",
+    "resourcesOpened": "None."
+  },
+  "publicPackage": {
+    "rootReviewed": true,
+    "independentReviewed": true,
+    "originalEvidencePreserved": true,
+    "rawLogsXCResultsFullScreenPhotosPrivateFixturesIncluded": false
+  }
+}
