@@ -1,5 +1,5 @@
 {
-  "status": "Same-store regression/investigation evidence delivered at7c9ad0d;108units/freshcleanbuild/focusedunit/nativecachedrelaunch verified; P01-008 remainsFAIL/open and fullQA incomplete",
+  "status": "Direct Modern Simulator Retry evidence reviewed; source/tests unchanged from6919503. P01-008 remains FAIL/open; full QA incomplete.",
   "reports": [
     "IOS_TEST_EXECUTION_REPORT.md",
     "IOS-FUNCTIONAL-PARITY-MATRIX.md",
@@ -643,10 +643,39 @@
         ],
         "resourcesOpened": "None."
       }
+    },
+    {
+      "index": "Proofs/oct12-direct-simulator-retry-anonymous-proof/index.json",
+      "artifactCount": 4,
+      "bytes": 859135,
+      "reviewProvenance": {
+        "reviewer": "Independent startup QA verifier /root/cache_review",
+        "checkedAtUTC": "2026-10-12T04:57:39.711256+00:00",
+        "verdict": "PASS for four-artifact directSimulatorUI observation evidence; original P01-008 remainsFAIL/open",
+        "artifactCount": 4,
+        "allArtifactHashesMatched": true,
+        "actualPNGViewed": 2,
+        "provenance": "Root operated currentSimulator throughcua_repl and authored twoobservationJSONs fromreturned nativeUI/CLIreadback states. Reviewer didnotoperateSimulator or independentlyreplay rawliveCUAsequence/PIDquery; independentlyinspected selectedPNGpixels/JSONs, savedactualcachebytes andsourcebaseline.",
+        "pixelGate": "ActualpublicerrorPNG shows complete Cannotcommunicate/Retrypanel; actualSignInPNG shows publicemptyEmailAddress/Passwordplaceholders andneutraldisabledsubmit. No enteredprivatevalues/account/media visible.",
+        "cacheGate": "Independentlyparsed preservedrecoveredcachebytes; hash matchesreport, schema3exact22datasets21advertisedkeys, expectedcounts/uniquerows/marker matchanonymousinspection. Pastcacheabsencebeforeclick isrootcapturedprecondition, not independentlyrecreated.",
+        "interactionGate": "Rootreported directnativeRetryactivation thenmetadata4\u21925/errorremoved/Welcome\u2192SignIn. SamePID47334 inrootlaunch/readbackrecords consistent. FullCUAAXledger tail truncated; noall22nativeGETuniqueness ortime-to-ready assertion.",
+        "sourceGate": "Currentproduct/tests matchbaseline69195036e92fe7b0fbb479185acbebffa3f17f53; no source/test delta for thisinteraction.",
+        "privacy": "Fourartifacts contain publicloading/formpixels andanonymous count/cache/marker/timing/processnumber/observationmetadata only; no privateidentities/credentials/URLs/privatepaths/personalmedia. Fullsavedreferencecache remainsprivate.",
+        "caseClosureApproved": false,
+        "originalCaseStatus": "P01-008 remainsFAIL/open; original147.669s failedautomatedRetry causeUNCONFIRMED. One directCUAsuccess doesnotprove originaltapcause orfix.",
+        "limitations": [
+          "OneModernsharedanonymouspre-role directUIactivation, nothumanphysicaltouch/Small/fourauthenticatedrole proof.",
+          "Rootobservations areexplicitprovenance, not reviewerdrivenUIorcomplete rawliveAXreplay.",
+          "Noall22requestuniqueness/physicalWiFiswitch/totalreadytime claim.",
+          "Noauthentication/camera/GPS/OTP/profile/messages/relationships/mediaupload performed in reportedsequence.",
+          "PhysicalcameraUNTESTED,Yahoobackend-onlyUNVERIFIED;nofullQAorcasepromotion."
+        ],
+        "resourcesOpened": "None."
+      }
     }
   ],
-  "proofIndexCount": 63,
-  "indexedArtifactCount": 1028,
+  "proofIndexCount": 64,
+  "indexedArtifactCount": 1032,
   "originalEvidenceIntact": true,
   "excludedTypes": [
     "raw logs",
@@ -668,58 +697,58 @@
   "documents": [
     {
       "path": "IOS_TEST_EXECUTION_REPORT.md",
-      "bytes": 80463,
-      "sha256": "f3ca53064f699083197a12a7dc3a132e643477785e9a156e0668f9a195383404"
+      "bytes": 81638,
+      "sha256": "a8d5818865dd986b4c361cbcce469f27beb6899a356bbaacfd95cc2b1cdcd2a3"
     },
     {
       "path": "IOS-FUNCTIONAL-PARITY-MATRIX.md",
-      "bytes": 80532,
-      "sha256": "09ca1b35290af577bf507732dae3f3a6dcf09c92e7d7a04d2bcb41f3d617dc55"
+      "bytes": 81707,
+      "sha256": "d0b87717ccbad2a2a5cfca9be1381f2e973fdf95c98f90d9648fbb51b8cb7deb"
     },
     {
       "path": "IOS-FIGMA-PARITY.md",
-      "bytes": 76573,
-      "sha256": "6b112bcc9dacfa940d7aa2e86a88641da9f4316fee2b0148545ae5b89058bb54"
+      "bytes": 77748,
+      "sha256": "a00eec06335e16b7fc0fe034083e3431ba85cfae4fef75b7ef1916c9f5749a79"
     },
     {
       "path": "BACKEND-ISSUES-FOR-CLIENT.md",
-      "bytes": 80021,
-      "sha256": "4248c2a717d9481317094a8ca354943fbb09d6a988b43860264d72fa9e90e1b0"
+      "bytes": 81196,
+      "sha256": "c44244102c26c6e88c13139d2cabccf39b650b26814510276c44b7aec8d2d598"
     },
     {
       "path": "QA-CASE-MANIFEST.md",
-      "bytes": 520552,
-      "sha256": "aa6b28e43c8e49ca0fe4250ca03d3773eb9512c49efe9d4c59136596ecbee2f3"
+      "bytes": 521976,
+      "sha256": "60622a323a85f7606420bf82e286d8bbae822d6304570945b743aa51af908158"
     },
     {
       "path": "EVIDENCE-COVERAGE-MAPPING.md",
-      "bytes": 688253,
-      "sha256": "c601460b25c493ca56c1e18faf57a58f6b09be5c63c319b6eac7c9a32aa3bc27"
+      "bytes": 689428,
+      "sha256": "469422dbff660328ca7194ef9ea5e0e483ec4ce1857aae1a57e910c62f18beed"
     },
     {
       "path": "ACCESSIBILITY-TRIAGE.md",
-      "bytes": 149586,
-      "sha256": "5a7d8388e856c19a03f520e9819d551d8f650397f99035272b70b77db7796044"
+      "bytes": 150761,
+      "sha256": "631ba062aef500eb7b354f680698a744ed3e95bd6214ae52ec0e839016b11193"
     },
     {
       "path": "NATIVE-SIGNUP-EXECUTION.md",
-      "bytes": 145576,
-      "sha256": "10639fe7ca833bf18b7a4c2c147fe5d20b44afc4e1ef327b11567926c8396247"
+      "bytes": 146751,
+      "sha256": "5506e8386d6408f6030d8eac3885acf6c09c627acb86c6a5b16e1f97ac018f7c"
     },
     {
       "path": "CROSS-ROLE-EXECUTION.md",
-      "bytes": 146818,
-      "sha256": "d4923bad08c7df9f43a11bdf3f840ed9b98d900ecd2517ad96ad0b37fb0448cb"
+      "bytes": 147993,
+      "sha256": "ff59265ef8d8b01fbd9dfa69b9ad4f89a57667d52c254710bd709135dbdb9cb9"
     },
     {
       "path": "README.md",
-      "bytes": 42599,
-      "sha256": "28bb8dc3be4a49ae9a62285668cc0c542ca76a069b27d3def2cc21b670c54242"
+      "bytes": 43774,
+      "sha256": "b7aeceaf463202327faa706c5dc8fb9892ce7eda2da66e88c6c2fbeac585b328"
     }
   ],
   "readme": {
     "path": "README.md",
-    "bytes": 42599,
-    "sha256": "28bb8dc3be4a49ae9a62285668cc0c542ca76a069b27d3def2cc21b670c54242"
+    "bytes": 43774,
+    "sha256": "b7aeceaf463202327faa706c5dc8fb9892ce7eda2da66e88c6c2fbeac585b328"
   }
 }

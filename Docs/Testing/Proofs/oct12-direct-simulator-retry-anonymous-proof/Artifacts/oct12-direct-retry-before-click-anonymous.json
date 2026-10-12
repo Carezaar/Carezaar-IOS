@@ -1,0 +1,12 @@
+{
+  "checkedAtUTC": "2026-10-12T04:43:24.313210+00:00",
+  "actualNativeCacheAbsent": true,
+  "observedNativeReferenceLedger": [
+    "GET /api/base/info=4"
+  ],
+  "observedTryAgain": true,
+  "savedTokensObservedAbsent": true,
+  "sharedAnonymousBeforeRoleChoice": true,
+  "directSimulatorUIClickPending": true,
+  "physicalCameraUsed": false
+}

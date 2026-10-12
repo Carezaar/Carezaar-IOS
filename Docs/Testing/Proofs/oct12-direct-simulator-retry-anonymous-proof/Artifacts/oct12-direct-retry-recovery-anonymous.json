@@ -1,0 +1,61 @@
+{
+  "checkedAtUTC": "2026-10-12T04:49:49.545106+00:00",
+  "interaction": "Direct Simulator UI via cua_repl, outside XCTest tap synthesis",
+  "observedSequence": [
+    "Initial uncached error and Try Again, metadata attempts4, savedtokensabsent",
+    "Clicked native Try Again through current AX button index9",
+    "Immediate subsequent UI showed metadata attempts5 and removederror/Retry",
+    "Next UI showed Welcome/Language/bothrole choices/Signin",
+    "Clicked native Signin link through current AX button index38",
+    "UI showed empty EmailAddress and Password fields; SignInsubmit disabled"
+  ],
+  "sameNativeProcess": true,
+  "originalProcessID": 47334,
+  "cacheBeforeClickAbsent": true,
+  "cacheAfterRecovery": {
+    "schemaVersion": 3,
+    "datasetCount": 22,
+    "advertisedCountsChecked": 21,
+    "counts": {
+      "reasons": 14,
+      "languageskills": 11,
+      "certifications": 3,
+      "issuetypes": 6,
+      "worktypes": 5,
+      "roles": 6,
+      "experiences": 4,
+      "countries": 1,
+      "caredays": 7,
+      "genders": 2,
+      "subjects": 5,
+      "shifts": 7,
+      "commutes": 4,
+      "careconditions": 21,
+      "contents": 515,
+      "clienttypes": 4,
+      "carespecials": 12,
+      "languages": 8,
+      "states": 52,
+      "media": 3,
+      "faqs": 14,
+      "faq_categories": 6
+    },
+    "uniqueIDs": true,
+    "serverMarker": 1791657662,
+    "sha256": "447ff0a871a63f13590f77f471f7f8826f2906436bac76075a77a83efba57dd1"
+  },
+  "fullNativeDatasetRequestCountLedgerAvailable": false,
+  "counterLimit": "CUA AX description is truncated before the final reference-request rows; metadata4\u21925 and visible leading dataset counts1 observed, remaining tail request counts not independently read",
+  "scopeLimits": [
+    "One Modern shared anonymous direct UI recovery, no Small or four-authenticated-role claim",
+    "No total time-to-ready or physical network switching claim",
+    "Original147.669s XCTestRetry failure cause remainsUNCONFIRMED/P01-008FAILopen",
+    "No camera/GPS/OTP/authentication/profile/message/relationship/media upload used"
+  ],
+  "accountDataWrites": false,
+  "physicalCameraUsed": false,
+  "cameraStatus": "UNTESTED",
+  "YahooBackendOnly": "UNVERIFIED",
+  "processIdentityReadBackAfterSignIn": 47334,
+  "sameProcessVerifiedByNativeLaunchctl": true
+}

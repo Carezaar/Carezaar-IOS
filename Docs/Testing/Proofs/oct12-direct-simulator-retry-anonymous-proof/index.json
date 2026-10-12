@@ -1,0 +1,71 @@
+{
+  "title": "Direct Simulator UI activation of uncached offline Retry",
+  "baselineMainCommitSHA": "69195036e92fe7b0fbb479185acbebffa3f17f53",
+  "artifacts": [
+    {
+      "path": "Artifacts/oct12-direct-retry-before-click-anonymous.json",
+      "description": "Uncached actual error/cache-absence precondition before direct UI activation",
+      "sha256": "c55ff0572be984b149750e695086a10cbd84d0485a6a677b4cfb60aef77e00c3",
+      "packagedSha256": "c55ff0572be984b149750e695086a10cbd84d0485a6a677b4cfb60aef77e00c3"
+    },
+    {
+      "path": "Artifacts/oct12-direct-retry-recovery-anonymous.json",
+      "description": "Root-observed direct native activation and independently inspectable recovered cache/PID facts; request-tail limits",
+      "sha256": "916b714ba2cca01f3ab9e4ac16cb690686792bf59f261fcad68f40fe95372169",
+      "packagedSha256": "916b714ba2cca01f3ab9e4ac16cb690686792bf59f261fcad68f40fe95372169"
+    },
+    {
+      "path": "Artifacts/oct12-direct-retry-before-click-public.png",
+      "description": "Actual anonymous public loading/error/Retry viewport",
+      "sha256": "348d67611cca2b01f6f101c6c83a5bf71ce96ca0e57f56a1113e06c021ab0473",
+      "packagedSha256": "348d67611cca2b01f6f101c6c83a5bf71ce96ca0e57f56a1113e06c021ab0473"
+    },
+    {
+      "path": "Artifacts/oct12-direct-retry-sign-in-public.png",
+      "description": "Actual empty Sign In fields and disabled submit after direct native recovery",
+      "sha256": "2a99d7757e550bd531a37211d0dec22ce48463bc6ee0d6535eb64e06af9268b0",
+      "packagedSha256": "2a99d7757e550bd531a37211d0dec22ce48463bc6ee0d6535eb64e06af9268b0"
+    }
+  ],
+  "rootReviewed": true,
+  "independentReviewed": true,
+  "observationProvenance": "Root operated cua_repl on Simulator and reported returned native UI states; snapshots/cache/PID readback retained. Independent reviewer did not drive the live CUA interaction.",
+  "scopeLimits": [
+    "One Modern anonymous direct UI activation; not a physical-human touch or a Small/four-authenticated-role test",
+    "Metadata4\u21925 and leading dataset counts observed; full native ledger tail unavailable from truncated CUA AX description, so no all22-request uniqueness claim",
+    "Actual complete22/21 unique cache and samePID verified after directSignIn navigation",
+    "Original147.669second automatedRetry failure cause remainsunconfirmed/P01-008FAILopen",
+    "No source/test changes or new originalcaseclosure; physicalcamera/Yahoo remainunverified"
+  ],
+  "rootReviewScope": "Root operated current Simulator UI, viewed both actual public PNGs, verified cachefile absence/recovered22/21/uniqueIDs and unchangedPID47334. Root-reported CUA states have explicit truncated-counter limits; no complete native request uniqueness or originalfailure cause claimed.",
+  "independentReview": {
+    "reviewer": "Independent startup QA verifier /root/cache_review",
+    "checkedAtUTC": "2026-10-12T04:57:39.711256+00:00",
+    "verdict": "PASS for four-artifact directSimulatorUI observation evidence; original P01-008 remainsFAIL/open",
+    "artifactCount": 4,
+    "allArtifactHashesMatched": true,
+    "actualPNGViewed": 2,
+    "provenance": "Root operated currentSimulator throughcua_repl and authored twoobservationJSONs fromreturned nativeUI/CLIreadback states. Reviewer didnotoperateSimulator or independentlyreplay rawliveCUAsequence/PIDquery; independentlyinspected selectedPNGpixels/JSONs, savedactualcachebytes andsourcebaseline.",
+    "pixelGate": "ActualpublicerrorPNG shows complete Cannotcommunicate/Retrypanel; actualSignInPNG shows publicemptyEmailAddress/Passwordplaceholders andneutraldisabledsubmit. No enteredprivatevalues/account/media visible.",
+    "cacheGate": "Independentlyparsed preservedrecoveredcachebytes; hash matchesreport, schema3exact22datasets21advertisedkeys, expectedcounts/uniquerows/marker matchanonymousinspection. Pastcacheabsencebeforeclick isrootcapturedprecondition, not independentlyrecreated.",
+    "interactionGate": "Rootreported directnativeRetryactivation thenmetadata4\u21925/errorremoved/Welcome\u2192SignIn. SamePID47334 inrootlaunch/readbackrecords consistent. FullCUAAXledger tail truncated; noall22nativeGETuniqueness ortime-to-ready assertion.",
+    "sourceGate": "Currentproduct/tests matchbaseline69195036e92fe7b0fbb479185acbebffa3f17f53; no source/test delta for thisinteraction.",
+    "privacy": "Fourartifacts contain publicloading/formpixels andanonymous count/cache/marker/timing/processnumber/observationmetadata only; no privateidentities/credentials/URLs/privatepaths/personalmedia. Fullsavedreferencecache remainsprivate.",
+    "caseClosureApproved": false,
+    "originalCaseStatus": "P01-008 remainsFAIL/open; original147.669s failedautomatedRetry causeUNCONFIRMED. One directCUAsuccess doesnotprove originaltapcause orfix.",
+    "limitations": [
+      "OneModernsharedanonymouspre-role directUIactivation, nothumanphysicaltouch/Small/fourauthenticatedrole proof.",
+      "Rootobservations areexplicitprovenance, not reviewerdrivenUIorcomplete rawliveAXreplay.",
+      "Noall22requestuniqueness/physicalWiFiswitch/totalreadytime claim.",
+      "Noauthentication/camera/GPS/OTP/profile/messages/relationships/mediaupload performed in reportedsequence.",
+      "PhysicalcameraUNTESTED,Yahoobackend-onlyUNVERIFIED;nofullQAorcasepromotion."
+    ],
+    "resourcesOpened": "None."
+  },
+  "publicPackage": {
+    "rootReviewed": true,
+    "independentReviewed": true,
+    "originalEvidencePreserved": true,
+    "rawLogsXCResultsFullScreenPhotosPrivateFixturesIncluded": false
+  }
+}
