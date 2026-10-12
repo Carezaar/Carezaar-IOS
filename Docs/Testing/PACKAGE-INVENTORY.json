@@ -1,5 +1,5 @@
 {
-  "status": "Client update implementation and final credential guard verified for engineering review; final main delivery pending remote verification. Full original QA remains incomplete.",
+  "status": "Client update implementation delivered to authorized main at9bbe0f262e7d5a9811167f6a7c34505d13cc06db; remote source/report proof verified, fresh clean build and both-role native smoke PASS. Full original QA remains incomplete.",
   "reports": [
     "IOS_TEST_EXECUTION_REPORT.md",
     "IOS-FUNCTIONAL-PARITY-MATRIX.md",
@@ -712,10 +712,38 @@
         "resourcesOpened": "None",
         "mutations": "Only this private verdict and candidate independentReviewed/independentReview fields."
       }
+    },
+    {
+      "index": "Proofs/oct12-login-storage-postpush-anonymous-proof/index.json",
+      "artifactCount": 5,
+      "bytes": 1894,
+      "reviewProvenance": {
+        "reviewer": "Independent QA verifier /root/cache_review",
+        "checkedAtUTC": "2026-10-12T09:00:47.022888+00:00",
+        "verdict": "PASS for committed-source fresh-build, focused credential regression and typed native role smoke; no full QA approval",
+        "sourceCommitSHA": "9bbe0f262e7d5a9811167f6a7c34505d13cc06db",
+        "artifactCount": 5,
+        "allHashesVerified": true,
+        "testedSourceBaseline": "oct12-login-storage-tested-source-baseline-private.json",
+        "all674TestedFileHashesMatchCurrent": true,
+        "localHEADMatchesSourceCommit": true,
+        "remoteVerificationProvenance": "Root verified remote SHA and five remote-file bytes; independent reviewer did not repeat external actions.",
+        "gates": {
+          "actualResults": "Independently read actual xcresult summaries: client2 Passed/0 failed/0 skipped, caregiver1 Passed/0 failed/0 skipped; matching private validations and terminal method logs. Focused storage regression0.010 seconds, client native25.835, caregiver native27.317.",
+          "cleanBuild": "Actual clean build-for-testing log contains fresh postpush derived-data path and TEST BUILD SUCCEEDED; build-log digest matches debug-image record. Native test execution uses corresponding built products.",
+          "debugImages": "Both actual Debug executable images match recorded SHA256 and exclude SIGNIN_HANDOFF_DIAGNOSTIC bytes; credential guard message appears in Carezaar.debug.dylib, not launcher image.",
+          "nativeRecords": "Four public counts records match raw exported bytes. Prelogin counters allzero, no automatedQALogin; typed login one/authInfoone/refreshzero/no opposite-role list; correct role lists clienttwo/caregiverone. Current test asserts native fields/input/masked password, actual single submit, authenticated Main and loaded own-role list; setup authentication is separate. No list deduplication claim.",
+          "privacy": "Five JSONs contain anonymous counters/roles/stages/status/hashes and public repository/commit only. No private identity, credentials, token values, private paths, backend URLs or media. No pixels included.",
+          "originalScope": "No original-case promotion; original Small cause UNCONFIRMED, Retry and P17 remain open, camera UNTESTED and Yahoo attribution UNVERIFIED. Simulator builds/smoke do not prove physical signing/distribution or Release runtime."
+        },
+        "provenance": "Root built/executed tests and verified remote delivery. Reviewer read current source/test, all five records, raw exported bytes by hash, terminal build/test logs, actual xcresult summaries, source snapshot and actual Debug images. No app/API/UI operations.",
+        "resourcesOpened": "None",
+        "mutations": "Only this private verdict and candidate independentReviewed/independentReview."
+      }
     }
   ],
-  "proofIndexCount": 65,
-  "indexedArtifactCount": 1046,
+  "proofIndexCount": 66,
+  "indexedArtifactCount": 1051,
   "originalEvidenceIntact": true,
   "excludedTypes": [
     "raw logs",
@@ -737,59 +765,64 @@
   "documents": [
     {
       "path": "IOS_TEST_EXECUTION_REPORT.md",
-      "bytes": 84734,
-      "sha256": "c0272d6b4bff03944540a25e737c0e757438de3696a10014560b8d3670f39f5b"
+      "bytes": 84839,
+      "sha256": "f5024960bd393f448b691f31c65dcee82d6e28f234bf573eb5a934c7eb3e9632"
     },
     {
       "path": "IOS-FUNCTIONAL-PARITY-MATRIX.md",
-      "bytes": 83541,
-      "sha256": "bd5c7a61ab5c6d03b51fee56030baeaabd582f7cf8fc93e86e8450515411202e"
+      "bytes": 83646,
+      "sha256": "13f35531f21ff7060ee3b582ebfb641de91e94ef0d89a22606e48ce0ae47aafd"
     },
     {
       "path": "IOS-FIGMA-PARITY.md",
-      "bytes": 79582,
-      "sha256": "a536c41e1269a7b0046549517b337268051b9da8fdaa0332fb1ba0dc401f3471"
+      "bytes": 79687,
+      "sha256": "2ee0644b1d403208ff6b6093446be0fe0255ab29a48f9086c1bfcf9a9d69a9f5"
     },
     {
       "path": "BACKEND-ISSUES-FOR-CLIENT.md",
-      "bytes": 83030,
-      "sha256": "f984f1990d62918cff568153b659d8cb6a11367dc4bd6c1baa72f4627f7e5a0c"
+      "bytes": 83135,
+      "sha256": "c67106897ebd12723ca38597461573658184138534124c09c43ec2afbc908fd3"
     },
     {
       "path": "QA-CASE-MANIFEST.md",
-      "bytes": 524119,
-      "sha256": "beea2e591d8fe19f5481f43d48f92d01acf42ec12e8d4c3756f4bd80353cac9c"
+      "bytes": 524224,
+      "sha256": "efdb418b5b3999f8737814e73dc8916d28736e0e33124af33ad5765c0419da03"
     },
     {
       "path": "EVIDENCE-COVERAGE-MAPPING.md",
-      "bytes": 691262,
-      "sha256": "e41edb8d341bb983adf923b92e3c7de1918d95b130a737a1f0fe85f80679212f"
+      "bytes": 691367,
+      "sha256": "2350fd21084ae9058c2d66210b6b7b515210ea33815f0076fb8c519d567592ac"
     },
     {
       "path": "ACCESSIBILITY-TRIAGE.md",
-      "bytes": 152595,
-      "sha256": "1a4b92acd4b94ae4847dcff598f81367b002deca74474b29ea1fc01ffca9aeac"
+      "bytes": 152700,
+      "sha256": "c2661be84fa14aa8bd39d2e4e751c107309300452a46f7e2b2b5d364ba9cabad"
     },
     {
       "path": "NATIVE-SIGNUP-EXECUTION.md",
-      "bytes": 148585,
-      "sha256": "89facb421df3beb709a8c8f69f485a2c8eb19ffc124d1c215af1d8e23cb61de9"
+      "bytes": 148690,
+      "sha256": "5f6005e1f68b442a2d2581ba20dc4b709e2de6d2f451fa7b527e6554c412294b"
     },
     {
       "path": "CROSS-ROLE-EXECUTION.md",
-      "bytes": 149827,
-      "sha256": "ce38ff85aa086350622ccdf6d4002ff826eeff245d7eb4bd654a011cbc89d2b3"
+      "bytes": 149932,
+      "sha256": "d6e255dac42d0147d0afdb1255160ee108070732652b0ff775bd504e00968643"
     },
     {
       "path": "README.md",
-      "bytes": 45608,
-      "sha256": "6d7036b29d6c0b7ab730f7ac361b84650cf12f7f74bf0e536f0ab48d7aaa9af2"
+      "bytes": 45713,
+      "sha256": "3a692c129094125b7e742ac3abb7b6c55d685562abffa7d2795bceb3cc859e5e"
+    },
+    {
+      "path": "CLIENT-UPDATE-HANDOFF.md",
+      "bytes": 3044,
+      "sha256": "b55e709c31388b5b32abe55a0b6666fe6ffca455774a72ab34493b96f382dc67"
     }
   ],
   "readme": {
     "path": "README.md",
-    "bytes": 45608,
-    "sha256": "6d7036b29d6c0b7ab730f7ac361b84650cf12f7f74bf0e536f0ab48d7aaa9af2"
+    "bytes": 45713,
+    "sha256": "3a692c129094125b7e742ac3abb7b6c55d685562abffa7d2795bceb3cc859e5e"
   },
   "credentialGuardVerification": {
     "productionSourceChanged": true,
@@ -797,6 +830,8 @@
     "nativePassingRoleDeviceAllocations": 4,
     "originalSmallFailureCause": "UNCONFIRMED",
     "originalFullCaseClosureApproved": false,
-    "finalMainDeliveryPending": true
+    "finalMainDeliveryPending": false,
+    "implementationCommit": "9bbe0f262e7d5a9811167f6a7c34505d13cc06db",
+    "postPushCleanBuildAndSmoke": "PASS"
   }
 }

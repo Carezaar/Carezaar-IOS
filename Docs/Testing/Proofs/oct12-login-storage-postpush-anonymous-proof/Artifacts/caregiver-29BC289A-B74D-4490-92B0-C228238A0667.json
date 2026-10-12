@@ -1,0 +1,12 @@
+{
+  "authInfoAttempts" : 1,
+  "automatedQALoginUsed" : false,
+  "caregiverListAttempts" : 1,
+  "case" : "P02-012",
+  "clientListAttempts" : 0,
+  "inputMethod" : "public-native-fields",
+  "loginAttempts" : 1,
+  "refreshAttempts" : 0,
+  "role" : "caregiver",
+  "stage" : "typed-login-role-list-loaded"
+}

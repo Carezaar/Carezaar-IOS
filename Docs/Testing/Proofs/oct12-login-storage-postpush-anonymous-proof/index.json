@@ -1,0 +1,84 @@
+{
+  "title": "Committed client-update login guard: clean build and native role smoke",
+  "sourceCommitSHA": "9bbe0f262e7d5a9811167f6a7c34505d13cc06db",
+  "artifacts": [
+    {
+      "path": "Artifacts/client-783073D5-0D38-47B9-9CF9-0782E2D5ADBA.json",
+      "description": "P02-012-typed-login-role-list-loaded-client_0_CE744A77-7FAF-4812-9891-BA9EEFF9BE1D.json",
+      "sha256": "70ae2deb3b10da0a8d2a8878976888f93ccee043465035916705cbd627c6b598",
+      "packagedSha256": "70ae2deb3b10da0a8d2a8878976888f93ccee043465035916705cbd627c6b598"
+    },
+    {
+      "path": "Artifacts/client-CF02880C-63E9-419B-9649-E88FEF6E3BF6.json",
+      "description": "P02-012-public-sign-in-ready-client_0_59436CD9-EA3D-4BA2-A168-4572164A9CD7.json",
+      "sha256": "aeea1cf1a92d5c2fc751544a26507d93ce16c94d062231874b4142e5856224c4",
+      "packagedSha256": "aeea1cf1a92d5c2fc751544a26507d93ce16c94d062231874b4142e5856224c4"
+    },
+    {
+      "path": "Artifacts/caregiver-29BC289A-B74D-4490-92B0-C228238A0667.json",
+      "description": "P02-012-typed-login-role-list-loaded-caregiver_0_5F9FB284-8F08-4BB3-BFD2-32EFA6066326.json",
+      "sha256": "07c5040106ca935c6ad8c039ef82fff46f4747af1be88a33aff259b7ea3c6da7",
+      "packagedSha256": "07c5040106ca935c6ad8c039ef82fff46f4747af1be88a33aff259b7ea3c6da7"
+    },
+    {
+      "path": "Artifacts/caregiver-29052C13-7E80-4205-B486-5A0367CAEFB8.json",
+      "description": "P02-012-public-sign-in-ready-caregiver_0_C04B3BCA-25DF-4985-BA3C-A21680403FDB.json",
+      "sha256": "3e5a92c4bbb682374639554bb37ed022525d263f480e4bb0847b214c2518a3e0",
+      "packagedSha256": "3e5a92c4bbb682374639554bb37ed022525d263f480e4bb0847b214c2518a3e0"
+    },
+    {
+      "path": "Artifacts/summary.json",
+      "description": "Verified main source delivery, fresh clean build and actual typed native role smoke",
+      "sha256": "6ddd250a4e5cd6db67aa35073959dac7fbda9a9b79a12798305f475db61790c2",
+      "packagedSha256": "6ddd250a4e5cd6db67aa35073959dac7fbda9a9b79a12798305f475db61790c2"
+    }
+  ],
+  "results": [
+    {
+      "role": "client",
+      "result": "PASS",
+      "seconds": 25.835
+    },
+    {
+      "role": "caregiver",
+      "result": "PASS",
+      "seconds": 27.317
+    }
+  ],
+  "rootReviewed": true,
+  "independentReviewed": true,
+  "scopeLimits": [
+    "Original full QA and unresolved Retry/accessibility/Small observations remain open",
+    "No opposite-role, hidden-login or refresh traffic in native smoke; setup authentication is separate",
+    "No physical camera, Yahoo backend-only, physical signing/distribution or Release-runtime claim"
+  ],
+  "independentReview": {
+    "reviewer": "Independent QA verifier /root/cache_review",
+    "checkedAtUTC": "2026-10-12T09:00:47.022888+00:00",
+    "verdict": "PASS for committed-source fresh-build, focused credential regression and typed native role smoke; no full QA approval",
+    "sourceCommitSHA": "9bbe0f262e7d5a9811167f6a7c34505d13cc06db",
+    "artifactCount": 5,
+    "allHashesVerified": true,
+    "testedSourceBaseline": "oct12-login-storage-tested-source-baseline-private.json",
+    "all674TestedFileHashesMatchCurrent": true,
+    "localHEADMatchesSourceCommit": true,
+    "remoteVerificationProvenance": "Root verified remote SHA and five remote-file bytes; independent reviewer did not repeat external actions.",
+    "gates": {
+      "actualResults": "Independently read actual xcresult summaries: client2 Passed/0 failed/0 skipped, caregiver1 Passed/0 failed/0 skipped; matching private validations and terminal method logs. Focused storage regression0.010 seconds, client native25.835, caregiver native27.317.",
+      "cleanBuild": "Actual clean build-for-testing log contains fresh postpush derived-data path and TEST BUILD SUCCEEDED; build-log digest matches debug-image record. Native test execution uses corresponding built products.",
+      "debugImages": "Both actual Debug executable images match recorded SHA256 and exclude SIGNIN_HANDOFF_DIAGNOSTIC bytes; credential guard message appears in Carezaar.debug.dylib, not launcher image.",
+      "nativeRecords": "Four public counts records match raw exported bytes. Prelogin counters allzero, no automatedQALogin; typed login one/authInfoone/refreshzero/no opposite-role list; correct role lists clienttwo/caregiverone. Current test asserts native fields/input/masked password, actual single submit, authenticated Main and loaded own-role list; setup authentication is separate. No list deduplication claim.",
+      "privacy": "Five JSONs contain anonymous counters/roles/stages/status/hashes and public repository/commit only. No private identity, credentials, token values, private paths, backend URLs or media. No pixels included.",
+      "originalScope": "No original-case promotion; original Small cause UNCONFIRMED, Retry and P17 remain open, camera UNTESTED and Yahoo attribution UNVERIFIED. Simulator builds/smoke do not prove physical signing/distribution or Release runtime."
+    },
+    "provenance": "Root built/executed tests and verified remote delivery. Reviewer read current source/test, all five records, raw exported bytes by hash, terminal build/test logs, actual xcresult summaries, source snapshot and actual Debug images. No app/API/UI operations.",
+    "resourcesOpened": "None",
+    "mutations": "Only this private verdict and candidate independentReviewed/independentReview."
+  },
+  "publicPackage": {
+    "rootReviewed": true,
+    "independentReviewed": true,
+    "originalEvidencePreserved": true,
+    "rawLogsXCResultsFullScreenPhotosPrivateFixturesIncluded": false
+  }
+}
