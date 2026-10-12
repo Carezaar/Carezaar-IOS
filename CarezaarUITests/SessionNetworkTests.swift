@@ -25,6 +25,104 @@ final class SessionNetworkTests: XCTestCase {
 
     // MARK: Session
 
+    /// Real owned saved tokens, an actual persisted reference cache, and a
+    /// connection-refused startup. Host witnesses separately inspect cache bytes.
+    func testOfflineSavedSessionClearsAuthenticationAndKeepsCachedWelcomeUsable() throws {
+        anonymousLogoutEvidenceOnly = true
+        let fixture = try ownedPrimaryFixture()
+        launchPrimarySession(["--qa-signout", "--qa-login-env"])
+        XCTAssertTrue(app.buttons["Messages"].waitForExistence(timeout: 60))
+        waitForMatchesLoaded(fixture)
+        assertNativeStoredTokenPresence(access: true, refresh: true)
+        recordSessionEvidence("offline-cache-warm-owned-session", fixture: fixture)
+        // Give the independent host witness a bounded observation window while
+        // asserting that the real authenticated UI remains stable.
+        let warmLost = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            !self.app.buttons["Messages"].exists
+        }, object: nil)
+        warmLost.isInverted = true
+        XCTAssertEqual(XCTWaiter.wait(for: [warmLost], timeout: 4), .completed)
+
+        launchPrimarySession(["--qa-offline", "0", "120"])
+        XCTAssertFalse(app.launchArguments.contains("--qa-signout"))
+        XCTAssertFalse(app.launchArguments.contains("--qa-login-env"))
+        let signIn = app.buttons["Sign in"].firstMatch
+        XCTAssertTrue(signIn.waitForExistence(timeout: 60))
+        XCTAssertTrue(signIn.isEnabled, "A valid reference cache must keep Welcome usable offline")
+        XCTAssertFalse(app.buttons["Messages"].exists)
+        assertNativeStoredTokenPresence(access: false, refresh: false)
+        // One logical GET has an initial attempt plus three bounded retries
+        // for cannotConnectToHost in APIClient.transfer.
+        XCTAssertEqual(requestCount("GET /api/auth/info"), 4)
+        for route in ["POST /api/auth/login", "PUT /api/auth/refresh", "DELETE /api/auth/logout",
+                      "GET /api/clients/matches", "GET /api/caregivers/matches"] {
+            XCTAssertEqual(requestCount(route), 0)
+        }
+        let mainReturned = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            self.app.buttons["Messages"].exists || !signIn.exists || !signIn.isEnabled
+        }, object: nil)
+        mainReturned.isInverted = true
+        XCTAssertEqual(XCTWaiter.wait(for: [mainReturned], timeout: 4), .completed)
+        XCTAssertEqual(requestCount("GET /api/base/info"), 4)
+        let ledger = app.staticTexts["qa-request-counts"].label
+        XCTAssertFalse(ledger.split(separator: "\n").contains {
+            $0.hasPrefix("GET /api/base/") && !$0.hasPrefix("GET /api/base/info=")
+        }, "Offline cache use must not dispatch dataset downloads")
+        let counts = XCTAttachment(string: ledger)
+        counts.name = "offline-cache-complete-native-transport-ledger"
+        counts.lifetime = .keepAlways; add(counts)
+        recordSessionEvidence("offline-cache-welcome-tokens-cleared", fixture: fixture)
+        for _ in 0..<8 {
+            if signIn.isHittable { break }
+            app.swipeUp(velocity: .slow)
+        }
+        XCTAssertTrue(signIn.isHittable)
+        signIn.tap()
+        XCTAssertTrue(app.textFields.firstMatch.waitForExistence(timeout: 10))
+        XCTAssertTrue(app.secureTextFields.firstMatch.exists)
+        XCTAssertEqual(requestCount("POST /api/auth/login"), 0)
+        let emptySubmit = app.buttons["Sign In"].firstMatch
+        XCTAssertTrue(emptySubmit.exists && !emptySubmit.isEnabled)
+        for _ in 0..<8 {
+            if emptySubmit.frame.width >= 44 && emptySubmit.frame.height >= 44
+                && app.frame.contains(emptySubmit.frame) { break }
+            app.swipeUp(velocity: .slow)
+        }
+        XCTAssertGreaterThanOrEqual(emptySubmit.frame.width, 44)
+        XCTAssertGreaterThanOrEqual(emptySubmit.frame.height, 44)
+        XCTAssertTrue(app.frame.contains(emptySubmit.frame), "Public empty Sign In control must be fully exposed before capture")
+        let crop = XCTAttachment(screenshot: emptySubmit.screenshot())
+        crop.name = "offline-cache-empty-sign-in-control-only"; crop.lifetime = .keepAlways; add(crop)
+
+        // A fresh process has no signout/login/offline or seeded-token flags.
+        launchPrimarySession([])
+        XCTAssertTrue(signIn.waitForExistence(timeout: 60))
+        XCTAssertTrue(signIn.isEnabled)
+        assertNativeStoredTokenPresence(access: false, refresh: false)
+        let restored = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            self.app.buttons["Messages"].exists || !signIn.exists
+        }, object: nil)
+        restored.isInverted = true
+        XCTAssertEqual(XCTWaiter.wait(for: [restored], timeout: 5), .completed)
+        for route in ["GET /api/auth/info", "POST /api/auth/login", "PUT /api/auth/refresh",
+                      "GET /api/clients/matches", "GET /api/caregivers/matches"] {
+            XCTAssertEqual(requestCount(route), 0)
+        }
+        recordSessionEvidence("offline-cache-ordinary-online-relaunch-signed-out", fixture: fixture)
+        let signedOutLost = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            self.app.buttons["Messages"].exists || !signIn.exists
+        }, object: nil)
+        signedOutLost.isInverted = true
+        XCTAssertEqual(XCTWaiter.wait(for: [signedOutLost], timeout: 4), .completed)
+
+        launchPrimarySession(["--qa-login-env"])
+        XCTAssertTrue(app.buttons["Messages"].waitForExistence(timeout: 60))
+        waitForMatchesLoaded(fixture)
+        assertNativeStoredTokenPresence(access: true, refresh: true)
+        XCTAssertEqual(requestCount("POST /api/auth/login"), 1)
+        recordSessionEvidence("offline-cache-fresh-owned-login-restored", fixture: fixture)
+    }
+
     /// P08-002 native logout persistence and Cancel/Confirm branch. Authentication
     /// setup/recovery uses the private QA login hook, not typed Sign In coverage.
     /// Debug evidence reads only Keychain-backed token presence booleans, never

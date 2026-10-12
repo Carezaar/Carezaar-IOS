@@ -1,0 +1,11 @@
+{
+  "authenticatedMainVisible" : false,
+  "authInfoAttempts" : 0,
+  "chatListAttempts" : 0,
+  "loginAttempts" : 0,
+  "matchListAttempts" : 0,
+  "refreshAttempts" : 0,
+  "role" : "caregiver",
+  "stage" : "offline-cache-ordinary-online-relaunch-signed-out",
+  "welcomeVisible" : true
+}

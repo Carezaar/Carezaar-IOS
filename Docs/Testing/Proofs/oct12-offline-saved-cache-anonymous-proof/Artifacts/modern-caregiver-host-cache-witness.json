@@ -1,0 +1,53 @@
+{
+  "role": "caregiver",
+  "nativeProcessExit": 0,
+  "stages": {
+    "offline-cache-warm-owned-session": {
+      "role": "caregiver",
+      "stage": "offline-cache-warm-owned-session",
+      "schemaVersion": 3,
+      "checkedAtUTC": "2026-10-12T02:06:20.691590+00:00",
+      "capturedBeforeNextNativeTermination": true,
+      "datasetCount": 22,
+      "advertisedCountsChecked": 21,
+      "completeUniqueCache": true,
+      "cacheSHA256": "f3ffbe1ec7a2b7870405d1a15a2c46ed9653e24a1a4439ad1e756ed152e66154",
+      "serverMarker": 1791657662,
+      "actualNativeAttachmentObserved": true,
+      "exactAppContainerVerified": true
+    },
+    "offline-cache-welcome-tokens-cleared": {
+      "role": "caregiver",
+      "stage": "offline-cache-welcome-tokens-cleared",
+      "schemaVersion": 3,
+      "checkedAtUTC": "2026-10-12T02:06:39.959989+00:00",
+      "capturedBeforeNextNativeTermination": true,
+      "datasetCount": 22,
+      "advertisedCountsChecked": 21,
+      "completeUniqueCache": true,
+      "cacheSHA256": "f3ffbe1ec7a2b7870405d1a15a2c46ed9653e24a1a4439ad1e756ed152e66154",
+      "serverMarker": 1791657662,
+      "actualNativeAttachmentObserved": true,
+      "exactAppContainerVerified": true
+    },
+    "offline-cache-ordinary-online-relaunch-signed-out": {
+      "role": "caregiver",
+      "stage": "offline-cache-ordinary-online-relaunch-signed-out",
+      "schemaVersion": 3,
+      "checkedAtUTC": "2026-10-12T02:06:59.492581+00:00",
+      "capturedBeforeNextNativeTermination": true,
+      "datasetCount": 22,
+      "advertisedCountsChecked": 21,
+      "completeUniqueCache": true,
+      "cacheSHA256": "f3ffbe1ec7a2b7870405d1a15a2c46ed9653e24a1a4439ad1e756ed152e66154",
+      "serverMarker": 1791657662,
+      "actualNativeAttachmentObserved": true,
+      "exactAppContainerVerified": true
+    }
+  },
+  "allThreeNativeStagesWitnessed": true,
+  "cacheBytesUnchangedAcrossAllWitnessedStages": true,
+  "fault": "Debug connection-refused port; physical network not disabled",
+  "freshLoginRecovery": "private QA hook, not typed Sign In",
+  "physicalCameraUsed": false
+}

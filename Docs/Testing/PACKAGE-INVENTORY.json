@@ -1,5 +1,5 @@
 {
-  "status": "Production source remains unchanged; invalid-cache regression commit3c4d75fd641efea0a68c4f4e93ad578e013801cd pushed and remotely verified; required post-push clean build and both-role typed smoke passed; these final verification reports are included in this documentation-only update; full QA remains incomplete",
+  "status": "Four-allocation offline saved-session regression independently verified locally, pending Git delivery; previous engineering delivery preserved; full QA remains incomplete",
   "reports": [
     "IOS_TEST_EXECUTION_REPORT.md",
     "IOS-FUNCTIONAL-PARITY-MATRIX.md",
@@ -391,10 +391,47 @@
         "sourceCommitSHA": "3c4d75fd641efea0a68c4f4e93ad578e013801cd",
         "resourcesOpened": "None."
       }
+    },
+    {
+      "index": "Proofs/oct12-offline-saved-cache-anonymous-proof/index.json",
+      "artifactCount": 28,
+      "bytes": 45748,
+      "reviewProvenance": {
+        "reviewer": "Independent cache QA verifier /root/cache_review",
+        "checkedAtUTC": "2026-10-12T02:10:15.349466+00:00",
+        "verdict": "PASS for exact original P01-007 and P02-004 only",
+        "scope": "Four completed final native executions: Client and Caregiver on Modern and Small. Small Caregiver uses unchanged-source fully-exposed retest; prior failed whole invocation remains preserved.",
+        "gateVerdicts": {
+          "originalCaseScope": "PASS: saved owned authenticated session, valid reference cache, forced process termination and connection-refused startup, cleared credentials with usable Welcome, actual offline Sign in navigation, and next ordinary launch remains signed out on both roles/sizes.",
+          "sourceAndRegression": "PASS: exact current SessionNetworkTests SHA matches candidate; all57 production source hashes match preserved post-A5 107-unit snapshot. Offline/ordinary phases have no signout/login/seed flags.",
+          "nativeExecutions": "PASS: final native logs pass74.627/74.093/73.856/73.670seconds and hashes match; six exact named native attachments per execution are present.",
+          "cacheWitness": "PASS: all12 preserved actual snapshots have schema3, exact22datasets and21advertised keys, counts and uniqueIDs; bytes unchanged across three phases per execution. CheckedAtUTC independently correlated with each raw native attachment and next termination, all0.106\u20130.358seconds after attachment and before phase end.",
+          "sessionAndNavigation": "PASS: executed native keychain-presence assertions require warm access/refreshtrue, offline/ordinaryfalse. Actual offline Sign in tap reaches empty public fields, empty submit disabled; ordinary relaunch no native auth/login/refresh/match calls; fresh QA-hook login restores loaded role data.",
+          "transport": "PASS: four full offline ledgers contain only GET auth/info=4 and GET base/info=4; counts represent one initial plus three bounded connection-refused retries, zero dataset downloads.",
+          "privacyAndPixels": "PASS: all28artifact hashes verified; read20anonymousJSONs/fourledgers, viewed actual public disabledSignIncontrol pixels and verified four PNG dimensions1190x248/676x140 plus identical per-size bytehashes. No private account/credentials/paths/profile/messages/relationships/personalmedia included.",
+          "failurePreservation": "PASS: earlier SmallCaregiver failed129.828second invocation digest matches preserved file; failure at fresh QA-hook login readiness retained with unconfirmed cause, no backend cause inferred."
+        },
+        "artifactCount": 28,
+        "pngCount": 4,
+        "jsonCount": 20,
+        "textCount": 4,
+        "cacheWitnessCount": 12,
+        "productionSourceCount": 57,
+        "scopeLimits": [
+          "Only P01-007 and P02-004 eligible for closure; no other case promotion.",
+          "Debug connection-refused fault represents unavailable transport, not physical Wi-Fi switching/server timeout.",
+          "Fresh login recovery is private QA hook, not typed Sign In coverage.",
+          "Ordinary relaunch metadata dispatch does not certify online reference refresh completion.",
+          "Public bounded control crops do not establish full-screen rendering, accessibility, contrast or P17 closure.",
+          "No screenshot defect is established by duplicate image-preview collapse; actual per-size PNG bytes/dimensions are valid.",
+          "Prior failed SmallCaregiver invocation remains history; unchanged retest passing does not establish its failure cause."
+        ],
+        "resourcesOpened": "None; local read-only artifact inspection and authorized proof metadata update only."
+      }
     }
   ],
-  "proofIndexCount": 55,
-  "indexedArtifactCount": 950,
+  "proofIndexCount": 56,
+  "indexedArtifactCount": 978,
   "originalEvidenceIntact": true,
   "excludedTypes": [
     "raw logs",
@@ -407,8 +444,8 @@
   ],
   "currentOriginalCaseCounts": {
     "total": 374,
-    "PASS": 106,
-    "NOT RUN": 250,
+    "PASS": 108,
+    "NOT RUN": 248,
     "FAIL": 2,
     "BLOCKED": 1,
     "N/A": 15
@@ -416,58 +453,58 @@
   "documents": [
     {
       "path": "IOS_TEST_EXECUTION_REPORT.md",
-      "bytes": 72773,
-      "sha256": "0455fd35446b06a23bc6a68396bf4530487389c80ba75908ab4a1a8e75f9eb61"
+      "bytes": 74301,
+      "sha256": "100b5f2573b9f2d295fedd5fdded7411f33cb40c11fe871fd41d52e02f45f6ab"
     },
     {
       "path": "IOS-FUNCTIONAL-PARITY-MATRIX.md",
-      "bytes": 72842,
-      "sha256": "03c9242ccbc3f403888f3fe394404757c478ed0e2c93229018301e418674bec5"
+      "bytes": 74370,
+      "sha256": "d661dd56f5a16699e2b27c0d899c4086138b5fd5139a1bc473dfb2a65b1b893f"
     },
     {
       "path": "IOS-FIGMA-PARITY.md",
-      "bytes": 68883,
-      "sha256": "c42f5d42ff85e8cc6e3f37ea5a5fcb7385d906e241400fc9410a444b394afdd9"
+      "bytes": 70411,
+      "sha256": "8a1ef81aa69b0bff9c6fec2ff3c7049b9c41ba472d1b155b300823d9666ad445"
     },
     {
       "path": "BACKEND-ISSUES-FOR-CLIENT.md",
-      "bytes": 72331,
-      "sha256": "f7c24c112510c55670dc74593337d47b810f43eb60dfb61aa1687268ab70c27f"
+      "bytes": 73859,
+      "sha256": "1fc3364f8d3e7a78b58dbc7592bd61a91c48241b99dfcb08f8cb42fecc8d5f15"
     },
     {
       "path": "QA-CASE-MANIFEST.md",
-      "bytes": 510768,
-      "sha256": "945d068bdc4cbea4d6c7cac98cb5b0ab6a01e35bb0abda40f3ebd46df4843c31"
+      "bytes": 513122,
+      "sha256": "80cd9da3d963d13cc211cdaf55463b5b74345e118e529879a18b9e3200aaf8ab"
     },
     {
       "path": "EVIDENCE-COVERAGE-MAPPING.md",
-      "bytes": 679337,
-      "sha256": "df034a947d7647ba042ec2511bcc7c0e8dfdfff84fef64d9ae9a46904cb6d175"
+      "bytes": 682091,
+      "sha256": "0a7e9d67a315bf2c612c95483a1c772b56f8b5c88a2ceafda88e2edf087f63dd"
     },
     {
       "path": "ACCESSIBILITY-TRIAGE.md",
-      "bytes": 141896,
-      "sha256": "64f30b6b6f52335c22eb67b942184bac4e12bf805b6cd5254a9b1c313b0f2f3a"
+      "bytes": 143424,
+      "sha256": "02f231eeb3f370b12f0d5e72fc4e2a7d133c877d252e04a70dec2db088601020"
     },
     {
       "path": "NATIVE-SIGNUP-EXECUTION.md",
-      "bytes": 137886,
-      "sha256": "164b13ac0e4d11f688e036c230d292b212bb47aea00aeae52aa37cadd6c2ee79"
+      "bytes": 139414,
+      "sha256": "ee54d387c90308c7f00c9a36a5bbeb1dda5c6e016589a327c51a672bcf4838cd"
     },
     {
       "path": "CROSS-ROLE-EXECUTION.md",
-      "bytes": 139128,
-      "sha256": "f6b4af36491ee36a7888ea41a3429ba83bd61610ba623793b5a8788f51b87db2"
+      "bytes": 140656,
+      "sha256": "f835a8d4227195c55ee9555bb5d3aca817790de996ccb97cc92df73ac874b2e1"
     },
     {
       "path": "README.md",
-      "bytes": 34909,
-      "sha256": "406685f54e59187caced4aa79f5caa37950476e85185f158565c794918550744"
+      "bytes": 36437,
+      "sha256": "225dade7a3ebe2e46d53bef9a849fad9ef87d8cecaecbce549f02eac806c8e8c"
     }
   ],
   "readme": {
     "path": "README.md",
-    "bytes": 34909,
-    "sha256": "406685f54e59187caced4aa79f5caa37950476e85185f158565c794918550744"
+    "bytes": 36437,
+    "sha256": "225dade7a3ebe2e46d53bef9a849fad9ef87d8cecaecbce549f02eac806c8e8c"
   }
 }

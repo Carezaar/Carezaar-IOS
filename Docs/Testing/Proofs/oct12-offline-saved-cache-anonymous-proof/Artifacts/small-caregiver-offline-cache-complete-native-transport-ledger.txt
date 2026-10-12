@@ -1,0 +1,2 @@
+GET /api/auth/info=4
+GET /api/base/info=4

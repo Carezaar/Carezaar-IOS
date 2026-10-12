@@ -1,0 +1,290 @@
+{
+  "title": "Native saved-session offline startup with valid persisted references",
+  "cases": [
+    "P01-007",
+    "P02-004"
+  ],
+  "baselineCommitSHA": "2e4de0792593183fc43c7c634bb74a0096628218",
+  "testSourceSHA256": "a7ae5560095af7e3f02ed4725ebad2e631ef6657f94f776a44577e8a64e38346",
+  "productionSourceUnchanged": true,
+  "results": [
+    {
+      "deviceSize": "modern",
+      "role": "client",
+      "status": "PASS",
+      "durationSeconds": 74.627,
+      "logSHA256": "c706ecdd40af818fc8089e06fe87a75f166d81dd19f4036dc18d3f7cd0b7cf51",
+      "fault": "Debug connection refused; physical network unchanged"
+    },
+    {
+      "deviceSize": "modern",
+      "role": "caregiver",
+      "status": "PASS",
+      "durationSeconds": 74.093,
+      "logSHA256": "e40fd4ec35d14290509420b48b3eea2132f0c0ed662ca044ebbce3d5e13dc614",
+      "fault": "Debug connection refused; physical network unchanged"
+    },
+    {
+      "deviceSize": "small",
+      "role": "client",
+      "status": "PASS",
+      "durationSeconds": 73.856,
+      "logSHA256": "517efb9a8982aef10dc1c056fe6a4d0200176da3b460d321788dcec5033c079c",
+      "fault": "Debug connection refused; physical network unchanged"
+    },
+    {
+      "deviceSize": "small",
+      "role": "caregiver",
+      "status": "PASS",
+      "durationSeconds": 73.67,
+      "logSHA256": "d680406271a75f42bcbf5a15fa1e6ca56ad2f64a2acd6bc78aa8bf0d36312d1b",
+      "fault": "Debug connection refused; physical network unchanged"
+    }
+  ],
+  "offlineNativeTransportAttemptsPerRun": {
+    "authInfo": 4,
+    "baseInfo": 4,
+    "datasetGETs": 0
+  },
+  "cacheWitnessStages": [
+    "warm actual owned session",
+    "offline Welcome with tokens cleared",
+    "ordinary online signed-out relaunch"
+  ],
+  "assertedNativeKeychainPresence": {
+    "warmAccessAndRefresh": true,
+    "offlineAccessAndRefresh": false,
+    "ordinaryRelaunchAccessAndRefresh": false
+  },
+  "actualOfflineSignInNavigation": true,
+  "freshLoginRecovery": "private QA hook; not typed Sign In coverage",
+  "setupAPIIdentityReadsAndLoginSeparateFromNativeCounters": true,
+  "excludedScreenshotArtifacts": [],
+  "scopeLimits": [
+    "Connection-refused test, not physical Wi-Fi switching or server timeout",
+    "Cached reference usability and byte preservation; no claim metadata dispatch proves online refresh completion",
+    "No broad accessibility, physical camera, Yahoo delivery or production-readiness pass",
+    "Public control crops establish only their bounded visual scope, without full rendered-screen or accessibility claims",
+    "Prior Small caregiver whole invocation failed at fresh QA-hook login readiness in129.828seconds; unchanged focused repeat preserved; failure cause unconfirmed"
+  ],
+  "preservedPriorFailure": {
+    "deviceSize": "small",
+    "role": "caregiver",
+    "status": "FAIL",
+    "durationSeconds": 129.828,
+    "stage": "fresh QA-hook login recovery readiness timeout60s",
+    "cause": "unconfirmed",
+    "logSHA256": "4d14afe6c485dbaf2be865ec4fa044077c5bb3189118af49be6129a788139ef4"
+  },
+  "rootReviewed": true,
+  "independentReviewed": true,
+  "artifacts": [
+    {
+      "path": "Artifacts/modern-client-offline-cache-fresh-owned-login-restored.json",
+      "description": "Actual native offline-cache-fresh-owned-login-restored, modern client",
+      "sha256": "3d0a47e7b514bf406e5a996123d2a9eb83c8cb94d2044397bc6416a976d4ee2b",
+      "packagedSha256": "3d0a47e7b514bf406e5a996123d2a9eb83c8cb94d2044397bc6416a976d4ee2b"
+    },
+    {
+      "path": "Artifacts/modern-client-offline-cache-ordinary-online-relaunch-signed-out.json",
+      "description": "Actual native offline-cache-ordinary-online-relaunch-signed-out, modern client",
+      "sha256": "d9a531bc36f6e4a95697bb95f61f2f31fc50052622614f5216bd96b2de94a42b",
+      "packagedSha256": "d9a531bc36f6e4a95697bb95f61f2f31fc50052622614f5216bd96b2de94a42b"
+    },
+    {
+      "path": "Artifacts/modern-client-offline-cache-empty-sign-in-control-only.png",
+      "description": "Actual native offline-cache-empty-sign-in-control-only, modern client",
+      "sha256": "ac90becb8e0855cec9a1eec90524a72745905688b1577d6c6345acc01e9df90f",
+      "packagedSha256": "ac90becb8e0855cec9a1eec90524a72745905688b1577d6c6345acc01e9df90f"
+    },
+    {
+      "path": "Artifacts/modern-client-offline-cache-welcome-tokens-cleared.json",
+      "description": "Actual native offline-cache-welcome-tokens-cleared, modern client",
+      "sha256": "a1653adfb59978440dee394ef9aba1e0e001df5572ced5e338f766518cfd9b97",
+      "packagedSha256": "a1653adfb59978440dee394ef9aba1e0e001df5572ced5e338f766518cfd9b97"
+    },
+    {
+      "path": "Artifacts/modern-client-offline-cache-complete-native-transport-ledger.txt",
+      "description": "Actual native offline-cache-complete-native-transport-ledger, modern client",
+      "sha256": "802ba80d2a87e4dc2fc4d40510d1b4a86841d8c37698da5ef8c27686013fddac",
+      "packagedSha256": "802ba80d2a87e4dc2fc4d40510d1b4a86841d8c37698da5ef8c27686013fddac"
+    },
+    {
+      "path": "Artifacts/modern-client-offline-cache-warm-owned-session.json",
+      "description": "Actual native offline-cache-warm-owned-session, modern client",
+      "sha256": "d79ba524db0308ed769bdb70643766688ad906ff64e0ff846ea3f74acd31b43d",
+      "packagedSha256": "d79ba524db0308ed769bdb70643766688ad906ff64e0ff846ea3f74acd31b43d"
+    },
+    {
+      "path": "Artifacts/modern-client-host-cache-witness.json",
+      "description": "Timed actual complete-cache byte witnesses, modern client",
+      "sha256": "bb470ebf8cbd5b5c91cbbee6c82e0dcf553232b128b635c0dde6b8465dfe6f2d",
+      "packagedSha256": "bb470ebf8cbd5b5c91cbbee6c82e0dcf553232b128b635c0dde6b8465dfe6f2d"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-offline-cache-fresh-owned-login-restored.json",
+      "description": "Actual native offline-cache-fresh-owned-login-restored, modern caregiver",
+      "sha256": "a0851f8dd5f760ea14c144fd058181f08a9d5bfcb7c651ce67c6430cd1eb667c",
+      "packagedSha256": "a0851f8dd5f760ea14c144fd058181f08a9d5bfcb7c651ce67c6430cd1eb667c"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-offline-cache-ordinary-online-relaunch-signed-out.json",
+      "description": "Actual native offline-cache-ordinary-online-relaunch-signed-out, modern caregiver",
+      "sha256": "1fb212a516afcc41769714f011d4dce2c0420005ba4b0b9b6865b8937a0c1ea9",
+      "packagedSha256": "1fb212a516afcc41769714f011d4dce2c0420005ba4b0b9b6865b8937a0c1ea9"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-offline-cache-empty-sign-in-control-only.png",
+      "description": "Actual native offline-cache-empty-sign-in-control-only, modern caregiver",
+      "sha256": "ac90becb8e0855cec9a1eec90524a72745905688b1577d6c6345acc01e9df90f",
+      "packagedSha256": "ac90becb8e0855cec9a1eec90524a72745905688b1577d6c6345acc01e9df90f"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-offline-cache-welcome-tokens-cleared.json",
+      "description": "Actual native offline-cache-welcome-tokens-cleared, modern caregiver",
+      "sha256": "d77ba74c5952e4f045400af609edbdc41c42b90a20f30fb91ae10d7eca87de91",
+      "packagedSha256": "d77ba74c5952e4f045400af609edbdc41c42b90a20f30fb91ae10d7eca87de91"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-offline-cache-complete-native-transport-ledger.txt",
+      "description": "Actual native offline-cache-complete-native-transport-ledger, modern caregiver",
+      "sha256": "802ba80d2a87e4dc2fc4d40510d1b4a86841d8c37698da5ef8c27686013fddac",
+      "packagedSha256": "802ba80d2a87e4dc2fc4d40510d1b4a86841d8c37698da5ef8c27686013fddac"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-offline-cache-warm-owned-session.json",
+      "description": "Actual native offline-cache-warm-owned-session, modern caregiver",
+      "sha256": "ed55156f33ae466b22db94dc6ec479b5c6895d7b71eac4a6b49fa31895ecd52f",
+      "packagedSha256": "ed55156f33ae466b22db94dc6ec479b5c6895d7b71eac4a6b49fa31895ecd52f"
+    },
+    {
+      "path": "Artifacts/modern-caregiver-host-cache-witness.json",
+      "description": "Timed actual complete-cache byte witnesses, modern caregiver",
+      "sha256": "aefd1949fba4777d69c652892943f90973cfce13b7a522b5b5095133fdbc0649",
+      "packagedSha256": "aefd1949fba4777d69c652892943f90973cfce13b7a522b5b5095133fdbc0649"
+    },
+    {
+      "path": "Artifacts/small-client-offline-cache-fresh-owned-login-restored.json",
+      "description": "Actual native offline-cache-fresh-owned-login-restored, small client",
+      "sha256": "3d0a47e7b514bf406e5a996123d2a9eb83c8cb94d2044397bc6416a976d4ee2b",
+      "packagedSha256": "3d0a47e7b514bf406e5a996123d2a9eb83c8cb94d2044397bc6416a976d4ee2b"
+    },
+    {
+      "path": "Artifacts/small-client-offline-cache-ordinary-online-relaunch-signed-out.json",
+      "description": "Actual native offline-cache-ordinary-online-relaunch-signed-out, small client",
+      "sha256": "d9a531bc36f6e4a95697bb95f61f2f31fc50052622614f5216bd96b2de94a42b",
+      "packagedSha256": "d9a531bc36f6e4a95697bb95f61f2f31fc50052622614f5216bd96b2de94a42b"
+    },
+    {
+      "path": "Artifacts/small-client-offline-cache-empty-sign-in-control-only.png",
+      "description": "Actual native offline-cache-empty-sign-in-control-only, small client",
+      "sha256": "1465c2415a6bd6d03bdc28cd27f74a19e91873396279336743cbd5c434073d6e",
+      "packagedSha256": "1465c2415a6bd6d03bdc28cd27f74a19e91873396279336743cbd5c434073d6e"
+    },
+    {
+      "path": "Artifacts/small-client-offline-cache-welcome-tokens-cleared.json",
+      "description": "Actual native offline-cache-welcome-tokens-cleared, small client",
+      "sha256": "a1653adfb59978440dee394ef9aba1e0e001df5572ced5e338f766518cfd9b97",
+      "packagedSha256": "a1653adfb59978440dee394ef9aba1e0e001df5572ced5e338f766518cfd9b97"
+    },
+    {
+      "path": "Artifacts/small-client-offline-cache-complete-native-transport-ledger.txt",
+      "description": "Actual native offline-cache-complete-native-transport-ledger, small client",
+      "sha256": "802ba80d2a87e4dc2fc4d40510d1b4a86841d8c37698da5ef8c27686013fddac",
+      "packagedSha256": "802ba80d2a87e4dc2fc4d40510d1b4a86841d8c37698da5ef8c27686013fddac"
+    },
+    {
+      "path": "Artifacts/small-client-offline-cache-warm-owned-session.json",
+      "description": "Actual native offline-cache-warm-owned-session, small client",
+      "sha256": "d79ba524db0308ed769bdb70643766688ad906ff64e0ff846ea3f74acd31b43d",
+      "packagedSha256": "d79ba524db0308ed769bdb70643766688ad906ff64e0ff846ea3f74acd31b43d"
+    },
+    {
+      "path": "Artifacts/small-client-host-cache-witness.json",
+      "description": "Timed actual complete-cache byte witnesses, small client",
+      "sha256": "99dbda1cb9ec0914bc622d8829b1afeb1e153ed1e9a0971af888132f2ad42bdc",
+      "packagedSha256": "99dbda1cb9ec0914bc622d8829b1afeb1e153ed1e9a0971af888132f2ad42bdc"
+    },
+    {
+      "path": "Artifacts/small-caregiver-offline-cache-fresh-owned-login-restored.json",
+      "description": "Actual native offline-cache-fresh-owned-login-restored, small caregiver",
+      "sha256": "a0851f8dd5f760ea14c144fd058181f08a9d5bfcb7c651ce67c6430cd1eb667c",
+      "packagedSha256": "a0851f8dd5f760ea14c144fd058181f08a9d5bfcb7c651ce67c6430cd1eb667c"
+    },
+    {
+      "path": "Artifacts/small-caregiver-offline-cache-ordinary-online-relaunch-signed-out.json",
+      "description": "Actual native offline-cache-ordinary-online-relaunch-signed-out, small caregiver",
+      "sha256": "1fb212a516afcc41769714f011d4dce2c0420005ba4b0b9b6865b8937a0c1ea9",
+      "packagedSha256": "1fb212a516afcc41769714f011d4dce2c0420005ba4b0b9b6865b8937a0c1ea9"
+    },
+    {
+      "path": "Artifacts/small-caregiver-offline-cache-empty-sign-in-control-only.png",
+      "description": "Actual native offline-cache-empty-sign-in-control-only, small caregiver",
+      "sha256": "1465c2415a6bd6d03bdc28cd27f74a19e91873396279336743cbd5c434073d6e",
+      "packagedSha256": "1465c2415a6bd6d03bdc28cd27f74a19e91873396279336743cbd5c434073d6e"
+    },
+    {
+      "path": "Artifacts/small-caregiver-offline-cache-welcome-tokens-cleared.json",
+      "description": "Actual native offline-cache-welcome-tokens-cleared, small caregiver",
+      "sha256": "d77ba74c5952e4f045400af609edbdc41c42b90a20f30fb91ae10d7eca87de91",
+      "packagedSha256": "d77ba74c5952e4f045400af609edbdc41c42b90a20f30fb91ae10d7eca87de91"
+    },
+    {
+      "path": "Artifacts/small-caregiver-offline-cache-complete-native-transport-ledger.txt",
+      "description": "Actual native offline-cache-complete-native-transport-ledger, small caregiver",
+      "sha256": "802ba80d2a87e4dc2fc4d40510d1b4a86841d8c37698da5ef8c27686013fddac",
+      "packagedSha256": "802ba80d2a87e4dc2fc4d40510d1b4a86841d8c37698da5ef8c27686013fddac"
+    },
+    {
+      "path": "Artifacts/small-caregiver-offline-cache-warm-owned-session.json",
+      "description": "Actual native offline-cache-warm-owned-session, small caregiver",
+      "sha256": "ed55156f33ae466b22db94dc6ec479b5c6895d7b71eac4a6b49fa31895ecd52f",
+      "packagedSha256": "ed55156f33ae466b22db94dc6ec479b5c6895d7b71eac4a6b49fa31895ecd52f"
+    },
+    {
+      "path": "Artifacts/small-caregiver-host-cache-witness.json",
+      "description": "Timed actual complete-cache byte witnesses, small caregiver",
+      "sha256": "02e4d7fb8d8dd7bc25c2d1972cd236eb582cae5eed99d8253a630084afce3856",
+      "packagedSha256": "02e4d7fb8d8dd7bc25c2d1972cd236eb582cae5eed99d8253a630084afce3856"
+    }
+  ],
+  "rootReview": "All28artifact hashes and anonymous records reviewed; fourPNG actual dimensions and pixels verified. Each role PNG is byte-identical to the visually reviewed other-role PNG at that size. Bounded public controls only; no whole-screen/accessibility claim.",
+  "independentReview": {
+    "reviewer": "Independent cache QA verifier /root/cache_review",
+    "checkedAtUTC": "2026-10-12T02:10:15.349466+00:00",
+    "verdict": "PASS for exact original P01-007 and P02-004 only",
+    "scope": "Four completed final native executions: Client and Caregiver on Modern and Small. Small Caregiver uses unchanged-source fully-exposed retest; prior failed whole invocation remains preserved.",
+    "gateVerdicts": {
+      "originalCaseScope": "PASS: saved owned authenticated session, valid reference cache, forced process termination and connection-refused startup, cleared credentials with usable Welcome, actual offline Sign in navigation, and next ordinary launch remains signed out on both roles/sizes.",
+      "sourceAndRegression": "PASS: exact current SessionNetworkTests SHA matches candidate; all57 production source hashes match preserved post-A5 107-unit snapshot. Offline/ordinary phases have no signout/login/seed flags.",
+      "nativeExecutions": "PASS: final native logs pass74.627/74.093/73.856/73.670seconds and hashes match; six exact named native attachments per execution are present.",
+      "cacheWitness": "PASS: all12 preserved actual snapshots have schema3, exact22datasets and21advertised keys, counts and uniqueIDs; bytes unchanged across three phases per execution. CheckedAtUTC independently correlated with each raw native attachment and next termination, all0.106\u20130.358seconds after attachment and before phase end.",
+      "sessionAndNavigation": "PASS: executed native keychain-presence assertions require warm access/refreshtrue, offline/ordinaryfalse. Actual offline Sign in tap reaches empty public fields, empty submit disabled; ordinary relaunch no native auth/login/refresh/match calls; fresh QA-hook login restores loaded role data.",
+      "transport": "PASS: four full offline ledgers contain only GET auth/info=4 and GET base/info=4; counts represent one initial plus three bounded connection-refused retries, zero dataset downloads.",
+      "privacyAndPixels": "PASS: all28artifact hashes verified; read20anonymousJSONs/fourledgers, viewed actual public disabledSignIncontrol pixels and verified four PNG dimensions1190x248/676x140 plus identical per-size bytehashes. No private account/credentials/paths/profile/messages/relationships/personalmedia included.",
+      "failurePreservation": "PASS: earlier SmallCaregiver failed129.828second invocation digest matches preserved file; failure at fresh QA-hook login readiness retained with unconfirmed cause, no backend cause inferred."
+    },
+    "artifactCount": 28,
+    "pngCount": 4,
+    "jsonCount": 20,
+    "textCount": 4,
+    "cacheWitnessCount": 12,
+    "productionSourceCount": 57,
+    "scopeLimits": [
+      "Only P01-007 and P02-004 eligible for closure; no other case promotion.",
+      "Debug connection-refused fault represents unavailable transport, not physical Wi-Fi switching/server timeout.",
+      "Fresh login recovery is private QA hook, not typed Sign In coverage.",
+      "Ordinary relaunch metadata dispatch does not certify online reference refresh completion.",
+      "Public bounded control crops do not establish full-screen rendering, accessibility, contrast or P17 closure.",
+      "No screenshot defect is established by duplicate image-preview collapse; actual per-size PNG bytes/dimensions are valid.",
+      "Prior failed SmallCaregiver invocation remains history; unchanged retest passing does not establish its failure cause."
+    ],
+    "resourcesOpened": "None; local read-only artifact inspection and authorized proof metadata update only."
+  },
+  "publicPackage": {
+    "rootReviewed": true,
+    "independentReviewed": true,
+    "originalEvidencePreserved": true,
+    "rawLogsXCResultsFullScreenPhotosPrivateFixturesIncluded": false
+  }
+}

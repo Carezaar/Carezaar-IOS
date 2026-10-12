@@ -1,0 +1,11 @@
+{
+  "authenticatedMainVisible" : true,
+  "authInfoAttempts" : 1,
+  "chatListAttempts" : 0,
+  "loginAttempts" : 1,
+  "matchListAttempts" : 2,
+  "refreshAttempts" : 0,
+  "role" : "client",
+  "stage" : "offline-cache-fresh-owned-login-restored",
+  "welcomeVisible" : false
+}
