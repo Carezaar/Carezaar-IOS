@@ -36,25 +36,26 @@ final class LocationBoundaryUITests: XCTestCase {
         try record("P03-021-controlled-cached-native", ["role": f.role, "mapOpened": false, "reviewRetainsExactControlledFix": true, "cachedPublisherAttested": true])
     }
 
-    func testControlledStaleCachedFixShowsHonestWizardAndMapLabels() throws {
+    func testStaleCachedLocationIsUsedSilentlyInWizardAndMap() throws {
         let f = try fixture()
         try launchSchedule(f, mode: "stale")
         try requireLocationEvent(mode: "stale", phase: "cached", accepted: true, stale: true)
-        let stale = app.staticTexts["Last known location"].firstMatch
-        try reveal(stale); proof(stale, name: "P03-022-controlled-wizard-last-known-only")
         let row = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "39.828300 , -98.579500")).firstMatch
-        try reveal(row); row.tap()
+        try reveal(row)
+        XCTAssertFalse(app.staticTexts["Last known location"].exists,
+                       "Oct13 R15: last-known location must initialize silently")
+        row.tap()
         XCTAssertTrue(app.maps.firstMatch.waitForExistence(timeout: 15))
-        let mapLabel = app.staticTexts.matching(NSPredicate(format: "label == %@", "Last known location"))
-            .allElementsBoundByIndex.first { $0.exists && $0.isHittable }
-        let visible = try XCTUnwrap(mapLabel, "Actual stale map needs visible last-known origin")
-        proof(visible, name: "P03-022-controlled-map-last-known-only")
+        XCTAssertFalse(app.staticTexts["Last known location"].exists)
+        XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Location is unavailable.")).firstMatch.exists)
+        XCTAssertTrue((try visibleButton(try f.text("general_confirm"))).isEnabled)
         try tapVisibleMapBack()
         try assertBackendUnchanged(f)
-        try record("P03-022-controlled-stale-native", ["role": f.role, "wizardStaleLabelObserved": true, "mapStaleLabelObserved": true])
+        try record("R15-controlled-stale-silent-native", ["role": f.role,
+            "cachedCoordinateRetained": true, "wizardAndMapNoticesAbsent": true, "profileMutations": 0])
     }
 
-    func testControlledNoFixMapContinueRetainsNilAndFinalSaveGuidesWithoutWrites() throws {
+    func testControlledNoFixMapContinuesSilentlyAndFinalSaveOffersMapWithoutWrites() throws {
         let f = try fixture()
         try launchSchedule(f, mode: "none")
         try requireLocationEvent(mode: "none", phase: "delivery", accepted: false, stale: false)
@@ -77,11 +78,8 @@ final class LocationBoundaryUITests: XCTestCase {
         let save = try visibleButton(try f.text("general_save"))
         XCTAssertTrue(save.isEnabled)
         save.tap()
-        let guidance = app.staticTexts["Location is unavailable. Enable location access or choose a point on the map to save."].firstMatch
-        XCTAssertTrue(guidance.waitForExistence(timeout: 10), "Final no-fix Save must show honest guidance")
-        XCTAssertTrue(guidance.exists)
-        proof(guidance, name: "P03-024-controlled-no-fix-save-guidance-only")
         XCTAssertTrue(app.maps.firstMatch.waitForExistence(timeout: 10), "No-fix Save must offer actual manual map selection")
+        XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Location is unavailable.")).firstMatch.exists)
         XCTAssertTrue((try visibleButton(try f.text("general_continue"))).isEnabled)
         XCTAssertEqual(try profileMutationCount(), 0)
         try tapVisibleMapBack()
@@ -91,10 +89,7 @@ final class LocationBoundaryUITests: XCTestCase {
         let scheduleKey = f.role == "client" ? "signup_form_client_schedule_preferences" : "signup_form_caregiver_schedule_title"
         XCTAssertTrue(app.staticTexts[try f.text(scheduleKey)].waitForExistence(timeout: 10))
         try openNoFixMap(f)
-        let ordinaryGuidance = app.staticTexts["Location is unavailable. You can continue without selecting a point."].firstMatch
-        XCTAssertTrue(ordinaryGuidance.waitForExistence(timeout: 10))
-        proof(ordinaryGuidance, name: "P03-024-controlled-ordinary-map-reason-reset-only")
-        XCTAssertFalse(guidance.exists, "Ordinary map reopening must not retain the final-Save-specific reason")
+        XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Location is unavailable.")).firstMatch.exists)
         XCTAssertTrue((try visibleButton(try f.text("general_continue"))).isEnabled)
         XCTAssertEqual(try profileMutationCount(), 0)
         try tapVisibleMapBack()
@@ -102,9 +97,9 @@ final class LocationBoundaryUITests: XCTestCase {
         try assertBackendUnchanged(f)
         try record("P03-023-024-026-controlled-no-fix-native", ["role": f.role,
             "scheduleContinuedWithoutLocation": true, "automaticMapViewportNeverSelected": true,
-            "mapReopenedUnselected": true, "reviewLocationNil": true, "finalSaveGuidanceObserved": true,
-            "manualMapOfferedAfterSave": true, "saveSpecificReasonResetOnOrdinaryReopen": true,
-            "ordinaryMapGenericGuidanceVisible": true, "actualBackendCoordinateRequirementTested": false])
+            "mapReopenedUnselected": true, "reviewLocationNil": true, "finalSaveMapOfferedWithoutNotices": true,
+            "manualMapOfferedAfterSave": true, "ordinaryReopenRemainsSilent": true,
+            "englishOnlyNoticesAbsent": true, "actualBackendCoordinateRequirementTested": false])
     }
 
     func testControlledInvalidAccuracyRangeAndFutureFixNeverBecomeSelections() throws {
@@ -241,8 +236,10 @@ final class LocationBoundaryUITests: XCTestCase {
             .max(by: { $0.frame.midY < $1.frame.midY }))
     }
     private func assertScheduleNil(_ f: Fixture) throws {
-        let guidance = app.staticTexts["Location is unavailable. You can continue and choose a location before saving."].firstMatch
-        try reveal(guidance); XCTAssertTrue(guidance.exists)
+        let row = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", try f.text("signup_form_client_location_hint"))).firstMatch
+        try reveal(row); XCTAssertTrue(row.exists)
+        XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Location is unavailable.")).firstMatch.exists)
+        XCTAssertFalse(app.staticTexts["Last known location"].exists)
         XCTAssertEqual(app.buttons.matching(NSPredicate(format: "label MATCHES %@", ".*-?[0-9]+\\.[0-9]{6} , -?[0-9]+\\.[0-9]{6}.*")).count, 0)
     }
     private func openNoFixMap(_ f: Fixture) throws {

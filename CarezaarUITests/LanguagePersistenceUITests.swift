@@ -38,7 +38,25 @@ final class LanguagePersistenceUITests: XCTestCase {
     }
     private func menu(_ key: String, _ language: Language) throws {
         let row = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", try text(key, language))).firstMatch
-        for _ in 0..<8 where !row.isHittable { app.swipeUp() }
+        XCTAssertTrue(row.waitForExistence(timeout: 15))
+        // Start gestures inside the actual profile viewport. Whole-app gestures
+        // can start over the bottom tab bar on Small and never scroll the menu.
+        for upward in [true, false] {
+            for _ in 0..<12 {
+                if row.exists && row.isHittable { break }
+                let scroll = try XCTUnwrap(app.scrollViews.allElementsBoundByIndex
+                    .filter { $0.frame.width > app.frame.width * 0.5 && $0.frame.height > 60 }
+                    .max { $0.frame.height < $1.frame.height })
+                scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: upward ? 0.75 : 0.25))
+                    .press(forDuration: 0.1, thenDragTo: scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: upward ? 0.25 : 0.75)), withVelocity: .slow, thenHoldForDuration: 0.1)
+            }
+            if row.exists && row.isHittable { break }
+        }
+        if !row.exists || !row.isHittable {
+            let proof = XCTAttachment(screenshot: app.screenshot())
+            proof.name = "language-menu-viewport-diagnostic-" + language.code
+            proof.lifetime = .keepAlways; add(proof)
+        }
         XCTAssertTrue(row.exists && row.isHittable); row.tap()
     }
     private func saveSelection(_ chosen: Language) throws {

@@ -473,7 +473,9 @@ final class ScreenSweepTests: XCTestCase {
         let detail = app.descendants(matching: .any).matching(identifier: "notification-detail").firstMatch
         XCTAssertTrue(detail.waitForExistence(timeout: 15), "Notification tap must open its detail sheet")
         saveReadabilityEvidence("notifications-largest-detail-top")
-        for fullText in [expected.0, expected.1, expected.2] {
+        // Oct13 R11 removes the detail timestamp; row timestamp remains intact.
+        XCTAssertFalse(detail.staticTexts[expected.2].exists)
+        for fullText in [expected.0, expected.1] {
             let text = detail.staticTexts[fullText].firstMatch
             makeReachable(text)
             XCTAssertTrue(text.exists && text.isHittable, "Notification detail must expose the complete server text")
@@ -734,7 +736,10 @@ final class ScreenSweepTests: XCTestCase {
         app.launchEnvironment["QA_PASSWORD"] = env["QA_PASSWORD"] ?? ""
         // QA_LAUNCH_EXTRA, e.g. "-carezaar.languageCode ar -carezaar.languageId 3", runs
         // the sweep in another language.
-        app.launchArguments = args + (env["QA_LAUNCH_EXTRA"] ?? "").split(separator: " ").map(String.init)
+        // English assertions need a deterministic locale even after a language
+        // persistence test restores the simulator's original French selection.
+        let locale = env["QA_LAUNCH_EXTRA"] ?? "-carezaar.languageCode en -carezaar.languageId 1"
+        app.launchArguments = args + locale.split(separator: " ").map(String.init)
         app.launch()
         let allow = XCUIApplication(bundleIdentifier: "com.apple.springboard").buttons["Allow"]
         if allow.waitForExistence(timeout: 4) { allow.tap() }

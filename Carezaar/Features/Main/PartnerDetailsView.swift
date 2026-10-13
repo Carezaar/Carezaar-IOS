@@ -24,7 +24,8 @@ struct PartnerDetailsView: View {
     @State private var visible = false
     @State private var delayedBack: Task<Void, Never>?
     @State private var checkUnavailable = false
-    @State private var failedCheckAction: MatchMutation?
+    @State private var pendingIntent: MatchActionIntent?
+    @StateObject private var favorites = FavoriteMutationCoordinator.shared
 
     private var isCaregiver: Bool { if case .caregiver = kind { return true } else { return false } }
     private var partner: User? { caregiver?.user ?? client?.user }
@@ -37,8 +38,8 @@ struct PartnerDetailsView: View {
 
     var body: some View {
         Group {
-            if let error, partner == nil {
-                Text(Feedback.message(error)).font(Theme.Typography.body(15)).padding(24)
+            if error != nil, partner == nil {
+                Color.clear.frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if let partner {
                 content(partner)
             } else {
@@ -61,14 +62,16 @@ struct PartnerDetailsView: View {
         .onDisappear { visible = false; delayedBack?.cancel(); delayedBack = nil }
         .task { await load() }
         .alert(loc.t("match_check_failed_title", "Couldn't check this match"), isPresented: $checkUnavailable) {
-            Button(loc.t("general_cancel", "Cancel"), role: .cancel) { failedCheckAction = nil }
+            Button(loc.t("general_cancel", "Cancel"), role: .cancel) {
+                // Cancelling the window cannot erase an uncertain write outcome.
+                if pendingIntent?.canSubmit == true { pendingIntent = nil }
+            }
             Button(loc.t("general_try_again", "Try Again")) {
-                // Retry the read only. The user must confirm any mutation again.
                 Task { await retryCheck() }
             }
         } message: { Text(loc.t("match_check_failed_message", "Please check your connection and try again.")) }
         .alert(confirming.map(title) ?? "", isPresented: Binding(get: { confirming != nil }, set: { if !$0 { confirming = nil } })) {
-            Button(confirming == .withdraw ? loc.t("general_close", "Close") : loc.t("general_cancel", "Cancel"), role: .cancel) { confirming = nil }
+            Button(loc.t("general_cancel", "Cancel"), role: .cancel) { confirming = nil }
                 .accessibilityIdentifier("match-confirm-dismiss")
             if let which = confirming {
                 Button(confirmLabel(which), role: which == .accept ? nil : .destructive) {
@@ -304,24 +307,30 @@ struct PartnerDetailsView: View {
     }
 
     private func retryCheck() async {
+        if let intent = pendingIntent {
+            await continueIntent(intent)
+            return
+        }
+        guard !busy else { return }
+        busy = true
+        defer { busy = false }
         do {
             try await fetch()
-            guard matchState != nil else { checkUnavailable = true; return }
-            // Confirmation remains a separate user action, preventing an ambiguous replay.
-            failedCheckAction = nil
+            guard visible, !Task.isCancelled else { return }
+            if matchState == nil { checkUnavailable = true }
         } catch is CancellationError { return }
-        catch { checkUnavailable = true }
+        catch { if visible { checkUnavailable = true } }
     }
 
-    private func fetch() async throws {
+    private func fetch(generation: UUID? = nil) async throws {
         switch kind {
-        case .caregiver(let id): caregiver = try await ClientService().caregiver(id: id)
-        case .client(let id): client = try await CaregiverService().client(id: id)
+        case .caregiver(let id): caregiver = try await ClientService().caregiver(id: id, ifGeneration: generation)
+        case .client(let id): client = try await CaregiverService().client(id: id, ifGeneration: generation)
         }
     }
 
-    private func freshState() async throws -> ProfileMatchState? {
-        try await fetch()
+    private func freshState(generation: UUID? = nil) async throws -> ProfileMatchState? {
+        try await fetch(generation: generation)
         return matchState
     }
 
@@ -338,80 +347,102 @@ struct PartnerDetailsView: View {
         } catch { feedback.toast(Feedback.message(error)) }
     }
 
-    /// Confirms the state is still the one the action was offered for, sends the one
-    /// operation that belongs to it, and re-reads the profile. Accept succeeds only
-    /// once the server shows an active match; then "It's a Match!" opens.
+    /// Preserve the exact confirmed action, original relationship and introduction.
+    /// A failed preflight can resume it; an uncertain write can only be reconciled.
     private func perform(_ which: MatchMutation) async {
         guard !busy, let shown = matchState else { return }
+        if let unresolved = pendingIntent, !unresolved.canSubmit {
+            await continueIntent(unresolved)
+            return
+        }
+        let intent = MatchActionIntent(action: which, before: shown, introduction: introduction, generation: TokenStore.shared.generation)
+        pendingIntent = intent
+        await continueIntent(intent)
+    }
+
+    private func continueIntent(_ intent: MatchActionIntent) async {
+        guard !busy, visible, !Task.isCancelled, TokenStore.shared.generation == intent.generation else { return }
         busy = true
         defer { busy = false }
-        let expected = which.expectedStatus
-        let current: ProfileMatchState
-        do {
-            let checked = try await freshState()
-            guard visible, !Task.isCancelled else { return }
-            guard let checked else {
-                failedCheckAction = which; checkUnavailable = true; return
-            }
-            current = checked
-        } catch is CancellationError { return }
+        let checked: ProfileMatchState?
+        do { checked = try await freshState(generation: intent.generation) }
+        catch is CancellationError { return }
         catch {
-            guard visible, !Task.isCancelled else { return }
-            failedCheckAction = which; checkUnavailable = true; return
+            if visible, TokenStore.shared.generation == intent.generation { pendingIntent = intent; checkUnavailable = true }
+            return
         }
-        guard visible, !Task.isCancelled else { return }
-        guard current.status == expected, current == shown else {
-            feedback.toast(loc.t("match_changed_message", "This match has changed")); return
+        guard visible, !Task.isCancelled, TokenStore.shared.generation == intent.generation else { return }
+        guard let checked else { pendingIntent = intent; checkUnavailable = true; return }
+        guard intent.canSubmit, checked == intent.before,
+              checked.status == intent.action.expectedStatus else {
+            resolve(intent, checked: checked)
+            return
         }
+        var submitted = intent
+        submitted.phase = .uncertain(APIError.unknown(""))
+        pendingIntent = submitted // Set before suspension: no tap can replay this write.
         do {
-            let result: Match? = try await feedback.run(loc.t(which.loadingKey, which.loadingFallback)) {
+            let result: Match? = try await feedback.run(loc.t(intent.action.loadingKey, intent.action.loadingFallback)) {
                 let service = UserService()
-                switch which {
-                case .request: return try await service.requestMatch(partnerId: partnerId, introduction: introduction)
-                case .accept: return try await service.acceptMatch(id: current.id ?? 0)
-                case .reject: try await service.rejectMatch(id: current.id ?? 0); return nil
-                case .withdraw: try await service.withdrawMatch(id: current.id ?? 0); return nil
-                case .unmatch: return try await service.breakMatch(id: current.id ?? 0)
+                switch intent.action {
+                case .request: return try await service.requestMatch(partnerId: partnerId, introduction: intent.introduction, ifGeneration: intent.generation)
+                case .accept: return try await service.acceptMatch(id: checked.id!, ifGeneration: intent.generation)
+                case .reject: try await service.rejectMatch(id: checked.id!, ifGeneration: intent.generation); return nil
+                case .withdraw: try await service.withdrawMatch(id: checked.id!, ifGeneration: intent.generation); return nil
+                case .unmatch: return try await service.breakMatch(id: checked.id!, ifGeneration: intent.generation)
                 }
             }
-            guard visible, !Task.isCancelled else { return }
-            introduction = ""
-            if (which == .request || which == .accept), result?.isActive(with: partnerId, for: session.role ?? .client) == true {
-                // The mutation response confirms an active relationship. MatchedView
-                // obtains the profile once; no separate connection check is needed.
-                applyMatchResult(result!)
-                router.push(.matched(partner: matchedPartner))
-            } else {
-                try await fetch() // Explicit mutation reconciliation, never appearance refresh.
-                guard visible, !Task.isCancelled else { return }
-                guard let reconciled = matchState else {
-                    failedCheckAction = which; checkUnavailable = true; return
-                }
-                if (which == .accept || which == .request), reconciled.status == .active {
-                    router.push(.matched(partner: matchedPartner))
-                } else if which == .accept {
-                    feedback.toast(loc.t("match_changed_message", "This match has changed"))
-                }
+            submitted.phase = .acknowledged
+            pendingIntent = submitted
+            guard visible, !Task.isCancelled, TokenStore.shared.generation == intent.generation else { return }
+            if (intent.action == .request || intent.action == .accept),
+               let result, result.isActive(with: partnerId, for: session.role ?? .client),
+               intent.action == .request || result.id == checked.id {
+                applyMatchResult(result)
+                complete(intent, matched: true)
+                return
             }
         } catch is CancellationError { return }
         catch {
-            // Never retry the write: it may have succeeded before the response was lost.
-            guard visible, !Task.isCancelled else { return }
-            let reconciled: ProfileMatchState?
-            do {
-                reconciled = try await freshState()
-            } catch is CancellationError { return }
-            catch {
-                guard visible, !Task.isCancelled else { return }
-                failedCheckAction = which; checkUnavailable = true; return
+            guard MutationOutcome.mayHaveCommitted(error) else {
+                pendingIntent = nil
+                if visible, !Task.isCancelled { feedback.toast(Feedback.message(error)) }
+                return
             }
-            guard visible, !Task.isCancelled else { return }
-            switch MatchFailureResolution.resolve(before: current, after: reconciled) {
-            case .changed: feedback.toast(loc.t("match_changed_message", "This match has changed"))
-            case .checkUnavailable: failedCheckAction = which; checkUnavailable = true
-            case .originalError: feedback.toast(Feedback.message(error))
-            }
+            submitted.phase = .uncertain(error)
+            pendingIntent = submitted
+            guard visible, !Task.isCancelled, TokenStore.shared.generation == intent.generation else { return }
         }
+        // Acknowledged and ambiguous writes both use a read, never another mutation.
+        do {
+            let actual = try await freshState(generation: intent.generation)
+            guard visible, !Task.isCancelled, TokenStore.shared.generation == intent.generation else { return }
+            resolve(submitted, checked: actual)
+        } catch is CancellationError { return }
+        catch { if visible, TokenStore.shared.generation == intent.generation { checkUnavailable = true } }
+    }
+
+    private func resolve(_ intent: MatchActionIntent, checked: ProfileMatchState?) {
+        switch MatchFailureResolution.resolve(before: intent.before, after: checked, action: intent.action) {
+        case .matched: complete(intent, matched: true)
+        case .completed: complete(intent, matched: false)
+        case .changed:
+            pendingIntent = nil
+            feedback.toast(loc.t("match_changed_message", "This match has changed"))
+        case .checkUnavailable:
+            pendingIntent = intent
+            checkUnavailable = true
+        case .originalError:
+            if intent.canSubmit { pendingIntent = nil }
+            else { pendingIntent = intent }
+            feedback.toast(Feedback.message(intent.failure ?? APIError.unknown("")))
+        }
+    }
+
+    private func complete(_ intent: MatchActionIntent, matched: Bool) {
+        pendingIntent = nil
+        if intent.action == .request, introduction == intent.introduction { introduction = "" }
+        if matched { router.push(.matched(partner: matchedPartner)) }
     }
 
     private func applyMatchResult(_ match: Match) {
@@ -424,17 +455,27 @@ struct PartnerDetailsView: View {
     }
 
     private func toggleFavorite() async {
-        guard let partner else { return }
+        guard let partner, !favorites.isBusy(partner: partner, accountId: session.state.user?.id) else { return }
+        let accountId = session.state.user?.id
+        let generation = TokenStore.shared.generation
         let on = partner.isFavorite
         setPartner(partner.with(isFavorite: !on))
         do {
-            try await feedback.run(on ? loc.t("loading_favorite_delete", "Removing from favorite list")
+            let saved = try await feedback.run(on ? loc.t("loading_favorite_delete", "Removing from favorite list")
                                       : loc.t("loading_favorite_create", "Adding to favorite list")) {
-                if on { try await UserService().removeBookmark(partnerId: partner.id) }
-                else { try await UserService().addBookmark(partnerId: partner.id) }
+                try await favorites.change(partner: partner, to: !on, profileId: partnerId, accountId: accountId, generation: generation)
             }
-            FavoriteSync.post(userId: partner.id, isFavorite: !on)
+            guard session.state.user?.id == accountId, TokenStore.shared.generation == generation else { return }
+            setPartner(saved)
+            FavoriteSync.post(userId: partner.id, isFavorite: saved.isFavorite)
+        } catch is CancellationError { return }
+        catch let failure as FavoriteReconciliationError {
+            guard session.state.user?.id == accountId, TokenStore.shared.generation == generation else { return }
+            setPartner(failure.saved)
+            FavoriteSync.post(userId: partner.id, isFavorite: failure.saved.isFavorite)
+            feedback.toast(Feedback.message(failure.underlying))
         } catch {
+            guard session.state.user?.id == accountId, TokenStore.shared.generation == generation else { return }
             setPartner(partner)
             feedback.toast(Feedback.message(error))
         }
@@ -446,16 +487,139 @@ struct PartnerDetailsView: View {
     }
 }
 
-/// Presentation chosen after a failed write has been reconciled with a fresh profile.
-/// Missing/failed checks cannot justify replay; a changed state gets the standard
-/// changed message. An unchanged state retains the original operation error.
-/// Kept separate from transport so lost-response behavior can be regression-tested.
-enum MatchFailureResolution: Equatable {
-    case changed, checkUnavailable, originalError
+/// A failed write may still have saved. Carry the actual profile state with a
+/// managed failure, rather than rolling the UI back to a guessed old value.
+struct FavoriteReconciliationError: Error {
+    let saved: User
+    let underlying: Error
+}
 
-    static func resolve(before: ProfileMatchState, after: ProfileMatchState?) -> Self {
+/// Shared by list/profile entry points so cross-screen taps cannot overlap writes.
+@MainActor
+final class FavoriteMutationCoordinator: ObservableObject {
+    static let shared = FavoriteMutationCoordinator()
+    private let service: UserService
+    init(service: UserService = UserService()) { self.service = service }
+
+    private struct PartnerKey: Hashable {
+        let accountId: String?
+        let userId: String
+        let role: UserRole
+    }
+    private struct Submission: Hashable {
+        let partner: PartnerKey
+        let desired: Bool
+        let generation: UUID
+    }
+    private struct Pending {
+        let profileId: String
+        let error: Error
+    }
+    @Published private var busy = Set<PartnerKey>()
+    private var pending: [Submission: Pending] = [:]
+
+    func isBusy(partner: User, accountId: String?) -> Bool {
+        busy.contains(PartnerKey(accountId: accountId, userId: partner.id, role: partner.role))
+    }
+
+    func change(partner: User, to desired: Bool, profileId: String? = nil, accountId: String? = nil, generation: UUID? = nil) async throws -> User {
+        let key = PartnerKey(accountId: accountId, userId: partner.id, role: partner.role)
+        guard !busy.contains(key) else { throw APIError.unknown("") }
+        busy.insert(key)
+        defer { busy.remove(key) }
+        let owner = await service.client.credentialGeneration()
+        guard generation == nil || generation == owner else { throw CancellationError() }
+        let submission = Submission(partner: key, desired: desired, generation: owner)
+        if let unresolved = pending[submission] {
+            return try await reconcile(submission, pending: unresolved)
+        }
+        do {
+            if desired { try await service.addBookmark(partnerId: partner.id, ifGeneration: owner) }
+            else { try await service.removeBookmark(partnerId: partner.id, ifGeneration: owner) }
+            return partner.with(isFavorite: desired)
+        } catch is CancellationError { throw CancellationError() }
+        catch {
+            guard MutationOutcome.mayHaveCommitted(error) else { throw error }
+            let unresolved = Pending(profileId: profileId ?? partner.id, error: error)
+            pending[submission] = unresolved
+            return try await reconcile(submission, pending: unresolved)
+        }
+    }
+
+    private func reconcile(_ submission: Submission, pending unresolved: Pending) async throws -> User {
+        let saved: User
+        do {
+            let path = submission.partner.role == .caregiver
+                ? "clients/caregivers/\(unresolved.profileId)" : "caregivers/clients/\(unresolved.profileId)"
+            let snapshot: FavoriteProfileSnapshot = try await service.client.send(Endpoint(method: .get, path: path), ifGeneration: submission.generation)
+            saved = snapshot.user
+        } catch is CancellationError { throw CancellationError() }
+        catch { throw unresolved.error }
+        guard saved.id == submission.partner.userId, saved.role == submission.partner.role else {
+            throw unresolved.error
+        }
+        guard saved.isFavorite == submission.desired else {
+            throw FavoriteReconciliationError(saved: saved, underlying: unresolved.error)
+        }
+        pending.removeValue(forKey: submission)
+        return saved
+    }
+}
+
+/// Unknown removals need an explicit saved flag; User's display fallback false
+/// is not proof that a mutation reached the server.
+private struct FavoriteProfileSnapshot: Decodable {
+    let user: User
+    private enum Keys: String, CodingKey { case user }
+    private enum UserKeys: String, CodingKey { case role; case favorite = "is_favorite" }
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: Keys.self)
+        let fields = try container.nestedContainer(keyedBy: UserKeys.self, forKey: .user)
+        _ = try fields.decode(Bool.self, forKey: .favorite)
+        let role = try fields.decode(String.self, forKey: .role)
+        guard UserRole(rawValue: role.lowercased()) != nil else {
+            throw DecodingError.dataCorruptedError(forKey: .role, in: fields, debugDescription: "Unknown favorite role")
+        }
+        user = try container.decode(User.self, forKey: .user)
+    }
+}
+
+/// Confirmed intent and delivery phase survive connection windows and later taps.
+struct MatchActionIntent {
+    enum Phase { case preflight, uncertain(Error), acknowledged }
+    let action: MatchMutation
+    let before: ProfileMatchState
+    let introduction: String
+    let generation: UUID
+    var phase: Phase = .preflight
+    var canSubmit: Bool { if case .preflight = phase { return true }; return false }
+    var failure: Error? { if case .uncertain(let error) = phase { return error }; return nil }
+}
+
+/// An own action reaching its requested outcome is success, not an external change.
+/// Same-status replacement relationship IDs cannot authorize or acknowledge an action.
+enum MatchFailureResolution: Equatable {
+    case matched, completed, changed, checkUnavailable, originalError
+
+    static func resolve(before: ProfileMatchState, after: ProfileMatchState?, action: MatchMutation? = nil) -> Self {
         guard let after else { return .checkUnavailable }
-        return after == before ? .originalError : .changed
+        guard after != before else { return .originalError }
+        let intent = action ?? inferredAction(before.status)
+        guard before.status == intent.expectedStatus else { return .changed }
+        switch intent {
+        case .request:
+            if after.status == .active { return .matched }
+            if after.status == .sent { return .completed }
+        case .accept:
+            if after.id == before.id, after.status == .active { return .matched }
+        case .withdraw, .reject, .unmatch:
+            if after.status == .none { return .completed }
+        }
+        return .changed
+    }
+
+    private static func inferredAction(_ status: ProfileMatchStatus) -> MatchMutation {
+        switch status { case .none: .request; case .sent: .withdraw; case .received: .accept; case .active: .unmatch }
     }
 }
 
@@ -546,6 +710,9 @@ struct MatchedView: View {
     @EnvironmentObject private var baseData: BaseDataStore
     @State private var error: Error?
     @AccessibilityFocusState private var headingFocused: Bool
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.layoutDirection) private var cardLayoutDirection
+    @State private var cardsPresented = false
 
     private var profileRoute: Route {
         switch partnerRef {
@@ -556,8 +723,8 @@ struct MatchedView: View {
 
     var body: some View {
         Group {
-            if let error {
-                Text(Feedback.message(error)).font(Theme.Typography.body(15)).padding(24)
+            if error != nil {
+                Color.clear.frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if let partner {
                 content(partner)
             } else {
@@ -575,12 +742,28 @@ struct MatchedView: View {
         return ScrollView {
             VStack(spacing: 18) {
                 HStack(alignment: .center, spacing: 10) {
-                    photoCard(session.state.user, label: loc.t("chat_screen_chats_you", "You"))
+                    photoCard(session.state.user, label: loc.t("chat_screen_you", "You"))
+                        .rotationEffect(.degrees(reduceMotion || cardsPresented ? (cardLayoutDirection == .rightToLeft ? 6 : -6) : 0))
+                        .offset(x: reduceMotion || cardsPresented ? 0 : (cardLayoutDirection == .rightToLeft ? 180 : -180))
+                        .opacity(cardsPresented ? 1 : 0)
+                        .accessibilityIdentifier("matched-self-photo-card")
                     Image(systemName: "heart.fill").font(.system(size: 24)).foregroundStyle(Theme.Palette.primary)
                         .accessibilityHidden(true)
                     photoCard(partner, label: partner.fullName)
+                        .rotationEffect(.degrees(reduceMotion || cardsPresented ? (cardLayoutDirection == .rightToLeft ? -6 : 6) : 0))
+                        .offset(x: reduceMotion || cardsPresented ? 0 : (cardLayoutDirection == .rightToLeft ? -180 : 180))
+                        .opacity(cardsPresented ? 1 : 0)
+                        .accessibilityIdentifier("matched-partner-photo-card")
                 }
                 .padding(.top, 12)
+                .task {
+                    guard !cardsPresented, !Task.isCancelled else { return }
+                    // One entrance per presentation. Reduced Motion keeps the cards
+                    // in place and reveals them without vestibular movement.
+                    withAnimation(reduceMotion ? .easeOut(duration: 0.15) : .spring(response: 0.55, dampingFraction: 0.9)) {
+                        cardsPresented = true
+                    }
+                }
                 Text(loc.t("match_matched_prompt", "You and {PARTNER} have matched!").replacingOccurrences(of: "{PARTNER}", with: name))
                     .font(Theme.Typography.heading(22)).multilineTextAlignment(.center)
                     .accessibilityAddTraits(.isHeader)
@@ -651,15 +834,16 @@ struct MatchedView: View {
     /// The profile must identify an active relationship with this partner. There is
     /// no redundant GET for the connection itself.
     private func activeProfile() async throws -> (ProfileMatchState, User)? {
+        let generation = TokenStore.shared.generation
         let state: ProfileMatchState?
         let user: User
         switch partnerRef {
         case .caregiver(let id):
             guard session.role == .client else { return nil }
-            let p = try await ClientService().caregiver(id: id); state = p.matchState; user = p.user
+            let p = try await ClientService().caregiver(id: id, ifGeneration: generation); state = p.matchState; user = p.user
         case .client(let id):
             guard session.role == .caregiver else { return nil }
-            let p = try await CaregiverService().client(id: id); state = p.matchState; user = p.user
+            let p = try await CaregiverService().client(id: id, ifGeneration: generation); state = p.matchState; user = p.user
         }
         guard let state, state.status == .active else { return nil }
         return (state, user)

@@ -1,0 +1,42 @@
+{
+  "requirement": 16,
+  "device": "iPhone 17 Pro Max / iOS26.5",
+  "imageSize": [
+    1320,
+    2868
+  ],
+  "sourceNode": "221:11986",
+  "foregroundRGB": [
+    127,
+    127,
+    127
+  ],
+  "backgroundRGB": [
+    255,
+    255,
+    255
+  ],
+  "exactForegroundPixelsInsideRecognizedHint": 1970,
+  "recognizedHintBounds": [
+    283,
+    2546,
+    1028,
+    2584
+  ],
+  "minimumGrayscaleInsideHint": 127,
+  "whiteContrastRatio": 4.0041069566148515,
+  "normalTextAAThreshold": 4.5,
+  "contrastReference": "https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html",
+  "requestedExactColorVerified": true,
+  "contrastLimitationDocumented": true,
+  "screenshotReviewedNoCredentialsOrPersonalData": true,
+  "screenshotSHA256": "c7c3f98e3252a6facd9919a107fa19caf38d7fbb54768f04422516e376efe088",
+  "scope": "Modern English loading view only; no full accessibility or Small/RTL claim",
+  "artifacts": [
+    {
+      "path": "loading-native-modern.png",
+      "sha256": "c7c3f98e3252a6facd9919a107fa19caf38d7fbb54768f04422516e376efe088",
+      "bytes": 360867
+    }
+  ]
+}

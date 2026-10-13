@@ -55,8 +55,8 @@ struct CaregiverService: Sendable {
         )
     }
 
-    func client(id: String) async throws -> ClientFull {
-        try await client.send(Endpoint(method: .get, path: "caregivers/clients/\(id)"))
+    func client(id: String, ifGeneration: UUID? = nil) async throws -> ClientFull {
+        try await client.send(Endpoint(method: .get, path: "caregivers/clients/\(id)"), ifGeneration: ifGeneration)
     }
 
     private static func sharedFields(_ s: CaregiverSkills) -> [String: FormValue?] {

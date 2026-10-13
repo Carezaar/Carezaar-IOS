@@ -245,28 +245,38 @@ final class StartupGateUITests: XCTestCase {
         add(proof)
     }
 
-    func testOfflineRejectedSavedSessionShowsWelcomeWithReferenceContinuationDisabled() {
+    /// October13 supersedes the earlier Welcome-on-unverifiable-session policy.
+    /// Offline cannot establish rejection; the next online server refusal can.
+    func testOfflineSavedSessionRetainsCredentialsUntilOnlineServerExplicitlyRejects() {
+        continueAfterFailure = false
         let app = XCUIApplication()
-        app.launchArguments = ["--qa-clear-reference-cache", "--qa-seed-invalid-session", "--qa-offline", "0", "120", "--qa-request-counts"]
+        app.launchArguments = ["--qa-clear-reference-cache", "--qa-seed-invalid-session", "--qa-offline", "0", "120", "--qa-request-counts",
+                               "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
         app.launch()
         defer { app.terminate() }
-        let signIn = app.buttons["Sign in"].firstMatch
-        XCTAssertTrue(signIn.waitForExistence(timeout: 60), "An unverifiable saved session must show Welcome, even with no cached lists")
-        XCTAssertFalse(signIn.isEnabled, "Welcome cannot proceed before every reference dataset is ready")
-        XCTAssertTrue(app.otherElements["welcome-reference-gate"].exists || app.buttons["Try Again"].waitForExistence(timeout: 20))
+        XCTAssertTrue(app.buttons["Try Again"].firstMatch.waitForExistence(timeout: 30))
+        XCTAssertFalse(app.buttons["Sign in"].firstMatch.exists)
         XCTAssertFalse(app.buttons["Messages"].exists)
-        let shot = XCTAttachment(screenshot: app.screenshot()); shot.name = "offline-saved-session-welcome-gated"; shot.lifetime = .keepAlways; add(shot)
+        XCTAssertEqual(app.staticTexts["qa-token-presence"].label, "accessPresent=true;refreshPresent=true")
+        XCTAssertTrue(app.staticTexts["qa-request-counts"].label.contains("GET /api/auth/info=4"))
+        XCTAssertFalse(app.staticTexts["qa-request-counts"].label.contains("PUT /api/auth/refresh="))
+        let offline = XCTAttachment(screenshot: app.screenshot())
+        offline.name = "offline-unverifiable-session-retained-retry"; offline.lifetime = .keepAlways; add(offline)
         app.terminate()
-        app.launchArguments = ["--qa-request-counts"]
+        app.launchArguments = ["--qa-request-counts", "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
         app.launch()
-        XCTAssertTrue(app.buttons["Sign in"].firstMatch.waitForExistence(timeout: 60), "Next launch must not restore invalid credentials")
-        let ready = XCTNSPredicateExpectation(predicate: NSPredicate(format: "isEnabled == true"), object: app.buttons["Sign in"].firstMatch)
-        XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 120), .completed, "Online Welcome must unlock only after complete reference startup")
+        let signIn = app.buttons["Sign in"].firstMatch
+        XCTAssertTrue(signIn.waitForExistence(timeout: 60))
+        XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "isEnabled == true"), object: signIn)], timeout: 120), .completed)
+        XCTAssertEqual(app.staticTexts["qa-token-presence"].label, "accessPresent=false;refreshPresent=false")
+        let ledger = app.staticTexts["qa-request-counts"].label
+        XCTAssertTrue(ledger.contains("GET /api/auth/info=1"))
+        XCTAssertTrue(ledger.contains("PUT /api/auth/refresh=1"))
+        XCTAssertFalse(ledger.contains("POST /api/auth/login="))
         for dataset in ["languages", "states", "media", "faqs", "faq_categories"] {
-            XCTAssertTrue(app.staticTexts["qa-request-counts"].label.contains("GET /api/base/\(dataset)=1"), "First uncached launch must load \(dataset)")
+            XCTAssertTrue(ledger.contains("GET /api/base/\(dataset)=1"))
         }
         XCTAssertFalse(app.buttons["Messages"].exists)
-        XCTAssertFalse(app.staticTexts["qa-request-counts"].label.contains("GET /api/auth/info="), "Invalid saved credentials must have been cleared")
-        let reopened = XCTAttachment(screenshot: app.screenshot()); reopened.name = "subsequent-online-welcome"; reopened.lifetime = .keepAlways; add(reopened)
     }
 }

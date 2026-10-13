@@ -28,6 +28,9 @@ struct MainView: View {
         .background(Color.white)
         .navigationBarBackButtonHidden()
         .toolbar(.hidden, for: .navigationBar)
+        .onAppear {
+            poller.start { slug, fallback in loc.t(slug, fallback) }
+        }
     }
 
     private var topBar: some View {
@@ -138,6 +141,7 @@ struct MatchesTab: View {
     @EnvironmentObject private var feedback: Feedback
 
     @StateObject private var pager = Pager<Card>()
+    @StateObject private var favorites = FavoriteMutationCoordinator.shared
     @State private var sort: MatchSort = .distance
     @State private var choosingSort = false
     @State private var headerImage = "bg_matches"
@@ -156,6 +160,7 @@ struct MatchesTab: View {
                 HeroHeader(image: headerImage, icon: "ic_matches_off",
                            title: loc.t("\(prefix)_matches_page_title", "My Matches"),
                            subtitle: loc.t("\(prefix)_matches_page_description", ""))
+                    .accessibilityIdentifier("matches-hero")
                 banner
                 AdaptiveStack(alignment: .center, spacing: 8) {
                     Text("\(loc.t("\(prefix)_matches_all_matches", "All Matches")) \(pager.total.map { "(\($0))" } ?? "")")
@@ -177,6 +182,16 @@ struct MatchesTab: View {
                 }
             }
         }
+        #if DEBUG
+        .overlay(alignment: .topLeading) {
+            if ProcessInfo.processInfo.arguments.contains("--qa-request-counts") {
+                Text("·").frame(width: 1, height: 1).clipped()
+                    .accessibilityLabel(headerImages.joined(separator: ",") + ";current=" + headerImage)
+                    .accessibilityIdentifier("qa-matches-header")
+                    .allowsHitTesting(false)
+            }
+        }
+        #endif
         .refreshable { await reload(quiet: true) }
         .task(id: sort) { await reload() }
         .onReceive(NotificationCenter.default.publisher(for: FavoriteSync.changed)) { note in
@@ -187,22 +202,30 @@ struct MatchesTab: View {
         }
         .onAppear { headerVisible = true }
         .onDisappear { headerVisible = false }
-        .task {
-            await loadHeader()
-            guard headerImages.count > 1 else { return }
+        .task { await loadHeader() }
+        // A new task exists only while this screen and scene are active. SwiftUI
+        // cancels the old sleep on disappearance/background instead of leaving a timer alive.
+        .task(id: headerRotationKey) {
+            guard !headerRotationKey.isEmpty, headerImages.count > 1 else { return }
             while !Task.isCancelled {
-                do { try await Task.sleep(for: .seconds(6)) } catch { return }
-                guard !Task.isCancelled, headerImages.count > 1 else { return }
-                guard headerVisible, headerScenePhase == .active else { continue }
+                do { try await Task.sleep(for: .seconds(5)) } catch { return }
+                guard !Task.isCancelled, headerVisible, headerScenePhase == .active,
+                      headerImages.count > 1 else { return }
                 headerIndex = (headerIndex + 1) % headerImages.count
                 headerImage = headerImages[headerIndex]
             }
         }
+
         .confirmationDialog(loc.t("\(prefix)_matches_sort", "Sort"), isPresented: $choosingSort, titleVisibility: .visible) {
             ForEach(MatchSort.allCases, id: \.self) { s in
                 Button((s == sort ? "✓ " : "") + loc.t("\(prefix)_matches_sort_\(s.rawValue)", s.title)) { sort = s }
             }
         }
+    }
+
+    private var headerRotationKey: String {
+        guard headerVisible, headerScenePhase == .active, headerImages.count > 1 else { return "" }
+        return headerImages.joined(separator: "|")
     }
 
     private var banner: some View {
@@ -347,16 +370,28 @@ struct MatchesTab: View {
     }
 
     private func toggleFavorite(_ card: Card) async {
-        guard let index = pager.items.firstIndex(where: { $0.id == card.id }) else { return }
+        guard !favorites.isBusy(partner: card.user, accountId: session.state.user?.id),
+              let index = pager.items.firstIndex(where: { $0.id == card.id }) else { return }
+        let accountId = session.state.user?.id
+        let generation = TokenStore.shared.generation
         let on = card.user.isFavorite
         pager.items[index].user = card.user.with(isFavorite: !on)
         do {
-            try await feedback.run(on ? loc.t("loading_favorite_delete", "Removing from favorite list")
+            let saved = try await feedback.run(on ? loc.t("loading_favorite_delete", "Removing from favorite list")
                                       : loc.t("loading_favorite_create", "Adding to favorite list")) {
-                if on { try await UserService().removeBookmark(partnerId: card.user.id) }
-                else { try await UserService().addBookmark(partnerId: card.user.id) }
+                try await favorites.change(partner: card.user, to: !on, profileId: card.id, accountId: accountId, generation: generation)
             }
+            guard session.state.user?.id == accountId, TokenStore.shared.generation == generation else { return }
+            if let i = pager.items.firstIndex(where: { $0.id == card.id }) { pager.items[i].user = saved }
+            FavoriteSync.post(userId: card.user.id, isFavorite: saved.isFavorite)
+        } catch is CancellationError { return }
+        catch let failure as FavoriteReconciliationError {
+            guard session.state.user?.id == accountId, TokenStore.shared.generation == generation else { return }
+            if let i = pager.items.firstIndex(where: { $0.id == card.id }) { pager.items[i].user = failure.saved }
+            FavoriteSync.post(userId: card.user.id, isFavorite: failure.saved.isFavorite)
+            feedback.toast(Feedback.message(failure.underlying))
         } catch {
+            guard session.state.user?.id == accountId, TokenStore.shared.generation == generation else { return }
             if let i = pager.items.firstIndex(where: { $0.id == card.id }) { pager.items[i].user = card.user }
             feedback.toast(Feedback.message(error))
         }

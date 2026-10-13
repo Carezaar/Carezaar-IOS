@@ -12,7 +12,7 @@ struct SplashView: View {
 
     static let sceneKey = "v2-195-11749"
 
-    private var failed: Bool { baseData.failed }
+    private var failed: Bool { baseData.failed || session.errorMessage != nil }
 
     var body: some View {
         // The splash frame has a tap target onto Intro; routing here is driven by
@@ -27,7 +27,9 @@ struct SplashView: View {
                             .font(Theme.Typography.title(17)).multilineTextAlignment(.center)
                         PrimaryButton(title: loc.t("general_try_again", "Try Again")) {
                             Task {
-                                if baseData.failed { await baseData.bootstrap() }
+                                async let restore: Void = session.retry()
+                                async let bootstrap: Void = baseData.failed ? baseData.bootstrap() : ()
+                                _ = await (restore, bootstrap)
                             }
                         }
                     }

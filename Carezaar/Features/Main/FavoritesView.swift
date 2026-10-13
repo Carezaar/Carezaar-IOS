@@ -5,6 +5,8 @@ struct FavoritesView: View {
     @EnvironmentObject private var router: AppRouter
     @EnvironmentObject private var loc: Localization
     @EnvironmentObject private var feedback: Feedback
+    @EnvironmentObject private var session: SessionManager
+    @StateObject private var favorites = FavoriteMutationCoordinator.shared
     @StateObject private var pager = Pager<User>()
 
     var body: some View {
@@ -44,6 +46,7 @@ struct FavoritesView: View {
                         AppIcon(name: "ic_favorite_on", size: 28, tint: Theme.Palette.danger).frame(width: 40, height: 40)
                     }
                     .buttonStyle(.plain)
+                    .disabled(favorites.isBusy(partner: u, accountId: session.state.user?.id))
                     .accessibilityLabel("Remove from favorites")
                     Spacer()
                     AppIcon(name: "ic_chevron_forward", size: 20, tint: Theme.Palette.textSecondary).flipsForRightToLeftLayoutDirection(true)
@@ -61,11 +64,25 @@ struct FavoritesView: View {
     }
 
     private func remove(_ u: User) async {
+        let accountId = session.state.user?.id
+        let generation = TokenStore.shared.generation
+        guard !favorites.isBusy(partner: u, accountId: accountId) else { return }
         do {
-            try await feedback.run(loc.t("loading_favorite_delete", "Removing from favorite list")) {
-                try await UserService().removeBookmark(partnerId: u.id)
+            let saved = try await feedback.run(loc.t("loading_favorite_delete", "Removing from favorite list")) {
+                try await favorites.change(partner: u, to: false, accountId: accountId, generation: generation)
             }
-            pager.items.removeAll { $0.id == u.id }
-        } catch { feedback.toast(Feedback.message(error)) }
+            guard session.state.user?.id == accountId, TokenStore.shared.generation == generation else { return }
+            if !saved.isFavorite { pager.items.removeAll { $0.id == u.id } }
+            FavoriteSync.post(userId: u.id, isFavorite: saved.isFavorite)
+        } catch is CancellationError { return }
+        catch let failure as FavoriteReconciliationError {
+            guard session.state.user?.id == accountId, TokenStore.shared.generation == generation else { return }
+            if !failure.saved.isFavorite { pager.items.removeAll { $0.id == u.id } }
+            FavoriteSync.post(userId: u.id, isFavorite: failure.saved.isFavorite)
+            feedback.toast(Feedback.message(failure.underlying))
+        } catch {
+            guard session.state.user?.id == accountId, TokenStore.shared.generation == generation else { return }
+            feedback.toast(Feedback.message(error))
+        }
     }
 }

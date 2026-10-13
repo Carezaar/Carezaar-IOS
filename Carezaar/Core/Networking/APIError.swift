@@ -10,31 +10,24 @@ enum APIError: Error, Equatable {
     case validation(message: String, fields: [String: [String]])
     case notFound(String)
     case server(String)
+    /// The transport establishes that no connection was made; deliberate retry is safe.
+    case connectionUnavailable
     case network(String)
     case timeout
     case decoding(String)
     case unknown(String)
 
-    /// User-facing message, matching the Android copy contract.
-    var message: String {
-        switch self {
-        case .unauthenticated(let m): return m.isEmpty ? "Your session has expired. Please sign in again." : m
-        case .validation(let m, _): return m
-        case .notFound(let m): return m.isEmpty ? "Not found." : m
-        case .server(let m): return m.isEmpty ? "Something went wrong on our end." : m
-        case .network: return "No internet connection. Please try again."
-        case .timeout: return "The server is taking too long to respond. Please try again."
-        case .decoding: return "Unexpected response from the server."
-        case .unknown(let m): return m.isEmpty ? "Something went wrong." : m
-        }
-    }
+    /// Common display copy has one managed resolver; raw service diagnostics are
+    /// available separately for classification and never become a second UI path.
+    @MainActor
+    var message: String { Feedback.message(self) }
 
     /// The server's own text, when it has one.
     var serverMessage: String {
         switch self {
         case .unauthenticated(let m), .notFound(let m), .server(let m), .unknown(let m), .decoding(let m): return m
         case .validation(let m, _): return m
-        case .network, .timeout: return ""
+        case .connectionUnavailable, .network, .timeout: return ""
         }
     }
 
@@ -57,5 +50,24 @@ enum APIError: Error, Equatable {
     func fieldError(_ field: String) -> String? {
         guard case .validation(_, let fields) = self else { return nil }
         return fields[field]?.first
+    }
+}
+
+/// The original protected write was explicitly refused before renewal failed.
+/// Its cause retains the managed error category, while reconciliation must not
+/// treat that refusal as a possibly committed mutation.
+struct AuthorizationRejectedMutationError: Error {
+    let cause: APIError
+}
+
+/// Shared transport evidence for writes in every feature.
+enum MutationOutcome {
+    static func mayHaveCommitted(_ error: Error) -> Bool {
+        if error is CancellationError || error is AuthorizationRejectedMutationError { return false }
+        guard let api = error as? APIError else { return true }
+        switch api {
+        case .validation, .notFound, .unauthenticated, .connectionUnavailable: return false
+        case .network, .timeout, .decoding, .server, .unknown: return true
+        }
     }
 }

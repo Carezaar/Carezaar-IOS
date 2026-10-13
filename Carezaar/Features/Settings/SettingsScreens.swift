@@ -134,6 +134,7 @@ struct ReportAnIssueView: View {
     @State private var issues: [Issue]?
     @State private var error: Error?
     @State private var composing = false
+    @StateObject private var issueSubmission = IssueSubmissionCoordinator()
 
     var body: some View {
         ScrollView {
@@ -162,7 +163,9 @@ struct ReportAnIssueView: View {
         .backHeader(loc.t("report_an_issue_title", "Report An Issue"))
         .task { await load() }
         .sheet(isPresented: $composing) {
-            IssueComposer { composing = false; Task { await load() } }
+            IssueComposer(submission: issueSubmission, existingIssues: issues) {
+                composing = false; Task { await load() }
+            }
                 .presentationDetents([.large])
         }
     }
@@ -208,7 +211,10 @@ struct ReportAnIssueView: View {
 /// Issue type from `base/issuetypes`, or "Other" with a free subject — the backend
 /// takes either `issuetype_id` or `title`, never both.
 private struct IssueComposer: View {
+    @ObservedObject var submission: IssueSubmissionCoordinator
+    let existingIssues: [Issue]?
     let onDone: () -> Void
+    @EnvironmentObject private var session: SessionManager
     @EnvironmentObject private var baseData: BaseDataStore
     @EnvironmentObject private var loc: Localization
     @EnvironmentObject private var feedback: Feedback
@@ -244,6 +250,7 @@ private struct IssueComposer: View {
                 TextField(loc.t("report_an_issue_description_placeholder", "Write your issue here..."), text: $description, axis: .vertical)
                     .lineLimit(4...8).padding(14).overlay(RoundedRectangle(cornerRadius: 12).stroke(Theme.Palette.line))
                 PrimaryButton(title: loc.t("report_an_issue_submit_button", "Submit")) { Task { await submit() } }
+                    .disabled(submission.submitting)
             }
             .padding(20)
         }
@@ -258,16 +265,78 @@ private struct IssueComposer: View {
         if description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             feedback.toast("\(loc.t("report_an_issue_description_label", "Description")): \(required)"); return
         }
+        let owner = session.state.user?.id, generation = TokenStore.shared.generation
+        guard owner != nil else { return }
         do {
             _ = try await feedback.run(loc.t("loading_user_issues_create", "Reporting a new issue")) {
-                try await UserService().createIssue(issuetypeId: typeId,
-                                                    title: typeId == nil ? subject.trimmingCharacters(in: .whitespaces) : nil,
-                                                    description: description.trimmingCharacters(in: .whitespacesAndNewlines))
+                try await submission.submit(IssueSubmissionDraft(issuetypeId: typeId,
+                    title: typeId == nil ? subject.trimmingCharacters(in: .whitespaces) : nil,
+                    description: description.trimmingCharacters(in: .whitespacesAndNewlines)), baseline: existingIssues, generation: generation)
             }
+            guard owner == session.state.user?.id, generation == TokenStore.shared.generation else { return }
             onDone()
-        } catch let error as APIError where error.isServiceFault {
+        } catch is CancellationError { }
+        catch let error as APIError where error.isServiceFault {
             feedback.toast(Feedback.unavailable(loc.t("report_an_issue_title", "Report An Issue")))
         } catch { feedback.toast(Feedback.message(error)) }
+    }
+}
+
+/// Exact issue fields submitted by the native composer, not server diagnostic copy.
+struct IssueSubmissionDraft: Hashable, Sendable {
+    let issuetypeId: Int?
+    let title: String?
+    let description: String
+}
+
+/// Public workflow seam wired to the real native issue composer.
+@MainActor
+final class IssueSubmissionCoordinator: ObservableObject {
+    private let service: UserService
+    init(service: UserService = UserService()) { self.service = service }
+
+    @Published private(set) var submitting = false
+    private struct Pending {
+        let existingIDs: Set<Int>
+        let error: Error
+    }
+    private struct Key: Hashable { let generation: UUID; let draft: IssueSubmissionDraft }
+    private var pending: [Key: Pending] = [:]
+
+    func submit(_ draft: IssueSubmissionDraft, baseline: [Issue]?, generation: UUID? = nil) async throws -> Issue {
+        guard !submitting else { throw APIError.unknown("") }
+        submitting = true
+        defer { submitting = false }
+        let owner = await service.client.credentialGeneration()
+        guard generation == nil || generation == owner else { throw CancellationError() }
+        let key = Key(generation: owner, draft: draft)
+        if let unresolved = pending[key] { return try await reconcile(key, pending: unresolved) }
+        let existing: [Issue]
+        if let baseline { existing = baseline } else { existing = try await service.issues(ifGeneration: owner) }
+        do {
+            return try await service.createIssue(issuetypeId: draft.issuetypeId,
+                                                  title: draft.title, description: draft.description, ifGeneration: owner)
+        } catch is CancellationError { throw CancellationError() }
+        catch {
+            guard MutationOutcome.mayHaveCommitted(error) else { throw error }
+            let unresolved = Pending(existingIDs: Set(existing.map(\.id)), error: error)
+            pending[key] = unresolved
+            return try await reconcile(key, pending: unresolved)
+        }
+    }
+
+    private func reconcile(_ key: Key, pending unresolved: Pending) async throws -> Issue {
+        let draft = key.draft
+        let issues: [Issue]
+        do { issues = try await service.issues(ifGeneration: key.generation) }
+        catch is CancellationError { throw CancellationError() }
+        catch { throw unresolved.error }
+        guard let saved = issues.first(where: {
+            !unresolved.existingIDs.contains($0.id) && $0.issuetypeId == draft.issuetypeId
+                && (draft.issuetypeId != nil || $0.title == draft.title) && $0.description == draft.description
+        }) else { throw unresolved.error }
+        pending.removeValue(forKey: key)
+        return saved
     }
 }
 
@@ -371,6 +440,8 @@ struct ChangePasswordView: View {
         .alert(loc.t("settings_change_password_dialog_title", "Are you sure?"), isPresented: $confirming) {
             Button(loc.t("settings_change_password_dialog_deny", "Cancel"), role: .cancel) {}
             Button(loc.t("settings_change_password_dialog_confirm", "Confirm")) { Task { await submit() } }
+        } message: {
+            Text(loc.t("settings_change_password_dialog_message", "You are going to change your password."))
         }
     }
 
@@ -385,7 +456,6 @@ struct ChangePasswordView: View {
             current = ""
             updated = ""
             confirmation = ""
-            feedback.toast("Password changed successfully.")
         } catch let error as APIError where error.isServiceFault {
             feedback.toast(Feedback.unavailable(loc.t("settings_change_password_title", "Change Password")))
         } catch { feedback.toast(Feedback.message(error)) }
@@ -486,9 +556,8 @@ struct DeleteAccountView: View {
         guard let reasonId else { return }
         do {
             try await feedback.run(loc.t("loading_deleting_user_account", "Deleting user account")) {
-                try await UserService().deleteAccount(reasonId: reasonId)
+                try await session.deleteAccount(reasonId: reasonId)
             }
-            session.endDeletedSession()
         } catch let error as APIError where error.isServiceFault {
             feedback.toast(Feedback.unavailable(loc.t("delete_account_title", "Delete Account")))
         } catch { feedback.toast(Feedback.message(error)) }

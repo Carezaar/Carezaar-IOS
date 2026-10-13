@@ -23,7 +23,6 @@ struct ChatView: View {
     @State private var replyOwnership = ChatReplyOwnership()
     @State private var sending = false
     @StateObject private var delivery = ChatSendCoordinator()
-    @State private var confirmingRetry = false
     @State private var visible = false
     @State private var scrollPosition = ChatViewportPosition()
     @State private var followIncoming = true
@@ -50,19 +49,12 @@ struct ChatView: View {
             } else {
                 transcript
             }
-            if delivery.uncertain { uncertainSendNotice }
             // The draft lives in its own view: typing re-renders only the composer, not
             // the transcript (a long message there made every keystroke re-lay it out).
             ChatComposer(replyTo: Binding(get: { replyTo }, set: selectReply), focusRequest: focusRequest,
-                         isEnabled: !delivery.uncertain && !sending, send: send)
+                         isEnabled: !sending, send: send)
         }
         .backHeader(loc.t("chat_screen_messages_title", "Chat Messages"))
-        .alert("Allow another send attempt?", isPresented: $confirmingRetry) {
-            Button(loc.t("general_cancel", "Cancel"), role: .cancel) {}
-            Button("Allow retry") { delivery.allowExplicitRetry() }
-        } message: {
-            Text("Your previous message may already be in the chat. Sending it again could create a duplicate. Check the messages before allowing another attempt.")
-        }
         .onAppear { visible = true }
         .onDisappear { visible = false; operations.invalidate(); scrollPosition = ChatViewportPosition() }
         .task {
@@ -75,25 +67,6 @@ struct ChatView: View {
         .onChange(of: scenePhase) { _, phase in
             if phase == .active, visible { Task { await refreshQuietly() } }
         }
-    }
-
-    private var uncertainSendNotice: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Couldn't confirm whether your message was sent. Your draft is still here.")
-                .font(Theme.Typography.body(13))
-            AdaptiveStack(alignment: .center, spacing: 12) {
-                Button { Task { await load() } } label: {
-                    Text("Check messages").frame(minHeight: 44).contentShape(Rectangle())
-                }
-                Button { confirmingRetry = true } label: {
-                    Text("Allow retry").frame(minHeight: 44).contentShape(Rectangle())
-                }
-            }
-            .font(Theme.Typography.control(13))
-        }
-        .padding(12).frame(maxWidth: .infinity, alignment: .leading)
-        .background(Theme.Palette.primarySoft)
-        .accessibilityIdentifier("chat-send-uncertain")
     }
 
     private var partnerBar: some View {
@@ -234,35 +207,38 @@ struct ChatView: View {
 
     /// Returns true when sent, so the composer clears its draft.
     private func send(_ text: String) async -> Bool {
-        guard visible, !Task.isCancelled, !sending, !delivery.uncertain else { return false }
+        guard visible, !Task.isCancelled, !sending, let current = chat else { return false }
+        let accountId = session.state.user?.id
+        let generation = TokenStore.shared.generation
+        let submittedRole = role
         let submittedReply = replyOwnership.capture(parentId: replyTo?.id)
         let owner = operations.beginSend()
         sending = true
         defer { sending = false }
         do {
-            // An already-open chat can outlive its relationship. Resolve current
-            // chat metadata before sending because this backend may accept ended
-            // match messages. This is not an extra Matched-screen navigation check.
-            let current = try await UserService().chat(id: chatId)
-            guard visible, !Task.isCancelled, operations.canCommit(owner) else { return false }
-            apply(current)
+            // The loaded conversation already supplies the relationship context.
+            // Server authorization remains authoritative; reads are reserved for
+            // initial/explicit refresh and uncertain delivery reconciliation.
             let partnerIsMatch = role == .client ? current.caregiver?.isMatch : current.client?.isMatch
             guard partnerIsMatch == true else {
                 feedback.toast(loc.t("chat_screen_match_check", "You can only send messages to your current matches."))
                 return false
             }
             let updated = try await feedback.run(loc.t("loading_chat_send", "Sending a new message")) {
-                try await delivery.submit(chatId: chatId, text: text, parentId: submittedReply.parentId)
+                try await delivery.submit(chatId: chatId, text: text, parentId: submittedReply.parentId,
+                                          baseline: current.messages, role: submittedRole, generation: generation)
             }
             // A deliberate, acknowledged send should reveal the new bubble even
             // when the keyboard reduced the viewport or the user was reading above.
-            guard visible, !Task.isCancelled, operations.canCommit(owner) else { return false }
+            guard visible, !Task.isCancelled, operations.canCommit(owner),
+                  session.state.user?.id == accountId, TokenStore.shared.generation == generation else { return false }
             apply(updated, revealAcknowledgedSend: true)
             if replyOwnership.canClear(submittedReply, currentParentId: replyTo?.id) { selectReply(nil) }
             return true
         } catch is CancellationError { return false }
         catch {
-            guard visible, !Task.isCancelled, operations.canCommit(owner) else { return false }
+            guard visible, !Task.isCancelled, operations.canCommit(owner),
+                  session.state.user?.id == accountId, TokenStore.shared.generation == generation else { return false }
             feedback.toast(Self.message(error, loc: loc))
             return false
         }
@@ -555,38 +531,63 @@ final class ChatSendCoordinator: ObservableObject {
     private let service: UserService
     init(service: UserService = UserService()) { self.service = service }
 
+    private struct Submission: Hashable {
+        let chatId: Int
+        let text: String
+        let parentId: Int?
+        let role: UserRole
+        let generation: UUID
+    }
+    private struct Pending {
+        let highestMessageID: Int
+        let originalError: Error
+    }
+    private var pending: [Submission: Pending] = [:]
     private var submitting = false
 
-    func submit(chatId: Int, text: String, parentId: Int?) async throws -> ChatFull {
-        guard !uncertain else { throw ChatSubmissionError.awaitingVerification }
-        guard !submitting else { throw ChatSubmissionError.busy }
+    /// A known transcript is supplied by the active conversation. Reconciliation
+    /// never mistakes an older identical message for this submission.
+    func submit(chatId: Int, text: String, parentId: Int?,
+                baseline: [ChatMessage] = [], role: UserRole = .client, generation: UUID? = nil) async throws -> ChatFull {
+        guard !submitting else { throw APIError.unknown("") }
         submitting = true
         defer { submitting = false }
+        let owner = await service.client.credentialGeneration()
+        guard generation == nil || generation == owner else { throw CancellationError() }
+        let submission = Submission(chatId: chatId, text: text, parentId: parentId, role: role, generation: owner)
+        if let unresolved = pending[submission] {
+            // Remember every unresolved operation, even when another draft was sent
+            // between attempts. Another tap may check its outcome, never replay POST.
+            return try await reconcile(submission, pending: unresolved)
+        }
         do {
-            return try await service.sendMessage(chatId: chatId, message: text, parentId: parentId)
-        } catch {
-            // No idempotency key or request id is supported. A transport failure,
-            // malformed acknowledgement or server error cannot prove non-delivery.
-            // A matching text found later is also not proof of this particular POST.
-            if Self.deliveryMayHaveOccurred(error) { uncertain = true }
-            throw error
+            return try await service.sendMessage(chatId: chatId, message: text, parentId: parentId, ifGeneration: owner)
+        } catch is CancellationError { throw CancellationError() }
+        catch {
+            guard MutationOutcome.mayHaveCommitted(error) else { throw error }
+            let unresolved = Pending(highestMessageID: baseline.map(\.id).max() ?? 0, originalError: error)
+            pending[submission] = unresolved
+            uncertain = true
+            return try await reconcile(submission, pending: unresolved)
         }
     }
 
-    static func deliveryMayHaveOccurred(_ error: Error) -> Bool {
-        guard let api = error as? APIError else { return true }
-        switch api {
-        case .validation, .notFound, .unauthenticated: return false
-        case .network, .timeout, .decoding, .server, .unknown: return true
-        }
+    private func reconcile(_ submission: Submission, pending unresolved: Pending) async throws -> ChatFull {
+        let conversation: ChatFull
+        do { conversation = try await service.chat(id: submission.chatId, ifGeneration: submission.generation) }
+        catch is CancellationError { throw CancellationError() }
+        catch { throw unresolved.originalError }
+        guard conversation.id == submission.chatId,
+              conversation.messages.contains(where: {
+                  $0.id > unresolved.highestMessageID && $0.isMine(role: submission.role)
+                      && $0.message == submission.text && $0.parent?.value.id == submission.parentId
+              }) else { throw unresolved.originalError }
+        pending.removeValue(forKey: submission)
+        uncertain = !pending.isEmpty
+        return conversation
     }
 
-    func allowExplicitRetry() { uncertain = false }
-}
 
-private enum ChatSubmissionError: Error {
-    case awaitingVerification
-    case busy
 }
 
 /// Reconciles only the submitted prefix after acknowledgement; new typing belongs

@@ -5,7 +5,7 @@ import CryptoKit
 #endif
 
 /// Uses a genuine cached phone fix immediately, then requests a newer fix.
-/// A stale cached fix remains usable but is explicitly labelled as last known.
+/// A stale cached fix remains usable silently as the initial map position.
 @MainActor
 final class LocationProvider: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published private(set) var coordinate: CLLocationCoordinate2D?

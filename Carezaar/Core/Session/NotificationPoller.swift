@@ -18,6 +18,7 @@ final class NotificationPoller: NSObject, ObservableObject, UNUserNotificationCe
     private var generation = 0
     private var checkedRevision = 0
     private var polling = false
+    private var pollFinished: [CheckedContinuation<Void, Never>] = []
     private var requestedPermission = false
     private let service: UserService
     private let tokens: any SessionTokenStorage
@@ -58,19 +59,29 @@ final class NotificationPoller: NSObject, ObservableObject, UNUserNotificationCe
         let started = generation
         let sleep = self.sleep
         loop = Task { [weak self] in
+            // Main opening checks now, then ticks every 30 seconds. A prior
+            // generation may still be unwinding after pause: serialize with it.
+            await self?.waitForPendingPoll()
+            guard !Task.isCancelled, let self, self.generation == started else { return }
+            await self.poll()
             while !Task.isCancelled {
                 do { try await sleep(Self.interval) }
                 catch { return }
-                guard !Task.isCancelled, let self, self.generation == started else { return }
+                guard !Task.isCancelled, self.generation == started else { return }
                 await self.poll()
             }
         }
     }
 
-    func stop() {
+    /// Suspend background work without losing the current notification indicator.
+    func pause() {
         generation += 1
         loop?.cancel()
         loop = nil
+    }
+
+    func stop() {
+        pause()
         unread = 0
         openNotificationsRequested = false
         defaults.set(0, forKey: Self.lastCountKey)
@@ -89,7 +100,12 @@ final class NotificationPoller: NSObject, ObservableObject, UNUserNotificationCe
         let started = generation
         let checked = checkedRevision
         polling = true
-        defer { polling = false }
+        defer {
+            polling = false
+            let finished = pollFinished
+            pollFinished.removeAll()
+            finished.forEach { $0.resume() }
+        }
         guard let count = try? await service.notificationCount(checkedAt: NotificationsBadge.checkedAt),
               !Task.isCancelled, loop != nil, generation == started,
               checkedRevision == checked, tokens.hasSession else { return }
@@ -105,6 +121,11 @@ final class NotificationPoller: NSObject, ObservableObject, UNUserNotificationCe
         content.sound = .default
         let request = UNNotificationRequest(identifier: "carezaar.notifications", content: content, trigger: nil)
         try? await deliver(request)
+    }
+
+    private func waitForPendingPoll() async {
+        guard polling else { return }
+        await withCheckedContinuation { pollFinished.append($0) }
     }
 
     // Android shows the notification even while the app is open.

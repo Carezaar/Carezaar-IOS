@@ -1,8 +1,284 @@
 import XCTest
+import Combine
 @testable import Carezaar
 
 @MainActor
 final class SessionTests: XCTestCase {
+    func testLateRenewalServiceFailureCancelsBeforeReachingNewAccount() async {
+        let tokens = FixtureTokens()
+        tokens.save(Session(accessToken: "original", refreshToken: "original-refresh"))
+        StubHTTP.handler = { request in
+            if request.url!.lastPathComponent == "refresh" {
+                tokens.save(Session(accessToken: "new-account", refreshToken: "new-refresh"))
+                return (503, Data(#"{"message":"Service unavailable"}"#.utf8))
+            }
+            return (403, Data(#"{"message":"Expired access"}"#.utf8))
+        }
+        do {
+            _ = try await APIClient(tokens: tokens, session: StubHTTP.session()).sendIgnoringResult(Endpoint(method: .get, path: "auth/info"))
+            XCTFail("Superseded operation must cancel")
+        } catch is CancellationError { }
+        catch { XCTFail("Late renewal failure must not reach the current account") }
+        XCTAssertEqual(tokens.accessToken, "new-account")
+    }
+
+    func testNonConnectivityRenewalFailuresDoNotUseConnectionProblemDialog() async {
+        for serverFailure in [true, false] {
+            let tokens = FixtureTokens()
+            tokens.save(Session(accessToken: "original-access", refreshToken: "original-refresh"))
+            var dialogRequests = 0
+            StubHTTP.handler = { request in
+                if request.url!.lastPathComponent == "refresh" {
+                    return serverFailure ? (503, Data(#"{"message":"Service unavailable"}"#.utf8))
+                        : (200, Data(#"{"result":{}}"#.utf8))
+                }
+                return (403, Data(#"{"message":"Expired access"}"#.utf8))
+            }
+            let client = APIClient(tokens: tokens, session: StubHTTP.session(), awaitRenewalRetry: { _ in
+                await MainActor.run { dialogRequests += 1 }
+                return false
+            })
+            do {
+                _ = try await client.sendIgnoringResult(Endpoint(method: .get, path: "auth/info"))
+                XCTFail("Unsuccessful renewal must report its managed error category")
+            } catch let error as APIError {
+                if serverFailure {
+                    guard case .server = error else { XCTFail("Expected service error"); continue }
+                } else {
+                    guard case .decoding = error else { XCTFail("Expected malformed-response error"); continue }
+                }
+            } catch { XCTFail("Unexpected renewal error") }
+            XCTAssertEqual(dialogRequests, 0, "A received service/malformed response is not a connectivity failure")
+            XCTAssertTrue(tokens.hasSession)
+            XCTAssertEqual(tokens.accessToken, "original-access")
+        }
+    }
+
+    func testLateValidationResponseCannotReachNewAccount() async {
+        let tokens = FixtureTokens()
+        tokens.save(Session(accessToken: "old-access", refreshToken: "old-refresh"))
+        StubHTTP.handler = { _ in
+            tokens.save(Session(accessToken: "new-account-access", refreshToken: "new-account-refresh"))
+            return (422, Data(#"{"message":"Old account validation","errors":{"email":["Correct old email"]}}"#.utf8))
+        }
+        do {
+            _ = try await APIClient(tokens: tokens, session: StubHTTP.session()).sendIgnoringResult(Endpoint(method: .post, path: "users/issues"))
+            XCTFail("Superseded operation must cancel")
+        } catch is CancellationError { }
+        catch { XCTFail("A late failure belongs to the old account, not the current UI: \(type(of: error))") }
+        XCTAssertEqual(tokens.accessToken, "new-account-access")
+    }
+
+    func testRefreshStorageFailurePreservesSessionWithoutClaimingServerRejection() async {
+        let tokens = RefreshStorageFailureTokens()
+        tokens.save(Session(accessToken: "old-access", refreshToken: "old-refresh"))
+        StubHTTP.handler = { request in
+            if request.url!.lastPathComponent == "refresh" { return (200, Self.passwordPair) }
+            return (403, Data(#"{"message":"Expired access"}"#.utf8))
+        }
+        do {
+            _ = try await APIClient(tokens: tokens, session: StubHTTP.session()).sendIgnoringResult(Endpoint(method: .get, path: "auth/info"))
+            XCTFail("Failed persistence cannot report successful renewal")
+        } catch APIError.unauthenticated { XCTFail("Local persistence failure is not a server refusal") }
+        catch { }
+        XCTAssertTrue(tokens.hasSession)
+        XCTAssertEqual(tokens.accessToken, "old-access")
+        XCTAssertEqual(tokens.refreshToken, "old-refresh")
+    }
+
+    func testStartupConnectivityFailurePreservesCredentialsAcrossRestartAndRetry() async {
+        for failure in [URLError.notConnectedToInternet, .timedOut, .cannotConnectToHost] {
+            let tokens = FixtureTokens()
+            tokens.save(Session(accessToken: "fixture", refreshToken: "fixture-refresh"))
+            StubHTTP.handler = { _ in throw URLError(failure) }
+            let auth = AuthService(client: APIClient(tokens: tokens, session: StubHTTP.session()))
+            let manager = SessionManager(auth: auth, tokens: tokens)
+            await manager.restore()
+            XCTAssertEqual(manager.state, .loading, "Unverified saved session stays behind startup recovery UI")
+            XCTAssertTrue(tokens.hasSession, "Connectivity failure must not destroy saved credentials")
+            XCTAssertFalse(manager.savedSessionRejected)
+            XCTAssertNotNil(manager.errorMessage, "Retry UI must receive the connection failure")
+            let restarted = SessionManager(auth: auth, tokens: tokens)
+            await restarted.restore()
+            XCTAssertTrue(tokens.hasSession, "An unresolved connection failure must survive app restart")
+            StubHTTP.handler = { _ in (200, Data(#"{"result":{"id":"fixture-user","role":"client"}}"#.utf8)) }
+            await restarted.retry()
+            XCTAssertEqual(restarted.state.user?.id, "fixture-user")
+            XCTAssertTrue(tokens.hasSession)
+            XCTAssertNil(restarted.errorMessage)
+        }
+    }
+
+    func testAcknowledgedPasswordChangeSignsOutWithoutBackgroundLogin() async throws {
+        let tokens = FixtureTokens()
+        tokens.save(Session(accessToken: "old-access", refreshToken: "old-refresh"))
+        var logins = 0, reads = 0, changes = 0, graphSwitches = 0
+        StubHTTP.handler = { request in
+            switch request.url!.lastPathComponent {
+            case "change": changes += 1; return (204, Data())
+            case "login": logins += 1; return (200, Self.passwordPair)
+            case "logout": return (204, Data())
+            default: reads += 1; return (200, Self.passwordUser)
+            }
+        }
+        let manager = SessionManager(auth: AuthService(client: APIClient(tokens: tokens, session: StubHTTP.session())), tokens: tokens)
+        await manager.restore()
+        manager.willSwitchGraph = { graphSwitches += 1 }
+        try await manager.changePassword(current: "Old-password1!", new: "Accepted-new-password1!")
+        XCTAssertEqual(changes, 1)
+        XCTAssertEqual(logins, 0, "Confirmed change must require the user's explicit next sign-in")
+        XCTAssertEqual(reads, 1, "No identity read is needed after confirmed password change")
+        XCTAssertEqual(manager.state, .signedOut)
+        XCTAssertFalse(tokens.hasSession)
+        XCTAssertEqual(graphSwitches, 1)
+    }
+
+    func testAmbiguousPasswordChangeVerifiesNewPasswordWithoutInstallingSessionOrRepeatingChange() async throws {
+        let tokens = FixtureTokens()
+        tokens.save(Session(accessToken: "old-access", refreshToken: "old-refresh"))
+        var changes = 0, probes = 0, candidateReads = 0
+        StubHTTP.handler = { request in
+            switch request.url!.lastPathComponent {
+            case "change": changes += 1; throw URLError(.networkConnectionLost)
+            case "login": probes += 1; return (200, Self.passwordPair)
+            case "logout": return (204, Data())
+            default:
+                if request.value(forHTTPHeaderField: "Authorization") == "Bearer replacement-access" {
+                    candidateReads += 1
+                    XCTAssertEqual(tokens.accessToken, "old-access", "Verification must not silently install candidate credentials")
+                }
+                return (200, Self.passwordUser)
+            }
+        }
+        let manager = SessionManager(auth: AuthService(client: APIClient(tokens: tokens, session: StubHTTP.session())), tokens: tokens)
+        await manager.restore()
+        try await manager.changePassword(current: "Old-password1!", new: "Accepted-new-password1!")
+        XCTAssertEqual(changes, 1, "An unknown write must never be replayed")
+        XCTAssertEqual(probes, 1)
+        XCTAssertEqual(candidateReads, 1)
+        XCTAssertEqual(manager.state, .signedOut)
+        XCTAssertFalse(tokens.hasSession)
+    }
+
+    func testRenewalRetryResumesInterruptedReadWithoutSigningOutOrRepeatingInitialRequest() async throws {
+        let tokens = FixtureTokens()
+        tokens.save(Session(accessToken: "old-access", refreshToken: "old-refresh"))
+        var recovered = false, callbacks = 0, reads = 0, refreshes = 0
+        StubHTTP.handler = { request in
+            if request.url!.lastPathComponent == "refresh" {
+                refreshes += 1
+                if !recovered { throw URLError(.timedOut) }
+                return (200, Data(#"{"result":{"access_token":"new-access","refresh_token":"new-refresh"}}"#.utf8))
+            }
+            reads += 1
+            if request.value(forHTTPHeaderField: "Authorization") == "Bearer new-access" {
+                return (200, Data(#"{"result":{"id":"fixture-user","role":"client"}}"#.utf8))
+            }
+            return (403, Data(#"{"message":"Expired access token"}"#.utf8))
+        }
+        let client = APIClient(tokens: tokens, session: StubHTTP.session(), awaitRenewalRetry: { generation in
+            await MainActor.run {
+                XCTAssertEqual(generation, tokens.generation)
+                XCTAssertTrue(tokens.hasSession)
+                callbacks += 1
+                recovered = true
+            }
+            return true
+        })
+        let user: User = try await client.send(Endpoint(method: .get, path: "auth/info"))
+        XCTAssertEqual(user.id, "fixture-user")
+        XCTAssertEqual(callbacks, 1)
+        XCTAssertEqual(refreshes, 2)
+        XCTAssertEqual(reads, 2, "Only the initial rejected read and the resumed authenticated read")
+        XCTAssertTrue(tokens.hasSession)
+    }
+
+    func testConcurrentRenewalWaitersShareOnePresentationAndResumeOnlyAfterRetry() async throws {
+        let tokens = FixtureTokens()
+        tokens.save(Session(accessToken: "old-access", refreshToken: "old-refresh"))
+        let recovery = SessionRecoveryCoordinator(tokens: tokens)
+        recovery.configure(signedIn: true)
+        var presentations = 0
+        let shown = expectation(description: "Recovery dialog visible")
+        let observation = recovery.$isPresented.dropFirst().sink {
+            if $0 {
+                presentations += 1
+                if presentations == 1 { shown.fulfill() }
+            }
+        }
+        let first = Task { try await recovery.waitForRetry(generation: tokens.generation) }
+        let second = Task { try await recovery.waitForRetry(generation: tokens.generation) }
+        defer { first.cancel(); second.cancel(); observation.cancel() }
+        await fulfillment(of: [shown], timeout: 1)
+        XCTAssertTrue(recovery.isPresented)
+        XCTAssertEqual(presentations, 1, "Concurrent API failures share one global dialog")
+        XCTAssertTrue(tokens.hasSession)
+        recovery.retry()
+        let firstRetried = try await first.value, secondRetried = try await second.value
+        XCTAssertTrue(firstRetried)
+        XCTAssertTrue(secondRetried)
+        XCTAssertFalse(recovery.isPresented)
+        XCTAssertTrue(tokens.hasSession)
+    }
+
+    func testDeletionCannotBorrowCredentialsFromAccountChangedBeforeAPIDispatch() async {
+        let tokens = DeletionDispatchSwapTokens()
+        tokens.save(Session(accessToken: "old-access", refreshToken: "old-refresh"))
+        var deletes = 0
+        StubHTTP.handler = { request in
+            if request.httpMethod == "DELETE" { deletes += 1; return (204, Data()) }
+            return (200, Data(#"{"result":{"id":"fixture-owner","role":"client"}}"#.utf8))
+        }
+        let manager = SessionManager(auth: AuthService(client: APIClient(tokens: tokens, session: StubHTTP.session())), tokens: tokens)
+        await manager.restore()
+        tokens.arm()
+        _ = try? await manager.deleteAccount(reasonId: 1)
+        XCTAssertEqual(deletes, 0, "An old deletion intent must never use a newer account's credential")
+        XCTAssertEqual(tokens.accessToken, "new-account-access")
+    }
+
+    func testCancellingOneRenewalWaiterKeepsOtherRequestAndDialogAlive() async throws {
+        let tokens = FixtureTokens()
+        tokens.save(Session(accessToken: "fixture", refreshToken: "fixture-refresh"))
+        let recovery = SessionRecoveryCoordinator(tokens: tokens)
+        recovery.configure(signedIn: true)
+        let shown = expectation(description: "dialog shown")
+        let entered = expectation(description: "second waiter entered")
+        let observation = recovery.$isPresented.filter { $0 }.first().sink { _ in shown.fulfill() }
+        let first = Task { try await recovery.waitForRetry(generation: tokens.generation) }
+        let second = Task { entered.fulfill(); return try await recovery.waitForRetry(generation: tokens.generation) }
+        defer { first.cancel(); second.cancel(); observation.cancel() }
+        await fulfillment(of: [shown, entered], timeout: 1)
+        first.cancel()
+        do { _ = try await first.value; XCTFail("Cancelled request must not resume") }
+        catch is CancellationError { }
+        catch { XCTFail("Cancellation must stay distinct from a connection failure") }
+        XCTAssertTrue(recovery.isPresented)
+        recovery.retry()
+        let resumed = try await second.value
+        XCTAssertTrue(resumed)
+        XCTAssertTrue(tokens.hasSession)
+    }
+
+    func testNewSignInCancelsOlderRecoveryWaiterWithoutChangingNewCredentials() async {
+        let tokens = FixtureTokens()
+        tokens.save(Session(accessToken: "fixture", refreshToken: "fixture-refresh"))
+        let recovery = SessionRecoveryCoordinator(tokens: tokens)
+        recovery.configure(signedIn: true)
+        let shown = expectation(description: "dialog shown")
+        let observation = recovery.$isPresented.filter { $0 }.first().sink { _ in shown.fulfill() }
+        let task = Task { try await recovery.waitForRetry(generation: tokens.generation) }
+        defer { task.cancel(); observation.cancel() }
+        await fulfillment(of: [shown], timeout: 1)
+        tokens.save(Session(accessToken: "new-account-access", refreshToken: "new-account-refresh"))
+        recovery.configure(signedIn: true)
+        do { _ = try await task.value; XCTFail("An older operation cannot resume in the new account") }
+        catch is CancellationError { }
+        catch { XCTFail("Account replacement cancels the old operation") }
+        XCTAssertFalse(recovery.isPresented)
+        XCTAssertEqual(tokens.accessToken, "new-account-access")
+    }
+
     func testLoginStorageFailureCannotVerifyMissingPartialOrPreviousCredentials() async {
         for failure in LoginStorageFailureTokens.Failure.allCases {
             let tokens = LoginStorageFailureTokens(failure: failure)
@@ -36,7 +312,9 @@ final class SessionTests: XCTestCase {
         }
     }
 
-    func testAcknowledgedPasswordChangeReauthenticatesRevokedPairWithoutChangingGraph() async throws {
+    /// October 13 supersedes retained-session handoff: even revoked old tokens
+    /// must end at start, followed by an explicit new-password sign-in.
+    func testAcknowledgedPasswordChangeWithRevokedPairRequiresExplicitNewSignIn() async throws {
         let tokens = FixtureTokens()
         tokens.save(Session(accessToken: "old-access", refreshToken: "old-refresh"))
         var changed = false, logins = 0, switches = 0
@@ -49,13 +327,10 @@ final class SessionTests: XCTestCase {
                 XCTAssertEqual(fields.first { $0.name == "email" }?.value, "fixture@example.invalid")
                 XCTAssertEqual(fields.first { $0.name == "password" }?.value, "Accepted-new-password1!")
                 return (200, Self.passwordPair)
-            case "refresh": return (403, Data(#"{"message":"Revoked"}"#.utf8))
+            case "logout": return (204, Data())
             default:
                 if changed && request.value(forHTTPHeaderField: "Authorization") != "Bearer replacement-access" {
                     return (403, Data(#"{"message":"Revoked"}"#.utf8))
-                }
-                if request.value(forHTTPHeaderField: "Authorization") == "Bearer replacement-access" {
-                    XCTAssertNil(tokens.accessToken, "Candidate pair must stay out of shared storage until identity is verified")
                 }
                 return (200, Self.passwordUser)
             }
@@ -64,16 +339,16 @@ final class SessionTests: XCTestCase {
         await manager.restore()
         manager.willSwitchGraph = { switches += 1 }
         try await manager.changePassword(current: "Old-password1!", new: "Accepted-new-password1!")
-        XCTAssertEqual(manager.state.user?.id, "fixture-user")
+        XCTAssertEqual(manager.state, .signedOut)
+        XCTAssertFalse(tokens.hasSession)
+        XCTAssertEqual(logins, 0)
+        XCTAssertEqual(switches, 1)
+        try await manager.signIn(email: "fixture@example.invalid", password: "Accepted-new-password1!")
+        XCTAssertEqual(logins, 1, "Only explicit sign-in may install the new pair")
         XCTAssertEqual(tokens.accessToken, "replacement-access")
-        XCTAssertEqual(logins, 1)
-        XCTAssertEqual(switches, 0, "Verified replacement must preserve the current settings graph")
-        StubHTTP.handler = { request in
-            XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer replacement-access")
-            return (200, Self.passwordUser)
-        }
+        XCTAssertEqual(manager.state.user?.id, "fixture-user")
         await manager.restore()
-        XCTAssertEqual(manager.state.user?.id, "fixture-user", "Replacement pair must restore through auth/info")
+        XCTAssertEqual(manager.state.user?.id, "fixture-user")
     }
 
     func testPasswordHandoffRejectsLoginRefusalAndWrongIdentity() async {
@@ -87,7 +362,7 @@ final class SessionTests: XCTestCase {
             var changed = false, logins = 0
             StubHTTP.handler = { request in
                 switch request.url!.lastPathComponent {
-                case "change": changed = true; return (204, Data())
+                case "change": changed = true; throw URLError(.networkConnectionLost)
                 case "login":
                     logins += 1
                     return wrongUser != nil ? (200, Self.passwordPair) : (400, Data(#"{"message":"Invalid Credentials!"}"#.utf8))
@@ -95,7 +370,7 @@ final class SessionTests: XCTestCase {
                 default:
                     if changed {
                         if request.value(forHTTPHeaderField: "Authorization") == "Bearer replacement-access" {
-                            XCTAssertNil(tokens.accessToken, "Wrong-identity candidate must never be installed")
+                            XCTAssertEqual(tokens.accessToken, "old-access", "Wrong-identity candidate must never be installed")
                             return (200, wrongUser!)
                         }
                         return (403, Data(#"{"message":"Revoked"}"#.utf8))
@@ -110,9 +385,39 @@ final class SessionTests: XCTestCase {
                 XCTFail("A refused or unrelated replacement cannot be reported as a retained session")
             } catch { }
             XCTAssertEqual(logins, 1)
-            XCTAssertEqual(manager.state, .signedOut)
-            XCTAssertFalse(tokens.hasSession)
+            XCTAssertEqual(manager.state.user?.id, "fixture-user")
+            XCTAssertTrue(tokens.hasSession)
         }
+    }
+
+    func testRepeatedUncertainPasswordChangeProbesOriginalOutcomeWithoutAnotherWrite() async throws {
+        let tokens = FixtureTokens()
+        tokens.save(Session(accessToken: "old-access", refreshToken: "old-refresh"))
+        var writes = 0, probes = 0
+        StubHTTP.handler = { request in
+            switch request.url!.lastPathComponent {
+            case "change": writes += 1; return (503, Data())
+            case "login":
+                probes += 1
+                XCTAssertTrue(StubHTTP.body(request).contains("Accepted-new-password"),
+                              "A later edited form must still reconcile the originally submitted password")
+                return probes == 1 ? (503, Data()) : (200, Self.passwordPair)
+            case "logout": return (204, Data())
+            default: return (200, Self.passwordUser)
+            }
+        }
+        let manager = SessionManager(auth: AuthService(client: APIClient(tokens: tokens, session: StubHTTP.session())), tokens: tokens)
+        await manager.restore()
+        do {
+            try await manager.changePassword(current: "Old-password1!", new: "Accepted-new-password1!")
+            XCTFail("An inconclusive outcome cannot be reported as success")
+        } catch { }
+        XCTAssertTrue(tokens.hasSession)
+        try await manager.changePassword(current: "Old-password1!", new: "Later-edited-password1!")
+        XCTAssertEqual(writes, 1, "An uncertain password mutation must never be repeated")
+        XCTAssertEqual(probes, 2)
+        XCTAssertEqual(manager.state, .signedOut)
+        XCTAssertFalse(tokens.hasSession)
     }
 
     func testLogoutOrNewAccountWinsLateAcknowledgedPasswordChange() async {
@@ -152,7 +457,7 @@ final class SessionTests: XCTestCase {
         }
     }
 
-    func testPasswordHandoffDefersOldSessionExpiryUntilReplacementIsVerified() async {
+    func testAmbiguousPasswordProbeDefersOldExpiryThenSignsOutAfterVerification() async {
         let tokens = FixtureTokens()
         tokens.save(Session(accessToken: "old-access", refreshToken: "old-refresh"))
         let loginPending = expectation(description: "replacement login pending")
@@ -160,7 +465,7 @@ final class SessionTests: XCTestCase {
         var changed = false, switches = 0
         StubHTTP.handler = { request in
             switch request.url!.lastPathComponent {
-            case "change": changed = true; return (204, Data())
+            case "change": changed = true; throw URLError(.networkConnectionLost)
             case "login":
                 // A previously captured old-token poll completes during handoff.
                 // Model its real expiry effect rather than inventing valid old auth.
@@ -189,12 +494,12 @@ final class SessionTests: XCTestCase {
         XCTAssertEqual(switches, 0)
         release.signal()
         await operation.value
-        XCTAssertEqual(manager.state.user?.id, "fixture-user")
-        XCTAssertEqual(tokens.accessToken, "replacement-access")
-        XCTAssertEqual(switches, 0)
+        XCTAssertEqual(manager.state, .signedOut)
+        XCTAssertNil(tokens.accessToken)
+        XCTAssertEqual(switches, 1)
     }
 
-    func testPasswordChangeKeepsVerifiedOldPairWithoutExtraLogin() async throws {
+    func testConfirmedPasswordChangeEndsEvenStillValidOldPairWithoutExtraLogin() async throws {
         let tokens = FixtureTokens()
         tokens.save(Session(accessToken: "old-access", refreshToken: "old-refresh"))
         let generation = tokens.generation
@@ -213,12 +518,12 @@ final class SessionTests: XCTestCase {
         manager.willSwitchGraph = { switches += 1 }
         try await manager.changePassword(current: "Old-password1!", new: "Accepted-new-password1!")
         XCTAssertEqual(patches, 1)
-        XCTAssertEqual(logins, 0, "A still-valid pair needs no replacement login")
-        XCTAssertEqual(tokens.accessToken, "old-access")
-        XCTAssertEqual(tokens.refreshToken, "old-refresh")
-        XCTAssertEqual(tokens.generation, generation)
-        XCTAssertEqual(manager.state.user?.id, "fixture-user")
-        XCTAssertEqual(switches, 0)
+        XCTAssertEqual(logins, 0, "Successful change requires explicit sign-in, even when old pair was still valid")
+        XCTAssertNil(tokens.accessToken)
+        XCTAssertNil(tokens.refreshToken)
+        XCTAssertNotEqual(tokens.generation, generation)
+        XCTAssertEqual(manager.state, .signedOut)
+        XCTAssertEqual(switches, 1)
     }
 
     func testPasswordHandoffNeverInstallsMalformedCandidate() async {
@@ -233,8 +538,8 @@ final class SessionTests: XCTestCase {
             var changed = false, candidateReads = 0, logins = 0
             StubHTTP.handler = { request in
                 switch request.url!.lastPathComponent {
-                case "change": changed = true; return (204, Data())
-                case "login": logins += 1; XCTAssertNil(tokens.accessToken); return (200, candidate)
+                case "change": changed = true; throw URLError(.networkConnectionLost)
+                case "login": logins += 1; XCTAssertEqual(tokens.accessToken, "old-access"); return (200, candidate)
                 case "refresh": return (403, Data(#"{"message":"Revoked"}"#.utf8))
                 default:
                     if request.value(forHTTPHeaderField: "Authorization") == "Bearer replacement-access" { candidateReads += 1 }
@@ -249,9 +554,9 @@ final class SessionTests: XCTestCase {
             } catch { }
             XCTAssertEqual(logins, 1)
             XCTAssertEqual(candidateReads, 0, "Unusable pair must be rejected before verification transport")
-            XCTAssertNil(tokens.accessToken)
-            XCTAssertNil(tokens.refreshToken)
-            XCTAssertEqual(manager.state, .signedOut)
+            XCTAssertEqual(tokens.accessToken, "old-access")
+            XCTAssertEqual(tokens.refreshToken, "old-refresh")
+            XCTAssertEqual(manager.state.user?.id, "fixture-user")
         }
     }
 
@@ -262,13 +567,13 @@ final class SessionTests: XCTestCase {
             var changed = false, candidateReads = 0, logins = 0
             StubHTTP.handler = { request in
                 switch request.url!.lastPathComponent {
-                case "change": changed = true; return (204, Data())
+                case "change": changed = true; throw URLError(.networkConnectionLost)
                 case "login": logins += 1; return (200, Self.passwordPair)
                 case "refresh": return (403, Data(#"{"message":"Revoked"}"#.utf8))
                 default:
                     if request.value(forHTTPHeaderField: "Authorization") == "Bearer replacement-access" {
                         candidateReads += 1
-                        XCTAssertFalse(tokens.hasSession, "Candidate must remain outside shared credentials throughout verification")
+                        XCTAssertEqual(tokens.accessToken, "old-access", "Candidate must remain outside shared credentials throughout verification")
                         if timeout { throw URLError(.timedOut) }
                         return (200, Data("malformed candidate identity".utf8))
                     }
@@ -283,9 +588,9 @@ final class SessionTests: XCTestCase {
             } catch { }
             XCTAssertEqual(logins, 1)
             XCTAssertGreaterThanOrEqual(candidateReads, 1)
-            XCTAssertNil(tokens.accessToken)
-            XCTAssertNil(tokens.refreshToken)
-            XCTAssertEqual(manager.state, .signedOut)
+            XCTAssertEqual(tokens.accessToken, "old-access")
+            XCTAssertEqual(tokens.refreshToken, "old-refresh")
+            XCTAssertEqual(manager.state.user?.id, "fixture-user")
         }
     }
 
@@ -298,7 +603,7 @@ final class SessionTests: XCTestCase {
             var changed = false
             PasswordCandidateHTTP.handler = { request, transport in
                 switch request.url!.lastPathComponent {
-                case "change": changed = true; transport.respond(204, Data())
+                case "change": changed = true; transport.client?.urlProtocol(transport, didFailWithError: URLError(.networkConnectionLost))
                 case "login":
                     let form = StubHTTP.body(request)
                     transport.respond(200, form.contains("Accepted-new-password") ? Self.passwordPair
@@ -308,7 +613,7 @@ final class SessionTests: XCTestCase {
                 default:
                     switch request.value(forHTTPHeaderField: "Authorization") {
                     case "Bearer replacement-access":
-                        XCTAssertFalse(tokens.hasSession, "Candidate cannot be installed before verification completes")
+                        XCTAssertEqual(tokens.accessToken, "old-access", "Candidate cannot be installed before verification completes")
                         gate.hold(transport)
                         verifying.fulfill()
                     case "Bearer unrelated-access":
@@ -491,7 +796,7 @@ final class SessionTests: XCTestCase {
             XCTAssertEqual(tokens.accessToken, "new-login", "Old session responses cannot alter a new login")
         }
     }
-    func testEmptyRefreshTokenPairIsRejected() async {
+    func testEmptyRefreshPairPreservesSavedCredentialsUntilExplicitRefusal() async {
         let tokens = FixtureTokens()
         tokens.save(Session(accessToken: "old-access", refreshToken: "old-refresh"))
         StubHTTP.handler = { request in
@@ -501,7 +806,9 @@ final class SessionTests: XCTestCase {
             return (403, Data(#"{"message":"Expired"}"#.utf8))
         }
         _ = try? await APIClient(tokens: tokens, session: StubHTTP.session()).sendIgnoringResult(Endpoint(method: .get, path: "auth/info"))
-        XCTAssertFalse(tokens.hasSession)
+        XCTAssertTrue(tokens.hasSession)
+        XCTAssertEqual(tokens.accessToken, "old-access")
+        XCTAssertEqual(tokens.refreshToken, "old-refresh")
     }
     func testPasswordVerificationRefusalEndsSessionButOfflineDoesNot() async {
         for status in [403, 200] {
@@ -573,22 +880,54 @@ final class SessionTests: XCTestCase {
         XCTAssertEqual(manager.state.user?.id, "fixture-user")
         XCTAssertTrue(tokens.hasSession)
     }
-    func testUnverifiableSavedSessionIsClearedAndCannotRestoreOnNextLaunch() async {
-        for code in [URLError.notConnectedToInternet, .timedOut, .networkConnectionLost] {
-            let tokens = FixtureTokens()
-            tokens.save(Session(accessToken: "fixture", refreshToken: "fixture-refresh"))
-            var calls = 0
-            StubHTTP.handler = { _ in calls += 1; throw URLError(code) }
-            let manager = SessionManager(auth: AuthService(client: APIClient(tokens: tokens, session: StubHTTP.session())), tokens: tokens)
-            await manager.restore()
-            XCTAssertEqual(manager.state, .signedOut)
-            XCTAssertFalse(tokens.hasSession)
-            XCTAssertNil(tokens.refreshToken)
-            let before = calls
-            await manager.restore()
-            XCTAssertEqual(calls, before, "Invalid saved credentials must not return on subsequent launch")
-        }
+    // October 13 explicitly supersedes the older clear-on-unverifiable-launch policy.
+    func testServerUnavailableAtStartupPreservesSavedSessionUntilVerified() async {
+        let tokens = FixtureTokens()
+        tokens.save(Session(accessToken: "fixture", refreshToken: "fixture-refresh"))
+        StubHTTP.handler = { _ in (503, Data(#"{"message":"Service unavailable"}"#.utf8)) }
+        let manager = SessionManager(auth: AuthService(client: APIClient(tokens: tokens, session: StubHTTP.session())), tokens: tokens)
+        await manager.restore()
+        XCTAssertEqual(manager.state, .loading)
+        XCTAssertTrue(tokens.hasSession)
+        XCTAssertFalse(manager.savedSessionRejected)
+        XCTAssertNotNil(manager.errorMessage)
+        StubHTTP.handler = { _ in (200, Data(#"{"result":{"id":"fixture-user","role":"client"}}"#.utf8)) }
+        await manager.retry()
+        XCTAssertEqual(manager.state.user?.id, "fixture-user")
+        XCTAssertNil(manager.errorMessage)
     }
+
+    func testRenewalConnectivityFailureKeepsCurrentSessionAndRecoversOnNextRequest() async throws {
+        let tokens = FixtureTokens()
+        tokens.save(Session(accessToken: "old-access", refreshToken: "old-refresh"))
+        var online = false, renewals = 0
+        StubHTTP.handler = { request in
+            if request.url!.lastPathComponent == "refresh" {
+                renewals += 1
+                if !online { throw URLError(.timedOut) }
+                return (200, Data(#"{"result":{"access_token":"new-access","refresh_token":"new-refresh"}}"#.utf8))
+            }
+            if request.value(forHTTPHeaderField: "Authorization") == "Bearer new-access" {
+                return (200, Data(#"{"result":{"id":"fixture-user","role":"client"}}"#.utf8))
+            }
+            return (403, Data(#"{"message":"Expired access token"}"#.utf8))
+        }
+        let client = APIClient(tokens: tokens, session: StubHTTP.session())
+        do {
+            let _: User = try await client.send(Endpoint(method: .get, path: "auth/info"))
+            XCTFail("Unavailable renewal cannot verify identity")
+        } catch let error as APIError {
+            XCTAssertEqual(error, .timeout, "Connectivity is not an explicit session rejection")
+        }
+        XCTAssertEqual(tokens.accessToken, "old-access")
+        XCTAssertEqual(tokens.refreshToken, "old-refresh")
+        online = true
+        let user: User = try await client.send(Endpoint(method: .get, path: "auth/info"))
+        XCTAssertEqual(user.id, "fixture-user")
+        XCTAssertEqual(tokens.accessToken, "new-access")
+        XCTAssertEqual(renewals, 2)
+    }
+
     func testMissingCredentialsDoNotRequestAuthInfo() async {
         let tokens = FixtureTokens()
         StubHTTP.handler = { _ in XCTFail("No session requires no server check"); return (500, Data()) }
@@ -605,7 +944,7 @@ final class SessionTests: XCTestCase {
         XCTAssertEqual(manager.state.user?.id, "fixture-user")
         XCTAssertTrue(tokens.hasSession)
     }
-    func testMalformedRefreshClearsSavedCredentials() async {
+    func testMalformedRefreshPreservesCredentialsAndStartupRetry() async {
         let tokens = FixtureTokens()
         tokens.save(Session(accessToken: "fixture", refreshToken: "fixture-refresh"))
         StubHTTP.handler = { request in
@@ -613,8 +952,10 @@ final class SessionTests: XCTestCase {
         }
         let manager = SessionManager(auth: AuthService(client: APIClient(tokens: tokens, session: StubHTTP.session())), tokens: tokens)
         await manager.restore()
-        XCTAssertEqual(manager.state, .signedOut)
-        XCTAssertFalse(tokens.hasSession)
+        XCTAssertEqual(manager.state, .loading)
+        XCTAssertTrue(tokens.hasSession)
+        XCTAssertNotNil(manager.errorMessage)
+        XCTAssertFalse(manager.savedSessionRejected)
     }
 }
 
@@ -721,4 +1062,43 @@ private final class PasswordCandidateResponseGate {
         lock.lock(); let response = self.response; self.response = nil; lock.unlock()
         response?.respond(200, data)
     }
+}
+
+/// Simulates an account replacement between the owning session's capture and
+/// entry into the API actor. Uses the existing storage seam, no real Keychain.
+private final class DeletionDispatchSwapTokens: SessionTokenStorage, @unchecked Sendable {
+    private let base = FixtureTokens()
+    private let lock = NSLock()
+    private var armed = false
+    private var reads = 0
+    func arm() { lock.lock(); armed = true; reads = 0; lock.unlock() }
+    var generation: UUID {
+        lock.lock(); defer { lock.unlock() }
+        if armed {
+            reads += 1
+            if reads == 2 { base.save(Session(accessToken: "new-account-access", refreshToken: "new-account-refresh")) }
+        }
+        return base.generation
+    }
+    var accessToken: String? { base.accessToken }
+    var refreshToken: String? { base.refreshToken }
+    var hasSession: Bool { base.hasSession }
+    func save(_ pair: Session) { base.save(pair) }
+    func clear() { base.clear() }
+    func replace(_ pair: Session, ifGeneration: UUID, refreshToken: String) -> Bool {
+        base.replace(pair, ifGeneration: ifGeneration, refreshToken: refreshToken)
+    }
+    func clear(ifGeneration: UUID) -> Bool { base.clear(ifGeneration: ifGeneration) }
+}
+
+private final class RefreshStorageFailureTokens: SessionTokenStorage, @unchecked Sendable {
+    private let storage = FixtureTokens()
+    var generation: UUID { storage.generation }
+    var accessToken: String? { storage.accessToken }
+    var refreshToken: String? { storage.refreshToken }
+    var hasSession: Bool { storage.hasSession }
+    func save(_ session: Session) { storage.save(session) }
+    func clear() { storage.clear() }
+    func replace(_ session: Session, ifGeneration: UUID, refreshToken: String) -> Bool { false }
+    func clear(ifGeneration: UUID) -> Bool { storage.clear(ifGeneration: ifGeneration) }
 }

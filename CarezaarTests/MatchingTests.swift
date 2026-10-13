@@ -2,6 +2,78 @@ import XCTest
 @testable import Carezaar
 
 final class MatchingTests: XCTestCase {
+    func testAllMatchMutationsRejectSupersededAccountBeforeTransport() async {
+        let tokens = FixtureTokens()
+        tokens.save(Session(accessToken: "original", refreshToken: "original-refresh"))
+        let original = tokens.generation
+        tokens.save(Session(accessToken: "new-account", refreshToken: "new-refresh"))
+        var requests = 0
+        StubHTTP.handler = { _ in requests += 1; return (204, Data()) }
+        let service = UserService(client: APIClient(tokens: tokens, session: StubHTTP.session()))
+        for action in [MatchMutation.request, .accept, .reject, .withdraw, .unmatch] {
+            do {
+                switch action {
+                case .request: _ = try await service.requestMatch(partnerId: "owned-peer", ifGeneration: original)
+                case .accept: _ = try await service.acceptMatch(id: 42, ifGeneration: original)
+                case .reject: try await service.rejectMatch(id: 42, ifGeneration: original)
+                case .withdraw: try await service.withdrawMatch(id: 42, ifGeneration: original)
+                case .unmatch: _ = try await service.breakMatch(id: 42, ifGeneration: original)
+                }
+                XCTFail("Superseded match intent must cancel before dispatch")
+            } catch is CancellationError { }
+            catch { XCTFail("Unexpected superseded-intent error") }
+        }
+        XCTAssertEqual(requests, 0)
+        XCTAssertEqual(tokens.accessToken, "new-account")
+    }
+
+    @MainActor
+    func testLostFavoriteResponseReadsRelevantProfileAndReflectsSavedStateWithoutAnotherWrite() async throws {
+        var methods: [String] = []
+        StubHTTP.handler = { request in
+            let method = request.httpMethod ?? ""; methods.append(method)
+            if method == "POST" {
+                XCTAssertEqual(request.url?.path, "/api/users/bookmarks")
+                throw URLError(.networkConnectionLost)
+            }
+            XCTAssertEqual(request.url?.path, "/api/clients/caregivers/profile-fixture")
+            return (200, Data(#"{"result":{"id":"profile-fixture","user":{"id":"user-fixture","role":"caregiver","is_favorite":true}}}"#.utf8))
+        }
+        let partner = User(id: "user-fixture", countryId: 1, genderId: nil, role: .caregiver,
+                           email: "fixture@example.invalid", firstName: nil, lastName: nil, photo: nil,
+                           bio: nil, dateOfBirth: nil, status: .verified, isFavorite: false)
+        let coordinator = FavoriteMutationCoordinator(service: UserService(client: APIClient(tokens: FixtureTokens(), session: StubHTTP.session())))
+        let saved = try await coordinator.change(partner: partner, to: true, profileId: "profile-fixture", accountId: "account-fixture")
+        XCTAssertEqual(saved.id, "user-fixture")
+        XCTAssertTrue(saved.isFavorite)
+        XCTAssertEqual(methods, ["POST", "GET"], "An uncertain favorite write is reconciled, never automatically repeated")
+    }
+
+    @MainActor
+    func testMissingFavoriteFlagCannotConfirmUnknownRemovalOrAllowSecondMutation() async {
+        var writes = 0, reads = 0
+        StubHTTP.handler = { request in
+            if request.httpMethod == "DELETE" {
+                writes += 1
+                throw URLError(.networkConnectionLost)
+            }
+            reads += 1
+            return (200, Data(#"{"result":{"id":"profile-fixture","user":{"id":"user-fixture","role":"caregiver"}}}"#.utf8))
+        }
+        let partner = User(id: "user-fixture", countryId: 1, genderId: nil, role: .caregiver,
+                           email: "fixture@example.invalid", firstName: nil, lastName: nil, photo: nil,
+                           bio: nil, dateOfBirth: nil, status: .verified, isFavorite: true)
+        let coordinator = FavoriteMutationCoordinator(service: UserService(client: APIClient(tokens: FixtureTokens(), session: StubHTTP.session())))
+        for _ in 0..<2 {
+            do {
+                _ = try await coordinator.change(partner: partner, to: false, profileId: "profile-fixture", accountId: "account-fixture")
+                XCTFail("Missing saved favorite state cannot confirm an uncertain removal")
+            } catch { }
+        }
+        XCTAssertEqual(writes, 1, "A later tap may reconcile but must not repeat the unknown mutation")
+        XCTAssertEqual(reads, 2)
+    }
+
     private func match(active: Bool, client: Bool, caregiver: Bool, finished: String? = nil) -> Match {
         Match(id: 42, client: nil, caregiver: nil, clientReview: nil, caregiverReview: nil,
               createdAt: nil, finishedAt: finished, isClientAccepted: client,
@@ -46,11 +118,20 @@ final class MatchingTests: XCTestCase {
         XCTAssertEqual(MatchMutation.reject.expectedStatus, .received)
         XCTAssertEqual(MatchMutation.unmatch.expectedStatus, .active)
     }
-    func testFailedWriteWithChangedProfileUsesStandardChangedPresentation() {
+    /// The October 13 client explicitly rejects the old changed-error presentation
+    /// when this user's accept became an active match. Historical results remain.
+    func testOwnAcceptConfirmedBySameRelationshipNeverReportsExternalMatchChange() {
+        let before = ProfileMatchState(status: "received", id: 41)!
+        let accepted = ProfileMatchState(status: "active", id: 41)!
+        XCTAssertEqual(MatchFailureResolution.resolve(before: before, after: accepted, action: .accept), .matched,
+                       "Confirmed same-relationship acceptance must open It's a match rather than report an external change")
+    }
+
+    func testOwnAcceptanceSucceedsButReplacementRelationshipStillReportsChanged() {
         let before = ProfileMatchState(status: "received", id: 41)!
         let accepted = ProfileMatchState(status: "active", id: 41)!
         let replacement = ProfileMatchState(status: "received", id: 42)!
-        XCTAssertEqual(MatchFailureResolution.resolve(before: before, after: accepted), .changed)
+        XCTAssertEqual(MatchFailureResolution.resolve(before: before, after: accepted, action: .accept), .matched)
         XCTAssertEqual(MatchFailureResolution.resolve(before: before, after: replacement), .changed)
     }
 

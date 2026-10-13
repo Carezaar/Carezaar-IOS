@@ -26,6 +26,41 @@ final class MatchActionBoundaryUITests: XCTestCase {
         super.tearDown()
     }
 
+    func testOwnedPendingRequestCancelDismissesConfirmationWithoutMutation() throws {
+        let f = try lostAckFixture()
+        XCTAssertEqual(try lostAckProfile(f)["match_status"] as? String, "none")
+        XCTAssertEqual(try lostAckProfile(f, peer: true)["match_status"] as? String, "none")
+        lostAckCleanup = f
+        let staged = try CarezaarAPI.callWithHTTPStatus("POST", "users/matches",
+            form: ["partner_id": f.partnerID, "introduction": f.marker], token: f.token)
+        XCTAssertEqual(staged.status, 200)
+        let edge = try XCTUnwrap((staged.body["result"] as? [String: Any])?["id"] as? Int)
+        _ = try lostAckOwnedEdge(edge, fixture: f)
+        app.launchEnvironment = ["QA_EMAIL": env["QA_EMAIL"]!, "QA_PASSWORD": env["QA_PASSWORD"]!]
+        app.launchArguments = ["--qa-signout", "--qa-login-env", "--qa-request-counts", "--qa-push", f.route,
+                               "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
+        app.launch()
+        let withdraw = app.buttons["match-withdraw"]
+        try revealOwnedRequest(withdraw, timeout: 45)
+        withdraw.tap()
+        let cancel = app.alerts.buttons["match-confirm-dismiss"].firstMatch
+        XCTAssertTrue(cancel.waitForExistence(timeout: 10))
+        XCTAssertEqual(cancel.label, "Cancel")
+        XCTAssertFalse(app.alerts.buttons["Close"].exists)
+        let labels = Set(app.alerts.firstMatch.buttons.allElementsBoundByIndex.map { $0.label })
+        XCTAssertEqual(labels, ["Cancel", "Withdraw"], "Exactly the two intended actions, ignoring nested AX wrappers")
+        let proof = XCTAttachment(screenshot: app.alerts.firstMatch.screenshot())
+        proof.name = "owned-withdraw-two-button-cancel-confirmation"; proof.lifetime = .keepAlways; add(proof)
+        cancel.tap()
+        XCTAssertFalse(app.alerts.firstMatch.exists)
+        XCTAssertEqual(try relationshipWrites(), 0)
+        XCTAssertEqual(try lostAckProfile(f)["match_id"] as? Int, edge)
+        XCTAssertEqual(try lostAckProfile(f)["match_status"] as? String, "sent")
+        XCTAssertEqual(try lostAckProfile(f, peer: true)["match_status"] as? String, "received")
+        try restoreLostAckNone(f)
+        lostAckCleanup = nil
+    }
+
     func testOwnedRequestCommittedLostAcknowledgementReconcilesSentWithoutReplay() throws {
         let f = try lostAckFixture()
         let before = try lostAckProfile(f)
@@ -73,13 +108,10 @@ final class MatchActionBoundaryUITests: XCTestCase {
         lostAckCleanup = f
         confirm.tap()
         let toast = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", changed)).firstMatch
-        XCTAssertTrue(toast.waitForExistence(timeout: 25), "Actual committed request with lost acknowledgement must reconcile through standard changed feedback")
-        XCTAssertTrue(toast.exists)
-        let toastProof = XCTAttachment(screenshot: toast.screenshot())
-        toastProof.name = "P23-017-lost-ack-managed-changed-control"; toastProof.lifetime = .keepAlways; add(toastProof)
         let withdraw = app.buttons["match-withdraw"]
         XCTAssertTrue(withdraw.waitForExistence(timeout: 10) && withdraw.isHittable)
         XCTAssertTrue(app.staticTexts[pending].exists)
+        XCTAssertFalse(toast.exists, "An own successfully reconciled request must not report an external match change")
         XCTAssertFalse(request.exists)
         XCTAssertEqual(try count("POST /api/users/matches"), 1)
         XCTAssertEqual(try relationshipWrites(), 1)
@@ -112,7 +144,7 @@ final class MatchActionBoundaryUITests: XCTestCase {
         _ = try lostAckOwnedEdge(edgeID, fixture: f)
         let record: [String: Any] = ["caseID": "P23-017", "ownedPairStartedNone": true,
             "realRequestPOSTsBeforeRevisit": 1, "actualSuccessfulAcknowledgementsDropped": 1,
-            "nativeProfileReadsBeforeRevisit": 3, "managedChangedFeedbackObserved": true,
+            "nativeProfileReadsBeforeRevisit": 3, "ownActionChangedErrorAbsent": true,
             "backendSentReceivedSameOwnedEdge": true, "nativeSentActionObserved": true,
             "revisitMutationRequests": try relationshipWrites(), "requestBodyCaptured": false,
             "faultScope": "one-actual-2xx-owned-request-acknowledgement",
@@ -222,7 +254,7 @@ final class MatchActionBoundaryUITests: XCTestCase {
             "scenarioLostAcknowledgement": false, "otherSessionChangedWhileNativeDialogOpen": true,
             "changeOccurredBeforeNativeConfirmPreflight": true, "concurrentPendingPreflightClaimed": false,
             "nativeRequestPOSTs": 0, "nativeRelationshipWrites": 0, "actualNativeProfileReadsBeforeRevisit": 2,
-            "backendReceivedSentSameMarkedOwnedEdge": true, "managedChangedFeedbackObserved": true,
+            "backendReceivedSentSameMarkedOwnedEdge": true, "ownActionChangedErrorAbsent": true,
             "nativeReceivedActionSetObserved": true, "revisitMutationRequests": try relationshipWrites()]
         let attachment = XCTAttachment(data: try JSONSerialization.data(withJSONObject: record, options: [.sortedKeys]), uniformTypeIdentifier: "public.json")
         attachment.name = "P23-017-real-owned-other-session-action-change"; attachment.lifetime = .keepAlways; add(attachment)
@@ -340,7 +372,9 @@ final class MatchActionBoundaryUITests: XCTestCase {
         XCTAssertEqual(try lostAckProfile(f, peer: true)["match_status"] as? String, "none")
     }
 
-    func testOwnedNoneMatchFailedPreflightRetryRecoversWithoutMutationReplay() throws {
+    func testOwnedFailedPreflightTryAgainCompletesCapturedRequestExactlyOnce() throws {
+        let f = try lostAckFixture()
+        XCTAssertEqual(try lostAckProfile(f, peer: true)["match_status"] as? String, "none")
         guard let email = env["QA_EMAIL"], !email.isEmpty,
               let password = env["QA_PASSWORD"], !password.isEmpty,
               let clientID = env["QA_CLIENT_USER_ID"], !clientID.isEmpty,
@@ -378,7 +412,7 @@ final class MatchActionBoundaryUITests: XCTestCase {
         let before = try profile()
         guard before["match_status"] as? String == "none",
               before["match_id"] == nil || before["match_id"] is NSNull else {
-            throw XCTSkip("P23-018 requires owned pair NONE; this read-only test never resets a relation")
+            throw XCTSkip("P23-018 requires owned pair NONE; the exact owned pair must start NONE")
         }
         let response = try CarezaarAPI.callWithHTTPStatus("GET", "base/contents?ts_cache=0", token: token)
         guard response.status == 200, let rows = response.body["result"] as? [[String: Any]] else {
@@ -416,6 +450,10 @@ final class MatchActionBoundaryUITests: XCTestCase {
         XCTAssertEqual(try count(profileKey), 1)
         XCTAssertEqual(try relationshipWrites(), 0)
         request.tap()
+        let field = app.textFields["Introduction"].firstMatch
+        XCTAssertTrue(field.waitForExistence(timeout: 10))
+        field.tap(); field.typeText(f.marker)
+        XCTAssertEqual(field.value as? String, f.marker)
         let confirm = app.buttons["match-request-confirm"]
         XCTAssertTrue(confirm.waitForExistence(timeout: 10) && confirm.isHittable)
         // The first app transport initialized its fault clock within [0,45]s
@@ -426,6 +464,7 @@ final class MatchActionBoundaryUITests: XCTestCase {
             XCTFail("Never confirm outside the proven offline interval")
             throw URLError(.timedOut)
         }
+        lostAckCleanup = f
         confirm.tap()
         let dialog = app.alerts[title]
         XCTAssertTrue(dialog.waitForExistence(timeout: 12), "Real failed action preflight must show managed check dialog")
@@ -457,23 +496,29 @@ final class MatchActionBoundaryUITests: XCTestCase {
         XCTAssertTrue(dialog.exists && retry.exists && retry.isHittable)
         retry.tap()
         XCTAssertTrue(dialog.waitForNonExistence(timeout: 20))
-        XCTAssertTrue(request.exists && request.isHittable && request.isEnabled)
-        XCTAssertEqual(try count(profileKey), recoveryBaseline + 1, "Recovery Try Again performs one real read")
-        Thread.sleep(forTimeInterval: 2)
+        let withdraw = app.buttons["match-withdraw"]
+        XCTAssertTrue(withdraw.waitForExistence(timeout: 30) && withdraw.isHittable)
+        XCTAssertFalse(request.exists, "Try Again must complete the captured request without another selection")
+        XCTAssertEqual(try count(profileKey), recoveryBaseline + 2, "Recovery preflight plus acknowledged-state read")
         let writes = try relationshipWrites()
-        XCTAssertEqual(writes, 0, "Retry must not replay a relationship mutation")
+        XCTAssertEqual(writes, 1, "Captured unsent intent executes once after the successful state check")
+        XCTAssertEqual(try count("POST /api/users/matches"), 1)
         let after = try profile()
-        XCTAssertEqual(after["match_status"] as? String, "none")
-        XCTAssertTrue(after["match_id"] == nil || after["match_id"] is NSNull)
+        XCTAssertEqual(after["match_status"] as? String, "sent")
+        let edge = try XCTUnwrap(after["match_id"] as? Int)
+        _ = try lostAckOwnedEdge(edge, fixture: f)
         let record: [String: Any] = ["caseID": "P23-018", "ownedIdentityVerified": true,
             "initialNoneVerified": true, "initialProfileGETs": 1,
-            "failedPreflightGETAttempts": failedCount - 1, "recoveryGETs": 1,
-            "relationshipMutationRequests": writes, "originalActionRetained": request.exists,
-            "backendRelationshipUnchanged": after["match_status"] as? String == "none",
-            "faultScope": "global-app-transport-during-action-phase", "noRelationStaging": true]
+            "failedPreflightGETAttempts": failedCount - 1, "recoveryGETs": 2,
+            "relationshipMutationRequests": writes, "capturedActionCompleted": withdraw.exists,
+            "backendCapturedRequestStored": after["match_status"] as? String == "sent",
+            "faultScope": "global-app-transport-during-action-phase", "ownedOnlyMutationAndCleanup": true]
         let data = try JSONSerialization.data(withJSONObject: record, options: [.sortedKeys])
         let attachment = XCTAttachment(data: data, uniformTypeIdentifier: "public.json")
-        attachment.name = "P23-018-native-read-only-recovery"; attachment.lifetime = .keepAlways; add(attachment)
+        attachment.name = "R7-native-captured-request-recovery"; attachment.lifetime = .keepAlways; add(attachment)
+        app.terminate()
+        try restoreLostAckNone(f)
+        lostAckCleanup = nil
     }
 
     private func wait(until elapsed: TimeInterval, launched: Date) throws {

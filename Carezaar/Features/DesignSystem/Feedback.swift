@@ -109,9 +109,10 @@ final class Feedback: ObservableObject {
     /// Common/global failures use managed general copy. Useful field-specific
     /// validation remains server authored; technical field text is suppressed.
     static func message(_ error: Error) -> String {
+        if let rejected = error as? AuthorizationRejectedMutationError { return message(rejected.cause) }
         let serverTrouble = translate("general_network_title", "Cannot communicate with server.")
         guard let api = error as? APIError else {
-            return translate("error_unexpected", "Something went wrong. Please try again.")
+            return translate("general_error_general", "Something went wrong. Please try again.")
         }
         switch api {
         case .validation(_, let fields):
@@ -125,25 +126,28 @@ final class Feedback: ObservableObject {
                     && !APIError.unknown($0).isTechnical }) {
                 return value
             }
-            return translate("error_unavailable", "This isn't working right now. Please try again later.")
-        case .network:
-            return "\(serverTrouble) \(translate("error_check_connection", "Check your internet connection and try again."))"
+            return translate("general_error_general", "Something went wrong. Please try again.")
+        case .connectionUnavailable, .network:
+            return serverTrouble
         case .timeout:
-            return "\(serverTrouble) \(translate("error_timeout", "Please try again."))"
+            return serverTrouble
         case .unauthenticated:
-            return translate("error_session_expired", "Your session has expired. Please sign in again.")
+            return translate("general_error_forbidden", "You can't do this right now.")
         case .decoding:
-            return translate("error_unexpected", "Something went wrong. Please try again.")
-        case .server, .notFound, .unknown:
-            return translate("error_unavailable", "This isn't working right now. Please try again later.")
+            return translate("general_error_general", "Something went wrong. Please try again.")
+        case .notFound:
+            return translate("general_error_not_found", "This item is no longer available.")
+        case .server, .unknown:
+            return translate("general_error_general", "Something went wrong. Please try again.")
         }
     }
 
-    /// For actions the live server currently cannot complete: says so plainly and
-    /// gives the support address instead of a misleading server message.
+    /// A known unavailable action uses the same managed permission/action copy as
+    /// other rejected actions. The feature name is context, not an English suffix.
     static func unavailable(_ feature: String) -> String {
-        "\(feature): \(translate("error_feature_unavailable", "this isn't available right now. Please contact")) \(supportEmail)."
+        translate("general_error_forbidden", "You can't do this right now.")
     }
+
 }
 
 /// Overlays the busy card and toasts above the whole app.

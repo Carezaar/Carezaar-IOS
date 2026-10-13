@@ -72,6 +72,45 @@ final class HelpSettingsBoundaryUITests: XCTestCase {
         XCTFail("Exact category never exposed a usable visible button region")
     }
 
+    func testPasswordConfirmationShowsManagedMessageAndCancelDoesNotWrite() throws {
+        let response = try CarezaarAPI.callWithHTTPStatus("GET", "base/contents?ts_cache=0")
+        XCTAssertEqual(response.status, 200)
+        let contents = try XCTUnwrap(response.body["result"] as? [[String: Any]])
+        func text(_ slug: String) throws -> String {
+            let row = try XCTUnwrap(contents.first { $0["slug"] as? String == slug })
+            return try XCTUnwrap((row["translations"] as? [[String: Any]])?.first {
+                ($0["language_id"] as? NSNumber)?.intValue == 1
+            }?["name"] as? String)
+        }
+        try launch("ChangePassword")
+        let fields = app.secureTextFields
+        XCTAssertTrue(fields.firstMatch.waitForExistence(timeout: 45))
+        XCTAssertEqual(fields.count, 3)
+        for (index, value) in ["Synthetic-old-password1!", "Synthetic-new-password1!", "Synthetic-new-password1!"].enumerated() {
+            let field = fields.element(boundBy: index)
+            scrollTo(field); field.tap(); field.typeText(value)
+            dismissKeyboard()
+        }
+        let change = app.buttons[try text("settings_change_password_change_password")]
+        scrollTo(change); XCTAssertTrue(change.isEnabled); change.tap()
+        let alert = app.alerts.firstMatch
+        XCTAssertTrue(alert.waitForExistence(timeout: 5))
+        let title = alert.staticTexts[try text("settings_change_password_dialog_title")]
+        let message = alert.staticTexts[try text("settings_change_password_dialog_message")]
+        let confirm = alert.buttons[try text("settings_change_password_dialog_confirm")]
+        XCTAssertTrue(title.exists && message.exists && confirm.exists)
+        XCTAssertGreaterThan(message.frame.midY, title.frame.midY)
+        XCTAssertLessThan(message.frame.midY, confirm.frame.midY)
+        let proof = XCTAttachment(screenshot: alert.screenshot())
+        proof.name = "R5-managed-password-confirmation-only"; proof.lifetime = .keepAlways; add(proof)
+        alert.buttons[try text("settings_change_password_dialog_deny")].tap()
+        XCTAssertTrue(alert.waitForNonExistence(timeout: 5))
+        XCTAssertEqual(count("PATCH /api/users/password/change"), 0)
+        XCTAssertEqual(count("POST /api/users/password/change"), 0)
+        try evidence("R5-password-confirmation-cancel", ["managedMessagePresent": true,
+            "messageBetweenTitleAndButtons": true, "passwordMutationRequests": 0])
+    }
+
     /// P15-004 expansion/collapse portion; P04-024 Back. Complements the older
     /// expansion-only test with collapse semantics and actual no-refetch evidence.
     func testFAQAnswerCollapsesAndBackReturnsWithoutRefetch() throws {

@@ -221,13 +221,6 @@ struct PreferencesWizard: View {
                 locationPickerGuidance = nil
                 picking = true
             }
-            if coordinateFromPhone, location.lastKnownIsStale {
-                Text("Last known location").font(Theme.Typography.caption()).foregroundStyle(Theme.Palette.textSecondary)
-            }
-            if coordinate == nil {
-                Text("Location is unavailable. You can continue and choose a location before saving.")
-                    .font(Theme.Typography.caption()).foregroundStyle(Theme.Palette.textSecondary)
-            }
             ChipSection(title: loc.t(isClient ? "signup_form_client_max_commute" : "signup_form_caregiver_commute", ""),
                         hint: isClient ? hint : nil, items: baseData.items(.commutes), selection: $commutes, single: !isClient)
             ChipSection(title: loc.t(isClient ? "signup_form_client_preferred_shifts" : "signup_form_caregiver_shift", ""),
@@ -357,7 +350,7 @@ struct PreferencesWizard: View {
 
     private func save() {
         guard let coordinate = LocationProvider.initialMapCoordinate(coordinate) else {
-            locationPickerGuidance = MapLocationPicker.saveLocationGuidance
+            locationPickerGuidance = nil
             picking = true
             return
         }
@@ -593,7 +586,6 @@ private struct LocationRow: View {
 /// Full-screen map with a fixed centre crosshair, a my-location button and Confirm,
 /// matching the Android location picker.
 struct MapLocationPicker: View {
-    static let saveLocationGuidance = "Location is unavailable. Enable location access or choose a point on the map to save."
     let initial: CLLocationCoordinate2D?
     let unavailableGuidance: String?
     let onConfirm: (CLLocationCoordinate2D) -> Void
@@ -614,7 +606,8 @@ struct MapLocationPicker: View {
         _center = State(initialValue: start)
         _position = State(initialValue: start.map {
             .region(MKCoordinateRegion(center: $0, latitudinalMeters: 3_000, longitudinalMeters: 3_000))
-        } ?? .automatic)
+        } ?? .region(MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 20, longitude: 0),
+                                        span: MKCoordinateSpan(latitudeDelta: 120, longitudeDelta: 240))))
     }
 
     var body: some View {
@@ -655,16 +648,6 @@ struct MapLocationPicker: View {
                         .accessibilityLabel("My location")
                 }
                 .padding(.horizontal, 20)
-                if location.lastKnownIsStale, !manuallyPositioned {
-                    Text("Last known location").font(Theme.Typography.caption())
-                        .padding(8).background(.white, in: Capsule())
-                }
-                if center == nil {
-                    Text(unavailableGuidance ?? (location.isResolving ? "Finding your location…" : "Location is unavailable. You can continue without selecting a point."))
-                        .font(Theme.Typography.caption()).multilineTextAlignment(.center)
-                        .padding(12).background(.white, in: RoundedRectangle(cornerRadius: 12))
-                        .padding(.horizontal, 20)
-                }
                 PrimaryButton(title: center == nil ? loc.t("general_continue", "Continue") : loc.t("general_confirm", "Confirm")) {
                     if let center { onConfirm(center) } else { onCancel() }
                 }

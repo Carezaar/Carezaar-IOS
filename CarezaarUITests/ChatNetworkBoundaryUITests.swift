@@ -37,118 +37,67 @@ final class ChatNetworkBoundaryUITests: XCTestCase {
         super.tearDown()
     }
 
-    /// Existing timing faults make the metadata read succeed before a later
-    /// delivery attempt fails. This is not a committed-message/lost-ack fixture.
-    func testOwnedNativeUncertainPOSTCheckCancelAndExplicitRetryNeverReplay() throws {
+    /// October 13 replaces the historical English-only uncertainty controls.
+    /// Closed local port failure proves no delivery connection was established;
+    /// committed-message/lost-ack reconciliation is covered by controlled service tests.
+    func testOwnedNativeOfflineDirectSendPreservesDraftAndRecoversWithoutBlockingNotice() throws {
         let (f, chatID) = try stageOwnedActiveChat()
-        let draft = "Synthetic uncertain POST " + UUID().uuidString
+        let draft = "Synthetic offline direct Send " + UUID().uuidString
         XCTAssertFalse(try chatTexts(ownedChat(chatID, fixture: f, active: true)).contains(draft))
-        // Fault selection occurs at request construction, before latency. A read
-        // built near 94s remains a genuine server read; its later POST is built
-        // during 100...125s and goes to the closed local port instead.
         launchChat(chatID, faults: ["--qa-offline", "100", "125", "--qa-latency", "8"])
         let field = try loadedComposer(chatID, fixture: f, timeout: 90)
         field.tap(); field.typeText(draft)
         XCTAssertEqual(field.value as? String, draft)
         let send = app.buttons["Send"]
         XCTAssertTrue(send.exists && send.isEnabled && send.isHittable)
-        waitUntilLaunchPlus(94)
-        let getBefore = count("GET /api/users/chats/\(chatID)")
+        waitUntilLaunchPlus(104)
         let elapsedBeforeSend = Date().timeIntervalSince(launchedAt)
-        guard elapsedBeforeSend < 98 else {
-            try record("owned-uncertain-post-timing-prerequisite-\(f.role)", [
+        guard elapsedBeforeSend < 119 else {
+            try record("owned-offline-direct-send-timing-prerequisite-\(f.role)", [
                 "elapsedBeforeSend": elapsedBeforeSend, "nativePOSTs": messagePOSTs(chatID),
                 "nativeSendAttempted": false, "timingPrerequisiteSatisfied": false])
-            throw XCTSkip("Native initialization/input observations missed the bounded preflight-before-offline timing interval; no Send was attempted")
+            throw XCTSkip("Native initialization/input missed the bounded offline-send window; no Send attempted")
         }
         send.tap()
-        let notice = app.descendants(matching: .any).matching(identifier: "chat-send-uncertain").firstMatch
-        XCTAssertTrue(notice.waitForExistence(timeout: 40),
-                      "A failed delivery transport after successful metadata preflight must expose native uncertainty controls")
-        let terminalTransportAttempts = messagePOSTs(chatID)
-        XCTAssertEqual(terminalTransportAttempts, 4,
-                       "One logical Send to the closed port must finish its initial connection attempt plus three safe preconnection retries; a zero-POST preflight failure is a different case")
-        XCTAssertGreaterThan(count("GET /api/users/chats/\(chatID)"), getBefore)
-        XCTAssertTrue(app.staticTexts["Please wait..."].waitForNonExistence(timeout: 15))
-        let explanation = app.staticTexts["Couldn't confirm whether your message was sent. Your draft is still here."]
-        XCTAssertTrue(explanation.exists && explanation.isHittable)
+        let failed = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            self.messagePOSTs(chatID) == 4 && send.isEnabled
+                && !self.app.staticTexts["Please wait..."].exists
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [failed], timeout: 35), .completed,
+                       "One direct Send must exhaust its safe preconnection attempts and restore its composer")
+        let failedAttempts = messagePOSTs(chatID)
+        XCTAssertEqual(failedAttempts, 4)
         XCTAssertEqual(field.value as? String, draft)
-        XCTAssertFalse(send.isEnabled)
-        controlProof(explanation, "owned-uncertain-post-retained-draft-guidance-only-\(f.role)")
-        controlProof(field, "owned-uncertain-post-synthetic-draft-only-\(f.role)")
-        // Attempt the real disabled control. No retry is authorized by this tap.
-        XCTAssertTrue(send.exists && send.isHittable)
+        XCTAssertFalse(app.descendants(matching: .any).matching(identifier: "chat-send-uncertain").firstMatch.exists)
+        XCTAssertFalse(app.buttons["Allow retry"].exists)
+        XCTAssertFalse(app.alerts["Allow another send attempt?"].exists)
+        let connectionError = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@",
+            f.label("general_network_title", "Cannot communicate with server."))).firstMatch
+        XCTAssertTrue(connectionError.exists, "Failed Send must present the standard managed connection error")
+        controlProof(connectionError, "owned-direct-send-managed-connection-error-only-\(f.role)")
+        try assertOwnedUncertainDraftAbsent(draft, chatID: chatID, fixture: f)
+
+        waitUntilLaunchPlus(137)
+        XCTAssertEqual(messagePOSTs(chatID), failedAttempts, "Connectivity recovery must never send automatically")
+        XCTAssertTrue(send.isEnabled && send.isHittable)
+        send.tap()
+        let acknowledged = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            (field.value as? String) != draft && self.app.staticTexts[draft].exists
+                && !self.app.staticTexts["Please wait..."].exists
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [acknowledged], timeout: 35), .completed,
+                       "A later intentional Send after proven preconnection failure must deliver and clear its draft")
+        XCTAssertEqual(messagePOSTs(chatID), 5, "Four failed preconnection attempts plus one acknowledged Send")
+        XCTAssertEqual(try chatTexts(ownedChat(chatID, fixture: f, active: true)).filter { $0 == draft }.count, 1)
         send.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
-        XCTAssertEqual(messagePOSTs(chatID), terminalTransportAttempts)
-
-        waitUntilLaunchPlus(137) // past the fault window, including launch overhead
-        let check = app.buttons["Check messages"].firstMatch
-        XCTAssertTrue(check.exists && check.isHittable)
-        let checkGETBefore = count("GET /api/users/chats/\(chatID)")
-        check.tap()
-        let checked = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
-            self.count("GET /api/users/chats/\(chatID)") > checkGETBefore
-        }, object: nil)
-        XCTAssertEqual(XCTWaiter.wait(for: [checked], timeout: 35), .completed,
-                       "Recovery Check messages must dispatch an actual read without resubmitting the draft; dispatch alone does not establish applied data")
-        XCTAssertTrue(notice.exists && explanation.exists)
-        XCTAssertEqual(field.value as? String, draft)
-        XCTAssertFalse(send.isEnabled, "A Check messages action is not permission to replay an uncertain POST")
-        XCTAssertEqual(messagePOSTs(chatID), terminalTransportAttempts)
-        try assertOwnedUncertainDraftAbsent(draft, chatID: chatID, fixture: f)
-        controlProof(check, "owned-uncertain-post-check-messages-control-only-\(f.role)")
-
-        let allow = app.buttons["Allow retry"].firstMatch
-        let retryControlReady = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
-            allow.exists && allow.isHittable
-        }, object: nil)
-        XCTAssertEqual(XCTWaiter.wait(for: [retryControlReady], timeout: 30), .completed,
-                       "Retry confirmation control must be reachable; this is not a successful read/apply attestation")
-        XCTAssertTrue(allow.exists && allow.isHittable)
-        allow.tap()
-        let dialog = app.alerts["Allow another send attempt?"]
-        XCTAssertTrue(dialog.waitForExistence(timeout: 5))
-        let cancel = dialog.buttons[f.label("general_cancel", "Cancel")]
-        XCTAssertTrue(cancel.exists && cancel.isHittable)
-        controlProof(cancel, "owned-uncertain-post-cancel-retry-control-only-\(f.role)")
-        cancel.tap()
-        XCTAssertTrue(dialog.waitForNonExistence(timeout: 5))
-        XCTAssertTrue(notice.exists)
-        XCTAssertFalse(send.isEnabled)
-        XCTAssertEqual(field.value as? String, draft)
-        XCTAssertEqual(messagePOSTs(chatID), terminalTransportAttempts)
-
-        XCTAssertTrue(allow.exists && allow.isHittable)
-        allow.tap()
-        XCTAssertTrue(dialog.waitForExistence(timeout: 5))
-        let authorize = dialog.buttons["Allow retry"]
-        XCTAssertTrue(authorize.exists && authorize.isHittable)
-        controlProof(authorize, "owned-uncertain-post-explicit-allow-retry-control-only-\(f.role)")
-        authorize.tap()
-        XCTAssertTrue(dialog.waitForNonExistence(timeout: 5))
-        XCTAssertTrue(notice.waitForNonExistence(timeout: 5))
-        XCTAssertEqual(field.value as? String, draft)
-        XCTAssertTrue(send.isEnabled, "Explicit permission should enable a deliberate later Send, without sending automatically")
-        let automaticReplay = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
-            self.messagePOSTs(chatID) != terminalTransportAttempts
-        }, object: nil)
-        automaticReplay.isInverted = true
-        XCTAssertEqual(XCTWaiter.wait(for: [automaticReplay], timeout: 25), .completed)
-        XCTAssertEqual(messagePOSTs(chatID), terminalTransportAttempts)
-        try assertOwnedUncertainDraftAbsent(draft, chatID: chatID, fixture: f)
-        XCTAssertEqual(messagePOSTs(chatID), terminalTransportAttempts)
-        try record("owned-native-uncertain-post-controls-\(f.role)", [
+        XCTAssertEqual(messagePOSTs(chatID), 5, "Empty-draft tap must not replay")
+        try record("owned-native-direct-send-offline-recovered-\(f.role)", [
             "role": f.role, "elapsedBeforeNativeSend": elapsedBeforeSend,
             "configuredGlobalLatencySeconds": 8, "configuredOfflineWindowSeconds": [100, 125],
-            "configuredFaultTarget": "closed local port 9", "successfulPreflightEstablishedByActualPOSTAttempt": true,
-            "logicalNativeSendActions": 1, "terminalNativePOSTTransportAttempts": terminalTransportAttempts,
-            "expectedSafePreconnectionRetries": 3, "uncertainNoticeObserved": true,
-            "exactSyntheticDraftRetained": true, "disabledSendAttemptExtraTransportAttempts": 0,
-            "checkMessagesGETDispatchObservedWithoutImplicitReplay": true,
-            "checkMessagesAppliedDataOrSuccessfulReadVerified": false,
-            "postAllowNoReplayObservationSeconds": 25, "cancelRetryRetainedRestriction": true,
-            "explicitAllowEnabledFutureSendWithoutAutomaticPOST": true,
-            "actualSecondSendPerformed": false, "backendDraftAbsentBothOwnedPerspectives": true,
+            "configuredFaultTarget": "closed local port 9", "logicalNativeSendActions": 2,
+            "safePreconnectionTransportAttempts": 4, "acknowledgedRecoveryPOSTs": 1,
+            "englishBlockingNoticeAbsent": true, "exactSyntheticDraftRetainedAfterFailure": true,
+            "draftClearedAfterAcknowledgement": true, "backendStoredSyntheticMessageCount": 1,
             "committedMessageOrLostAcknowledgementCovered": false,
             "deviceNetworkChanged": false, "requestBodyCaptured": false])
         try finish(f)
@@ -939,7 +888,7 @@ final class ChatNetworkBoundaryUITests: XCTestCase {
         XCTAssertTrue(send.exists && send.isEnabled && send.isHittable)
         let beforeGET = count("GET /api/users/chats/\(chatID)")
         send.tap()
-        XCTAssertFalse(send.isEnabled, "Native Send must disable during its delayed metadata preflight")
+        XCTAssertFalse(send.isEnabled, "Native Send must disable during its delayed delivery")
         field.typeText(second)
         XCTAssertTrue((field.value as? String) == first + second,
                       "Continued typing must actually occur before acknowledgement and append to the unchanged submitted baseline")
@@ -950,7 +899,7 @@ final class ChatNetworkBoundaryUITests: XCTestCase {
         let retained = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in (field.value as? String) == second }, object: nil)
         XCTAssertEqual(XCTWaiter.wait(for: [retained], timeout: 15), .completed,
                        "Acknowledgement must remove only submitted prefix, preserving exact new typing")
-        XCTAssertGreaterThan(count("GET /api/users/chats/\(chatID)"), beforeGET)
+        XCTAssertEqual(count("GET /api/users/chats/\(chatID)"), beforeGET, "An acknowledged send must not add a conversation read")
         XCTAssertEqual(messagePOSTs(chatID), 1)
         XCTAssertTrue(send.isEnabled, "Retained new draft remains available for deliberate later submission")
         let bubble = app.staticTexts[first]
@@ -961,14 +910,14 @@ final class ChatNetworkBoundaryUITests: XCTestCase {
         controlProof(bubble, "owned-slow-send-first-synthetic-bubble-only-\(f.role)")
         controlProof(field, "owned-slow-send-retained-synthetic-draft-only-\(f.role)")
         try record("owned-slow-send-new-typing-\(f.role)", ["role": f.role,
-            "injectedNativeTransportDelaySeconds": 6, "disabledSendDuringPreflightObserved": true,
+            "injectedNativeTransportDelaySeconds": 6, "disabledSendDuringDeliveryObserved": true, "redundantConversationReads": 0,
             "actualPOSTProgressObserved": true, "exactContinuedTypingRetained": true,
             "nativeMessagePOSTs": 1, "backendFirstMessageOccurrencesBothOwnedPerspectives": 1,
             "continuedTypingSent": false, "rapidCardsConfirmSortCoverageClaimed": false])
         try finish(f)
     }
 
-    func testOwnedReplySendKeepsSubmittedParentAndNewerReplyAfterAcknowledgement() throws {
+    func testOwnedDirectReplySendPersistsParentAndAllowsFutureReplyAfterAcknowledgement() throws {
         let (f, chatID) = try stageOwnedActiveChat()
         let initial = try ownedChat(chatID, fixture: f, active: true)
         let messages = try XCTUnwrap(initial["messages"] as? [[String: Any]])
@@ -1007,78 +956,43 @@ final class ChatNetworkBoundaryUITests: XCTestCase {
         let sentText = "Synthetic reply race " + UUID().uuidString
         field.tap(); field.typeText(sentText)
         XCTAssertEqual(field.value as? String, sentText)
-        // Both target bubbles must already be reachable before opening the
-        // ten-second pending-preflight interval. Never spend it scrolling.
-        let bBubble = try revealSyntheticPeerBubble(bText, messageID: bID)
-        XCTAssertTrue(bBubble.exists && bBubble.isHittable)
-        _ = try adjacentMessageMenu(for: bBubble, messageID: bID)
+        // October13 R14 removes the historical delayed GET preflight. Delivery
+        // starts immediately and its progress modal blocks interaction. This
+        // migration does not certify changing reply selection during delivery.
         let send = app.buttons["Send"]
         let refresh = app.buttons[f.label("chat_screen_refresh", "Refresh")].firstMatch
         let busy = app.staticTexts[f.label("loading_please_wait", "Please wait...")]
-        XCTAssertTrue(send.isEnabled && send.isHittable && refresh.exists && refresh.isHittable)
-        let initialCancel = app.buttons["Cancel"].firstMatch
-        XCTAssertGreaterThanOrEqual(initialCancel.frame.width, 44, "Reply cancellation requires a 44-point target")
-        XCTAssertGreaterThanOrEqual(initialCancel.frame.height, 44)
+        XCTAssertTrue(send.isEnabled && send.isHittable && refresh.isEnabled)
+        let beforeGET = count("GET /api/users/chats/\(chatID)")
         XCTAssertEqual(messagePOSTs(chatID), 0)
-        var dismissedSystemBanners = 0
-        let bannerMonitor = addUIInterruptionMonitor(withDescription: "Dismiss native notification banner") { interruption in
-            // The previous runs spent the measured interval waiting for a real
-            // SpringBoard banner to expire. Dismiss only that banner with the
-            // normal native gesture; never handle permission dialogs here.
-            guard interruption.identifier == "NotificationShortLookView", interruption.isHittable else { return false }
-            interruption.swipeUp(velocity: .fast)
-            // Evaluate immediately: the convenience wait adds a fixed first-poll
-            // delay even when the normal swipe has already dismissed the banner.
-            if interruption.exists {
-                let dismissed = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in !interruption.exists }, object: nil)
-                guard XCTWaiter.wait(for: [dismissed], timeout: 2) == .completed else { return false }
-            }
-            dismissedSystemBanners += 1
-            return true
-        }
-        defer { removeUIInterruptionMonitor(bannerMonitor) }
-        let sendStarted = Date()
         send.tap()
+        XCTAssertTrue(busy.waitForExistence(timeout: 10), "Direct POST delivery must present progress")
         XCTAssertFalse(send.isEnabled)
-        XCTAssertFalse(refresh.isEnabled, "Actual manual Refresh must disable during native send")
-        guard !refresh.isEnabled, refresh.exists, refresh.isHittable else { throw URLError(.cannotParseResponse) }
-        refresh.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
-        // A deliberate disabled-control attempt is covered, without claiming
-        // a fabricated no-GET count while unrelated quiet reads can be pending.
-        let cancel = app.buttons["Cancel"].firstMatch
-        XCTAssertTrue(cancel.exists && cancel.isHittable)
-        cancel.tap()
-        try selectSyntheticReply(bText, reveal: false, messageID: bID)
-        // AX snapshots are real, potentially slow work. Finish every required
-        // observation before taking the single timing checkpoint used by proof.
-        let observedSendDisabled = !send.isEnabled
-        let observedPOSTProgressAbsent = !busy.exists
-        let observedPOSTCount = messagePOSTs(chatID)
-        let observedNewerReplyRetained = replyBannerContains(bText, near: field)
-        let observedRefreshDisabled = !refresh.isEnabled
-        let observedElapsed = Date().timeIntervalSince(sendStarted)
-        let changedBeforePreflight = observedElapsed < 10 && observedSendDisabled
-            && observedPOSTProgressAbsent && observedPOSTCount == 0
-            && observedNewerReplyRetained && observedRefreshDisabled
-        try record("owned-reply-race-timing-\(f.role)", ["replyChangedWithinTenSeconds": changedBeforePreflight,
-            "injectedGlobalDelaySeconds": 20, "elapsedSinceNativeSendTap": observedElapsed,
-            "nativePOSTsBeforeReplyChange": observedPOSTCount, "POSTProgressAbsent": observedPOSTProgressAbsent,
-            "sendDisabledObserved": observedSendDisabled, "newerReplyRetainedObserved": observedNewerReplyRetained,
-            "manualRefreshDisabledObserved": observedRefreshDisabled, "allObservationsCompletedBeforeTimingCheckpoint": true,
-            "nativeSystemBannersDismissed": dismissedSystemBanners, "bannerDismissalTimeIncluded": true,
-            "noExtraGETClaimed": false])
-        XCTAssertTrue(changedBeforePreflight,
-                      "Reply replacement must complete within ten seconds while the twenty-second metadata delay is still pending")
-        guard changedBeforePreflight else { throw URLError(.timedOut) }
-        XCTAssertTrue(busy.waitForExistence(timeout: 20), "Actual delayed delivery must show progress")
+        XCTAssertFalse(refresh.isEnabled, "Manual refresh stays disabled during delivery")
+        XCTAssertEqual(count("GET /api/users/chats/\(chatID)"), beforeGET)
+        XCTAssertFalse(refresh.isHittable, "Progress modal blocks the disabled refresh target")
+        // The deliberate transport latency runs before the request counter.
+        // Require actual dispatch after that delay, without inventing a GET
+        // preflight or equating the progress UI with an already-sent request.
+        let dispatched = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            self.messagePOSTs(chatID) == 1
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [dispatched], timeout: 30), .completed)
+        XCTAssertEqual(messagePOSTs(chatID), 1)
+        // A quiet read begun before Send can finish its injected latency during
+        // delivery. Its counter is not evidence of a new per-send preflight.
+        // Dedicated direct-send tests retain the controlled no-extra-GET proof.
+        let readsAtDispatch = count("GET /api/users/chats/\(chatID)")
         XCTAssertTrue(busy.waitForNonExistence(timeout: 45))
         waitForExactEmptyDraft(field, fixture: f, timeout: 15)
-        XCTAssertTrue(replyBannerContains(bText, near: field), "Acknowledgement must retain the newer selected reply B")
-        XCTAssertTrue(app.buttons["Cancel"].exists)
-        XCTAssertEqual(messagePOSTs(chatID), 1)
-        XCTAssertFalse(send.isEnabled, "Empty new draft must not automatically send the retained reply B")
+        XCTAssertFalse(app.buttons["Cancel"].exists, "Acknowledgement clears the submitted reply selection")
         let bubble = app.staticTexts.matching(NSPredicate(format: "label == %@", sentText)).firstMatch
-        XCTAssertTrue(bubble.waitForExistence(timeout: 10) && bubble.isHittable)
+        XCTAssertTrue(bubble.waitForExistence(timeout: 10))
+        try selectSyntheticReply(bText, messageID: bID)
+        XCTAssertTrue(replyBannerContains(bText, near: field), "A future reply may be selected after acknowledgement")
+        XCTAssertTrue(app.buttons["Cancel"].exists)
+        XCTAssertEqual(messagePOSTs(chatID), 1, "Selecting a future reply cannot send another message")
+        XCTAssertFalse(send.isEnabled, "Future reply still requires deliberate draft entry and send")
         let primary = try ownedChat(chatID, fixture: f, active: true)
         let peerResponse = try CarezaarAPI.callWithHTTPStatus("GET", "users/chats/\(chatID)", token: f.peerToken)
         XCTAssertEqual(peerResponse.status, 200)
@@ -1099,7 +1013,10 @@ final class ChatNetworkBoundaryUITests: XCTestCase {
         controlProof(bubble, "owned-reply-race-synthetic-acknowledged-message-only-\(f.role)")
         try record("owned-reply-race-acknowledged-\(f.role)", ["role": f.role,
             "persistedOriginalParentVerifiedBothOwnedPerspectives": true,
-            "newerSelectedReplyRetained": replyBannerContains(bText, near: field),
+            "futureReplySelectedAfterAcknowledgement": replyBannerContains(bText, near: field),
+            "replyChangedDuringDeliveryVerified": false, "legacyPreflightTimingSupersededByDirectPOST": true,
+            "conversationReadDeltaDuringInjectedDelay": readsAtDispatch - beforeGET,
+            "quietReadAttributionVerified": false, "wholeDeliveryNoGETClaimed": false,
             "nativeMessagePOSTs": messagePOSTs(chatID), "emptyNewDraftSendDisabled": !send.isEnabled,
             "requestBodyCaptured": false, "syntheticPeerMessagesSeeded": false,
             "existingQuotedParentIDsExcludedFromTargets": true, "originalPeerTargetsWithoutParentQuotes": true])

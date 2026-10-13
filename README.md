@@ -61,7 +61,7 @@ xcodebuild -project Carezaar.xcodeproj -scheme Carezaar \
 
 **Authentication**
 - `auth/login` returns an access token and a refresh token, which are stored in the Keychain (`Core/Session/TokenStore.swift`).
-- `APIClient` refreshes the session once when the server answers 403, then retries the request. If the refresh fails, the user is signed out.
+- APIClient uses one shared session renewal when the server rejects the access token. Connectivity failures preserve credentials and show the managed Connection Problem/Retry window. Server, decoding and local persistence failures retain credentials and surface their managed error; only explicit rejection of the saved session ends sign-in. A known-refused mutation is distinguished from an uncertain write, and late results cannot affect another account.
 
 **Localisation**
 - UI text is served by the backend, not bundled. `GET base/contents` returns every label by slug and language (`Core/Storage/Localization.swift`).

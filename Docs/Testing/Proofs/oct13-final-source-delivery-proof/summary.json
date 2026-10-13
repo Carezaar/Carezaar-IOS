@@ -1,0 +1,254 @@
+{
+  "scope": "Executed runs, not unique-case totals or full original QA acceptance. Failed runs and skipped cases retained.",
+  "results": [
+    {
+      "bundle": "final-timing-lifecycle-full-units.xcresult",
+      "totalTestCount": 143,
+      "passedTests": 143,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "result": "Passed"
+    },
+    {
+      "bundle": "small-two-failures-isolated-retest.xcresult",
+      "totalTestCount": 2,
+      "passedTests": 2,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "result": "Passed"
+    },
+    {
+      "bundle": "final-small-client-regression.xcresult",
+      "totalTestCount": 26,
+      "passedTests": 22,
+      "failedTests": 3,
+      "skippedTests": 1,
+      "result": "Failed"
+    },
+    {
+      "bundle": "final-small-client-locale-and-auth-regression.xcresult",
+      "totalTestCount": 17,
+      "passedTests": 17,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "result": "Passed"
+    },
+    {
+      "bundle": "final-disposable-client-lifecycle.xcresult",
+      "totalTestCount": 1,
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "result": "Passed"
+    },
+    {
+      "bundle": "final-disposable-caregiver-lifecycle.xcresult",
+      "totalTestCount": 1,
+      "passedTests": 0,
+      "failedTests": 1,
+      "skippedTests": 0,
+      "result": "Failed"
+    },
+    {
+      "bundle": "final-disposable-caregiver-lifecycle-readiness-retest.xcresult",
+      "totalTestCount": 1,
+      "passedTests": 0,
+      "failedTests": 1,
+      "skippedTests": 0,
+      "result": "Failed"
+    },
+    {
+      "bundle": "final-disposable-caregiver-post-photo-resume.xcresult",
+      "totalTestCount": 1,
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "result": "Passed",
+      "scope": "Explicit root-owned same-account post-photo resume. Signup/photo upload were completed in the prior interrupted run; this is not uninterrupted full lifecycle coverage."
+    },
+    {
+      "bundle": "final-actual-os-denied-caregiver-and-interrupted-cleanup.xcresult",
+      "totalTestCount": 2,
+      "passedTests": 2,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "result": "Passed"
+    },
+    {
+      "bundle": "final-actual-os-denied-client.xcresult",
+      "totalTestCount": 1,
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "result": "Passed"
+    },
+    {
+      "bundle": "final-small-caregiver-core-regression.xcresult",
+      "totalTestCount": 12,
+      "passedTests": 12,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "result": "Passed"
+    },
+    {
+      "bundle": "final-actual-os-reduced-motion-native-client.xcresult",
+      "totalTestCount": 1,
+      "passedTests": 0,
+      "failedTests": 1,
+      "skippedTests": 0,
+      "result": "Failed"
+    },
+    {
+      "bundle": "final-actual-os-reduced-motion-native-client-toggle-retest.xcresult",
+      "totalTestCount": 1,
+      "passedTests": 0,
+      "failedTests": 1,
+      "skippedTests": 0,
+      "result": "Failed"
+    },
+    {
+      "bundle": "final-actual-os-reduced-motion-native-client-navigation-retest.xcresult",
+      "totalTestCount": 1,
+      "passedTests": 0,
+      "failedTests": 1,
+      "skippedTests": 0,
+      "result": "Failed"
+    },
+    {
+      "bundle": "final-actual-os-reduced-motion-native-client-profile-ready-retest.xcresult",
+      "totalTestCount": 1,
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "result": "Passed"
+    },
+    {
+      "bundle": "final-arabic-managed-self-label-red.xcresult",
+      "totalTestCount": 1,
+      "passedTests": 0,
+      "failedTests": 1,
+      "skippedTests": 0,
+      "result": "Failed"
+    },
+    {
+      "bundle": "final-arabic-managed-label-green-and-english.xcresult",
+      "totalTestCount": 1,
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "result": "Passed",
+      "scope": "One executed Arabic native regression only; English covered separately in the 144-record bundle."
+    },
+    {
+      "bundle": "final-managed-label-english-and-full-units.xcresult",
+      "totalTestCount": 144,
+      "passedTests": 144,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "result": "Passed",
+      "scope": "143 signed unit tests and one English native R10 regression; no skipped tests."
+    },
+    {
+      "bundle": "final-managed-label-caregiver-preferences-help-chat.xcresult",
+      "totalTestCount": 15,
+      "passedTests": 13,
+      "failedTests": 1,
+      "skippedTests": 1,
+      "result": "Failed"
+    },
+    {
+      "bundle": "final-managed-label-reply-guard-diagnostic-swift-fix.xcresult",
+      "totalTestCount": 1,
+      "passedTests": 0,
+      "failedTests": 1,
+      "skippedTests": 0,
+      "result": "Failed"
+    },
+    {
+      "bundle": "final-managed-label-direct-reply-policy-regression.xcresult",
+      "totalTestCount": 1,
+      "passedTests": 0,
+      "failedTests": 1,
+      "skippedTests": 0,
+      "result": "Failed"
+    },
+    {
+      "bundle": "final-managed-label-direct-reply-dispatch-retest.xcresult",
+      "totalTestCount": 1,
+      "passedTests": 0,
+      "failedTests": 1,
+      "skippedTests": 0,
+      "result": "Failed"
+    },
+    {
+      "bundle": "final-managed-label-direct-reply-parent-retest.xcresult",
+      "totalTestCount": 0,
+      "passedTests": 0,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "result": "unknown",
+      "scope": "Runtime log says passed, but Xcode mkstemp No space left on device prevented importing test records. NOT a verified native pass."
+    },
+    {
+      "bundle": "final-managed-label-direct-reply-importable-retest.xcresult",
+      "totalTestCount": 1,
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "result": "Passed",
+      "scope": "Current-policy direct reply, original parent stored once both perspectives, controls blocked during delivery, future reply selected only after acknowledgement. No whole-delivery zero-GET or reply-change-during-delivery claim."
+    }
+  ],
+  "release": {
+    "markerCount": 32,
+    "markersPresentInReleaseBinary": [],
+    "binarySHA256": "93b15d12f6610e885fa8b3dc266f19cd75884f4a91f32ca13fa76dccf5938ff1",
+    "initializationSceneBundledUnchanged": true,
+    "buildAndAnalyzeSucceeded": true
+  },
+  "originalCaseInventory": {
+    "total": 374,
+    "passed": 110,
+    "notRun": 246,
+    "failed": 3,
+    "blocked": 0,
+    "notApplicable": 15
+  },
+  "limitations": [
+    "Full original 374-case QA unfinished; historical original case statuses preserved.",
+    "Reviewed Small client default opposing entrance and actual Settings Reduced Motion stationary fade: invalid recorder timestamps prohibit precise duration or continuous-smoothness certification. Navigation during animation not verified.",
+    "Arabic selected-language managed self label, mirrored order and settled geometry verified by final-source native regression.",
+    "Yahoo endpoint acceptance does not establish inbox delivery or backend-only causation.",
+    "No physical capture or personal media upload in October13 follow-up. October12 local capture/retake/crop/cancel evidence remains dated.",
+    "Git handover not yet performed at evidence generation."
+  ],
+  "actualOSDeniedLocation": "Small client and caregiver native Settings Never; real LocationProvider, nil map progression, no invented coordinates or preference writes; backend fields unchanged. No physical GPS claim.",
+  "finalSourceVerification": {
+    "anchor": "production-source-anchor.json",
+    "ArabicNative": {
+      "pass": 1,
+      "fail": 0,
+      "skip": 0
+    },
+    "EnglishNativeAndUnits": {
+      "pass": 144,
+      "fail": 0,
+      "skip": 0
+    },
+    "sourceUnchangedAfterVerification": true
+  },
+  "recordedAt": "2026-10-13T20:21:16.106086+05:30",
+  "testPolicyMigration": "Legacy delayed pre-send GET / POST0 / absent-progress / ten-second reply race conflicts with R14 immediate POST. Original failures and incomplete case verdict preserved. New case separately verifies one delayed-transport POST, submitted parent once, blocked delivery controls and future reply only AFTER acknowledgement. It does not certify reply changes during delivery or zero total GETs throughout delivery; read increase recorded with attribution unverified.",
+  "environmentFailures": [
+    {
+      "log": "final-managed-label-reply-guard-diagnostic.log",
+      "type": "test-only Swift API naming compile error corrected",
+      "executedTests": 0
+    },
+    {
+      "bundle": "final-managed-label-direct-reply-parent-retest.xcresult",
+      "type": "Xcode result-summary import failed: mkstemp No space left on device",
+      "verifiedPass": false
+    }
+  ]
+}

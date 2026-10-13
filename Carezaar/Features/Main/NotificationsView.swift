@@ -24,9 +24,29 @@ struct NotificationsView: View {
         .backHeader(loc.t("general_notifications", "Notifications"))
         .task { await reload() }
         .onDisappear { poller.markChecked() }
-        .sheet(item: $selected) { notification in
-            notificationDetails(notification)
-                .presentationDetents([.medium, .large])
+        .allowsHitTesting(selected == nil)
+        .accessibilityHidden(selected != nil)
+        .overlay {
+            if let notification = selected {
+                GeometryReader { geometry in
+                    ZStack {
+                        Button { selected = nil } label: {
+                            Color.black.opacity(0.3).frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(loc.t("general_cancel", "Cancel"))
+                        .accessibilityIdentifier("notification-dismiss-backdrop")
+                        notificationDetails(notification)
+                            .frame(maxWidth: 420, maxHeight: geometry.size.height * 0.72)
+                            .background(.white, in: RoundedRectangle(cornerRadius: Theme.Radius.card))
+                            .padding(.horizontal, 20)
+                            .shadow(color: .black.opacity(0.15), radius: 20, y: 8)
+                            .accessibilityAction(.escape) { selected = nil }
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+            }
         }
     }
 
@@ -92,14 +112,6 @@ struct NotificationsView: View {
         let subject = baseData.items(.subjects).first { $0.id == n.subjectId }
         return ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                HStack {
-                    Text(loc.t("general_notifications", "Notifications")).font(Theme.Typography.title(20))
-                    Spacer()
-                    Button { selected = nil } label: {
-                        Image(systemName: "xmark").frame(width: 44, height: 44)
-                    }
-                    .accessibilityLabel(loc.t("general_cancel", "Cancel"))
-                }
                 if let partner = n.partner {
                     HStack(spacing: 12) {
                         Avatar(url: partner.photo, size: 64)
@@ -107,8 +119,6 @@ struct NotificationsView: View {
                     }
                 }
                 Text(loc.label(subject)).font(Theme.Typography.body(16))
-                Text(ServerTime.local(n.createdAt)).font(Theme.Typography.caption(13))
-                    .foregroundStyle(Theme.Palette.textSecondary)
                 PrimaryButton(title: loc.t("general_show", "Show")) {
                     selected = nil
                     // A missing target simply dismisses the detail. The list remains

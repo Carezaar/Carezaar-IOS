@@ -62,7 +62,7 @@ final class SignupTests: XCTestCase {
 
     /// Uses only the already-completed disposable signup account supplied by root.
     /// No new signup, photo access, upload, account deletion or token corruption.
-    func testDisposablePasswordChangeRetainsSession() throws {
+    func testDisposablePasswordChangeSignsOutAndRequiresExplicitNewPasswordSignIn() throws {
         let environment = ProcessInfo.processInfo.environment
         guard let file = environment["QA_DISPOSABLE_CREDENTIAL_FILE"], !file.isEmpty else {
             throw XCTSkip("Root must supply the private credential file of its completed disposable client signup.")
@@ -111,7 +111,7 @@ final class SignupTests: XCTestCase {
         try JSONSerialization.data(withJSONObject: record).write(to: url, options: .atomic)
         try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: file)
         confirm.tap()
-        let acknowledgedSuccess = textContaining("Password changed successfully.").waitForExistence(timeout: 60)
+        let returnedToStart = welcomeSignIn.waitForExistence(timeout: 60)
 
         // Capture actual app state before separate verification logins can affect
         // backend sessions. Delay failure until the proven secret is retained.
@@ -156,22 +156,44 @@ final class SignupTests: XCTestCase {
         afterProof.name = "password-after-api-proof-request-counts"
         afterProof.lifetime = .keepAlways
         add(afterProof)
-        try requirePasswordProof(acknowledgedSuccess, "Changed credentials were retained, but the native password handoff did not report success")
-        try requirePasswordProof(settingsImmediatelyAfterAcknowledgment && !welcomeImmediatelyAfterAcknowledgment,
-                                 "Password success had already left authenticated settings before any separate verification API login; proven recovery credentials were retained")
+        try requirePasswordProof(returnedToStart, "Verified password change must return to the start screen")
+        try requirePasswordProof(!settingsImmediatelyAfterAcknowledgment && welcomeImmediatelyAfterAcknowledgment,
+                                 "Confirmed change must end authenticated settings before verification API calls")
+        XCTAssertFalse(textContaining("Password changed successfully.").exists)
+        XCTAssertFalse(app.buttons["Messages"].exists)
+        let presence = app.staticTexts["qa-token-presence"]
+        XCTAssertEqual(presence.label, "accessPresent=false;refreshPresent=false")
+        XCTAssertTrue(immediateLedger.contains("POST /api/auth/login=1"), "Only the user's initial sign-in is permitted")
+        XCTAssertTrue(immediateLedger.contains("PATCH /api/users/password/change=1"), "Password change must be sent once")
 
-        XCTAssertTrue(app.navigationBars["Change Password"].exists, "Successful change must retain authenticated settings")
-        XCTAssertFalse(welcomeSignIn.exists, "Successful change unexpectedly signed out")
-
-        // Preserve the session produced by the actual controls; no debug login,
-        // supplied credentials or injected token is used on this relaunch.
+        // Ordinary relaunch must stay signed out; it cannot restore old credentials.
         app.terminate()
-        app.launchArguments = []
+        app.launchArguments = ["--qa-request-counts", "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
         app.launch()
-        XCTAssertTrue(app.buttons["Messages"].waitForExistence(timeout: 60), "Changed-password session did not restore from storage")
+        XCTAssertTrue(welcomeSignIn.waitForExistence(timeout: 60))
+        XCTAssertFalse(app.buttons["Messages"].exists)
+        XCTAssertEqual(presence.label, "accessPresent=false;refreshPresent=false")
+        XCTAssertFalse(requestCounts.label.contains("POST /api/auth/login="))
+        XCTAssertFalse(requestCounts.label.contains("GET /api/auth/info="))
+
+        // The user explicitly enters the proven new password in the real form.
+        welcomeSignIn.tap()
+        XCTAssertTrue(emailField.waitForExistence(timeout: 20))
+        emailField.tap(); emailField.typeText(email)
+        typeSecure(app.secureTextFields["Enter your password..."], next)
+        dismissKeyboard()
+        XCTAssertTrue(signIn.isEnabled); signIn.tap()
+        XCTAssertTrue(app.buttons["Messages"].waitForExistence(timeout: 60))
+        XCTAssertTrue(requestCounts.label.contains("POST /api/auth/login=1"))
+        XCTAssertEqual(presence.label, "accessPresent=true;refreshPresent=true")
+        app.terminate()
+        app.launchArguments = ["--qa-request-counts", "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
+        app.launch()
+        XCTAssertTrue(app.buttons["Messages"].waitForExistence(timeout: 60))
+        XCTAssertFalse(requestCounts.label.contains("POST /api/auth/login="), "Saved new credentials restore without a hidden login")
         openProfileTab()
-        XCTAssertTrue(textContaining("Manage your personal information").exists, "Restored session did not load the actual profile")
-        XCTAssertFalse(welcomeSignIn.exists, "Profile read rejected the restored session")
+        XCTAssertTrue(textContaining("Manage your personal information").exists)
+        XCTAssertFalse(welcomeSignIn.exists)
 
     }
 
@@ -246,9 +268,34 @@ final class SignupTests: XCTestCase {
             throw XCTSkip("Root must prepare an isolated simulator gallery containing only the synthetic QA photo before upload.")
         }
         var password = Self.newPassword()
-        let inbox = try signUp(caregiver: caregiver, password: password)
+        let inbox: MailTM.Inbox
+        let resume = ProcessInfo.processInfo.environment["QA_RESUME_AFTER_LIFECYCLE_PHOTO"] == "1"
+        if resume {
+            let environment = ProcessInfo.processInfo.environment
+            let file = try XCTUnwrap(environment["QA_ACCOUNT_FILE"])
+            let record = try XCTUnwrap(try JSONSerialization.jsonObject(with: Data(contentsOf: URL(fileURLWithPath: file))) as? [String: Any])
+            let email = try XCTUnwrap(record["email"] as? String)
+            password = try XCTUnwrap(record["password"] as? String)
+            try requirePasswordProof(record["role"] as? String == (caregiver ? "caregiver" : "client")
+                                     && record["pending_password"] == nil && record["deleted"] as? Bool != true,
+                                     "Resume requires the exact interrupted role before password mutation")
+            let normalizedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+            let retainedEmails = ["QA_EMAIL", "QA_CG_EMAIL", "QA_CLIENT_EMAIL"].compactMap { environment[$0] }
+                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }
+            try requirePasswordProof(!retainedEmails.contains(normalizedEmail), "Refusing retained fixtures")
+            inbox = MailTM.Inbox(address: email, token: try XCTUnwrap(record["inbox_token"] as? String))
+            _ = try requireAcceptedLogin(email, password: password, role: caregiver ? "caregiver" : "client")
+            app.launchEnvironment["QA_EMAIL"] = email
+            app.launchEnvironment["QA_PASSWORD"] = password
+            app.launchArguments = ["--qa-signout", "--qa-login-env", "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
+            app.launch()
+            XCTAssertTrue(app.buttons["Messages"].waitForExistence(timeout: 60))
+        } else {
+            inbox = try signUp(caregiver: caregiver, password: password)
+        }
 
         // Photo, then a second save that changes only the bio.
+        if !resume {
         openProfileEdit()
         let upload = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Upload Photo")).firstMatch
         XCTAssertTrue(upload.waitForExistence(timeout: 20)); upload.tap()
@@ -260,21 +307,21 @@ final class SignupTests: XCTestCase {
         let crop = app.buttons["Confirm"]
         XCTAssertTrue(crop.waitForExistence(timeout: 15)); crop.tap()
         saveProfile()
+        }
         var token = try CarezaarAPI.login(inbox.address, password)
         let firstPhoto = try CarezaarAPI.me(token)["photo"] as? String
         XCTAssertNotNil(firstPhoto, "photo not saved")
 
         openProfileEdit()
         let bio = app.textFields["Tell us a little about yourself."]
-        XCTAssertTrue(bio.waitForExistence(timeout: 20)); bio.tap(); bio.typeText("Lifecycle bio")
+        XCTAssertTrue(bio.waitForExistence(timeout: 20)); scrollTo(bio); bio.tap(); bio.typeText("Lifecycle bio")
         dismissKeyboard()
         saveProfile()
         let afterBio = try CarezaarAPI.me(token)
         XCTAssertEqual(afterBio["bio"] as? String, "Lifecycle bio", "bio not saved")
         XCTAssertNotNil(afterBio["photo"] as? String, "saving the bio removed the photo (BE-15)")
 
-        // October specification: successful change retains the current valid session.
-        // Check the real UI and a stored-session relaunch before any separate API login.
+        // October13 supersedes the earlier retained-session lifecycle policy.
         openProfileRow("Change Password")
         let previousPasswordForChange = password
         let next = Self.newPassword()
@@ -285,19 +332,33 @@ final class SignupTests: XCTestCase {
         app.buttons["Change Password"].firstMatch.tap()
         try retainPendingPassword(next)
         app.alerts.buttons["Confirm"].tap()
-        XCTAssertTrue(textContaining("Password changed successfully.").waitForExistence(timeout: 40), "password change did not acknowledge success")
-        password = next
-        try saveDisposableAccount(inbox, password: password, caregiver: caregiver)
-        XCTAssertFalse(app.buttons["Sign in"].firstMatch.exists, "successful change must retain a backend-valid session")
-        XCTAssertTrue(app.navigationBars["Change Password"].exists, "successful change should stay in settings")
-        app.terminate()
-        app.launchArguments = []
-        app.launch()
-        XCTAssertTrue(app.buttons["Messages"].waitForExistence(timeout: 60), "post-change session was not restored without signing in")
-        openProfileTab() // Reads auth/info using the app's retained credentials.
-        XCTAssertFalse(app.buttons["Sign in"].firstMatch.exists, "post-change profile read rejected the retained session")
+        let reachedStart = app.buttons["Sign in"].firstMatch.waitForExistence(timeout: 40)
+        let authenticatedSettingsRemain = app.navigationBars["Change Password"].exists
+        // Preserve the backend-proven disposable secret before later UI assertions.
         _ = try requireAcceptedLogin(inbox.address, password: next, role: caregiver ? "caregiver" : "client")
         try requireExplicitCredentialRefusal(inbox.address, password: previousPasswordForChange)
+        password = next
+        try saveDisposableAccount(inbox, password: password, caregiver: caregiver)
+        XCTAssertTrue(reachedStart, "Confirmed password change must sign out")
+        XCTAssertFalse(authenticatedSettingsRemain)
+        XCTAssertFalse(textContaining("Password changed successfully.").exists)
+        app.terminate()
+        app.launchArguments = ["--qa-request-counts"]
+        app.launch()
+        let welcome = app.buttons["Sign in"].firstMatch
+        XCTAssertTrue(welcome.waitForExistence(timeout: 60))
+        XCTAssertEqual(app.staticTexts["qa-token-presence"].label, "accessPresent=false;refreshPresent=false")
+        XCTAssertFalse(app.staticTexts["qa-request-counts"].label.contains("POST /api/auth/login="))
+        XCTAssertFalse(app.staticTexts["qa-request-counts"].label.contains("GET /api/auth/info="))
+        welcome.tap()
+        let newEmail = app.textFields["Enter your email address..."]
+        XCTAssertTrue(newEmail.waitForExistence(timeout: 15))
+        newEmail.tap(); newEmail.typeText(inbox.address)
+        typeSecure(app.secureTextFields["Enter your password..."], next)
+        dismissKeyboard(); app.buttons["Sign In"].firstMatch.tap()
+        XCTAssertTrue(app.buttons["Messages"].waitForExistence(timeout: 60), "Explicit new-password sign-in must succeed")
+        XCTAssertTrue(app.staticTexts["qa-request-counts"].label.contains("POST /api/auth/login=1"))
+        openProfileTab()
 
         // Explicit server refusal is different: invalid access AND refresh must clear
         // the session, return to Welcome and remain signed out on the next launch.
@@ -445,6 +506,14 @@ final class SignupTests: XCTestCase {
         openProfileTab()
         let edit = app.buttons["Edit"]
         XCTAssertTrue(edit.waitForExistence(timeout: 15)); edit.tap()
+        // The form's fields exist beneath the loading overlay. Existence alone
+        // does not mean the server profile has loaded or the form can be edited.
+        let photoAction = app.buttons.matching(NSPredicate(format: "label CONTAINS %@ OR label CONTAINS %@", "Upload Photo", "Remove Photo")).firstMatch
+        XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(
+            predicate: NSPredicate { _, _ in
+                photoAction.exists && photoAction.isHittable && !self.app.staticTexts["Please wait..."].exists
+            }, object: nil
+        )], timeout: 60), .completed, "Profile edit must finish loading before interaction")
     }
 
     private func saveProfile() {
@@ -604,7 +673,8 @@ final class SignupTests: XCTestCase {
     private func saveDisposableAccount(_ inbox: MailTM.Inbox, password: String, caregiver: Bool) throws {
         guard let file = ProcessInfo.processInfo.environment["QA_ACCOUNT_FILE"] else { return }
         let url = URL(fileURLWithPath: file)
-        let record = ["email": inbox.address, "password": password, "role": caregiver ? "caregiver" : "client"]
+        let record = ["email": inbox.address, "password": password, "role": caregiver ? "caregiver" : "client",
+                      "inbox_token": inbox.token]
         try JSONSerialization.data(withJSONObject: record).write(to: url, options: .atomic)
         try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: file)
     }

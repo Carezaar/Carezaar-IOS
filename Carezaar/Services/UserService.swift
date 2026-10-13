@@ -34,13 +34,12 @@ struct UserService: Sendable {
         )
     }
 
-    /// Change the password without locally revoking a valid current session.
-    /// The caller verifies auth/info; actual backend refusal still ends authentication.
-    func changePassword(oldPassword: String, newPassword: String) async throws {
+    /// Sends the password mutation; SessionManager owns confirmation and sign-out.
+    func changePassword(oldPassword: String, newPassword: String, ifGeneration: UUID? = nil) async throws {
         try await client.sendIgnoringResult(
             Endpoint(method: .patch, path: "users/password/change",
                      body: .form(["old_password": .string(oldPassword),
-                                  "new_password": .string(newPassword)]))
+                                  "new_password": .string(newPassword)])), ifGeneration: ifGeneration
         )
     }
 
@@ -97,9 +96,9 @@ struct UserService: Sendable {
     }
 
     /// Android's call takes a non-optional reason id (a role-specific `base/reasons` row).
-    func deleteAccount(reasonId: Int) async throws {
+    func deleteAccount(reasonId: Int, ifGeneration: UUID? = nil) async throws {
         try await client.sendIgnoringResult(
-            Endpoint(method: .delete, path: "users", query: ["reason_id": String(reasonId)])
+            Endpoint(method: .delete, path: "users", query: ["reason_id": String(reasonId)]), ifGeneration: ifGeneration
         )
     }
 
@@ -119,29 +118,29 @@ struct UserService: Sendable {
 
     /// The introduction is optional (the server stores an empty one as null) and at most
     /// 1000 characters; the partner sees it with the request.
-    func requestMatch(partnerId: String, introduction: String? = nil) async throws -> Match {
+    func requestMatch(partnerId: String, introduction: String? = nil, ifGeneration: UUID? = nil) async throws -> Match {
         var form: [String: FormValue?] = ["partner_id": .string(partnerId)]
         if let text = introduction?.trimmingCharacters(in: .whitespacesAndNewlines), !text.isEmpty {
             form["introduction"] = .string(text)
         }
-        return try await client.send(Endpoint(method: .post, path: "users/matches", body: .form(form)))
+        return try await client.send(Endpoint(method: .post, path: "users/matches", body: .form(form)), ifGeneration: ifGeneration)
     }
 
-    func acceptMatch(id: Int) async throws -> Match {
-        try await client.send(Endpoint(method: .patch, path: "users/matches/\(id)/accept"))
+    func acceptMatch(id: Int, ifGeneration: UUID? = nil) async throws -> Match {
+        try await client.send(Endpoint(method: .patch, path: "users/matches/\(id)/accept"), ifGeneration: ifGeneration)
     }
 
-    func rejectMatch(id: Int) async throws {
-        try await client.sendIgnoringResult(Endpoint(method: .delete, path: "users/matches/\(id)/reject"))
+    func rejectMatch(id: Int, ifGeneration: UUID? = nil) async throws {
+        try await client.sendIgnoringResult(Endpoint(method: .delete, path: "users/matches/\(id)/reject"), ifGeneration: ifGeneration)
     }
 
-    func withdrawMatch(id: Int) async throws {
-        try await client.sendIgnoringResult(Endpoint(method: .delete, path: "users/matches/\(id)/withdraw"))
+    func withdrawMatch(id: Int, ifGeneration: UUID? = nil) async throws {
+        try await client.sendIgnoringResult(Endpoint(method: .delete, path: "users/matches/\(id)/withdraw"), ifGeneration: ifGeneration)
     }
 
     /// Break an active match. The reason comes from `base/reasons`.
-    func breakMatch(id: Int) async throws -> Match {
-        try await client.send(Endpoint(method: .delete, path: "users/matches/\(id)"))
+    func breakMatch(id: Int, ifGeneration: UUID? = nil) async throws -> Match {
+        try await client.send(Endpoint(method: .delete, path: "users/matches/\(id)"), ifGeneration: ifGeneration)
     }
 
     func submitReview(matchId: Int, score: Int, comment: String?) async throws -> Match {
@@ -162,8 +161,8 @@ struct UserService: Sendable {
         )
     }
 
-    func chat(id: Int) async throws -> ChatFull {
-        try await client.send(Endpoint(method: .get, path: "users/chats/\(id)"))
+    func chat(id: Int, ifGeneration: UUID? = nil) async throws -> ChatFull {
+        try await client.send(Endpoint(method: .get, path: "users/chats/\(id)"), ifGeneration: ifGeneration)
     }
 
     func createChat(partnerId: String) async throws -> ChatFull {
@@ -174,11 +173,11 @@ struct UserService: Sendable {
     }
 
     /// `parentId` threads the message as a reply.
-    func sendMessage(chatId: Int, message: String, parentId: Int? = nil) async throws -> ChatFull {
+    func sendMessage(chatId: Int, message: String, parentId: Int? = nil, ifGeneration: UUID? = nil) async throws -> ChatFull {
         try await client.send(
             Endpoint(method: .post, path: "users/chats/\(chatId)",
                      body: .form(["message": .string(message),
-                                  "parent_id": parentId.map { .int($0) } ?? nil]))
+                                  "parent_id": parentId.map { .int($0) } ?? nil])), ifGeneration: ifGeneration
         )
     }
 
@@ -192,16 +191,16 @@ struct UserService: Sendable {
         )
     }
 
-    func addBookmark(partnerId: String) async throws {
+    func addBookmark(partnerId: String, ifGeneration: UUID? = nil) async throws {
         try await client.sendIgnoringResult(
             Endpoint(method: .post, path: "users/bookmarks",
-                     body: .form(["partner_id": .string(partnerId)]))
+                     body: .form(["partner_id": .string(partnerId)])), ifGeneration: ifGeneration
         )
     }
 
-    func removeBookmark(partnerId: String) async throws {
+    func removeBookmark(partnerId: String, ifGeneration: UUID? = nil) async throws {
         try await client.sendIgnoringResult(
-            Endpoint(method: .delete, path: "users/bookmarks/\(partnerId)")
+            Endpoint(method: .delete, path: "users/bookmarks/\(partnerId)"), ifGeneration: ifGeneration
         )
     }
 
@@ -229,16 +228,16 @@ struct UserService: Sendable {
 
     // MARK: - Issues
 
-    func issues() async throws -> [Issue] {
-        try await client.send(Endpoint(method: .get, path: "users/issues"))
+    func issues(ifGeneration: UUID? = nil) async throws -> [Issue] {
+        try await client.send(Endpoint(method: .get, path: "users/issues"), ifGeneration: ifGeneration)
     }
 
     /// A predefined issue type and a free-text title are mutually exclusive — the
     /// backend rejects both together. "Other" sends a title; any type sends the id.
-    func createIssue(issuetypeId: Int?, title: String?, description: String) async throws -> Issue {
+    func createIssue(issuetypeId: Int?, title: String?, description: String, ifGeneration: UUID? = nil) async throws -> Issue {
         let fields: [String: FormValue?] = issuetypeId.map {
             ["issuetype_id": .int($0), "description": .string(description)]
         } ?? ["title": .string(title ?? ""), "description": .string(description)]
-        return try await client.send(Endpoint(method: .post, path: "users/issues", body: .form(fields)))
+        return try await client.send(Endpoint(method: .post, path: "users/issues", body: .form(fields)), ifGeneration: ifGeneration)
     }
 }

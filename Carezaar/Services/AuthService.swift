@@ -34,8 +34,8 @@ struct AuthService: Sendable {
         )
     }
 
-    func currentUser() async throws -> User {
-        try await client.send(Endpoint(method: .get, path: "auth/info"))
+    func currentUser(ifGeneration: UUID? = nil) async throws -> User {
+        try await client.send(Endpoint(method: .get, path: "auth/info"), ifGeneration: ifGeneration)
     }
 
     /// Local state is cleared synchronously by SessionManager before revocation.

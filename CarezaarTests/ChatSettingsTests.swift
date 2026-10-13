@@ -2,6 +2,49 @@ import XCTest
 @testable import Carezaar
 
 final class ChatSettingsTests: XCTestCase {
+    @MainActor
+    func testRejectedSendAndFailedRenewalNeverBecomeUncertainDelivery() async {
+        let tokens = FixtureTokens()
+        tokens.save(Session(accessToken: "original", refreshToken: "original-refresh"))
+        var methods: [String] = []
+        StubHTTP.handler = { request in
+            methods.append(request.httpMethod ?? "")
+            if request.url!.lastPathComponent == "refresh" { return (503, Data(#"{"message":"Service unavailable"}"#.utf8)) }
+            if request.httpMethod == "POST" { return (403, Data(#"{"message":"Expired access"}"#.utf8)) }
+            return (200, Data(#"{"result":{"id":42,"messages":[]}}"#.utf8))
+        }
+        let coordinator = ChatSendCoordinator(service: UserService(client: APIClient(tokens: tokens, session: StubHTTP.session())))
+        do { _ = try await coordinator.submit(chatId: 42, text: "Retain unsent draft", parentId: nil); XCTFail("Renewal failed") }
+        catch { XCTAssertEqual(Feedback.message(error), Feedback.message(APIError.server(""))) }
+        XCTAssertEqual(methods, ["POST", "PUT"], "An explicitly rejected Send needs no delivery reconciliation read")
+        XCTAssertFalse(coordinator.uncertain)
+        XCTAssertTrue(tokens.hasSession)
+    }
+
+    @MainActor
+    func testCancelledOldAccountSendNeverReconcilesUsingNewAccount() async {
+        let tokens = FixtureTokens()
+        tokens.save(Session(accessToken: "old-access", refreshToken: "old-refresh"))
+        var methods: [String] = []
+        StubHTTP.handler = { request in
+            methods.append(request.httpMethod ?? "")
+            if request.httpMethod == "POST" {
+                tokens.save(Session(accessToken: "new-account", refreshToken: "new-refresh"))
+                throw URLError(.networkConnectionLost)
+            }
+            return (200, Data(#"{"result":{"id":42,"messages":[{"id":101,"message":"Old draft","is_from_caregiver":false}]}}"#.utf8))
+        }
+        let coordinator = ChatSendCoordinator(service: UserService(client: APIClient(tokens: tokens, session: StubHTTP.session())))
+        do {
+            _ = try await coordinator.submit(chatId: 42, text: "Old draft", parentId: nil)
+            XCTFail("Old account Send must not complete using a new account read")
+        } catch is CancellationError { }
+        catch { XCTFail("Superseded Send must cancel") }
+        XCTAssertEqual(methods, ["POST"])
+        XCTAssertFalse(coordinator.uncertain)
+        XCTAssertEqual(tokens.accessToken, "new-account")
+    }
+
     func testViewportPreferenceDoesNotEraseMeasuredGeometryWithDefaultNil() {
         let measured = ChatViewportMetrics(contentBottom: 700, viewportHeight: 700)
         var value: ChatViewportMetrics?
@@ -95,25 +138,152 @@ final class ChatSettingsTests: XCTestCase {
                                createdAt: "2026-10-10 12:30", seenAt: nil)
     }
 
+    /// October 13 supersedes the old blanket uncertain-send blocking flow.
+    /// Historical October 12 results remain in the existing QA reports.
     @MainActor
-    func testLostMessageResponseBlocksRepeatUntilExplicitChoice() async {
+    func testLostMessageResponseReadsConversationAndConfirmsStoredMessageWithoutSecondPost() async throws {
+        var requests: [String] = []
+        StubHTTP.handler = { request in
+            let method = request.httpMethod ?? ""
+            requests.append(method)
+            XCTAssertEqual(request.url?.path, "/api/users/chats/42")
+            if method == "POST" { throw URLError(.networkConnectionLost) }
+            return (200, Data(#"{"result":{"id":42,"messages":[{"id":101,"message":"Keep my draft","is_from_caregiver":false}]}}"#.utf8))
+        }
+        let coordinator = ChatSendCoordinator(service: UserService(client: APIClient(tokens: FixtureTokens(), session: StubHTTP.session())))
+        let reconciled = try await coordinator.submit(chatId: 42, text: "Keep my draft", parentId: nil)
+        XCTAssertEqual(reconciled.messages.map(\.id), [101])
+        XCTAssertEqual(requests, ["POST", "GET"], "Read only after ambiguity, and never replay POST")
+        XCTAssertEqual(ChatDraftReconciliation.afterAcknowledgedSend(current: "Keep my draft", submitted: "Keep my draft"), "")
+    }
+
+    @MainActor
+    func testProvenPreconnectionFailureAllowsDeliberateSameDraftSendAfterRecovery() async throws {
+        var recovered = false
+        var attempts = 0, acknowledgements = 0, reads = 0
+        StubHTTP.handler = { request in
+            if request.httpMethod == "GET" {
+                reads += 1
+                return (200, Data(#"{"result":{"id":42,"messages":[]}}"#.utf8))
+            }
+            attempts += 1
+            guard recovered else { throw URLError(.cannotConnectToHost) }
+            acknowledgements += 1
+            return (200, Data(#"{"result":{"id":42,"messages":[{"id":101,"message":"Retry my draft","is_from_caregiver":false}]}}"#.utf8))
+        }
+        let coordinator = ChatSendCoordinator(service: UserService(client: APIClient(tokens: FixtureTokens(), session: StubHTTP.session())))
+        do { _ = try await coordinator.submit(chatId: 42, text: "Retry my draft", parentId: nil); XCTFail("Offline Send") } catch {}
+        XCTAssertEqual(acknowledgements, 0)
+        recovered = true
+        let full = try await coordinator.submit(chatId: 42, text: "Retry my draft", parentId: nil)
+        XCTAssertEqual(full.messages.first?.message, "Retry my draft")
+        XCTAssertEqual(acknowledgements, 1, "The later explicit user Send delivers once")
+        XCTAssertEqual(attempts, 5, "Four safe closed-connection attempts then one acknowledged intentional Send")
+        XCTAssertEqual(reads, 0, "Proven preconnection failure needs no outcome reconciliation or pre-send read")
+    }
+
+    @MainActor
+    func testAcknowledgedMessageSendsImmediatelyWithoutConversationRead() async throws {
+        var methods: [String] = []
+        StubHTTP.handler = { request in
+            methods.append(request.httpMethod ?? "")
+            return (200, Data(#"{"result":{"id":42,"messages":[{"id":101,"message":"Immediate","is_from_caregiver":false}]}}"#.utf8))
+        }
+        let coordinator = ChatSendCoordinator(service: UserService(client: APIClient(tokens: FixtureTokens(), session: StubHTTP.session())))
+        let full = try await coordinator.submit(chatId: 42, text: "Immediate", parentId: nil)
+        XCTAssertEqual(full.messages.first?.message, "Immediate")
+        XCTAssertEqual(methods, ["POST"], "Requirement 14 forbids a conversation read before normal Send")
+    }
+
+    @MainActor
+    func testAmbiguousMessageRequiresNewIDCorrectSenderAndExactReplyBeforeAcknowledgement() async throws {
+        let prior = ChatMessage(id: 100, parent: nil, message: "Repeated", createdAt: nil,
+                                updatedAt: nil, seenAt: nil, isFromCaregiver: false)
+        let mismatches = [
+            #"{"id":100,"message":"Repeated","is_from_caregiver":false}"#,
+            #"{"id":101,"message":"Repeated","is_from_caregiver":true}"#,
+            #"{"id":101,"message":"Repeated","is_from_caregiver":false,"parent":{"id":7,"message":"Parent","is_from_caregiver":true}}"#,
+            #"{"id":101,"message":"Different","is_from_caregiver":false}"#
+        ]
+        for wire in mismatches {
+            var methods: [String] = []
+            StubHTTP.handler = { request in
+                let method = request.httpMethod ?? ""; methods.append(method)
+                if method == "POST" { throw URLError(.networkConnectionLost) }
+                return (200, Data(("{\"result\":{\"id\":42,\"messages\":[" + wire + "]}}").utf8))
+            }
+            let coordinator = ChatSendCoordinator(service: UserService(client: APIClient(tokens: FixtureTokens(), session: StubHTTP.session())))
+            do {
+                _ = try await coordinator.submit(chatId: 42, text: "Repeated", parentId: nil, baseline: [prior])
+                XCTFail("An older message, other sender, other reply, or different text is not proof of this Send")
+            } catch {}
+            XCTAssertTrue(coordinator.uncertain)
+            XCTAssertEqual(methods, ["POST", "GET"])
+        }
+    }
+
+    @MainActor
+    func testUnresolvedMessageSurvivesDifferentSendAndLaterTapReadsWithoutReplay() async throws {
+        var methods: [String] = []
+        var stored = false
+        StubHTTP.handler = { request in
+            let method = request.httpMethod ?? ""; methods.append(method)
+            if method == "POST" {
+                if StubHTTP.body(request).contains("message=Uncertain") { throw URLError(.networkConnectionLost) }
+                return (200, Data(#"{"result":{"id":42,"messages":[{"id":102,"message":"Different","is_from_caregiver":false}]}}"#.utf8))
+            }
+            return (200, Data((stored
+                ? #"{"result":{"id":42,"messages":[{"id":101,"message":"Uncertain","is_from_caregiver":false}]}}"#
+                : #"{"result":{"id":42,"messages":[]}}"#).utf8))
+        }
+        let coordinator = ChatSendCoordinator(service: UserService(client: APIClient(tokens: FixtureTokens(), session: StubHTTP.session())))
+        do { _ = try await coordinator.submit(chatId: 42, text: "Uncertain", parentId: nil); XCTFail("Absent message") } catch {}
+        _ = try await coordinator.submit(chatId: 42, text: "Different", parentId: nil)
+        do { _ = try await coordinator.submit(chatId: 42, text: "Uncertain", parentId: nil); XCTFail("Still absent") } catch {}
+        XCTAssertEqual(methods, ["POST", "GET", "POST", "GET"], "Returning to the old draft cannot reset its unresolved outcome")
+        stored = true
+        let verified = try await coordinator.submit(chatId: 42, text: "Uncertain", parentId: nil)
+        XCTAssertEqual(verified.messages.first?.message, "Uncertain")
+        XCTAssertFalse(coordinator.uncertain)
+        XCTAssertEqual(methods, ["POST", "GET", "POST", "GET", "GET"])
+    }
+
+    @MainActor
+    func testFailedReconciliationReadPreservesOutcomeAndNeverRepostsSameDraft() async {
+        var posts = 0, reads = 0
+        StubHTTP.handler = { request in
+            if request.httpMethod == "POST" { posts += 1; throw URLError(.networkConnectionLost) }
+            reads += 1
+            return (503, Data(#"{"message":"Synthetic unavailable"}"#.utf8))
+        }
+        let coordinator = ChatSendCoordinator(service: UserService(client: APIClient(tokens: FixtureTokens(), session: StubHTTP.session())))
+        for _ in 0..<2 {
+            do { _ = try await coordinator.submit(chatId: 42, text: "Retained", parentId: nil); XCTFail("Unverified outcome") }
+            catch { XCTAssertFalse(Feedback.message(error).isEmpty) }
+        }
+        XCTAssertEqual(posts, 1)
+        XCTAssertEqual(reads, 2)
+        XCTAssertTrue(coordinator.uncertain)
+    }
+
+    @MainActor
+    func testConcurrentSendDoesNotQueueAnotherMessage() async throws {
+        let started = expectation(description: "first actual POST started")
         var posts = 0
         StubHTTP.handler = { request in
             XCTAssertEqual(request.httpMethod, "POST")
             posts += 1
-            throw URLError(.networkConnectionLost)
+            started.fulfill()
+            Thread.sleep(forTimeInterval: 0.25)
+            return (200, Data(#"{"result":{"id":42,"messages":[{"id":101,"message":"First","is_from_caregiver":false}]}}"#.utf8))
         }
         let coordinator = ChatSendCoordinator(service: UserService(client: APIClient(tokens: FixtureTokens(), session: StubHTTP.session())))
-        do { _ = try await coordinator.submit(chatId: 42, text: "Keep my draft", parentId: nil); XCTFail("Lost response") }
-        catch {}
-        XCTAssertTrue(coordinator.uncertain, "A lost response cannot prove message rejection")
-        do { _ = try await coordinator.submit(chatId: 42, text: "Keep my draft", parentId: nil) }
-        catch {}
-        XCTAssertEqual(posts, 1, "Repeating Send must not silently duplicate a potentially committed POST")
-        coordinator.allowExplicitRetry()
-        do { _ = try await coordinator.submit(chatId: 42, text: "Keep my draft", parentId: nil) }
-        catch {}
-        XCTAssertEqual(posts, 2, "Only an explicit duplicate-risk acknowledgement permits another attempt")
+        let first = Task { try await coordinator.submit(chatId: 42, text: "First", parentId: nil) }
+        await fulfillment(of: [started], timeout: 2)
+        do { _ = try await coordinator.submit(chatId: 42, text: "Second", parentId: nil); XCTFail("Second Send must not queue") } catch {}
+        let acknowledged = try await first.value
+        XCTAssertEqual(acknowledged.messages.first?.message, "First")
+        XCTAssertEqual(posts, 1)
     }
 
     @MainActor
@@ -232,4 +402,80 @@ final class ChatSettingsTests: XCTestCase {
         XCTAssertFalse(replies.canClear(noReply, currentParentId: 9))
     }
 
+}
+
+/// R3: public coordinators, actual UserService/AuthService/APIClient transport,
+/// controlled responses only. This class never contacts production.
+@MainActor
+final class SettingsMutationReconciliationTests: XCTestCase {
+    func testLostIssueAcknowledgementFindsOnlyNewExactIssueWithoutRepeatingCreate() async throws {
+        let tokens = FixtureTokens()
+        tokens.save(Session(accessToken: "fixture", refreshToken: "fixture-refresh"))
+        let draft = IssueSubmissionDraft(issuetypeId: nil, title: "Synthetic issue", description: "Synthetic description")
+        let prior = Issue(id: 101, issuetypeId: nil, title: draft.title, description: draft.description,
+                          reply: nil, createdAt: nil, repliedAt: nil, isReplied: false)
+        var posts = 0, reads = 0
+        StubHTTP.handler = { request in
+            XCTAssertEqual(request.url?.path, "/api/users/issues")
+            if request.httpMethod == "POST" {
+                posts += 1
+                throw URLError(.networkConnectionLost)
+            }
+            XCTAssertEqual(request.httpMethod, "GET")
+            reads += 1
+            return (200, Data(#"{"result":[{"id":101,"title":"Synthetic issue","description":"Synthetic description","is_replied":false},{"id":102,"title":"Synthetic issue","description":"Synthetic description","is_replied":false}]}"#.utf8))
+        }
+        let coordinator = IssueSubmissionCoordinator(service: UserService(client: APIClient(tokens: tokens, session: StubHTTP.session())))
+        do {
+            let created = try await coordinator.submit(draft, baseline: [prior])
+            XCTAssertEqual(created.id, 102, "An old identical issue must never confirm this request")
+        } catch { XCTFail("A new exact issue confirms the lost acknowledgement; no error expected") }
+        XCTAssertEqual(posts, 1, "Never repeat issue creation after an uncertain response")
+        XCTAssertEqual(reads, 1, "Use one authoritative read for reconciliation")
+        XCTAssertTrue(tokens.hasSession)
+    }
+
+    func testPredefinedIssueReconciliationUsesSubmittedTypeAndDescriptionNotGeneratedTitle() async throws {
+        let tokens = FixtureTokens()
+        tokens.save(Session(accessToken: "fixture", refreshToken: "fixture-refresh"))
+        StubHTTP.handler = { request in
+            if request.httpMethod == "POST" { throw URLError(.networkConnectionLost) }
+            return (200, Data(#"{"result":[{"id":102,"issuetype_id":7,"title":"Server category caption","description":"Synthetic description","is_replied":false}]}"#.utf8))
+        }
+        let coordinator = IssueSubmissionCoordinator(service: UserService(client: APIClient(tokens: tokens, session: StubHTTP.session())))
+        let draft = IssueSubmissionDraft(issuetypeId: 7, title: nil, description: "Synthetic description")
+        let saved = try await coordinator.submit(draft, baseline: [])
+        XCTAssertEqual(saved.id, 102)
+        XCTAssertEqual(saved.issuetypeId, 7)
+    }
+
+    func testLostDeletionAcknowledgementAndRejectedSessionClearsLocalStateWithoutAnotherDelete() async throws {
+        let tokens = FixtureTokens()
+        tokens.save(Session(accessToken: "fixture", refreshToken: "fixture-refresh"))
+        var deletes = 0, reads = 0
+        StubHTTP.handler = { request in
+            switch request.url!.path {
+            case "/api/users":
+                XCTAssertEqual(request.httpMethod, "DELETE")
+                deletes += 1
+                throw URLError(.networkConnectionLost)
+            case "/api/auth/info":
+                reads += 1
+                if reads == 1 { return (200, Data(#"{"result":{"id":"fixture-owner","role":"client"}}"#.utf8)) }
+                return (403, Data(#"{"message":"Valid JWT token is required!"}"#.utf8))
+            case "/api/auth/refresh":
+                return (403, Data(#"{"message":"Refresh credential rejected"}"#.utf8))
+            default: XCTFail("Unexpected deletion request"); return (500, Data())
+            }
+        }
+        let manager = SessionManager(auth: AuthService(client: APIClient(tokens: tokens, session: StubHTTP.session())), tokens: tokens)
+        await manager.restore()
+        XCTAssertEqual(manager.state.user?.id, "fixture-owner")
+        do { try await manager.deleteAccount(reasonId: 1) }
+        catch { XCTFail("Rejected saved session after uncertain deletion must finish local deletion flow") }
+        XCTAssertEqual(deletes, 1)
+        XCTAssertEqual(reads, 2, "Verify the session read-only after losing acknowledgement")
+        XCTAssertEqual(manager.state, .signedOut)
+        XCTAssertFalse(tokens.hasSession)
+    }
 }

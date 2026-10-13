@@ -4,20 +4,70 @@ import XCTest
 @MainActor
 final class FeedbackTests: XCTestCase {
     func testCommonFailuresNeverShowRawImplementationWording() {
-        for error in [APIError.unknown("Database lookup failed"), .validation(message: "Internal query failed", fields: [:]), .server("Internal query failed"), .notFound("No row in database")] {
-            XCTAssertEqual(Feedback.message(error), "This isn't working right now. Please try again later.")
+        for error in [APIError.unknown("Database lookup failed"), .validation(message: "Internal query failed", fields: [:]), .server("Internal query failed")] {
+            XCTAssertEqual(Feedback.message(error), "Something went wrong. Please try again.")
         }
-        XCTAssertEqual(Feedback.message(APIError.unauthenticated("Valid JWT token is required!")), "Your session has expired. Please sign in again.")
+        XCTAssertEqual(Feedback.message(APIError.unauthenticated("Valid JWT token is required!")), "You can't do this right now.")
     }
+    func testManagedErrorCategoriesUseActualCMSKeysWithoutObsoleteSuffixes() {
+        let original = Feedback.translate
+        defer { Feedback.translate = original }
+        Feedback.translate = { key, _ in "managed:\(key)" }
+        for error in [APIError.network("offline"), .timeout] {
+            XCTAssertEqual(Feedback.message(error), "managed:general_network_title")
+        }
+        XCTAssertEqual(Feedback.message(APIError.unauthenticated("JWT required")), "managed:general_error_forbidden")
+        XCTAssertEqual(Feedback.message(APIError.notFound("Missing row")), "managed:general_error_not_found")
+        for error in [APIError.server("query failed"), .unknown("raw fault"), .decoding("invalid JSON"),
+                      .validation(message: "raw fault", fields: [:])] {
+            XCTAssertEqual(Feedback.message(error), "managed:general_error_general")
+        }
+        XCTAssertEqual(Feedback.unavailable("Change Password"), "managed:general_error_forbidden")
+        XCTAssertEqual(APIError.server("Internal query failed").message, "managed:general_error_general")
+    }
+
+    func testMissingManagedErrorEntriesKeepCanonicalCategoryFallbacks() {
+        let original = Feedback.translate
+        defer { Feedback.translate = original }
+        let loc = Localization()
+        loc.languageId = 3
+        Feedback.translate = { loc.t($0, $1) }
+        XCTAssertEqual(Feedback.message(APIError.network("offline")), "Cannot communicate with server.")
+        XCTAssertEqual(Feedback.message(APIError.timeout), "Cannot communicate with server.")
+        XCTAssertEqual(Feedback.message(APIError.notFound("raw fault")), "This item is no longer available.")
+        XCTAssertEqual(Feedback.unavailable("Report Issue"), "You can't do this right now.")
+    }
+
+    func testManagedErrorLanguageSwitchUsesEverySupportedLanguage() throws {
+        let original = Feedback.translate
+        defer { Feedback.translate = original }
+        let keys = ["general_network_title", "general_error_forbidden", "general_error_not_found", "general_error_general"]
+        let rows: [[String: Any]] = keys.enumerated().map { index, key in
+            ["id": index + 1, "slug": key, "translations": (1...8).map {
+                ["id": index * 8 + $0, "language_id": $0, "name": "language\($0):\(key)"] as [String: Any]
+            }]
+        }
+        let loc = Localization()
+        loc.apply(try JSONDecoder().decode([BaseItem].self, from: JSONSerialization.data(withJSONObject: rows)))
+        Feedback.translate = { loc.t($0, $1) }
+        for language in 1...8 {
+            loc.languageId = language
+            XCTAssertEqual(Feedback.message(APIError.timeout), "language\(language):general_network_title")
+            XCTAssertEqual(Feedback.message(APIError.unauthenticated("raw")), "language\(language):general_error_forbidden")
+            XCTAssertEqual(Feedback.message(APIError.notFound("raw")), "language\(language):general_error_not_found")
+            XCTAssertEqual(Feedback.message(APIError.server("raw")), "language\(language):general_error_general")
+        }
+    }
+
     func testUsefulFieldValidationIsPreservedAndStable() {
         XCTAssertEqual(Feedback.message(APIError.validation(message: "Invalid input", fields: ["email": ["Please enter a valid email."]])), "Please enter a valid email.")
-        XCTAssertEqual(Feedback.message(APIError.validation(message: "Invalid input", fields: ["email": ["SQLSTATE internal"]])), "This isn't working right now. Please try again later.")
+        XCTAssertEqual(Feedback.message(APIError.validation(message: "Invalid input", fields: ["email": ["SQLSTATE internal"]])), "Something went wrong. Please try again.")
     }
 
     func testRouteReferenceValidationUsesManagedGeneralError() {
         for field in ["id", "partner_id", "chat_id", "match_id", "user_id"] {
             let error = APIError.validation(message: "Invalid reference", fields: [field: ["The selected id is invalid."]])
-            XCTAssertEqual(Feedback.message(error), "This isn't working right now. Please try again later.", field)
+            XCTAssertEqual(Feedback.message(error), "Something went wrong. Please try again.", field)
         }
     }
 
@@ -55,7 +105,7 @@ final class FeedbackTests: XCTestCase {
             "password": ["Undefined variable in reset.php"],
             "id": ["The selected id is invalid."], "chat_id": ["Unauthorized value."]
         ])
-        XCTAssertEqual(Feedback.message(error), "This isn't working right now. Please try again later.")
+        XCTAssertEqual(Feedback.message(error), "Something went wrong. Please try again.")
     }
 
     func testOTPInlineNeverAllowsServiceOrTechnicalErrorsToBypassCommonCopy() {

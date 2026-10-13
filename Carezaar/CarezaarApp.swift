@@ -44,12 +44,14 @@ enum StartupDestination: Equatable {
 /// session state, the way the Android `Splash` route and `AppNavHost` do.
 struct CarezaarRoot: View {
     @StateObject private var session = SessionManager()
+    @StateObject private var recovery = SessionRecoveryCoordinator.shared
     @StateObject private var router = AppRouter()
     @StateObject private var baseData = BaseDataStore()
     @StateObject private var signUp = SignUpFlow()
     @StateObject private var language = AppLanguage.shared
     @StateObject private var feedback = Feedback()
     @StateObject private var poller = NotificationPoller()
+    @Environment(\.scenePhase) private var scenePhase
 
     /// `--qa-route <identifier>` opens a single screen at launch so every route can
     /// be captured for review without driving the UI. Debug builds only.
@@ -91,6 +93,14 @@ struct CarezaarRoot: View {
         }
         // Inside the environment objects below: the overlay reads Feedback and Localization.
         .feedbackOverlay()
+        .alert(baseData.localization.t("general_session_renewal_title", "Connection Problem"),
+               isPresented: Binding(get: { recovery.isPresented }, set: { _ in })) {
+            Button(baseData.localization.t("general_retry", "Retry")) { recovery.retry() }
+        } message: {
+            Text(baseData.localization.t("general_session_renewal_message",
+                "We could not reach the server to renew your sign-in. Please check your internet connection and try again."))
+        }
+
         #if DEBUG
         .overlay(alignment: .topTrailing) { QARequestCountsView() }
         #endif
@@ -107,12 +117,26 @@ struct CarezaarRoot: View {
         .environmentObject(poller)
         .preferredColorScheme(.light)
         // Android's 30 s notification poll runs while signed in.
-        .onChange(of: session.state.user?.id, initial: true) { _, id in
-            if id != nil {
+        .onChange(of: session.state.user?.id, initial: true) { previous, id in
+            recovery.configure(signedIn: id != nil)
+            if id == nil {
+                poller.stop()
+            } else if previous != nil, previous != id {
+                poller.stop()
                 let loc = baseData.localization
                 poller.start { slug, fallback in loc.t(slug, fallback) }
-            } else {
-                poller.stop()
+            }
+            // Initial polling starts in MainView.onAppear, never while saved
+            // session or reference loading still holds the app on Splash.
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .background {
+                poller.pause()
+            } else if phase == .active,
+                      StartupDestination.resolve(state: session.state, referencesReady: baseData.isReady,
+                                                 savedSessionRejected: session.savedSessionRejected) == .main {
+                let loc = baseData.localization
+                poller.start { slug, fallback in loc.t(slug, fallback) }
             }
         }
         .onChange(of: poller.openNotificationsRequested) { _, requested in

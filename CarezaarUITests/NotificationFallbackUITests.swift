@@ -18,6 +18,32 @@ final class NotificationFallbackUITests: XCTestCase {
         try verifyFallback(kind: "chat")
     }
 
+    func testNotificationDetailsContainOnlyContentAndShowAndBackdropDismisses() throws {
+        let f = try fixture(kind: "person")
+        app.launchEnvironment["QA_EMAIL"] = env["QA_EMAIL"]
+        app.launchEnvironment["QA_PASSWORD"] = env["QA_PASSWORD"]
+        app.launchArguments = ["--qa-signout", "--qa-login-env", "--qa-request-counts", "--qa-push", "Notifications",
+            "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
+        app.launch()
+        let row = app.buttons["notification-row-\(f.id)"]
+        XCTAssertTrue(row.waitForExistence(timeout: 60))
+        let ready = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in row.isHittable }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 20), .completed)
+        row.tap()
+        let detail = app.scrollViews["notification-detail"]
+        XCTAssertTrue(detail.waitForExistence(timeout: 10))
+        XCTAssertFalse(detail.staticTexts[f.title].exists, "R11 removes the Notifications modal title")
+        XCTAssertEqual(detail.buttons.count, 1, "R11 allows only Show; no explicit close control")
+        XCTAssertTrue(detail.staticTexts[f.subject].exists)
+        XCTAssertEqual(detail.buttons["notification-show"].label, f.show)
+        let backdrop = app.buttons["notification-dismiss-backdrop"]
+        XCTAssertTrue(backdrop.exists && backdrop.isHittable)
+        backdrop.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.05)).tap()
+        XCTAssertTrue(detail.waitForNonExistence(timeout: 5))
+        XCTAssertTrue(row.exists && row.isHittable)
+        XCTAssertEqual(destinationGETs(), 0)
+    }
+
     private func verifyFallback(kind: String) throws {
         let f = try fixture(kind: kind) // identity proof precedes any UI seen PATCH
         app.launchEnvironment["QA_EMAIL"] = env["QA_EMAIL"]
@@ -41,13 +67,12 @@ final class NotificationFallbackUITests: XCTestCase {
         row.tap()
         XCTAssertTrue(detail.waitForExistence(timeout: 10))
         XCTAssertTrue(detail.staticTexts[f.subject].exists, "Exact independently translated subject required")
-        XCTAssertTrue(detail.staticTexts[f.title].exists)
+        XCTAssertFalse(detail.staticTexts[f.title].exists)
         XCTAssertEqual(show.label, f.show)
         XCTAssertTrue(show.isEnabled)
-        let cancel = detail.buttons[f.cancel]
-        XCTAssertTrue(cancel.exists && cancel.isHittable)
-        controlProof(cancel, "notification-missing-\(kind)-cancel-only")
-        cancel.tap()
+        let backdrop = app.buttons["notification-dismiss-backdrop"]
+        XCTAssertTrue(backdrop.exists && backdrop.isHittable)
+        backdrop.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.05)).tap()
         XCTAssertTrue(detail.waitForNonExistence(timeout: 10))
         XCTAssertTrue(row.exists && row.isHittable)
         XCTAssertEqual(destinationGETs(), 0)
@@ -68,7 +93,7 @@ final class NotificationFallbackUITests: XCTestCase {
         XCTAssertLessThanOrEqual(count("PATCH /api/users/notifications/\(f.id)/see"), f.wasSeen ? 0 : 1)
         let data = try JSONSerialization.data(withJSONObject: ["role": f.role, "kind": kind,
             "exactOwnedPreflight": true, "existingFirstPageNotification": true,
-            "actualHTTP200ScopedTargetRemoval": true, "cancelStayedOnNotifications": true,
+            "actualHTTP200ScopedTargetRemoval": true, "outsideDismissStayedOnNotifications": true,
             "showDismissedMissingTarget": true, "destinationGETs": destinationGETs(),
             "physicalNetworkOrDeletedBackendPerson": false], options: [.sortedKeys])
         let proof = XCTAttachment(data: data, uniformTypeIdentifier: "public.json")

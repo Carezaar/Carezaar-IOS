@@ -1,0 +1,16 @@
+{
+  "scope": "Anonymous scoped October13 verification. Result bundles retained privately; counts inspected with xcresulttool. Historical failures and skips included. Source anchor does not retroactively certify earlier builds.",
+  "reviewStatus": "APPROVED: independent standards review verified artifact hashes, exact xcresult counts, all 284 source hashes, Release markers/binary/scene and privacy. Root verified executed scope; full QA remains unfinished.",
+  "artifacts": [
+    {
+      "path": "production-source-anchor.json",
+      "sha256": "8cd000a11da6c50c125128b4c659195920c33983279bfed0b370253347e2944b",
+      "bytes": 45491
+    },
+    {
+      "path": "summary.json",
+      "sha256": "707e47086bc05b35ce302d2c1b427da6797d415ee0790f5b3bfaa39b1f6e94b9",
+      "bytes": 3364
+    }
+  ]
+}

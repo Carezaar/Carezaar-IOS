@@ -31,8 +31,14 @@ final class SessionManager: ObservableObject {
 
     private let auth: AuthService
     private let tokens: any SessionTokenStorage
+    private var deleting = false
+    private var pendingDeletion: (revision: Int, generation: UUID, error: Error)?
+    private var restoring = false
     private var authRevision = 0
     private var passwordHandoff: (id: UUID, revision: Int)?
+    // Memory only: retain the original candidate while its write is uncertain.
+    // Later confirmations probe this outcome instead of sending another PATCH.
+    private var pendingPassword: (revision: Int, generation: UUID, user: User, candidate: String, error: Error)?
     @Published private(set) var savedSessionRejected = false
     private var cancellables = Set<AnyCancellable>()
 
@@ -57,6 +63,10 @@ final class SessionManager: ObservableObject {
 
     /// Splash behaviour: token present ⇒ fetch `auth/info`, else straight to Intro.
     func restore() async {
+        guard !restoring else { return }
+        restoring = true
+        defer { restoring = false }
+        errorMessage = nil
         let revision = authRevision
         guard tokens.hasSession else {
             if tokens.accessToken != nil || tokens.refreshToken != nil {
@@ -72,16 +82,23 @@ final class SessionManager: ObservableObject {
             apply(user)
         } catch {
             guard revision == authRevision else { return }
-            // Unverifiable launch credentials never authorize this or a later launch.
-            tokens.clear()
-            savedSessionRejected = true
-            state = .signedOut
+            // A temporary failure does not establish that the saved sign-in is
+            // invalid. Keep credentials behind the startup gate until Retry can
+            // verify them; only explicit authentication rejection ends a session.
+            if case APIError.unauthenticated = error {
+                tokens.clear()
+                savedSessionRejected = true
+                state = .signedOut
+            } else if !(error is CancellationError) {
+                errorMessage = Feedback.message(error)
+            }
         }
     }
 
     func retry() async { state = .loading; await restore() }
 
     func signIn(email: String, password: String) async throws {
+        pendingPassword = nil
         authRevision += 1
         let revision = authRevision
         let pair = try await auth.login(email: email, password: password)
@@ -108,15 +125,14 @@ final class SessionManager: ObservableObject {
         }
     }
 
-    /// The change endpoint returns no JWTs and may revoke the old pair. Keep the
-    /// settings graph during a narrowly scoped, verified same-account handoff.
+    /// A confirmed password change ends the current session. The next sign-in
+    /// belongs to the user; no background login or replacement pair is installed.
     func changePassword(current: String, new: String) async throws {
         guard let original = state.user, tokens.hasSession, passwordHandoff == nil else {
             throw APIError.unauthenticated("")
         }
-        let revision = authRevision, operation = UUID()
+        let revision = authRevision, generation = tokens.generation, operation = UUID()
         passwordHandoff = (operation, revision)
-        var acknowledged = false
         defer {
             if passwordHandoff?.id == operation { passwordHandoff = nil }
             if revision == authRevision, !tokens.hasSession {
@@ -128,51 +144,40 @@ final class SessionManager: ObservableObject {
         func checkOwner() throws {
             guard revision == authRevision, passwordHandoff?.id == operation else { throw CancellationError() }
         }
-        func checkIdentity(_ user: User) throws {
-            guard user.id == original.id, user.role == original.role,
-                  user.email == original.email else {
-                throw APIError.unauthenticated("Could not verify the changed-password account.")
-            }
-        }
-        do {
-            try await UserService(client: auth.client).changePassword(oldPassword: current, newPassword: new)
-            acknowledged = true
-            try checkOwner()
+        func reconcile(user: User, candidate: String, originalError: Error) async throws {
+            let pair: Session
             do {
-                let verified = try await auth.currentUser()
+                pair = try await auth.login(email: user.email, password: candidate)
                 try checkOwner()
-                try checkIdentity(verified)
-                guard tokens.hasSession else { throw APIError.unauthenticated("") }
-                apply(verified)
-                return
-            } catch is CancellationError {
-                throw CancellationError()
+                guard !pair.accessToken.isEmpty, !pair.refreshToken.isEmpty else { throw APIError.decoding("") }
+                let verified = try await auth.client.verifyUser(accessToken: pair.accessToken)
+                try checkOwner()
+                guard verified.id == user.id, verified.role == user.role,
+                      verified.email == user.email else { throw APIError.unauthenticated("") }
             } catch {
-                // Old credentials may be revoked, or their read unverifiable.
-                // Obtain genuine replacement credentials using the accepted input.
                 try checkOwner()
+                throw originalError
             }
-            let pair = try await auth.login(email: original.email, password: new)
+            await auth.logout(accessToken: pair.accessToken)
             try checkOwner()
-            guard !pair.accessToken.isEmpty, !pair.refreshToken.isEmpty else {
-                throw APIError.decoding("Login did not return valid credentials.")
-            }
-            let verified = try await auth.client.verifyUser(accessToken: pair.accessToken)
-            try checkOwner()
-            try checkIdentity(verified)
-            // Unverified credentials never enter shared storage or reach pollers.
-            tokens.save(pair)
-            apply(verified)
-        } catch {
-            try checkOwner()
-            if acknowledged || !tokens.hasSession {
-                tokens.clear()
-                savedSessionRejected = true
-                authRevision += 1
-                state = .signedOut
-            }
-            throw error
         }
+        if let pending = pendingPassword, pending.revision == revision, pending.generation == generation {
+            try await reconcile(user: pending.user, candidate: pending.candidate, originalError: pending.error)
+        } else {
+            pendingPassword = nil
+            do {
+                try await UserService(client: auth.client).changePassword(oldPassword: current, newPassword: new, ifGeneration: generation)
+            } catch {
+                try checkOwner()
+                guard MutationOutcome.mayHaveCommitted(error) else { throw error }
+                pendingPassword = (revision, generation, original, new, error)
+                // Isolated authentication proves acceptance; it never installs
+                // credentials or turns into an automatic background sign-in.
+                try await reconcile(user: original, candidate: new, originalError: error)
+            }
+        }
+        try checkOwner()
+        await signOut()
     }
 
     func refreshUser() async {
@@ -194,6 +199,7 @@ final class SessionManager: ObservableObject {
     }
 
     func signOut() async {
+        pendingPassword = nil
         let oldAccess = tokens.accessToken
         authRevision += 1
         tokens.clear()
@@ -201,7 +207,61 @@ final class SessionManager: ObservableObject {
         await auth.logout(accessToken: oldAccess)
     }
 
+    /// The session owning a deletion request is the only session it may end.
+    /// Once the write is uncertain, later taps can verify only, never repeat DELETE.
+    func deleteAccount(reasonId: Int) async throws {
+        guard state.user != nil, tokens.hasSession else { throw APIError.unauthenticated("") }
+        guard !deleting else { throw APIError.unknown("") }
+        deleting = true
+        defer { deleting = false }
+        let revision = authRevision, generation = tokens.generation
+        func checkOwner() throws {
+            guard revision == authRevision, generation == tokens.generation else { throw CancellationError() }
+        }
+        func endRejectedOwner() throws {
+            guard !tokens.hasSession else { throw CancellationError() }
+            if revision == authRevision {
+                endDeletedSession()
+            } else if !(authRevision == revision + 1 && state == .signedOut && savedSessionRejected) {
+                throw CancellationError()
+            }
+        }
+        func reconcile(_ originalError: Error) async throws {
+            do {
+                _ = try await auth.currentUser(ifGeneration: generation)
+            } catch APIError.unauthenticated {
+                try endRejectedOwner()
+                return
+            } catch {
+                try checkOwner()
+                throw originalError
+            }
+            try checkOwner()
+            throw originalError
+        }
+        if let pendingDeletion, pendingDeletion.revision == revision, pendingDeletion.generation == generation {
+            try await reconcile(pendingDeletion.error)
+            return
+        }
+        do {
+            try await UserService(client: auth.client).deleteAccount(reasonId: reasonId, ifGeneration: generation)
+        } catch APIError.unauthenticated {
+            try endRejectedOwner()
+            return
+        } catch is CancellationError { throw CancellationError() }
+        catch {
+            try checkOwner()
+            guard MutationOutcome.mayHaveCommitted(error) else { throw error }
+            pendingDeletion = (revision, generation, error)
+            try await reconcile(error)
+            return
+        }
+        try checkOwner()
+        endDeletedSession()
+    }
+
     func endDeletedSession() {
+        pendingDeletion = nil
         authRevision += 1
         tokens.clear()
         state = .signedOut
@@ -211,5 +271,67 @@ final class SessionManager: ObservableObject {
         // One signed-in state whatever `status` says: there is no verification step.
         savedSessionRejected = false
         state = .signedIn(user)
+    }
+}
+
+/// One recovery presentation for all interrupted calls in the current sign-in.
+/// The root controls eligibility so startup uses its own Try Again gate.
+@MainActor
+final class SessionRecoveryCoordinator: ObservableObject {
+    static let shared = SessionRecoveryCoordinator()
+    @Published private(set) var isPresented = false
+    private let tokens: any SessionTokenStorage
+    private var enabled = false
+    private struct Waiter {
+        let generation: UUID
+        let continuation: CheckedContinuation<Bool, Error>
+    }
+    private var waiters: [UUID: Waiter] = [:]
+
+    init(tokens: any SessionTokenStorage = TokenStore.shared) { self.tokens = tokens }
+
+    func configure(signedIn: Bool) {
+        enabled = signedIn
+        let obsolete = waiters.filter { !signedIn || !tokens.hasSession || $0.value.generation != tokens.generation }.map(\.key)
+        for id in obsolete { cancel(id) }
+    }
+
+    func waitForRetry(generation: UUID) async throws -> Bool {
+        guard enabled else { return false }
+        guard tokens.hasSession, tokens.generation == generation else { throw CancellationError() }
+        let id = UUID()
+        return try await withTaskCancellationHandler(operation: {
+            try Task.checkCancellation()
+            return try await withCheckedThrowingContinuation { continuation in
+                guard !Task.isCancelled else { continuation.resume(throwing: CancellationError()); return }
+                guard enabled, tokens.hasSession, tokens.generation == generation else {
+                    continuation.resume(returning: false); return
+                }
+                waiters[id] = Waiter(generation: generation, continuation: continuation)
+                if !isPresented { isPresented = true }
+            }
+        }, onCancel: {
+            Task { @MainActor [weak self] in self?.cancel(id) }
+        })
+    }
+
+    func retry() {
+        let waiting = waiters
+        waiters.removeAll()
+        if isPresented { isPresented = false }
+        for waiter in waiting.values {
+            if enabled, tokens.hasSession, waiter.generation == tokens.generation {
+                waiter.continuation.resume(returning: true)
+            } else {
+                waiter.continuation.resume(throwing: CancellationError())
+            }
+        }
+    }
+
+    private func cancel(_ id: UUID) {
+        guard let waiter = waiters.removeValue(forKey: id) else { return }
+        waiter.continuation.resume(throwing: CancellationError())
+        let stillWaiting = !waiters.isEmpty
+        if isPresented != stillWaiting { isPresented = stillWaiting }
     }
 }

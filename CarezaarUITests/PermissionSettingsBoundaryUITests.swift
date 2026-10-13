@@ -1,6 +1,6 @@
 import XCTest
 
-/// Representative real simulator OS permission checks. Each fresh-decision method
+/// Representative real simulator OS permission and accessibility checks. Each fresh-decision method
 /// needs its own fresh isolated simulator; the decided-state method reuses only
 /// that task's previously decided device. No TCC edits, permission mocks, GPS,
 /// camera, uploads, remote push delivery, or four-allocation coverage claim.
@@ -137,8 +137,6 @@ final class PermissionSettingsBoundaryUITests: XCTestCase {
         next.tap()
         let second = app.staticTexts[try text(owner.role == "client" ? "signup_form_client_tell_us_about_needs" : "signup_form_caregiver_skill_title")]
         XCTAssertTrue(second.waitForExistence(timeout: 15)); next.tap()
-        let guidance = app.staticTexts["Location is unavailable. You can continue and choose a location before saving."].firstMatch
-        try reveal(guidance); proof(guidance, "actual-location-denied-schedule-guidance-only")
         let row = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", try text("signup_form_client_location_hint"))).firstMatch
         try reveal(row); row.tap()
         XCTAssertTrue(app.maps.firstMatch.waitForExistence(timeout: 15))
@@ -146,7 +144,7 @@ final class PermissionSettingsBoundaryUITests: XCTestCase {
         let proceed = try requireVisible(app.buttons[try text("general_continue")].firstMatch)
         XCTAssertTrue(proceed.isEnabled); proof(proceed, "actual-location-denied-map-continue-only"); proceed.tap()
         XCTAssertTrue(app.maps.firstMatch.waitForNonExistence(timeout: 10))
-        try reveal(guidance)
+        XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Location is unavailable.")).firstMatch.exists)
         XCTAssertEqual(app.buttons.matching(NSPredicate(format: "label MATCHES %@", ".*-?[0-9]+\\.[0-9]{6} , -?[0-9]+\\.[0-9]{6}.*")).count, 0)
         let mutations = app.staticTexts["qa-request-counts"].label.split(separator: "\n").filter {
             $0.contains(" /api/clients") || $0.contains(" /api/caregivers")
@@ -160,6 +158,116 @@ final class PermissionSettingsBoundaryUITests: XCTestCase {
         try record("actual-os-location-denied-native", ["role": owner.role, "nativeSettingsNeverObserved": true,
             "controlledLocationFixtureUsed": false, "mapContinuedWithoutSelection": true,
             "profileMutationRequests": 0, "physicalGPSVerified": false, "validSaveAttempted": false])
+    }
+
+    /// Uses only root's exact marker-owned ACTIVE pair. Native Settings supplies
+    /// Reduced Motion; no launch argument or location fixture simulates this flag.
+    /// Root restores its staged relationship after this read-only UI check.
+    func testActualOSReducedMotionMatchedCardsAndNavigation() throws {
+        let owner = try ownedFixture()
+        guard env["QA_OWNED_MATCH_MOTION"] == "1",
+              let edge = env["QA_MATCH_EDGE"], let marker = env["QA_MATCH_MARKER"],
+              !edge.isEmpty, !marker.isEmpty else {
+            throw XCTSkip("Requires root's exact marker-owned active relationship")
+        }
+        let response = try CarezaarAPI.callWithHTTPStatus("GET", "users/matches/\(edge)", token: owner.token)
+        XCTAssertEqual(response.status, 200)
+        let relation = try XCTUnwrap(response.body["result"] as? [String: Any])
+        func userID(_ role: String) -> String? {
+            ((relation[role] as? [String: Any])?["user"] as? [String: Any])?["id"].map { String(describing: $0) }
+        }
+        guard relation["introduction"] as? String == marker,
+              userID("client") == env["QA_CLIENT_USER_ID"], userID("caregiver") == env["QA_CG_ID"] else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        let peer = try XCTUnwrap(env[owner.role == "client" ? "QA_CG_ID" : "QA_CLIENT_USER_ID"])
+        let endpoint = (owner.role == "client" ? "clients/caregivers/" : "caregivers/clients/") + peer
+        let current = try CarezaarAPI.callWithHTTPStatus("GET", endpoint, token: owner.token)
+        XCTAssertEqual(current.status, 200)
+        XCTAssertEqual((current.body["result"] as? [String: Any])?["match_status"] as? String, "active")
+
+        settings.launch()
+        try returnSettingsToRoot()
+        try tapSettingsRow("Accessibility")
+        try tapSettingsRow("Motion")
+        let toggle = try requireVisible(settings.switches["Reduce Motion"])
+        let original = try switchState(toggle)
+        proof(toggle, "motion-original-native-setting-only")
+        addTeardownBlock { [self] in
+            settings.activate()
+            let restored = try requireVisible(settings.switches["Reduce Motion"])
+            if try switchState(restored) != original {
+                restored.coordinate(withNormalizedOffset: CGVector(dx: 0.95, dy: 0.5)).tap()
+            }
+            try waitSwitch(restored, equals: original)
+            proof(restored, "motion-restored-native-setting-only")
+        }
+        if !original {
+            // The observed native Settings screenshot exposes a wide AX row;
+            // its switch is on the right. Tapping the title does not toggle it.
+            toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.95, dy: 0.5)).tap()
+            try waitSwitch(toggle, equals: true)
+        }
+        proof(toggle, "motion-enabled-native-setting-only")
+        let route = "Matched/\(owner.role == "client" ? "caregivers" : "clients")/\(peer)"
+        launchOwned(extra: ["--qa-push", route, "--qa-push-delay", "10"])
+        let own = app.descendants(matching: .any).matching(identifier: "matched-self-photo-card").firstMatch
+        let other = app.descendants(matching: .any).matching(identifier: "matched-partner-photo-card").firstMatch
+        XCTAssertTrue(own.waitForExistence(timeout: 60) && other.exists)
+        var previous: (CGRect, CGRect)?
+        var stable = 0
+        let readyPredicate = NSPredicate { _, _ in
+            let frames = (own.frame, other.frame)
+            if let previous,
+               abs(frames.0.midX - previous.0.midX) < 0.5,
+               abs(frames.1.midX - previous.1.midX) < 0.5 { stable += 1 }
+            else { stable = 0 }
+            previous = frames
+            return stable >= 3 && own.isHittable && other.isHittable
+                && !self.app.staticTexts["Please wait..."].exists
+        }
+        let ready = XCTNSPredicateExpectation(predicate: readyPredicate, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 10), .completed)
+        let first = (own.frame, other.frame)
+        XCTAssertLessThan(abs(first.0.width - first.1.width), 25)
+        XCUIDevice.shared.press(.home)
+        app.activate()
+        let foreground = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            own.exists && other.exists && abs(own.frame.midX - first.0.midX) <= 2
+                && abs(other.frame.midX - first.1.midX) <= 2
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [foreground], timeout: 5), .completed)
+        let profile = try requireVisible(app.buttons["View Profile"].firstMatch)
+        profile.tap()
+        XCTAssertTrue(profile.waitForNonExistence(timeout: 30))
+        var backs: [XCUIElement] = []
+        let profileReady = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            backs = self.app.navigationBars.buttons.allElementsBoundByIndex.filter {
+                $0.exists && $0.isHittable && !$0.frame.isEmpty && $0.frame.midX < self.app.frame.midX
+            }
+            return backs.count == 1 && !self.app.staticTexts["Please wait..."].exists
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [profileReady], timeout: 30), .completed,
+                       "Profile loading must finish before its native Back control is used")
+        XCTAssertEqual(backs.count, 1, "Only the observed native back control is eligible")
+        try XCTUnwrap(backs.first).tap()
+        // View Profile intentionally pops Matched before opening the profile.
+        // Its Back action therefore returns to Main, not to a retained Matched.
+        XCTAssertTrue(app.buttons["Messages"].waitForExistence(timeout: 30))
+        XCTAssertFalse(own.exists || other.exists)
+        app.terminate()
+        previous = nil
+        stable = 0
+        launchOwned(extra: ["--qa-push", route, "--qa-push-delay", "10"])
+        XCTAssertTrue(own.waitForExistence(timeout: 60) && other.exists)
+        let repeated = XCTNSPredicateExpectation(predicate: readyPredicate, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [repeated], timeout: 10), .completed)
+        XCTAssertLessThan(abs(own.frame.width - other.frame.width), 25)
+        try record("actual-os-reduced-motion-native-match", ["role": owner.role,
+            "nativeSettingEnabledObserved": true, "controlledMotionFixtureUsed": false,
+            "balancedCards": true, "freshPresentations": 2,
+            "foregroundPreservesGeometry": true, "nativeViewProfileBackReturnsToMain": true,
+            "slideRasterReviewRequired": true, "navigationDuringAnimationVerified": false])
     }
 
     private func ownedFixture() throws -> Owner {

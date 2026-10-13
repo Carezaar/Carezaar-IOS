@@ -1,5 +1,5 @@
 {
-  "status": "Camera/OTP test/evidence delivery verified on authorized main5b814a6; fresh ARM64 clean build and both-role post-push smoke PASS. Strict accessibility FAIL4/5 and original full QA remain incomplete.",
+  "status": "October13 implementation and scoped final-source verification complete; full original QA remains incomplete. Engineering handover snapshot prepared before remote push verification.",
   "reports": [
     "IOS_TEST_EXECUTION_REPORT.md",
     "IOS-FUNCTIONAL-PARITY-MATRIX.md",
@@ -801,6 +801,22 @@
         "resourcesOpened": "None",
         "mutations": "Only private gate and candidate independentReviewed/independentReview."
       }
+    },
+    {
+      "index": "Proofs/oct13-loading-hint-raster-proof/index.json",
+      "artifactCount": 1
+    },
+    {
+      "index": "Proofs/oct13-scoped-current-verification-proof/index.json",
+      "artifactCount": 2,
+      "bytes": 49650,
+      "reviewProvenance": "Independent standards review verified 10 actual result summaries, all 284 source hashes, Release audit and privacy; failed/skipped runs and partial lifecycle/full-QA limitations preserved."
+    },
+    {
+      "index": "Proofs/oct13-final-source-delivery-proof/index.json",
+      "artifactCount": 2,
+      "bytes": 54885,
+      "reviewProvenance": "Independent standards review approved24 actual result summaries including preserved failures/skips and zero-record disk failure excluded from passes; current production284 hashes and privacy checked."
     }
   ],
   "proofIndexCount": 68,
@@ -817,52 +833,27 @@
   ],
   "currentOriginalCaseCounts": {
     "total": 374,
-    "PASS": 108,
-    "NOT RUN": 248,
+    "PASS": 110,
+    "NOT RUN": 246,
     "FAIL": 3,
     "BLOCKED": 0,
     "N/A": 15
   },
   "documents": [
     {
-      "path": "IOS_TEST_EXECUTION_REPORT.md",
-      "bytes": 87814,
-      "sha256": "5ac8d962f6a2b2c34723d83f2f19de6062bf2d8d5d8d2d3ef4d497e246399d42"
-    },
-    {
-      "path": "IOS-FUNCTIONAL-PARITY-MATRIX.md",
-      "bytes": 86621,
-      "sha256": "f1472d19e50b2a5295bc1f69335b5ebbb373bda505f2265a878e30ab1b490234"
-    },
-    {
-      "path": "IOS-FIGMA-PARITY.md",
-      "bytes": 82662,
-      "sha256": "b2f80154c4658b5c4884a7791cb30835582774f132c72b6b2f5c5900127b0a98"
-    },
-    {
-      "path": "BACKEND-ISSUES-FOR-CLIENT.md",
-      "bytes": 86110,
-      "sha256": "cc6ad37f9518365d8ff2e77cf0a4530e727e0cbafdd6389157017cab35d545a0"
-    },
-    {
-      "path": "QA-CASE-MANIFEST.md",
-      "bytes": 527545,
-      "sha256": "a8daa9598077e39127d6066f67544898a9fafcfe924445b902db248108d048fe"
-    },
-    {
-      "path": "EVIDENCE-COVERAGE-MAPPING.md",
-      "bytes": 694342,
-      "sha256": "85b60320c3fd708834e26cd6653203970359a29f49acf19ef0e1e5c9e05cbb8e"
-    },
-    {
       "path": "ACCESSIBILITY-TRIAGE.md",
       "bytes": 155675,
       "sha256": "60d1607fed8520c6f9b1c1da7400167df3dac9e56b586de3548132442be31c3e"
     },
     {
-      "path": "NATIVE-SIGNUP-EXECUTION.md",
-      "bytes": 151665,
-      "sha256": "370c59f908d5ff56f6a2d773f7e83b2e54f57c398f0c2a4c439b9df98f9d33cf"
+      "path": "BACKEND-ISSUES-FOR-CLIENT.md",
+      "bytes": 94511,
+      "sha256": "93903f596aacea9a279dfa057175c0be13400381ce643a6b0a5b4359a8c93abf"
+    },
+    {
+      "path": "CLIENT-UPDATE-HANDOFF.md",
+      "bytes": 7209,
+      "sha256": "fa4952d9410ccf6fe264ae4c11bfac6bba2b0fa2a690ae49c7768fe49b9a3203"
     },
     {
       "path": "CROSS-ROLE-EXECUTION.md",
@@ -870,14 +861,64 @@
       "sha256": "5fafe6b209b388e481d18368083e8d658099ae517b261f278d33ed6059731991"
     },
     {
+      "path": "EVIDENCE-COVERAGE-MAPPING.md",
+      "bytes": 694342,
+      "sha256": "85b60320c3fd708834e26cd6653203970359a29f49acf19ef0e1e5c9e05cbb8e"
+    },
+    {
+      "path": "IOS-FIGMA-PARITY.md",
+      "bytes": 91050,
+      "sha256": "12d85ce4e4a53beb6b313a388766a5e8841bd68ff569a89623e4c1a9fd08345d"
+    },
+    {
+      "path": "IOS-FUNCTIONAL-PARITY-MATRIX.md",
+      "bytes": 95016,
+      "sha256": "5770cef5ad110889bdd86e25792e8f60648255da04f9739c96557de98b8d0448"
+    },
+    {
+      "path": "IOS_TEST_EXECUTION_REPORT.md",
+      "bytes": 99408,
+      "sha256": "0cf15ed207896f7b0f30b0e9170e718ae2da065fc4dfccf426388fb312147c00"
+    },
+    {
+      "path": "NATIVE-SIGNUP-EXECUTION.md",
+      "bytes": 151665,
+      "sha256": "370c59f908d5ff56f6a2d773f7e83b2e54f57c398f0c2a4c439b9df98f9d33cf"
+    },
+    {
+      "path": "OCT13-CHAT-RECONCILIATION.md",
+      "bytes": 3551,
+      "sha256": "81fde9fef608f3b086206f224c8359fa26cd660a040087b63492e250dd68532d"
+    },
+    {
+      "path": "OCT13-MATCH-RECONCILIATION.md",
+      "bytes": 3236,
+      "sha256": "460da7560c003b41e14164933f01fe5deafe7fddc2203673e17ad53fd7767fe3"
+    },
+    {
+      "path": "OCT13-REQUIREMENTS.md",
+      "bytes": 16917,
+      "sha256": "6e15adddfa96216fab154a7d1776275b8837a09cfdd380ee2ddd5140e652ab35"
+    },
+    {
+      "path": "OCT13-SETTINGS-RECONCILIATION.md",
+      "bytes": 1994,
+      "sha256": "9c10945c94831cde2705fe91710d11ae2afd610f30018c6f4f96908539c96b30"
+    },
+    {
+      "path": "OCT13-UI-CHANGES.md",
+      "bytes": 7794,
+      "sha256": "d85bad55ad7ec2eb450668ca6641edbcef6c486bf38e3b70a90f7e3e6296d290"
+    },
+    {
+      "path": "QA-CASE-MANIFEST.md",
+      "bytes": 530364,
+      "sha256": "536c9e9ecb5bc2f1a0b55e2e8a37d7decba6ca206cfadbaa89c999ee245464b3"
+    },
+    {
       "path": "README.md",
       "bytes": 48688,
       "sha256": "421a8a7ddef569e4f51d19ebc84738e899d6e14950b09f4dbec557cdff3682b5"
-    },
-    {
-      "path": "CLIENT-UPDATE-HANDOFF.md",
-      "bytes": 7209,
-      "sha256": "fa4952d9410ccf6fe264ae4c11bfac6bba2b0fa2a690ae49c7768fe49b9a3203"
     }
   ],
   "readme": {

@@ -1,0 +1,109 @@
+{
+  "scope": "Executed runs, not unique-case totals or full original QA acceptance. Failed runs and skipped cases retained.",
+  "results": [
+    {
+      "bundle": "final-timing-lifecycle-full-units.xcresult",
+      "totalTestCount": 143,
+      "passedTests": 143,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "result": "Passed"
+    },
+    {
+      "bundle": "small-two-failures-isolated-retest.xcresult",
+      "totalTestCount": 2,
+      "passedTests": 2,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "result": "Passed"
+    },
+    {
+      "bundle": "final-small-client-regression.xcresult",
+      "totalTestCount": 26,
+      "passedTests": 22,
+      "failedTests": 3,
+      "skippedTests": 1,
+      "result": "Failed"
+    },
+    {
+      "bundle": "final-small-client-locale-and-auth-regression.xcresult",
+      "totalTestCount": 17,
+      "passedTests": 17,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "result": "Passed"
+    },
+    {
+      "bundle": "final-disposable-client-lifecycle.xcresult",
+      "totalTestCount": 1,
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "result": "Passed"
+    },
+    {
+      "bundle": "final-disposable-caregiver-lifecycle.xcresult",
+      "totalTestCount": 1,
+      "passedTests": 0,
+      "failedTests": 1,
+      "skippedTests": 0,
+      "result": "Failed"
+    },
+    {
+      "bundle": "final-disposable-caregiver-lifecycle-readiness-retest.xcresult",
+      "totalTestCount": 1,
+      "passedTests": 0,
+      "failedTests": 1,
+      "skippedTests": 0,
+      "result": "Failed"
+    },
+    {
+      "bundle": "final-disposable-caregiver-post-photo-resume.xcresult",
+      "totalTestCount": 1,
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "result": "Passed",
+      "scope": "Explicit root-owned same-account post-photo resume. Signup/photo upload were completed in the prior interrupted run; this is not uninterrupted full lifecycle coverage."
+    },
+    {
+      "bundle": "final-actual-os-denied-caregiver-and-interrupted-cleanup.xcresult",
+      "totalTestCount": 2,
+      "passedTests": 2,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "result": "Passed"
+    },
+    {
+      "bundle": "final-actual-os-denied-client.xcresult",
+      "totalTestCount": 1,
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "result": "Passed"
+    }
+  ],
+  "release": {
+    "markerCount": 32,
+    "markersPresentInReleaseBinary": [],
+    "binarySHA256": "05827f2637844daa2509758296d75322bdfbde1ac7ee443fe5ea09d293379f55",
+    "initializationSceneBundledUnchanged": true,
+    "buildAndAnalyzeSucceeded": true
+  },
+  "originalCaseInventory": {
+    "total": 374,
+    "passed": 110,
+    "notRun": 246,
+    "failed": 3,
+    "blocked": 0,
+    "notApplicable": 15
+  },
+  "limitations": [
+    "Full original QA unfinished.",
+    "Initial match slide and actual Reduced Motion/RTL motion not yet verified.",
+    "Yahoo endpoint acceptance does not prove inbox delivery or backend-only cause.",
+    "No physical camera capture or personal media upload in this follow-up.",
+    "No October13 push yet."
+  ],
+  "actualOSDeniedLocation": "Small client and caregiver native Settings Never; real LocationProvider, nil map progression, no invented coordinates or preference writes; backend fields unchanged. No physical GPS claim."
+}

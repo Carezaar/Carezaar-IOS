@@ -75,7 +75,7 @@ final class PartnerNavigationBoundaryUITests: XCTestCase {
         let message = try XCTUnwrap((fields["id"] as? [String])?.first,
                                    "Missing-ID response must identify its exact validation error")
         XCTAssertFalse(message.isEmpty)
-        return try managedFailure(token: token, slug: "error_unavailable")
+        return try managedFailure(token: token, slug: "general_error_general")
     }
 
     private func managedFailure(token: String, slug: String) throws -> String {
@@ -91,8 +91,7 @@ final class PartnerNavigationBoundaryUITests: XCTestCase {
         // exact English fallback strings are independently documented in
         // Feedback.message; missing reference content is not a service failure.
         switch slug {
-        case "error_unavailable": return "This isn't working right now. Please try again later."
-        case "error_unexpected": return "Something went wrong. Please try again."
+        case "general_error_general": return "Something went wrong. Please try again."
         default:
             XCTFail("No independently specified native error fallback for this slug")
             throw URLError(.cannotParseResponse)
@@ -100,14 +99,30 @@ final class PartnerNavigationBoundaryUITests: XCTestCase {
     }
 
     private func leaveFailureBeforeTimer(route: String, endpoint: String, caseID: String, expectedFailure: String) throws {
-        launch("HelpCenter,\(route)")
+        // The immediate Main poll may post the app's native notification banner.
+        // Observe that poll and let its banner finish before the two-second
+        // navigation window begins; keep the actual timer assertions unchanged.
+        launch("HelpCenter")
+        XCTAssertTrue(app.buttons["Delete Account"].firstMatch.waitForExistence(timeout: 45))
+        let ledger = app.staticTexts["qa-request-counts"]
+        let polled = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label CONTAINS %@", "GET /api/users/notifications/count=1"), object: ledger)
+        XCTAssertEqual(XCTWaiter.wait(for: [polled], timeout: 15), .completed)
+        let banner = XCUIApplication(bundleIdentifier: "com.apple.springboard").descendants(matching: .any)
+            .matching(identifier: "NotificationShortLookView").firstMatch
+        let clear = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in !banner.exists || !banner.isHittable }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [clear], timeout: 10), .completed)
+        app.terminate()
+        launch("HelpCenter,\(route)", extra: ["--qa-push-delay", "10"])
         let failure = app.staticTexts.matching(NSPredicate(format: "label == %@", expectedFailure)).firstMatch
-        XCTAssertTrue(failure.waitForExistence(timeout: 45), "Actual failed destination must be observed")
+        let observed = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in failure.exists }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [observed], timeout: 45), .completed, "Actual failed destination must be observed")
+        let observedAt = Date()
         // Auto-back on these pushed scenes is the real UINavigationBar control.
         // Help Center itself uses BackButton, so it cannot satisfy this selector.
         let back = app.navigationBars.buttons["Help Center"]
         XCTAssertTrue(back.exists && back.isHittable, "Failure must still be open before its delayed return")
-        back.tap()
+        back.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+        try record(caseID + "-departure-timing", ["secondsFromObservedFailureThroughBackTap": Date().timeIntervalSince(observedAt)])
         let deletionEntry = app.buttons["Delete Account"].firstMatch
         XCTAssertTrue(deletionEntry.waitForExistence(timeout: 5) && deletionEntry.isHittable)
         deletionEntry.tap() // Opens a screen only; never presses its deletion action.
@@ -123,6 +138,22 @@ final class PartnerNavigationBoundaryUITests: XCTestCase {
         XCTAssertEqual(count, 1, "Failed destination must not silently retry")
         try record(caseID, ["failureObserved": true, "manualBackObserved": true,
                             "newDestinationRetainedBeyondTimer": destination.isHittable, "profileGETs": count])
+    }
+
+    func testFailedProfileShowsOneShortMessageAndReturnsWithoutRetry() throws {
+        let f = try fixture()
+        let endpoint = "\(f.endpoint)/qa-missing-profile-20261010"
+        let expected = try missingIDFailure(endpoint: endpoint, token: f.token)
+        launch("HelpCenter,\(f.profileRoute)/qa-missing-profile-20261010")
+        let messages = app.staticTexts.matching(NSPredicate(format: "label == %@", expected))
+        XCTAssertTrue(messages.firstMatch.waitForExistence(timeout: 45))
+        XCTAssertEqual(messages.count, 1, "R9: toast only, no redundant page-level error")
+        XCTAssertFalse(app.buttons["Try Again"].exists)
+        let entry = app.buttons["Delete Account"].firstMatch
+        let returned = XCTNSPredicateExpectation(predicate: NSPredicate(format: "isHittable == true"), object: entry)
+        XCTAssertEqual(XCTWaiter.wait(for: [returned], timeout: 5), .completed)
+        XCTAssertEqual(requestCount(endpoint), 1)
+        try record("R9-profile-short-return", ["singleMessage": true, "returnedWithoutRetry": true, "profileGETs": 1])
     }
 
     func testLeavingFailedProfileCancelsDelayedReturn() throws {
@@ -208,7 +239,7 @@ final class PartnerNavigationBoundaryUITests: XCTestCase {
     func testInactiveMatchedThenUnavailableProfileReturnsOnceWithoutLoop() throws {
         let f = try fixture()
         let endpoint = "\(f.endpoint)/\(f.partnerID)"
-        let expectedFailure = try managedFailure(token: f.token, slug: "error_unexpected")
+        let expectedFailure = try managedFailure(token: f.token, slug: "general_error_general")
         launch("HelpCenter,Matched/\(f.kind)/\(f.partnerID)",
                extra: ["--qa-profile-inactive-then-unavailable", endpoint])
         // First real transport response is controlled inactive success, so

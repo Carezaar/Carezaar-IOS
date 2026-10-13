@@ -85,100 +85,82 @@ final class SessionNetworkTests: XCTestCase {
 
     /// Real owned saved tokens, an actual persisted reference cache, and a
     /// connection-refused startup. Host witnesses separately inspect cache bytes.
-    func testOfflineSavedSessionClearsAuthenticationAndKeepsCachedWelcomeUsable() throws {
+    /// October 13 retains the pair across failed startup and restart.
+    func testOfflineSavedSessionPreservesCredentialsAcrossRestartAndRetry() throws {
         anonymousLogoutEvidenceOnly = true
         let fixture = try ownedPrimaryFixture()
         launchPrimarySession(["--qa-signout", "--qa-login-env"])
         XCTAssertTrue(app.buttons["Messages"].waitForExistence(timeout: 60))
         waitForMatchesLoaded(fixture)
         assertNativeStoredTokenPresence(access: true, refresh: true)
-        recordSessionEvidence("offline-cache-warm-owned-session", fixture: fixture)
-        // Give the independent host witness a bounded observation window while
-        // asserting that the real authenticated UI remains stable.
-        let warmLost = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
-            !self.app.buttons["Messages"].exists
-        }, object: nil)
-        warmLost.isInverted = true
-        XCTAssertEqual(XCTWaiter.wait(for: [warmLost], timeout: 4), .completed)
-
-        launchPrimarySession(["--qa-offline", "0", "120"])
-        XCTAssertFalse(app.launchArguments.contains("--qa-signout"))
-        XCTAssertFalse(app.launchArguments.contains("--qa-login-env"))
-        let signIn = app.buttons["Sign in"].firstMatch
-        XCTAssertTrue(signIn.waitForExistence(timeout: 60))
-        XCTAssertTrue(signIn.isEnabled, "A valid reference cache must keep Welcome usable offline")
-        XCTAssertFalse(app.buttons["Messages"].exists)
-        assertNativeStoredTokenPresence(access: false, refresh: false)
-        // One logical GET has an initial attempt plus three bounded retries
-        // for cannotConnectToHost in APIClient.transfer.
-        XCTAssertEqual(requestCount("GET /api/auth/info"), 4)
-        for route in ["POST /api/auth/login", "PUT /api/auth/refresh", "DELETE /api/auth/logout",
-                      "GET /api/clients/matches", "GET /api/caregivers/matches"] {
-            XCTAssertEqual(requestCount(route), 0)
+        for attempt in 0..<2 {
+            launchPrimarySession(["--qa-offline", "0", "12"])
+            let retry = app.buttons["Try Again"].firstMatch
+            XCTAssertTrue(retry.waitForExistence(timeout: 10))
+            XCTAssertTrue(app.staticTexts["Cannot communicate with server."].exists)
+            XCTAssertFalse(app.buttons["Sign in"].exists)
+            XCTAssertFalse(app.buttons["Messages"].exists)
+            assertNativeStoredTokenPresence(access: true, refresh: true)
+            XCTAssertEqual(requestCount("GET /api/auth/info"), 4)
+            for route in ["POST /api/auth/login", "PUT /api/auth/refresh", "DELETE /api/auth/logout", fixture.matchesRequest] {
+                XCTAssertEqual(requestCount(route), 0)
+            }
+            recordSessionEvidence("startup-retained-attempt-\(attempt)", fixture: fixture)
+            if attempt == 1 {
+                sleep(13)
+                retry.tap()
+                XCTAssertTrue(app.buttons["Messages"].waitForExistence(timeout: 45))
+                waitForMatchesLoaded(fixture)
+                assertNativeStoredTokenPresence(access: true, refresh: true)
+                XCTAssertEqual(requestCount("POST /api/auth/login"), 0)
+                XCTAssertEqual(requestCount("GET /api/auth/info"), 5)
+                XCTAssertFalse(retry.exists)
+                recordSessionEvidence("startup-retry-restored-without-login", fixture: fixture)
+            }
         }
-        let mainReturned = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
-            self.app.buttons["Messages"].exists || !signIn.exists || !signIn.isEnabled
-        }, object: nil)
-        mainReturned.isInverted = true
-        XCTAssertEqual(XCTWaiter.wait(for: [mainReturned], timeout: 4), .completed)
-        XCTAssertEqual(requestCount("GET /api/base/info"), 4)
-        let ledger = app.staticTexts["qa-request-counts"].label
-        XCTAssertFalse(ledger.split(separator: "\n").contains {
-            $0.hasPrefix("GET /api/base/") && !$0.hasPrefix("GET /api/base/info=")
-        }, "Offline cache use must not dispatch dataset downloads")
-        let counts = XCTAttachment(string: ledger)
-        counts.name = "offline-cache-complete-native-transport-ledger"
-        counts.lifetime = .keepAlways; add(counts)
-        recordSessionEvidence("offline-cache-welcome-tokens-cleared", fixture: fixture)
-        for _ in 0..<8 {
-            if signIn.isHittable { break }
-            app.swipeUp(velocity: .slow)
-        }
-        XCTAssertTrue(signIn.isHittable)
-        signIn.tap()
-        XCTAssertTrue(app.textFields.firstMatch.waitForExistence(timeout: 10))
-        XCTAssertTrue(app.secureTextFields.firstMatch.exists)
-        XCTAssertEqual(requestCount("POST /api/auth/login"), 0)
-        let emptySubmit = app.buttons["Sign In"].firstMatch
-        XCTAssertTrue(emptySubmit.exists && !emptySubmit.isEnabled)
-        for _ in 0..<8 {
-            if emptySubmit.frame.width >= 44 && emptySubmit.frame.height >= 44
-                && app.frame.contains(emptySubmit.frame) { break }
-            app.swipeUp(velocity: .slow)
-        }
-        XCTAssertGreaterThanOrEqual(emptySubmit.frame.width, 44)
-        XCTAssertGreaterThanOrEqual(emptySubmit.frame.height, 44)
-        XCTAssertTrue(app.frame.contains(emptySubmit.frame), "Public empty Sign In control must be fully exposed before capture")
-        let crop = XCTAttachment(screenshot: emptySubmit.screenshot())
-        crop.name = "offline-cache-empty-sign-in-control-only"; crop.lifetime = .keepAlways; add(crop)
-
-        // A fresh process has no signout/login/offline or seeded-token flags.
         launchPrimarySession([])
-        XCTAssertTrue(signIn.waitForExistence(timeout: 60))
-        XCTAssertTrue(signIn.isEnabled)
-        assertNativeStoredTokenPresence(access: false, refresh: false)
-        let restored = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
-            self.app.buttons["Messages"].exists || !signIn.exists
-        }, object: nil)
-        restored.isInverted = true
-        XCTAssertEqual(XCTWaiter.wait(for: [restored], timeout: 5), .completed)
-        for route in ["GET /api/auth/info", "POST /api/auth/login", "PUT /api/auth/refresh",
-                      "GET /api/clients/matches", "GET /api/caregivers/matches"] {
-            XCTAssertEqual(requestCount(route), 0)
-        }
-        recordSessionEvidence("offline-cache-ordinary-online-relaunch-signed-out", fixture: fixture)
-        let signedOutLost = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
-            self.app.buttons["Messages"].exists || !signIn.exists
-        }, object: nil)
-        signedOutLost.isInverted = true
-        XCTAssertEqual(XCTWaiter.wait(for: [signedOutLost], timeout: 4), .completed)
-
-        launchPrimarySession(["--qa-login-env"])
-        XCTAssertTrue(app.buttons["Messages"].waitForExistence(timeout: 60))
-        waitForMatchesLoaded(fixture)
+        XCTAssertTrue(app.buttons["Messages"].waitForExistence(timeout: 45))
+        XCTAssertEqual(requestCount("POST /api/auth/login"), 0)
         assertNativeStoredTokenPresence(access: true, refresh: true)
+    }
+
+    func testNativeRenewalConnectionDialogRetriesAndPreservesHelpRoute() throws {
+        anonymousLogoutEvidenceOnly = true
+        let fixture = try ownedPrimaryFixture()
+        launchPrimarySession(["--qa-signout", "--qa-login-env", "--qa-push", "HelpCenter",
+                              "--qa-break-access-later", "--qa-refresh-failures", "2"])
+        XCTAssertTrue(app.navigationBars["Help Center"].waitForExistence(timeout: 60))
+        sleep(12)
+        XCUIDevice.shared.press(.home)
+        sleep(2)
+        app.activate()
+        let dialog = app.alerts["Connection Problem"]
+        XCTAssertTrue(dialog.waitForExistence(timeout: 45))
+        XCTAssertEqual(app.alerts.count, 1)
+        XCTAssertTrue(dialog.staticTexts["We could not reach the server to renew your sign-in. Please check your internet connection and try again."].exists)
+        assertNativeStoredTokenPresence(access: true, refresh: true)
+        XCTAssertEqual(requestCount("PUT /api/auth/refresh"), 4)
         XCTAssertEqual(requestCount("POST /api/auth/login"), 1)
-        recordSessionEvidence("offline-cache-fresh-owned-login-restored", fixture: fixture)
+        let proof = XCTAttachment(screenshot: dialog.screenshot())
+        proof.name = "managed-connection-dialog-only"; proof.lifetime = .keepAlways; add(proof)
+        dialog.buttons["Retry"].tap()
+        let secondFailure = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            self.requestCount("PUT /api/auth/refresh") == 8 && dialog.exists
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [secondFailure], timeout: 20), .completed)
+        XCTAssertEqual(app.alerts.count, 1)
+        assertNativeStoredTokenPresence(access: true, refresh: true)
+        dialog.buttons["Retry"].tap()
+        let resumed = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            self.requestCount("PUT /api/auth/refresh") == 9 && !dialog.exists
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [resumed], timeout: 30), .completed)
+        XCTAssertTrue(app.navigationBars["Help Center"].exists)
+        XCTAssertFalse(app.buttons["Sign in"].exists)
+        XCTAssertEqual(requestCount("POST /api/auth/login"), 1)
+        XCTAssertEqual(requestCount("DELETE /api/auth/logout"), 0)
+        assertNativeStoredTokenPresence(access: true, refresh: true)
+        recordSessionEvidence("renewal-repeated-retry-help-route-retained", fixture: fixture)
     }
 
     /// P08-002 native logout persistence and Cancel/Confirm branch. Authentication
@@ -476,8 +458,10 @@ final class SessionNetworkTests: XCTestCase {
         app.buttons["Send"].tap()
         XCTAssertTrue(text("Cannot communicate").waitForExistence(timeout: 30), "no connection message")
         XCTAssertEqual(field.value as? String, message, "draft lost after a failed send")
-        XCTAssertEqual(requestCount("POST /api/users/chats/\(chatId)"), 0, "Offline preflight must not attempt a message POST")
-        XCTAssertFalse(text("Couldn't confirm whether your message was sent").exists, "A failed preflight must not imply uncertain delivery")
+        XCTAssertEqual(requestCount("POST /api/users/chats/\(chatId)"), 4,
+                       "One logical direct Send has one initial closed-port attempt plus three safe preconnection retries")
+        XCTAssertFalse(text("Couldn't confirm whether your message was sent").exists,
+                       "The superseded English-only blocking notice must be absent")
         shot("chat-offline-draft-kept")
         // The app's offline window counts from its own start, a few seconds after the
         // test launches it; resend well clear of the window's end.
@@ -490,7 +474,8 @@ final class SessionNetworkTests: XCTestCase {
         sleep(3)
         let stored = try messages(chatId: chatId, token: clientToken).filter { $0 == message }
         XCTAssertEqual(stored.count, 1, "sent \(stored.count) times")
-        XCTAssertEqual(requestCount("POST /api/users/chats/\(chatId)"), 1, "Empty-draft taps must not repeat the POST")
+        XCTAssertEqual(requestCount("POST /api/users/chats/\(chatId)"), 5,
+                       "Four safe preconnection attempts plus one successful intentional recovery Send; empty-draft taps never repeat it")
     }
 
     /// Slow network: the busy card shows; text typed while a message is sending is kept.
@@ -504,8 +489,8 @@ final class SessionNetworkTests: XCTestCase {
         let first = "slow first \(run)", second = "slow second \(run)"
         field.tap(); field.typeText(first)
         app.buttons["Send"].tap()
-        XCTAssertFalse(app.buttons["Send"].isEnabled, "Repeated send must be disabled during the fresh-chat preflight")
-        field.typeText(second)          // keep typing during the delayed preflight
+        XCTAssertFalse(app.buttons["Send"].isEnabled, "Repeated Send must be disabled during the in-flight direct message submission")
+        field.typeText(second)          // keep typing during the delayed direct submission
         XCTAssertTrue(busy.waitForExistence(timeout: 12), "no progress card during the delayed message POST")
         XCTAssertTrue(busy.waitForNonExistence(timeout: 30), "send did not finish")
         XCTAssertTrue(app.staticTexts[first].waitForExistence(timeout: 10))

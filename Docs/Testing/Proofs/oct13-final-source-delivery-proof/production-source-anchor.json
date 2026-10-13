@@ -1,0 +1,1142 @@
+{
+  "recordedAt": "2026-10-13T20:16:34.656744+05:30",
+  "scope": "Production source frozen after Arabic managed self-label fix; recorded before final verification.",
+  "files": [
+    {
+      "path": "Carezaar/Assets.xcassets/AccentColor.colorset/Contents.json",
+      "sha256": "0b885087e60855bef90430efb8f0d79f27c6023aef7871344cfc1758f280e01c"
+    },
+    {
+      "path": "Carezaar/Assets.xcassets/AppIcon.appiconset/Contents.json",
+      "sha256": "02cbd1527dd1b90b017315f94b34bedcb538a1f15a7799a7979844fd2aeb20c5"
+    },
+    {
+      "path": "Carezaar/Assets.xcassets/Contents.json",
+      "sha256": "80b0b2e5ce5f42d06c9cea0234147e7f2bea58ef205c47ce3a82f0abe4b64465"
+    },
+    {
+      "path": "Carezaar/CarezaarApp.swift",
+      "sha256": "19b5f9c7b81a49466d8b54e214a4547f1517ee4e5c5367dcbf68a5484f378507"
+    },
+    {
+      "path": "Carezaar/Components/DesignElement.swift",
+      "sha256": "469f2d85f5c455e70f0cfccde8ecc3daec3bdb1748bb796084ba98e365dfa0fc"
+    },
+    {
+      "path": "Carezaar/Components/SourceSurface.swift",
+      "sha256": "5372fe2fa3c8debbf1e3d94e636ab36514a465eb9a419ad7daee8ab63836e7fd"
+    },
+    {
+      "path": "Carezaar/Components/SourceText.swift",
+      "sha256": "23f0e66ef1a91dcbc38a6b957f280f3cf29b54f333320da4a9a4216477e18712"
+    },
+    {
+      "path": "Carezaar/Components/SourceVector.swift",
+      "sha256": "a204b025291a95cc2bdb30b44b76a5b8cc41dc6ba0123e8c787187148139149c"
+    },
+    {
+      "path": "Carezaar/Core/Networking/APIClient.swift",
+      "sha256": "77f6982f7d3e6b9c48ad5bb9b383118cd5038fb79f36bb501f159d80b25a473a"
+    },
+    {
+      "path": "Carezaar/Core/Networking/APIConfiguration.swift",
+      "sha256": "586c8d66e23704e893be57376b2f0e7d14212e65809eaeee9766c4efd919274f"
+    },
+    {
+      "path": "Carezaar/Core/Networking/APIEnvelope.swift",
+      "sha256": "d8396e5f4c43ee3808fd8b4806a6b60ed9713972a3961e97caee5ecc85e7d0dc"
+    },
+    {
+      "path": "Carezaar/Core/Networking/APIError.swift",
+      "sha256": "28f31966687cf70777139593c7ca94436da181f85a86c87919d4907fdb2e3b60"
+    },
+    {
+      "path": "Carezaar/Core/Networking/AppLanguage.swift",
+      "sha256": "e132903143cc3af0ecec07c2bf8af5340f66358a66f3b5521c33ace3b56f6c22"
+    },
+    {
+      "path": "Carezaar/Core/Networking/Endpoint.swift",
+      "sha256": "e11075eab17f705bacf4856c628a069089020e7454e166a77f50d49cc6297ca1"
+    },
+    {
+      "path": "Carezaar/Core/Session/DeviceInfo.swift",
+      "sha256": "384c7ee08ecb31e64d8e09fee9c550216cfb854590244710e9e40923f4fdb236"
+    },
+    {
+      "path": "Carezaar/Core/Session/NotificationPoller.swift",
+      "sha256": "8e97573b235bb894a6b340e01357fee796da2e7a00ccbed2073c9cd9caccb5c9"
+    },
+    {
+      "path": "Carezaar/Core/Session/ServerTime.swift",
+      "sha256": "c98fe0a4f2e2f47db073a653afdb3380ea71d341b4edcb6ac82857d5b519385c"
+    },
+    {
+      "path": "Carezaar/Core/Session/SessionManager.swift",
+      "sha256": "af3539777d3f197147b010ff2e497ec12b7a28487cded1f6c15b774666e694a2"
+    },
+    {
+      "path": "Carezaar/Core/Session/TokenStore.swift",
+      "sha256": "cb96f7e5cb9e1c8d55d0be7ed6975aa3f1b0c17b2c6290d4ff202674af479f83"
+    },
+    {
+      "path": "Carezaar/Core/Storage/BaseDataStore.swift",
+      "sha256": "b93d3cbcab958f90bfd1fc9c3367175b711a24d8f321aeede094ac4f16e5a0dc"
+    },
+    {
+      "path": "Carezaar/Core/Storage/Localization.swift",
+      "sha256": "d6951b77478f2b2b9e90e57069f1a78a8ed14be5e6f05e2cbed9f77082912fb8"
+    },
+    {
+      "path": "Carezaar/Core/Validation/Validation.swift",
+      "sha256": "941d017d7beafb5c7f2e22b825f5ee4d4a7dacf884e654938282a89b0f31e718"
+    },
+    {
+      "path": "Carezaar/Design/DesignNode.swift",
+      "sha256": "608068f3ba6cfa4cef59449e8821ba85f66d0189e08bb799117a4dfd45a7d907"
+    },
+    {
+      "path": "Carezaar/Design/ViewportLayout.swift",
+      "sha256": "682e336e8d7382df343c5a4ddec1e0d0032a51f46bab44b945dc5430967a5717"
+    },
+    {
+      "path": "Carezaar/Features/Auth/AuthScreens.swift",
+      "sha256": "2c5ea76815e0f8766618c18212f8dd06a000d72b703e3e0ce8e4139be73e116d"
+    },
+    {
+      "path": "Carezaar/Features/Auth/PhotoCropper.swift",
+      "sha256": "33b87ac1588a6155e1f593a1718a6fba8d40523273b26438c154a66b36cb72bf"
+    },
+    {
+      "path": "Carezaar/Features/Auth/ProfileFormView.swift",
+      "sha256": "40405c0bb8fd765249d004c455c0fed0113667b237ce6f63ebe33abc76f74523"
+    },
+    {
+      "path": "Carezaar/Features/Auth/SignUpFlow.swift",
+      "sha256": "bc64d7b158903d26f2e05478bd9327a4b27c9148f173046055d44b09b8934831"
+    },
+    {
+      "path": "Carezaar/Features/Auth/SplashView.swift",
+      "sha256": "9fa240cdba2d983cc791e9b426f0b3f48141384060c109423c44d37a3e1ef9b2"
+    },
+    {
+      "path": "Carezaar/Features/DesignSystem/AppIcon.swift",
+      "sha256": "2510c3f10f05bf56a68f78728ad10f0ab01cedd1d58bb030de3e2084a6293cdc"
+    },
+    {
+      "path": "Carezaar/Features/DesignSystem/Components.swift",
+      "sha256": "d0d0025d270b7d980e706e03ddaf36e99d911f3ad6a434d76ca8446ecda50cc2"
+    },
+    {
+      "path": "Carezaar/Features/DesignSystem/Feedback.swift",
+      "sha256": "4d2705d89edcdf590da395c69355d1879b2bd6869ba3b2741cb0cfda8ab6a209"
+    },
+    {
+      "path": "Carezaar/Features/DesignSystem/FigmaScreen.swift",
+      "sha256": "94258ee9bb3cb5ef4c69e11bdaac22f16b5e59bb3b57b1f3fbd6b8bdf979561c"
+    },
+    {
+      "path": "Carezaar/Features/DesignSystem/Kit.swift",
+      "sha256": "03feef697b4a6c99c17e2d12980c6d59e6699337146903f334f2e95783ebb8a0"
+    },
+    {
+      "path": "Carezaar/Features/DesignSystem/SceneBinder.swift",
+      "sha256": "d390bc72451dff8c67d68f9f97889b207a0d12747e5a3ce3b16ecf84bebecbe9"
+    },
+    {
+      "path": "Carezaar/Features/DesignSystem/SelectionControls.swift",
+      "sha256": "65a466ed852ec1d8a745243624f6370bd0e5a8eacafa87297c5369f841a321bf"
+    },
+    {
+      "path": "Carezaar/Features/DesignSystem/Theme.swift",
+      "sha256": "0d1164cd6c54458909c564092cfcb8dbf98eb89d7f22d524358e5d6fe6f6b9ce"
+    },
+    {
+      "path": "Carezaar/Features/Main/ChatView.swift",
+      "sha256": "748fad479417d4f82b3389d241d39c0e5aa7482fc58d4314864162e4d186cf1e"
+    },
+    {
+      "path": "Carezaar/Features/Main/FavoritesView.swift",
+      "sha256": "2b7b2f89132a52bcac238fefbd4ef111708002bff3cc9fa7ca3c81fe15957c77"
+    },
+    {
+      "path": "Carezaar/Features/Main/MainView.swift",
+      "sha256": "b4608e15d1f7b13b15ade387498be41d8febfabbf91255c318321995059fe3a0"
+    },
+    {
+      "path": "Carezaar/Features/Main/NotificationsView.swift",
+      "sha256": "99a26987359de8fdc65290fbab4be6bd2abe8166042e591e9e52e4448ceff35b"
+    },
+    {
+      "path": "Carezaar/Features/Main/PartnerDetailsView.swift",
+      "sha256": "57bdc3c46d9b52e46ac8efd77b13ebb006d12e2453e273a57317e65e0923264e"
+    },
+    {
+      "path": "Carezaar/Features/Onboarding/LocationProvider.swift",
+      "sha256": "e306e79ad7ca2d3733d629dc8aa6f56f887afdab7ebeef12dec444291d8cdca3"
+    },
+    {
+      "path": "Carezaar/Features/Onboarding/PreferencesWizard.swift",
+      "sha256": "8f3608a697bc978485c4f169ebf3f0011cb1c597cf00e86a896cbe72636f1125"
+    },
+    {
+      "path": "Carezaar/Features/Settings/SettingsScreens.swift",
+      "sha256": "919012f8cdfcee2a37c0584ba439215ab1e92fef158b9fed7caaa0ee265aca37"
+    },
+    {
+      "path": "Carezaar/Models/BaseMetadata.swift",
+      "sha256": "816742afc9bf5ff6698a09fecf023ebc5c80f00ef6a91e8ac7f96eb6dba96eab"
+    },
+    {
+      "path": "Carezaar/Models/Chat.swift",
+      "sha256": "677698448c56cc9ecf5d4fae31099b065ef7d351a7bda394e3df6cd5299edabc"
+    },
+    {
+      "path": "Carezaar/Models/Match.swift",
+      "sha256": "aed5eff0f073e26e3a9f4863685da570779ff72e8c4ca55ae275cefc18bf1609"
+    },
+    {
+      "path": "Carezaar/Models/Profiles.swift",
+      "sha256": "c9c3b1d1f6b75b23ef1282e01077e1fad1e0d190cb469c9b529abe193f389349"
+    },
+    {
+      "path": "Carezaar/Models/Support.swift",
+      "sha256": "eb2297bea4ebb80f86c57cec578ed970b0c4c25d745711c37317e4021ed44d85"
+    },
+    {
+      "path": "Carezaar/Models/User.swift",
+      "sha256": "1d9950d2ba2560d92c422e9e55d6688419b38df353a0922d2927c4fe29d8b9f3"
+    },
+    {
+      "path": "Carezaar/Navigation/AppRouter.swift",
+      "sha256": "f97563e347872bb35389e957bad9f22663a4cc158b1b8dc0613efb3def936dbe"
+    },
+    {
+      "path": "Carezaar/Navigation/QALaunch.swift",
+      "sha256": "bc49af64930510ea5cf460086db942299aca0471de28e88de0626f978a515528"
+    },
+    {
+      "path": "Carezaar/Navigation/Route.swift",
+      "sha256": "0d55d8c1f1cc4cb97592c27f87715cc04a3c0fe42e1c4f63c6b73d821a9f1c42"
+    },
+    {
+      "path": "Carezaar/Resources/Assets/app/manifest.json",
+      "sha256": "c13865abe3020ddb78e4079c4efdd027888659b80a48b355966cf3693e8b8597"
+    },
+    {
+      "path": "Carezaar/Resources/Assets/app/vectors.json",
+      "sha256": "2df1bdc3cba898aff14b5e465914479231fdb03ebaae73e9f852d4d6e981fded"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-148-3.json",
+      "sha256": "8f3f852c8bb998f0f73714833ab0895f61a98b6cdce5b8c77b4b715d7dd5b44c"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-151-6.json",
+      "sha256": "e45e3ba721a80a65e706806cad087c37182bef57a693e482b528a2866b772e54"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-153-9.json",
+      "sha256": "f3ea5dfb052e35d853a71bd78c4b499dd8bdce6c714b1b0001ad125f09c29444"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-164-11698.json",
+      "sha256": "e57bdd93370a46cd966ba0774b8af7715b21ef6ff83765d6ab754ad37e0261e4"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-164-11701.json",
+      "sha256": "0bdeed4a14d9172823b35e5a2981b35393e0086f2cdd20e46eede56fc35e429c"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-165-18492.json",
+      "sha256": "459cb0d98d2f968960bbf85eb824281b6bebc2a991723c71236f940c88f8e15e"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-172-11710.json",
+      "sha256": "f6f04939e255fe9eea7cbb5af73970418a86f6dddc3c043410815c8d35d32931"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-184-11695-create-account.json",
+      "sha256": "4f7e7dcfa0a246597ef7dc11f16c7aa5ae3f5b1a86fef257ef24f4a5cd5a5041"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-184-11695-role-selection.json",
+      "sha256": "f5af10a4ebdba70b16d18b17664f57feb41ecf711314d4dbb9a6f1ac197d15e1"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-184-11695-sign-in.json",
+      "sha256": "87115adb63bb0c829ff62b0f89dcf77588d4316c8093bdc43aa82aceffb5f53a"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-184-11695-welcome.json",
+      "sha256": "15a0934f266d989c8182da48ec593e0b2ee13882864ae327137009e26b8b551b"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-203-11698.json",
+      "sha256": "450088b915e930bcc929f9a3caed8a49936ec3390baa40def7f8425fca546929"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-215-11981-needs.json",
+      "sha256": "271923b603c3ac4d3339790d356e746d9c369a1e3ede489630aa379a67274172"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-215-11981-schedule.json",
+      "sha256": "2cd943f0b76d2a03c2aecc456dd241651e2a5b013f7111cef2c465aaf74e0143"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-287-11685.json",
+      "sha256": "cc7859527551ce990ec3a4165e54df5d596ca9f8d576a723f2625bda3db7eb76"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-287-11691.json",
+      "sha256": "80cf812712bd6e3253484172f707525966ce585ab1e1b38f664091bf97b11db3"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-287-11694-schedule.json",
+      "sha256": "94ee58eb4d88b33d0efb7bb0624db4e66ee090a0b145a425bdb33bed3d867963"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-287-11694-skills.json",
+      "sha256": "010aad55852987c41a3e8caf9d97b473e004b0e87f3630842b006170b4b96da4"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-287-11700.json",
+      "sha256": "3fddcbd970f2ce892b3244e61a7a061ffd9690087abf7a7a141dfdafd3aa47ed"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-287-11712.json",
+      "sha256": "a4d24144c06f6a0323612d827b0a7e8c5aaf2e335c83e141ebfb832d924afe4a"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-291-11715.json",
+      "sha256": "d72c5aa232c5a1daa7112acf1d9d188cb04e2055e9a73618044e565ac06ee933"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-65-19923.json",
+      "sha256": "ab2a1d26bc5ba9b4924fce1fe52c53ed4c202aa885b2cde73583e46b873e6637"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-65-19924.json",
+      "sha256": "30f619d34a9e07671ab0f5656efb15f2b9b19ce17fa7ffa3e9dfad3ffdb1523a"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-65-19925.json",
+      "sha256": "ddd0115f3c8cb2f8b1a743acaa63409a78432561b4995e03fa1bd1e35fe59a14"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-65-19926.json",
+      "sha256": "8704df2109ab2025d700be13451f2ab74350f126102bb78863da9319f7520182"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-65-19927.json",
+      "sha256": "da7c8bc56356a1da25576b952fc9435e8cffcebe48b7008e9755bb65852a397b"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-65-19928.json",
+      "sha256": "5244f200986d6b2aff7eaced49c91adf2db931110c64a3458fd8922713d48f27"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-65-19929.json",
+      "sha256": "d5906a6a68e02379d6b7fada44878e7c66fd2d2f3263e80e157742d7b6f96d48"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-73-18507-characteristics.json",
+      "sha256": "a77ba8cdcdd869415a3db91b53ec1032ef3626e05fe6f580b1bf62d1c730589c"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-73-18507-intro.json",
+      "sha256": "327b7e6d38341c9909dd619cd584808abba9934836706dc0107ee0ad935dbee2"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-73-18507-qualifications.json",
+      "sha256": "c3bb3a12dbe0dab156a04b7187fa3d495fca7818dd847506d5edc524eb99d624"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/brainstorm-73-18507-review.json",
+      "sha256": "ceb1bdd3fd602b9315f821330812cfc910822fe01abee4a75628c363b5acced2"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/desktop-about-yourself.json",
+      "sha256": "4404bdc58cad2df6f7ff8368d9193e8634b347620305d1cb6607f81113cf8fbb"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/desktop-care-type.json",
+      "sha256": "99b97c529b2aaacfd86af66e0ef3d4ca0ff3f4d7998984530b3ecf9adb54e3eb"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/desktop-client-types.json",
+      "sha256": "6a28c5957692ada232602753eff87c3a16eeb9293e789c3a60d8806d9770edc9"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/desktop-find-caregiver.json",
+      "sha256": "2b1ffabc30dec768554ac65008db5da1c3d52112586f3543f2b5050935a8c26c"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/desktop-find-matches.json",
+      "sha256": "3159836cb18fc26f12291c9cbf98108cf8acb257112eb7f3929d15160223b7e7"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/desktop-introduction.json",
+      "sha256": "078e509f4e28045f8b709b2a80046c06518ded8a4356942c826ff1dab058b4d5"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/desktop-matches.json",
+      "sha256": "62ffa1ba243ab898f29ad1d90fb38e367ce1b31b8e8c9fa462eba6aa326bf8d4"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/desktop-messages-empty.json",
+      "sha256": "629e3f475a904e19d5f64ec4e26a630bddba7dfa5942824a3d6cedc467714141"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/desktop-messages-list.json",
+      "sha256": "a36749d4e859d2bacc5cd4eadca6374ea1af24e8f0e828878abfe126fcf224a5"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/desktop-needs.json",
+      "sha256": "e7238311368891833cc1957848cb7adcc6f0aa06aadbfa88c0d2666fd6dc3529"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/desktop-schedule.json",
+      "sha256": "10cf8c4c2b57f7daefecb107739280f77e20aa83f7d346ee4074f44913adc5b0"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/desktop-signin.json",
+      "sha256": "be05adfc9d7acfdc4cb11a180b9c49cf98c929d48fa5fcfa13d410229920cd15"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/desktop-signup.json",
+      "sha256": "699a7c063f132536c7d5f748b60db7e9f541ebf537c15c07cd7bdd17ad54d4ee"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/desktop-splash.json",
+      "sha256": "e25c0d5f653eb3bfa7c231dd6cc920d433e91424dabf17cb7fd00392f64e6d73"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-1.json",
+      "sha256": "44a2b7efa34e0392b6db2dbc973e858026b4270c34982bfb0380e692c017eb93"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-10.json",
+      "sha256": "5b8ef105dcf6c0180b9f2f38785726ce3ade7527806d707203b7c4039da8be19"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-11.json",
+      "sha256": "1e2d3788eb3c3c9a501d7a02768932218ba5f2d2d0fabd05ea10b549072c0381"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-12.json",
+      "sha256": "2c9c92e6d9466fbc9146c216b8f80c526a152c82a1b017e19af193ec2a370ccb"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-13.json",
+      "sha256": "fc7d781a6ef325eb70ff33939732e13d3a0a3fe37238efeb2b0b587c842056e4"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-14.json",
+      "sha256": "17271a38c2a9c5b8c29d0cc37685a7a4c8eb03f0f07bac9138b5b28a2066281a"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-15-duplicate.json",
+      "sha256": "81aecab8e2c10e2c2de52aa069c8f8acfd9fc1ab1cdfa476814fbcf994597f6b"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-15-error.json",
+      "sha256": "931e39473dbd01ce90aed2d51ec7898fcda259e449987cfc3b5ac0569e63ada6"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-15-format.json",
+      "sha256": "f47fcf85f1e0c493bd828a191fafcac79cdaffc0a2832e9589d50501c4b9dc0e"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-15-info.json",
+      "sha256": "8292682464ed8a1d61bc901a59b255cbc377d44efeb4ad9ddb7b106f63ec3dd0"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-15-offline.json",
+      "sha256": "5ef001e39c80c3cbe35b8da4abccd6e9db8ab838272fc0887034aefe19cec153"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-15-required.json",
+      "sha256": "bf186766b147006cbf4c0de512633576a44ba95b141892c13b18d94aa27a6467"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-15-server.json",
+      "sha256": "6a5846b79d65e8b25eb3db9c3ece13e6c53412352881fcbc8ccf0b2b081de29d"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-15-success.json",
+      "sha256": "d926fd5283da3536aa587f43ac7bf8bf484299cd28202d19b7ade1bea7b1fa4a"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-15-warning.json",
+      "sha256": "6c8da9346c2306bcf40fa60b69a7513c8b4820fdf887e70ab999a427e024cdf8"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-16.json",
+      "sha256": "8c992b9df098b0ea8a8c9692ee8ced77bf0d5d00ac49aeab78e1367930ad2725"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-17.json",
+      "sha256": "aa4adb34e9092279e98d92dbef607bde870f217c51c3ea90efded5c2443b886c"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-2.json",
+      "sha256": "fb65e0a6408f33dddaeb15eeeca5d1c662c25e15f1573acdff7677f46fc32662"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-26.json",
+      "sha256": "12d0cb3aa0edb6c1ba1dbf8565dabc1ecdb09af0d86b4eb873cdd89d046c3572"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-27.json",
+      "sha256": "597853ed2c41d2131b62c212675a334f8f1ffa2640ee15836ec004e601cfbdc5"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-28.json",
+      "sha256": "5c157510af205691a0ed99b1b170dcb07ca2c5a9d141839cf53e46d34f5c07bd"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-29.json",
+      "sha256": "91e8a0334e3933e4fe8f874db6c9f0c7c73e3db94fbacbc59ea04586dfc431b5"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-3.json",
+      "sha256": "205e97776c7c3b2e62f6bc6614ec57208d1d20ca659977dbda0e812ff0488f69"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-30.json",
+      "sha256": "1458e7fd8f87e6060a52687bd362ae7166c5f350fa0913941950f3c7edbfde92"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-31.json",
+      "sha256": "c912c70da0bbf7b73b2c397ff551337b6c936f561855b38931f0ae359ed40995"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-32.json",
+      "sha256": "cc63958e87d5c0a8152771b50d0a2563f4890f64bb4c7a3a9096fc37dfeab13d"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-33.json",
+      "sha256": "4dda059e42c5a02331ab0c32fb33767c4d1c2aaa8eb360c53c6826e808c8c7d2"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-34.json",
+      "sha256": "a16cfa5c3f0b2d43aaafd4943b7390140987c2b90d64779e9c7fc584a894e207"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-35.json",
+      "sha256": "56a5a1831c193bb7d0e68718f483cb978eb3d88c09259fd5cd255320c317b3ce"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-36.json",
+      "sha256": "d5dc84e5a50792cb429649779704b3b2180cb0c98cd9c726e9a4d7630642f9e7"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-37.json",
+      "sha256": "efc661d4d52278f0da264ac8f726ddfb80577d378f89764069e99c50fca9a9de"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-38.json",
+      "sha256": "c322406bd7de9f738b41b63bbd410166e581efc60758b81d218db8420760b66e"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-39.json",
+      "sha256": "f95f2608e2554bb4f55996385d862f91d6bc9d6845fee54c7ac38460f984a059"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-4.json",
+      "sha256": "ba9cafd406b0d89f0cf44ee5459d0b278bfbf1d654bee96c40e6931a1dcab40d"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-40.json",
+      "sha256": "240be7f0ad0f80be0eb83ef5b15e44f1c82ec6a73fd0ea5ae2a0a20fb73899fa"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-41.json",
+      "sha256": "e47f9b2bd553c8bf82dea0923fb64fa8aab10d2d6907468d67c2d6da30aa4678"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-42.json",
+      "sha256": "bc6133b6ec282ad47c6ed1e76f99b60d42abfefc7cc7a270864ce0bd53452b72"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-5.json",
+      "sha256": "68673dca2442688fd2258900c89218c56aec8859b7580bcf29fb945b46a41af6"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-6.json",
+      "sha256": "1fca158aeea01b65ca2bfbf2cb44d09abb113fc6f18348b8164aadad9a481ee8"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-7.json",
+      "sha256": "0d0ce16f928df6d01670d837fe60f6a942c80ca1246aaefe63264fa2e11d2892"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-8.json",
+      "sha256": "8bcaaed2b27d86c5ee24d95acaf13e6c397b593ce3ccc0cf5e2e4693f6161b97"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/legacy-concept-9.json",
+      "sha256": "1dfdbd9b2bcae79f93f50bcff57fc3620718ae2ffdbeb13f9867464bd9665096"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/mobile-360-11686.json",
+      "sha256": "8e1960f932c02f3251a1e1da4106bbac6f1da80526743b3e0342a590cc16730a"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/mobile-714-11654.json",
+      "sha256": "48c1212ca7fbfe604bc0109a3dd0c44f38e499af7baff7d450f9099598f190ee"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/mobile-714-11657.json",
+      "sha256": "86b25f43b4008894963c40cd30faf3bacb8733acd0c4ff3eb9479e11fde5ab32"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/mobile-714-11660.json",
+      "sha256": "8527e8139edf0764efb24f55d1c00dd74ff73988626598a8ba81ac40dabe6dc6"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/mobile-714-11663.json",
+      "sha256": "94e8ed1b90605c1a55491517b26589c53384cd0bf39e24f26281ab7d3a246945"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/mobile-714-11666.json",
+      "sha256": "ed4d71a052d3f688c439591f9c4e76e53ecb6b9910d21162f3a5aba6c7294804"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/mobile-714-11669.json",
+      "sha256": "0d5eecffd7dd3ccdbb74a325ee3b62090cf6f295ed128fc1c5280052ae852564"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/mobile-714-11672.json",
+      "sha256": "95d00023f1977a68ecb73ae26f0c3e4340b47b13f4b64d82f70a7688215450c0"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/mobile-714-11675.json",
+      "sha256": "3d13f3aa33851364ab831ef4b2da01781978e82724295fd272ac7574d802250c"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/mobile-715-11684.json",
+      "sha256": "ae9375d887237ee36901d87d630020f2f67ad3526a6fe22cbf2f1393f050f202"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/mobile-715-11687.json",
+      "sha256": "521d2751f8bb505310ad3723d2d4792daeb0dbf8f1d83be51ddda71b195924d1"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/mobile-716-11690.json",
+      "sha256": "9a280f405c99640fc8ae9e4aa9ac019554d4695179b0915ac73f4148f3871eb0"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/mobile-716-11693.json",
+      "sha256": "5fc505c86a02ad4e54ae7db93e4e44815bf449ed3781dfa28b0b02e2d85ae03d"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/mobile-720-11696.json",
+      "sha256": "b5cb32b1ce894fd2a7a0293e8c3f867f424793197da670456027ad0d99179e9b"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/mobile-721-11699.json",
+      "sha256": "a69d6afb242e04e1d1a73b217cd16a7cc956d953b3001ef331d0b78a0dea562a"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/mobile-721-11702.json",
+      "sha256": "65e88e5a069b94d49a68ff775dba262c0f90491dc0941549b35708f8daeba8c4"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/mobile-732-11714.json",
+      "sha256": "55d252b2fbda1b7df05e45a7390ee47cb0c0863cc16b528ca2599ab0098852d1"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/mobile-734-11717.json",
+      "sha256": "980be2f97e8930e6a73c7a85719e5cd95974c3bbe21458e85999c3a33d1ee30f"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/mobile-734-11720.json",
+      "sha256": "12206f387168ae1705980b46ab1ff948eea28640152349de29daeef81bdc5f96"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/mobile-735-11726.json",
+      "sha256": "8a4e356ae9a5e2b11bc5da4389ceddcafb0f81492841d82c1856e4afbc06a704"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/mobile-736-11729.json",
+      "sha256": "c56f1a69900408d3b38f4e87cdbc551b0bcf412093dfc729f99a9f7a4bded02c"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/mobile-738-11732.json",
+      "sha256": "4ad77c46799c5cb64565fed22eb9b751d46b9215e70b7983751a272d16c95355"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/mobile-738-11737.json",
+      "sha256": "e72b91bc249ca10251f5a62c38e0a39abd2a4f05971d664432dcdfa9c3c7ed64"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/mobile-746-11740.json",
+      "sha256": "7b7242182fa055b4afb360f1ba321963ad338d86fbe64f96c70b4a189bfe9678"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/mobile-751-11743.json",
+      "sha256": "6a04c9be6a16203747753bcfa67257223499c9e90becd053ffc86e91ef4e42b5"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/mobile-795-11669.json",
+      "sha256": "d02da1ccbb1ac20f146bdabf1a17117948e8f2c80000595bf9395466558b1bb7"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/source-board-11-care-type.json",
+      "sha256": "4c485830cfe72d5d446e4f41af98c4df0c6ca2e7ad1c09fde69c0457ff51c83b"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/source-board-11-complete.json",
+      "sha256": "d10fb7b4396401c3d833cc18278c161cd005a73e38927bb9d9e56198df7bdfc0"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/source-board-11-profile.json",
+      "sha256": "11a30ae736951c61de08f07ad7ca143ed206f06157433ab4e531917cffecbb35"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/source-board-11-services.json",
+      "sha256": "654c77d3d64188f434b3120b303cdfa26d084d9e9bfdc670a7ba52c63a1b773f"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/source-board-12-additional.json",
+      "sha256": "8606c13eb962220dd006e8269cbddba433040692b04ae60c6aab31c7f6b052f9"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/source-board-12-person.json",
+      "sha256": "6619f81efd64b3cfa54bb79375c9749869214114f52c40cdbaaed57eb2725e10"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/source-board-12-review.json",
+      "sha256": "d553e291306af3379ce6db34d13d879c6714f660c9cd12680fb0d9364a27281e"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/source-board-12-work.json",
+      "sha256": "e7285ae6af0726c15219e9d52068411991a6286964b703da8ce8286a5049232e"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/source-board-16-needs.json",
+      "sha256": "621ad354036df6a771f9d28e93918e2e33a22daa63e7b588cecd62e5783083c6"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/source-board-7-care-type.json",
+      "sha256": "f12aac11fd02a4f3fc863dd0d8e40ecc96ee4b1df18507b61fccaa2bc025bd15"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/source-board-7-complete.json",
+      "sha256": "35aa6bc21785249f9a56f6bf8c908534008e42491fed99a7ce9c367648f90afa"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/source-board-7-needs.json",
+      "sha256": "08de2347175b59463f0ac89b3dc9bf108e548bfa19eede7670c6e83b9b33ac8d"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/source-board-7-profile.json",
+      "sha256": "5e1315b14b33f2d56523e2c190014a7dba60b5e2f69272538e2c887af0d872e4"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/source-board-group-favorites.json",
+      "sha256": "a3a305693889ad1a2d2022b7eebae0a710bf654640b64c635dc4fd921a4272fb"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/source-board-group-help.json",
+      "sha256": "4eafb627bc803440b2a3f2f43a2f7c80c8c213bad95daa5a87927208ae62a637"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/source-board-group-notifications.json",
+      "sha256": "24b69a70d24216a541fb0fe45127173a8c20dcf5f87ee43f911d69ea196ecfcd"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/source-board-intro-meaningful.json",
+      "sha256": "c7718522d0953312c00247f48d3a9bdd13084a3420c106032c3bff96425bcd7f"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/source-board-wa-needs.json",
+      "sha256": "16f26a02b2f858d1b9d903343ce5917cb50e4ff71935d9eed14ee769dcf7dab2"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/source-board-wa-schedule.json",
+      "sha256": "09334c0319ea01a837cc3926d5e883b1d36d6e6e7c86c9bc066bc7ca8b7a9d7b"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/state-v1-8-13750.json",
+      "sha256": "c2404193dc461fe5e2b5ebbfa3eadbe2d928f6db1b5949fd8aab7bfcfe8797ce"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/state-v1-8-13752.json",
+      "sha256": "89c9f1c0b3c5f96db812b20a1a5025646cd257ea7f154f5e815bc67136c76b1f"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17309.json",
+      "sha256": "d1c6a0a2e1f1eaa5941850ff8c7ba1755ce9d900fe7bd636504ea3c512ae99e5"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17327.json",
+      "sha256": "3fb96f65cb717828886ca3cca42550eaa586d41b3a432d86f38c27559e081504"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17344.json",
+      "sha256": "b359c3f828cc6b983e0ea2e0608babc4447a7171f15b29b36a2cf419fe4c3c84"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17360.json",
+      "sha256": "eb6ac7ceb9f4f05badcd30e3dac7a43399420f471a2069e01851e724ed21ea45"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17376.json",
+      "sha256": "f777e7144dcc26473af5e62c0b75b0fb260630c95005536e92177b89ae316bb1"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17393.json",
+      "sha256": "bf06b6b40ab7cf812364b39a4a617b12fc411831bdab27b247252ec41ab0ef2f"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17415.json",
+      "sha256": "95627b7171c24b27f7cc5db67b4c74aea305a7ba4410d12e3688179fe1c5bc36"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17438.json",
+      "sha256": "298da52bab6ab01635f5a87de08622e275d599cc47f940575f2a37d159802030"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17460.json",
+      "sha256": "252c647860573f3bf5ab4e8ef3978e139fd0558a092fa913499d8914fce2771a"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17481.json",
+      "sha256": "30c414f7a793e287639c93158bfadd1165cf775cc38147fb101c61b4bc4543ea"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17513.json",
+      "sha256": "1ae9971d8950b476f69bcbee4f72e5af36ef45ee0b2bbf61bb0dfaebcefae67a"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17533.json",
+      "sha256": "2a73fcbdaf7c669d726b980683fd8f4a7e8f03e31788419db347ce4f4881ba98"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17551.json",
+      "sha256": "0c1fb700d1fe6127404639981f9d390e290b929ef6ad525c1dbad4bc4dff2db1"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17563.json",
+      "sha256": "9e27fd8260758a38df2deecb7aa85b677810a30e4bd61af27d19e69bb9aec08d"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17577.json",
+      "sha256": "c424e8b15d3ad1e66a7670fcb30cf79537c7108cb7c629dbabc11f9cd43880ff"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17587.json",
+      "sha256": "e15dfb956e39f3f8f2246d4d711060785770f9de879549ddcfafd9b69fc4e221"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17598.json",
+      "sha256": "6baa281279b5009da3bae4ddf15c9ac7f2a05a31246cb248bc21ec7cc9c5e161"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17608.json",
+      "sha256": "287aa4e7ff48d768bc29885eeb023b223a06dee425dd473c2b6d0a1883aac841"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17620.json",
+      "sha256": "0af050bf2f312a27beb370d99e5cff1407e50a43dc3e81626d1e2be4f0a042b6"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17633.json",
+      "sha256": "74f380fd394f00d1119e1311e4421567b5ecb372eeb6ce30e5eb92f0e3905a5d"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17652.json",
+      "sha256": "3e4477f224ef1131bf2e5049d0aaff63cef05beed405b7c15a051ca648007842"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17703.json",
+      "sha256": "997dbf6344776a24b81c965b1daa50bc0b4149d3660e8fbe4a91d08bae172f9b"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17717.json",
+      "sha256": "8fbc4c5bcaa90b27e322493d834fe0c452a6ac5fe9f47f35953cab6436314266"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17726.json",
+      "sha256": "a24803026d112c7c0ea129b4a1070003d90c346bbf99dca5e401e4e78006c77c"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17735.json",
+      "sha256": "04d3086d1a0ed743e87b1187b98c359885bf4d20b9aa9f7c9151ab3cccbcb420"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17748.json",
+      "sha256": "2237ffdb17e4d25f4b8afa3d3099491baeca9ef918288b903134270fee8291ac"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17758.json",
+      "sha256": "246ec04240127f51db9f6aeb23dbab0755584f3bd897012e3d334a560830d4ae"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17767.json",
+      "sha256": "8190f1fc0f7ada2b4c5cad64ad3f995babdbb597d144867cffba54faa8a7eef0"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17785.json",
+      "sha256": "bd4df69532603daf1ae9d7a628ce09685a760a80072929d8e57354a0d7480b43"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17814.json",
+      "sha256": "55929d546f372289e7838a70942023e4bc7036dcb2178a8408a0541dfd6508ff"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17853.json",
+      "sha256": "d78360e0d5ac4b66030ae806c9d362d6f74b299c67ca287c1d2016d0a7257b61"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17876.json",
+      "sha256": "bea2afcddb7d5bfbe2366e074959f6c9e9b2b1d326ea8fb74ff68109371e4e16"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17893.json",
+      "sha256": "faab8554032b5a3f06bf9bd3fe2887f9f73549d316448eece76cdbb13516b90f"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17921.json",
+      "sha256": "621d330ba60146f293ccdf567d59c4bcd2596c7689b811a090b801f6351a3927"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17937.json",
+      "sha256": "7bf2b7e78cf146a0c0fbb311b3dc2a3596bb2df64408a72982ceaaef212bdcf8"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17962.json",
+      "sha256": "8028b60c82b562b8f88449499af7124bf682b4fd65904cbce92ba8cc8b0d9a07"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17976.json",
+      "sha256": "ca881d14d05a8a5f380aef7dffe70484e653daa4db193fbc46f823610c342698"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-17991.json",
+      "sha256": "25b45fd8180ea4c968f1c82ac4f27842ae4f0e7c5cd747e6f5fc29521e7d6551"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-18040.json",
+      "sha256": "f0d5bbe8e995ba0b343f59aff15921d70c4a67bdbeb387e66e8076050a34594f"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-18087.json",
+      "sha256": "ceeebdac0807cd81b0ec79501b1abc0ee7819ae6a92c02215acec9eedc7e5bdc"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-18151.json",
+      "sha256": "1d54858798a5e692478be257d615141274d1d32b53897ff29872d15a2538a51e"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-18163.json",
+      "sha256": "e6767db4fff92e1210b94fdae234e745631be4313359095dfdf72ac4b3a1d1a5"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-18178.json",
+      "sha256": "beb7d4b10c2151d152ecae4525d2f48d2155e7354913e554b7c1d6c74d447655"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-18199.json",
+      "sha256": "43d078ef49ffcbd7b1006331084eb4cd60d329f14f6ab6d5d824d0390a53a4a7"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-18211.json",
+      "sha256": "bc33661228723ff4384d966f5020cbc5bda20354b91333f6322489191967aec0"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-18261.json",
+      "sha256": "8cb6e9d5b29d29138a484b31e46128316078768ca56a5b6f941e4e601cdc215f"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-18291.json",
+      "sha256": "fef91e4b45f4563e6532d4330f6ab6243dea5ec5284bca643fd3e68cabe44b36"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-18376.json",
+      "sha256": "3befb5ced366d959e027689a31207d1ed28001e6e9a2ab04ce9eeac77f1d89d8"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-18429.json",
+      "sha256": "2151ce12b708358a8d08bebb5f3612e73d45ac02cb516b2ad823cefce9eb3760"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-18526.json",
+      "sha256": "1861a66e0ca27f57aacf5c6f7ef1b688937abaaf20aab61140d71b20f4b8b21a"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-18645.json",
+      "sha256": "4cbbbe3b4f93b6911d43441bc314bc3ab6d8f9a9c184a7ada3afbdccda39f21a"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-18721.json",
+      "sha256": "2ea15411c17417f435dd64d3973fe5d6ef7f91846605b04f61acb24a54f4bbf4"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-18740.json",
+      "sha256": "f1ba87bfc6e03571994710cdc5796a9e41788fce1dbd73e828820ab18b453081"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-18753.json",
+      "sha256": "0ae359c3022419e29d8bd0afc685d79729aac310c22881b79174793953b4eb38"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-18768.json",
+      "sha256": "74bf64c9cc7e14cfb19c14974bb4e59a708d5cfee71a76a6e7fd9bc714b033ad"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-18805.json",
+      "sha256": "20016ed5d48ca726c437d49cd0b768e3c03c629c7f150b9b07dd25c4fa20e529"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-18863.json",
+      "sha256": "9561f3a320cfe848ece1843f6d268b59bbc317b2a2d4948ed137cff9d7f89403"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-18880.json",
+      "sha256": "c92755fd44746cbeee57abe45e85956805fc5d27113187e90df38ce24c87002a"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-18905.json",
+      "sha256": "efac13653f61212366b9aeb0d8434c363659db4f670d552d6f9f1b0d5a47126a"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-18906.json",
+      "sha256": "b8f16afaef70a5246f0d16095a121f857407d30a1fb7a539335c830f9b09dcb6"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-18922.json",
+      "sha256": "97a0fed2632e728ccbe67fb9cff781673ceed4078fff2806a5df02a13c7a2828"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-18957.json",
+      "sha256": "61c2b245138586868b8864eeed85b419e3f5aff134a9f0b0032630e510988921"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-19013.json",
+      "sha256": "4585689a72804c561a2368e37489a5b4f468aac1341d878e45a08e1665fdf73e"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-19261.json",
+      "sha256": "1c2c3a82dcf697dd63eae386e0c28b8c2c54c274f27532adfc9c6ed666f549d3"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-19277.json",
+      "sha256": "b6661723ce9345cd186c9074c9c8c0a0e43bdbf130f2bd6a22017071af766d72"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-19414.json",
+      "sha256": "e0ca5043c9f30f0f976bf51199c08573f7bc99cafdd407d81fe3c9ec32e890ca"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-19444.json",
+      "sha256": "f4299743c21694d7232baaed4f2b65242ff1453d0b7846315ff09d3a4c357505"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-19610.json",
+      "sha256": "c37c02f5483d73516c1de40dbf073a2f726e95fe463d086d44da12cf17371dc5"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-19777.json",
+      "sha256": "012a3343a0b18cd6a72c577bf0adb402ad1f17298f456ed8bda9623c67f344d1"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-19790.json",
+      "sha256": "fb7fb521a77f945258cb8828315efecb08c67c166bffc47296e52eafad948c4d"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-19932.json",
+      "sha256": "2955a326a248150b156499a3e12107954b6148e6c90c7d3efa02387eb0a9cdab"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-19958.json",
+      "sha256": "ec3e3dc146f88614271eaba7f16471939f790c63649a08cfa2df2bba4035eab2"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-19978.json",
+      "sha256": "8359eaaef8c8d1e3f4c094a8ce204c13ebe46cb8b551367e29ae5195cf36b889"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v1-8-20007.json",
+      "sha256": "ca3628649ea509e1dced6a8448f031278a86d5e1021dba582ef34b568ca8e81d"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v2-101-11973.json",
+      "sha256": "4fc4389e227f5e80b52e4f9be14b63685be5529f589970e2d2818c8ac3941b37"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v2-16-14997.json",
+      "sha256": "00e569d7fa01d2410410c6067a6e3c1887f539af82507d36cde2a688656f8832"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v2-195-11749.json",
+      "sha256": "5a02a37c115e3988e1f3e1147b1075b65e2d5e7d6b730087d84a72b281b2037f"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v2-32-14974.json",
+      "sha256": "e82d0d2b19c67f937ca1b26d34e4e0dae4e989d8d8cde7e855c7f4dd8385037c"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v2-51-5170.json",
+      "sha256": "991776ce43a47abb2ab0cad302fb2b8b722135df58d61b242acb0cd85246138e"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v2-56-84378.json",
+      "sha256": "079befc769573a580aa9f0380cb0024580db1085013cf2b3b0525fc5a246de67"
+    },
+    {
+      "path": "Carezaar/Resources/Scenes/v2-65-19934.json",
+      "sha256": "ed2c32fd2deff7f6be4a02a78af7c9b4a15b37f44b4967fa97d4a5c28ee00e3d"
+    },
+    {
+      "path": "Carezaar/Resources/brainstorm-catalog.json",
+      "sha256": "7536581f281ff2a21a9d054af6a95e0bd523939083f75f1afdaa054a8ec9c8f8"
+    },
+    {
+      "path": "Carezaar/Resources/catalog.json",
+      "sha256": "d82e6bb985ce7bec9e5ee3fe2697992c3d930b46070fae69e8e1d0a4b5afa6ef"
+    },
+    {
+      "path": "Carezaar/Resources/desktop-catalog.json",
+      "sha256": "de88bcfba617ae3b2bf6cafd257b148fbae12a654b56ef456aad68557d8a9cc4"
+    },
+    {
+      "path": "Carezaar/Resources/legacy-concept-catalog.json",
+      "sha256": "6e1f82943f1d07bc1e000498c862fff14bfdfa1b901c0a352129d39982e49cc5"
+    },
+    {
+      "path": "Carezaar/Resources/mobile-catalog.json",
+      "sha256": "856a01d5829b946aafcd514b41be58b0bc73fd2a5c5dd849fe83c53b7aaf6228"
+    },
+    {
+      "path": "Carezaar/Resources/source-board-catalog.json",
+      "sha256": "e3bd8a911064a444e38075d0fa77664da928e35c1b91af3ce4b3275075517e2d"
+    },
+    {
+      "path": "Carezaar/Screens/SourceScreen.swift",
+      "sha256": "ac93d91c6b760c071f13af00baa2c2bf191a1bd50d02125d6518e22c367d1016"
+    },
+    {
+      "path": "Carezaar/Services/AuthService.swift",
+      "sha256": "5f9035613b45d6c7f171638787cb1fac357c96c6bc7f7156638e63f1ab3ad813"
+    },
+    {
+      "path": "Carezaar/Services/BaseService.swift",
+      "sha256": "b806541b44f3490d0deba3f57840e1f88618b522bf375ae3516c8a4e8d5d6987"
+    },
+    {
+      "path": "Carezaar/Services/CaregiverService.swift",
+      "sha256": "edd316e495342dcedfb33a9e8a15531304febcde1337677f4b838939fc0df0c7"
+    },
+    {
+      "path": "Carezaar/Services/ClientService.swift",
+      "sha256": "45f8d0670b8482be8693ed2f7628267589967e752467d41c4256f0997f884d38"
+    },
+    {
+      "path": "Carezaar/Services/UserService.swift",
+      "sha256": "22a81c730b89964870044ee3cdbf651e52cdd58fbb0040ea4942832514d57a67"
+    }
+  ]
+}

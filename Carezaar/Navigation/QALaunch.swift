@@ -55,6 +55,11 @@ enum QALaunch {
             catch { print("QA login failed; see standard in-app error handling.") }
         }
         try? await Task.sleep(for: .milliseconds(300))
+        // A bounded Debug-only delay lets native tests observe departure during
+        // a short failure window after startup loading has finished.
+        if let raw = value("--qa-push-delay"), let delay = Double(raw), delay > 0, delay <= 30 {
+            do { try await Task.sleep(for: .seconds(delay)) } catch { return }
+        }
         if let tab = value("--qa-tab").flatMap(MainTab.init(rawValue:)) { router.selectedTab = tab }
         for id in value("--qa-push")?.split(separator: ",").map(String.init) ?? [] {
             if let route = route(id) { router.push(route) }
@@ -203,6 +208,17 @@ enum QANetworkFault {
             root["result"] = NSNull()
         }
         return (try? JSONSerialization.data(withJSONObject: root)) ?? data
+    }
+
+    /// Bounded failures before real renewal; no successful response is fabricated.
+    private static let refreshFailures = QARefreshFailureCounter()
+    static func refreshRequest(_ request: URLRequest) -> URLRequest {
+        guard refreshFailures.consume(),
+              var parts = request.url.flatMap({ URLComponents(url: $0, resolvingAgainstBaseURL: false) }) else { return request }
+        parts.host = "127.0.0.1"; parts.port = 9
+        var failed = request
+        failed.url = parts.url
+        return failed
     }
 
     /// `--qa-latency <s>`: every request waits this long first (a slow network).
@@ -375,6 +391,23 @@ struct QARequestCountsView: View {
             .font(.system(size: 7)).frame(width: 1, height: 2).clipped()
             .allowsHitTesting(false)
         }
+    }
+}
+#endif
+
+#if DEBUG
+private final class QARefreshFailureCounter: @unchecked Sendable {
+    private let lock = NSLock()
+    private var remaining: Int = {
+        let args = ProcessInfo.processInfo.arguments
+        guard let index = args.firstIndex(of: "--qa-refresh-failures"), index + 1 < args.count else { return 0 }
+        return max(0, Int(args[index + 1]) ?? 0)
+    }()
+    func consume() -> Bool {
+        lock.lock(); defer { lock.unlock() }
+        guard remaining > 0 else { return false }
+        remaining -= 1
+        return true
     }
 }
 #endif

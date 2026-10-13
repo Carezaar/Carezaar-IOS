@@ -66,6 +66,96 @@ final class MatchStateMatrixUITests: XCTestCase {
             "chatSendCovered": false, "confirmationCovered": false, "greenRasterReviewRequired": true])
     }
 
+    /// R10 uses only the exact retained fixture pair and restores its staged edge.
+    /// This checks settled geometry/navigation; raster review verifies the slide itself.
+    func testOwnedActiveMatchedCardsRemainBalancedAcrossForegroundAndReopening() throws {
+        try matchedCardsBalanced(languageID: 1, languageCode: "en")
+    }
+
+    func testOwnedArabicMatchedUsesManagedSelfLabelAndMirroredBalancedCards() throws {
+        try matchedCardsBalanced(languageID: 3, languageCode: "ar")
+    }
+
+    private func matchedCardsBalanced(languageID: Int, languageCode: String) throws {
+        let f = try preflight(languageID: languageID)
+        let selfLabel = try XCTUnwrap(f.labels["chat_screen_you"], "Actual CMS self label must exist in the selected language")
+        let initial = try profile(f.profileEndpoint, token: f.primaryToken, expectedUser: f.peerID)
+        let peerInitial = try profile(f.peerEndpoint, token: f.peerToken, expectedUser: f.primaryID)
+        guard initial["match_status"] as? String == "none", peerInitial["match_status"] as? String == "none" else {
+            throw XCTSkip("R10 requires exact retained pair NONE; no existing relationship disturbed")
+        }
+        cleanupFixture = f
+        let edge = try createRequest(f, fromPrimary: true)
+        _ = try ownedEdge(edge, fixture: f)
+        let acceptance = try CarezaarAPI.callWithHTTPStatus("PATCH", "users/matches/\(edge)/accept", token: f.peerToken)
+        XCTAssertTrue((200..<300).contains(acceptance.status))
+        XCTAssertEqual(try pairStatus(f), "active")
+        let route = "Matched/\(f.role == "client" ? "caregivers" : "clients")/\(f.peerID)"
+        for _ in 0..<2 {
+            launchOwnedRoute(route, languageID: languageID, languageCode: languageCode)
+            let own = app.descendants(matching: .any).matching(identifier: "matched-self-photo-card").firstMatch
+            let peer = app.descendants(matching: .any).matching(identifier: "matched-partner-photo-card").firstMatch
+            XCTAssertTrue(own.waitForExistence(timeout: 45) && peer.exists)
+            // Hittability can become true before an entrance spring settles.
+            // Require consecutive stable measurements inside the same original
+            // five-second deadline; retain strict post-foreground comparisons.
+            var previous: (CGRect, CGRect)?
+            var stableSamples = 0
+            var geometrySamples: [[String: Double]] = []
+            let ready = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+                let ownFrame = own.frame, peerFrame = peer.frame
+                geometrySamples.append(["selfX": ownFrame.midX, "partnerX": peerFrame.midX,
+                    "selfWidth": ownFrame.width, "partnerWidth": peerFrame.width])
+                if let previous, abs(previous.0.midX - ownFrame.midX) < 0.5,
+                   abs(previous.1.midX - peerFrame.midX) < 0.5,
+                   abs(previous.0.width - ownFrame.width) < 0.5,
+                   abs(previous.1.width - peerFrame.width) < 0.5 {
+                    stableSamples += 1
+                } else { stableSamples = 0 }
+                previous = (ownFrame, peerFrame)
+                return stableSamples >= 2 && own.isHittable && peer.isHittable
+                    && self.app.frame.contains(ownFrame) && self.app.frame.contains(peerFrame)
+            }, object: nil)
+            XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 5), .completed)
+            let settlingProof = XCTAttachment(data: try JSONSerialization.data(withJSONObject: geometrySamples, options: [.sortedKeys]), uniformTypeIdentifier: "public.json")
+            settlingProof.name = "R10-entrance-settling-frame-samples"; settlingProof.lifetime = .keepAlways; add(settlingProof)
+            if languageCode == "ar" { XCTAssertGreaterThan(own.frame.midX, peer.frame.midX) }
+            else { XCTAssertLessThan(own.frame.midX, peer.frame.midX) }
+            XCTAssertLessThan(abs(own.frame.width - peer.frame.width), 25)
+            XCTAssertTrue(peer.label.contains(f.peerName))
+            XCTAssertTrue(own.label.contains(selfLabel), "Matched self label must use the actual selected-language CMS value")
+            let ownFrame = own.frame, peerFrame = peer.frame
+            XCUIDevice.shared.press(.home); app.activate()
+            XCTAssertTrue(own.exists && peer.exists)
+            var foregroundSamples: [[String: Double]] = []
+            let returned = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+                let a = own.frame, b = peer.frame
+                foregroundSamples.append(["selfX": a.midX, "partnerX": b.midX,
+                    "selfWidth": a.width, "partnerWidth": b.width])
+                // SpringBoard's foreground zoom can temporarily transform AX
+                // rectangles even after activate() returns. Require the original
+                // settled geometry, retaining the strict comparison below.
+                return abs(a.midX - ownFrame.midX) <= 2 && abs(b.midX - peerFrame.midX) <= 2
+                    && abs(a.width - ownFrame.width) <= 2 && abs(b.width - peerFrame.width) <= 2
+            }, object: nil)
+            XCTAssertEqual(XCTWaiter.wait(for: [returned], timeout: 5), .completed)
+            let foregroundProof = XCTAttachment(data: try JSONSerialization.data(withJSONObject: foregroundSamples, options: [.sortedKeys]), uniformTypeIdentifier: "public.json")
+            foregroundProof.name = "R10-foreground-frame-samples"; foregroundProof.lifetime = .keepAlways; add(foregroundProof)
+            XCTAssertEqual(own.frame.midX, ownFrame.midX, accuracy: 2)
+            XCTAssertEqual(peer.frame.midX, peerFrame.midX, accuracy: 2)
+            XCTAssertEqual(count("GET /api/" + f.profileEndpoint), 1)
+            XCTAssertEqual(count("POST /api/users/matches"), 0)
+        }
+        app.terminate()
+        try restoreNone(f)
+        XCTAssertEqual(try pairStatus(f), "none")
+        cleanupFixture = nil
+        try record("R10-owned-matched-card-lifecycle", ["role": f.role, "languageCode": languageCode, "freshPresentations": 2,
+            "settledCardsBalanced": true, "foregroundRestoresSettledGeometry": true,
+            "oneProfileReadPerOpening": true, "ownedEdgeRestored": true,
+            "slideRasterAndReducedMotionReviewRequired": true])
+    }
+
     /// Remaining P16-001–004 / P16-008–011 chat-authorization portions. The
     /// inactive native Send guard is exercised, never a direct negative POST.
     /// ACTIVE opens the already existing owned conversation and types only.
@@ -229,12 +319,12 @@ final class MatchStateMatrixUITests: XCTestCase {
         (row["messages"] as? [[String: Any]] ?? []).compactMap { $0["message"] as? String }
     }
 
-    private func launchOwnedRoute(_ route: String) {
+    private func launchOwnedRoute(_ route: String, languageID: Int = 1, languageCode: String = "en") {
         app.terminate()
         app.launchEnvironment["QA_EMAIL"] = env["QA_EMAIL"]
         app.launchEnvironment["QA_PASSWORD"] = env["QA_PASSWORD"]
         app.launchArguments = ["--qa-signout", "--qa-login-env", "--qa-request-counts", "--qa-push", route,
-                               "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
+                               "-carezaar.languageId", String(languageID), "-carezaar.languageCode", languageCode]
         app.launch()
     }
 
@@ -277,20 +367,20 @@ final class MatchStateMatrixUITests: XCTestCase {
         XCTAssertTrue(toast.exists, "Managed transient restriction must exist when its control crop is captured")
         let proof = XCTAttachment(screenshot: toast.screenshot())
         proof.name = "owned-\(status)-chat-restriction-only-\(f.role)"; proof.lifetime = .keepAlways; add(proof)
-        XCTAssertGreaterThan(count("GET /api/users/chats/\(chatID)"), before,
-                             "Native Send must actually re-check current chat metadata")
+        XCTAssertEqual(count("GET /api/users/chats/\(chatID)"), before,
+                       "Requirement 14 uses the already loaded inactive relationship without another Send preflight")
         XCTAssertEqual(chatSendAttempts(), 0, "Inactive native guard must prevent every message POST")
         XCTAssertTrue((field.value as? String) == draft, "Blocked send must preserve the unchanged draft")
         let after = try ownedChat(chatID, fixture: f, active: false)
         XCTAssertFalse(chatTexts(after).contains(draft), "Inactive synthetic draft must be absent from persisted messages")
         XCTAssertEqual(try pairStatus(f), status)
         try record("owned-\(status)-native-send-guard-\(f.role)", ["role": f.role, "publicState": status,
-            "nativeCurrentMetadataGETObserved": true, "nativeChatSendPOSTs": 0,
+            "loadedInactiveMetadataUsed": true, "additionalSendPreflightGETs": 0, "nativeChatSendPOSTs": 0,
             "managedCurrentMatchesRestrictionObserved": true, "exactDraftPreserved": true,
             "syntheticDraftAbsentFromBackend": true, "directNegativeBackendPOSTPerformed": false])
     }
 
-    private func preflight() throws -> Fixture {
+    private func preflight(languageID: Int = 1) throws -> Fixture {
         let required = ["QA_EMAIL", "QA_PASSWORD", "QA_CLIENT_EMAIL", "QA_CLIENT_PASSWORD",
                         "QA_CG_EMAIL", "QA_CG_PASSWORD", "QA_CLIENT_USER_ID", "QA_CG_ID"]
         guard required.allSatisfy({ !(env[$0] ?? "").isEmpty }) else {
@@ -332,7 +422,7 @@ final class MatchStateMatrixUITests: XCTestCase {
         var labels = [String: String]()
         for row in rows {
             guard let slug = row["slug"] as? String, let translation = (row["translations"] as? [[String: Any]])?.first(where: {
-                ($0["language_id"] as? NSNumber)?.intValue == 1 || ($0["language_id"] as? String) == "1"
+                ($0["language_id"] as? NSNumber)?.intValue == languageID || ($0["language_id"] as? String) == String(languageID)
             }), let name = translation["name"] as? String else { continue }
             labels[slug] = name
         }
