@@ -102,16 +102,40 @@ final class NetworkTests: XCTestCase {
 }
 
 final class NetworkPolicyTests: XCTestCase {
+    func testDroppedReadRecoversOnFirstRetryWithBoundedBackoff() async {
+        await assertDroppedReadRecovers(drops: 1)
+    }
+    func testDroppedReadRecoversOnSecondRetryWithBoundedBackoff() async {
+        await assertDroppedReadRecovers(drops: 2)
+    }
     func testDroppedReadRecoversAfterUpToThreeRetries() async {
-        var attempts = 0
-        StubHTTP.handler = { _ in
-            attempts += 1
-            if attempts <= 3 { throw URLError(.networkConnectionLost) }
+        await assertDroppedReadRecovers(drops: 3)
+    }
+
+    private func assertDroppedReadRecovers(drops: Int) async {
+        var starts: [TimeInterval] = []
+        StubHTTP.handler = { request in
+            XCTAssertEqual(request.httpMethod, "GET")
+            starts.append(ProcessInfo.processInfo.systemUptime)
+            if starts.count <= drops { throw URLError(.networkConnectionLost) }
             return (200, Data(#"{"message":"Successful Operation"}"#.utf8))
         }
         do { _ = try await APIClient(session: StubHTTP.session()).sendIgnoringResult(Endpoint(method: .get, path: "fixture", requiresAuth: false)) }
         catch { XCTFail("Read should recover: \(error)") }
-        XCTAssertEqual(attempts, 4)
+        XCTAssertEqual(starts.count, drops + 1)
+        let intervals = zip(starts, starts.dropFirst()).map { $1 - $0 }
+        for (index, interval) in intervals.enumerated() {
+            let scheduled = 0.25 * Double(1 << index)
+            XCTAssertGreaterThanOrEqual(interval, scheduled - 0.01, "Retries must respect the shared backoff")
+            XCTAssertLessThan(interval, 10, "An immediate fixture response must not stall retry recovery")
+        }
+        let attachment = XCTAttachment(data: try! JSONSerialization.data(withJSONObject: [
+            "droppedReadCount": drops, "attemptCount": starts.count,
+            "monotonicRetryIntervalsSeconds": intervals, "productionNetworkContacted": false
+        ], options: [.sortedKeys]), uniformTypeIdentifier: "public.json")
+        attachment.name = "P07-004-recovery-after-\(drops)-drops"
+        attachment.lifetime = .keepAlways
+        add(attachment)
     }
     func testDroppedReadStopsAfterThreeRetries() async {
         var attempts = 0

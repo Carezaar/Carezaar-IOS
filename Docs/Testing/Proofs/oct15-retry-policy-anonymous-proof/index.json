@@ -1,0 +1,26 @@
+{
+  "scope": "Shared production APIClient GET retry boundary using URLProtocol; not physical-network or multi-device UI recovery.",
+  "reviewStatus": "APPROVED: independent reviewer verified native8PASS/0FAIL/0SKIP, all three recovery/backoff attachments, artifact hashes, test-source hash and privacy. P07-004 shared retry-policy scope only.",
+  "artifacts": [
+    {
+      "path": "recovery-1-drops.json",
+      "sha256": "e316a24f1abb1f171d9c883a41e09f957a25ce5922c9426a005351cc7e143687",
+      "bytes": 154
+    },
+    {
+      "path": "recovery-2-drops.json",
+      "sha256": "06076a12c23d9b2596fb210690501f9cc9c8e56b7835ad47128f0858c4333848",
+      "bytes": 179
+    },
+    {
+      "path": "recovery-3-drops.json",
+      "sha256": "cb1f61a0ef4005915b8e887fd635529ab6077f76988a1088d30ac15244f7618b",
+      "bytes": 203
+    },
+    {
+      "path": "summary.json",
+      "sha256": "821ed49d1c58af8401c90e5f7ff55be58de8a67bb86f8dfb28d865545b242edc",
+      "bytes": 456
+    }
+  ]
+}

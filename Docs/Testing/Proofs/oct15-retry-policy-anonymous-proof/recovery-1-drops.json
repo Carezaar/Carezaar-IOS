@@ -1,0 +1,8 @@
+{
+  "attemptCount": 2,
+  "droppedReadCount": 1,
+  "monotonicRetryIntervalsSeconds": [
+    0.2538795833333438
+  ],
+  "productionNetworkContacted": false
+}

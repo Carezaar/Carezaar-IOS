@@ -1,0 +1,13 @@
+{
+  "case": "P07-004",
+  "scope": "Shared production APIClient GET retry boundary using URLProtocol; not physical-network or multi-device UI recovery.",
+  "bundle": "retry-policy.xcresult",
+  "totalTestCount": 8,
+  "passedTests": 8,
+  "failedTests": 0,
+  "skippedTests": 0,
+  "result": "Passed",
+  "testSourceSHA256": "b69fbfb07d3d30697ba43d72108a4e06b951fe9c0e7502c75abc5305961152f2",
+  "productionCodeChanged": false,
+  "fullOriginalQAComplete": false
+}

@@ -1,3 +1,7 @@
+## October 15 shared retry-policy verification
+
+P07-004 shared retry coverage is verified after separate1/2/3-loss recovery runs through the production APIClient boundary. All8 focused network-policy tests passed with zero failures/skips. Independent review verified attempts2/3/4, bounded backoff and the anonymous evidence. Current original inventory:111PASS,245NOT RUN,3FAIL,0BLOCKED,15N/A =374. Earlier counts are historical. No broader UI, physical-network, device or production-readiness claim.
+
 ## October 13 verification checkpoint
 
 All 16 client changes are implemented in the existing SwiftUI app. The checklist separates implementation from verified acceptance coverage. Git handover is pending; no October 13 push is claimed at this checkpoint.
