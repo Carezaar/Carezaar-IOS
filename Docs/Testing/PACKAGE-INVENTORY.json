@@ -1,5 +1,5 @@
 {
-  "status": "October15 focused shared network-policy tests8/8PASS; P07-004 closed after independent review. October13 application implementation unchanged; full original QA remains incomplete.",
+  "status": "October 16 focused exhaustion and feedback tests 20/20 PASS; P07-005 closed after independent review. Application/backend unchanged; full original QA remains incomplete.",
   "reports": [
     "IOS_TEST_EXECUTION_REPORT.md",
     "IOS-FUNCTIONAL-PARITY-MATRIX.md",
@@ -823,10 +823,16 @@
       "artifactCount": 4,
       "bytes": 1970,
       "reviewProvenance": "Independent source/native-result/attachment/hash/privacy review; exact P07-004 shared retry-policy closure."
+    },
+    {
+      "index": "Proofs/oct16-exhaustion-managed-error-anonymous-proof/index.json",
+      "artifactCount": 2,
+      "bytes": 1401,
+      "reviewProvenance": "Independent actual-result/attachment/source-SHA/hash/privacy review; exact P07-005 shared exhaustion/error-policy closure."
     }
   ],
-  "proofIndexCount": 68,
-  "indexedArtifactCount": 1083,
+  "proofIndexCount": 73,
+  "indexedArtifactCount": 1094,
   "originalEvidenceIntact": true,
   "excludedTypes": [
     "raw logs",
@@ -839,8 +845,8 @@
   ],
   "currentOriginalCaseCounts": {
     "total": 374,
-    "PASS": 111,
-    "NOT RUN": 245,
+    "PASS": 112,
+    "NOT RUN": 244,
     "FAIL": 3,
     "BLOCKED": 0,
     "N/A": 15
@@ -853,8 +859,8 @@
     },
     {
       "path": "BACKEND-ISSUES-FOR-CLIENT.md",
-      "bytes": 95013,
-      "sha256": "909e392bed657a4b1c62ff3109d82a4c7043d4b7877658b22c071306acaad454"
+      "bytes": 95796,
+      "sha256": "736f793e5161237e448317cf266ef61b58d4265f54641631e018e2fe81bfd670"
     },
     {
       "path": "CLIENT-UPDATE-HANDOFF.md",
@@ -873,18 +879,18 @@
     },
     {
       "path": "IOS-FIGMA-PARITY.md",
-      "bytes": 91552,
-      "sha256": "c9a300891c12004d1e432c02bddb3fe9df7154a21803e813f5cdefa73b3f25b3"
+      "bytes": 92335,
+      "sha256": "0a30d9c438e052d01677f831746d44d895790735706d31dba91184d3edd9a825"
     },
     {
       "path": "IOS-FUNCTIONAL-PARITY-MATRIX.md",
-      "bytes": 95518,
-      "sha256": "2661b64d47030c2909e4cec89077cb06b428c2aa12979d9357f9756df53a9ad8"
+      "bytes": 96301,
+      "sha256": "85201cc10ab00d5e9e1b0ecc994b37b4b84536402a6118862b3a79c9501ab89d"
     },
     {
       "path": "IOS_TEST_EXECUTION_REPORT.md",
-      "bytes": 99910,
-      "sha256": "22845ef3fcfbcd10d97d881822674123e2702952e555b51dc78f638a0607dd99"
+      "bytes": 100693,
+      "sha256": "2e7320a9200c358fbd827f63498c30a0b718cb5d9915043fbacdddabc63c7004"
     },
     {
       "path": "NATIVE-SIGNUP-EXECUTION.md",
@@ -918,8 +924,8 @@
     },
     {
       "path": "QA-CASE-MANIFEST.md",
-      "bytes": 531100,
-      "sha256": "3667b0a2ff04bcb9bc78e77c5fc7043f420129cea3475e5feae92ad6574aad99"
+      "bytes": 532139,
+      "sha256": "5a954b3d8baf868242a931d1c93763dd43dff8f437d1c4bdb44ea8be0dd49bb1"
     },
     {
       "path": "README.md",

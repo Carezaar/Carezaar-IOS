@@ -1,0 +1,16 @@
+{
+  "scope": "Shared controlled public APIClient exhaustion and managed error routing, not native UI or physical-network testing.",
+  "reviewStatus": "APPROVED: independent source, actual result/attachment, hash and privacy review; exact shared-policy scope only.",
+  "artifacts": [
+    {
+      "path": "exhaustion.json",
+      "sha256": "ae81f17452a581b36939c75edcc6f40239655d0c622a0d704294218403d28378",
+      "bytes": 348
+    },
+    {
+      "path": "summary.json",
+      "sha256": "49154cfa78c417af5bebede9ebe1a7dbb16faf51e1d4210b4a0221a7ef6f5eab",
+      "bytes": 470
+    }
+  ]
+}

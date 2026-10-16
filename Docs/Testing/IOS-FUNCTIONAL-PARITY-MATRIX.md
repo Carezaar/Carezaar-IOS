@@ -1,3 +1,7 @@
+## October 16 shared retry-exhaustion verification
+
+P07-005 is PASS after independently reviewed controlled APIClient tests: 20 passed, zero failures or skips. Exhaustion stopped after four attempts in 1.755 seconds, with measured retry intervals of 0.252, 0.501 and 1.001 seconds. The actual network error routes through managed key `general_network_title` and the canonical connection message. [Anonymous evidence](Proofs/oct16-exhaustion-managed-error-anonymous-proof/index.json). Current original inventory: 112 PASS, 244 NOT RUN, 3 FAIL, 0 BLOCKED, 15 N/A = 374. Application and backend code are unchanged. This verifies shared policy, not native UI or physical-network coverage; full original QA remains incomplete. The latest full 143-unit baseline remains dated October 13.
+
 ## October 15 shared retry-policy verification
 
 P07-004 shared retry coverage is verified after separate1/2/3-loss recovery runs through the production APIClient boundary. All8 focused network-policy tests passed with zero failures/skips. Independent review verified attempts2/3/4, bounded backoff and the anonymous evidence. Current original inventory:111PASS,245NOT RUN,3FAIL,0BLOCKED,15N/A =374. Earlier counts are historical. No broader UI, physical-network, device or production-readiness claim.

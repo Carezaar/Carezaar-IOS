@@ -137,12 +137,51 @@ final class NetworkPolicyTests: XCTestCase {
         attachment.lifetime = .keepAlways
         add(attachment)
     }
-    func testDroppedReadStopsAfterThreeRetries() async {
-        var attempts = 0
-        StubHTTP.handler = { _ in attempts += 1; throw URLError(.networkConnectionLost) }
+    func testDroppedReadStopsAfterThreeRetries() async throws {
+        var starts: [TimeInterval] = []
+        var failure: APIError?
+        StubHTTP.handler = { request in
+            XCTAssertEqual(request.httpMethod, "GET")
+            starts.append(ProcessInfo.processInfo.systemUptime)
+            throw URLError(.networkConnectionLost)
+        }
+        let started = ProcessInfo.processInfo.systemUptime
         do { _ = try await APIClient(session: StubHTTP.session()).sendIgnoringResult(Endpoint(method: .get, path: "fixture", requiresAuth: false)); XCTFail("Must fail") }
-        catch {}
-        XCTAssertEqual(attempts, 4)
+        catch let error as APIError { failure = error }
+        catch { XCTFail("Exhaustion must return the standard API error category: \(error)") }
+        let elapsed = ProcessInfo.processInfo.systemUptime - started
+        XCTAssertEqual(starts.count, 4)
+        XCTAssertLessThan(elapsed, 10, "Exhaustion must terminate after the bounded retry budget")
+        let error = try XCTUnwrap(failure)
+        guard case .network = error else {
+            XCTFail("A lost read connection must end as a network error")
+            return
+        }
+        let mapped = await MainActor.run { () -> (String, String) in
+            let original = Feedback.translate
+            defer { Feedback.translate = original }
+            Feedback.translate = { _, fallback in fallback }
+            let fallback = Feedback.message(error)
+            Feedback.translate = { key, _ in "managed:\(key)" }
+            return (fallback, Feedback.message(error))
+        }
+        XCTAssertEqual(mapped.0, "Cannot communicate with server.")
+        XCTAssertEqual(mapped.1, "managed:general_network_title")
+        let intervals = zip(starts, starts.dropFirst()).map { $1 - $0 }
+        for (index, interval) in intervals.enumerated() {
+            XCTAssertGreaterThanOrEqual(interval, 0.25 * Double(1 << index) - 0.01)
+            XCTAssertLessThan(interval, 10)
+        }
+        let proof: [String: Any] = ["attemptCount": starts.count,
+            "elapsedSeconds": elapsed, "monotonicRetryIntervalsSeconds": intervals,
+            "exhaustedCategory": "network", "managedKey": "general_network_title",
+            "canonicalFallbackVerified": true, "managedRoutingVerified": true,
+            "scope": "Controlled fixture client; no production endpoint contacted"]
+        let attachment = XCTAttachment(data: try JSONSerialization.data(withJSONObject: proof, options: [.sortedKeys]),
+            uniformTypeIdentifier: "public.json")
+        attachment.name = "P07-005-bounded-exhaustion-managed-error"
+        attachment.lifetime = .keepAlways
+        add(attachment)
     }
     func testAmbiguousMutationIsNeverAutomaticallyReplayed() async {
         var attempts = 0

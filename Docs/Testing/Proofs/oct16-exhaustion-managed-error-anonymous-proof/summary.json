@@ -1,0 +1,13 @@
+{
+  "totalTestCount": 20,
+  "passedTests": 20,
+  "failedTests": 0,
+  "skippedTests": 0,
+  "result": "Passed",
+  "case": "P07-005",
+  "scope": "Shared controlled public APIClient exhaustion and managed error routing, not native UI or physical-network testing.",
+  "bundle": "exhaustion-managed-error.xcresult",
+  "testSourceSHA256": "bbd2ffe3da6be23e667cac8be5f3e34629e8efe8ac25c48a68ef0cb1e62f79f1",
+  "productionCodeChanged": false,
+  "fullOriginalQAComplete": false
+}

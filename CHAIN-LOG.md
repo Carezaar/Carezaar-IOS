@@ -357,3 +357,5 @@ The native Swift checkout is the delivery project. The client brief takes preced
 | Oct13-16 | diagnosing-bugs → tdd → iterate-until-verified | Explicit R14 legacy preflight-test migration reviewed; caregiver supplement13PASS/1legacyFAIL/1mail-handlerSKIP; current-policy parent/single-send case1PASS with actual result records after preserved disk-import failure | ChatNetworkBoundaryUITests.swift; reports; anonymous result summaries |
 
 | Oct15-01 | iterate-until-verified | Separate dropped-read recovery1/2/3 and real monotonic backoff verified; focused8/8 PASS; independent review closes only P07-004 | NetworkTests.swift; four reports; QA manifest; indexed anonymous proof |
+
+| Oct16-01 | iterate-until-verified | Actual exhaustion category, bounded attempts/backoff and managed error routing verified; focused 20/20 PASS; independent result/hash/privacy review closes only P07-005 | NetworkTests.swift; four reports; QA manifest; indexed anonymous proof |
