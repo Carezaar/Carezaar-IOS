@@ -100,7 +100,7 @@ struct PartnerDetailsView: View {
                     VStack(alignment: .leading, spacing: 10) {
                         HStack(spacing: 6) {
                             AppIcon(name: item(.genders, partner.genderId)?.icon, size: 24, tint: Theme.Palette.primaryDark)
-                            Text(partner.fullName).font(Theme.Typography.heading(21))
+                            Text(partner.displayName(loc)).font(Theme.Typography.heading(21))
                         }
                         Text(isCaregiver ? loc.label(item(.roles, caregiver?.roleId)) : loc.label(item(.clienttypes, client?.clienttypeId)))
                             .font(Theme.Typography.body(14)).foregroundStyle(Theme.Palette.textSecondary)
@@ -738,7 +738,7 @@ struct MatchedView: View {
     }
 
     private func content(_ partner: User) -> some View {
-        let name = partner.fullName
+        let name = partner.displayName(loc)
         return ScrollView {
             VStack(spacing: 18) {
                 HStack(alignment: .center, spacing: 10) {
@@ -749,7 +749,7 @@ struct MatchedView: View {
                         .accessibilityIdentifier("matched-self-photo-card")
                     Image(systemName: "heart.fill").font(.system(size: 24)).foregroundStyle(Theme.Palette.primary)
                         .accessibilityHidden(true)
-                    photoCard(partner, label: partner.fullName)
+                    photoCard(partner, label: partner.displayName(loc))
                         .rotationEffect(.degrees(reduceMotion || cardsPresented ? (cardLayoutDirection == .rightToLeft ? -6 : 6) : 0))
                         .offset(x: reduceMotion || cardsPresented ? 0 : (cardLayoutDirection == .rightToLeft ? -180 : 180))
                         .opacity(cardsPresented ? 1 : 0)

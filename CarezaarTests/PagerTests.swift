@@ -131,4 +131,28 @@ final class PagerTests: XCTestCase {
         XCTAssertTrue(pager.hasMore)
         XCTAssertFalse(pager.isLoading)
     }
+
+    // MARK: Parity v3 K1 — quiet periodic refresh
+
+    func testQuietRefreshReplacesListOnSuccessAndKeepsItOnFailure() async {
+        let pager = Pager<Row>()
+        await pager.reload { _ in ([Row(id: 1)], nil) }
+        await pager.refreshQuietly { page in
+            XCTAssertEqual(page, 1)
+            return ([Row(id: 2), Row(id: 1)], nil)
+        }
+        XCTAssertEqual(pager.items.map(\.id), [2, 1])
+        await pager.refreshQuietly { _ in throw URLError(.notConnectedToInternet) }
+        XCTAssertEqual(pager.items.map(\.id), [2, 1], "A failed background refresh keeps the list")
+        XCTAssertNil(pager.error, "A failed background refresh shows no error state")
+    }
+
+    func testQuietRefreshWaitsForFirstLoad() async {
+        let pager = Pager<Row>()
+        var calls = 0
+        await pager.refreshQuietly { _ in calls += 1; return ([Row(id: 9)], nil) }
+        XCTAssertEqual(calls, 0)
+        XCTAssertTrue(pager.items.isEmpty)
+    }
+
 }

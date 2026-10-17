@@ -31,6 +31,15 @@ enum APIError: Error, Equatable {
         }
     }
 
+    /// The request never got an answer from the server (no connection, dropped
+    /// connection, timeout), as opposed to the server answering with an error.
+    var isUnreachable: Bool {
+        switch self {
+        case .network, .timeout, .connectionUnavailable: return true
+        default: return false
+        }
+    }
+
     /// The server's message is an implementation detail (a PHP notice, a missing
     /// route) rather than something written for people.
     var isTechnical: Bool {
@@ -51,6 +60,14 @@ enum APIError: Error, Equatable {
         guard case .validation(_, let fields) = self else { return nil }
         return fields[field]?.first
     }
+}
+
+/// `auth/login` answered 409: the account's email is verified but sign-up was never
+/// finished (no profile and/or no client/caregiver entity). Android shows the
+/// server's message and opens the profile step of sign-up (parity review v3, B1).
+struct RegistrationIncompleteError: Error, Equatable {
+    let message: String
+    let role: UserRole?
 }
 
 /// The original protected write was explicitly refused before renewal failed.

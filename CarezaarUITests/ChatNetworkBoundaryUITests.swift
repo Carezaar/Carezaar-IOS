@@ -859,12 +859,14 @@ final class ChatNetworkBoundaryUITests: XCTestCase {
         XCTAssertTrue(bubble.waitForExistence(timeout: 10) && bubble.isHittable,
                       "Acknowledged retry must reveal the complete own synthetic bubble")
         XCTAssertEqual(messagePOSTs(chatID), 1)
-        XCTAssertFalse(send.isEnabled)
-        send.doubleTap() // real still-existing disabled Send; no stale coordinates
+        // Parity v3 K4: Send stays tappable with an empty draft and explains itself.
+        XCTAssertTrue(send.isEnabled)
+        send.doubleTap()
         let duplicate = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in self.messagePOSTs(chatID) != 1 }, object: nil)
         duplicate.isInverted = true
         XCTAssertEqual(XCTWaiter.wait(for: [duplicate], timeout: 3), .completed)
-        XCTAssertFalse(send.isEnabled)
+        XCTAssertTrue(app.staticTexts[f.label("chat_screen_message_required", "Please type a message first.")].exists,
+                      "An empty Send explains instead of sending")
         try assertStoredOnce(message, chatID: chatID, fixture: f)
         controlProof(bubble, "owned-offline-retry-synthetic-bubble-only-\(f.role)")
         try record("owned-offline-preflight-retry-\(f.role)", ["role": f.role,

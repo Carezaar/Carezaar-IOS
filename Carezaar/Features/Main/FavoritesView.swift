@@ -36,7 +36,7 @@ struct FavoritesView: View {
             AdaptiveStack(spacing: 12) {
                 Avatar(url: u.photo, size: 84)
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(u.fullName).font(Theme.Typography.title(17)).foregroundStyle(.black)
+                    Text(u.displayName(loc)).font(Theme.Typography.title(17)).foregroundStyle(.black)
                     Text(u.bio ?? "").font(Theme.Typography.body(13)).foregroundStyle(Theme.Palette.textSecondary).lineLimit(3)
                         .multilineTextAlignment(.leading)
                 }

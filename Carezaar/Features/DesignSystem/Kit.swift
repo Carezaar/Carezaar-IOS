@@ -42,6 +42,21 @@ final class Pager<Item: Identifiable>: ObservableObject where Item.ID: Hashable 
         await next(fetch, replacing: true, generation: generation)
     }
 
+    /// Periodic background refresh (Messages list, K1): replaces the list with the
+    /// first page only when it loads, never shows loading or error state, and yields
+    /// to any explicit load or reload in flight.
+    func refreshQuietly(_ fetch: Fetch) async {
+        guard !isLoading, loadedOnce else { return }
+        let g = generation
+        guard let (result, meta) = try? await fetch(1), g == generation, !isLoading else { return }
+        var seen = Set<Item.ID>()
+        items = result.filter { seen.insert($0.id).inserted }
+        page = 1
+        exhausted = result.isEmpty
+        total = meta?.total
+        error = nil
+    }
+
     func loadMore(_ fetch: Fetch) async {
         guard hasMore, !isLoading else { return }
         await next(fetch, replacing: page == 0, generation: generation)

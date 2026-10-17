@@ -349,35 +349,32 @@ final class MatchStateMatrixUITests: XCTestCase {
             .compactMap { Int($0.split(separator: "=").last ?? "") }.reduce(0, +)
     }
 
+    /// Parity v3 K2: a conversation with someone who is no longer a match is closed:
+    /// the managed note sits above a disabled typing box and a grey Send.
     private func rejectInactiveSend(_ status: String, fixture f: Fixture, chatID: Int) throws {
         XCTAssertEqual(try pairStatus(f), status)
         _ = try ownedChat(chatID, fixture: f, active: false)
         launchOwnedRoute("Chat/\(chatID)")
         let field = try loadedOwnedComposer(chatID: chatID)
-        let draft = "Synthetic inactive " + status + " " + UUID().uuidString
-        field.tap(); field.typeText(draft)
-        XCTAssertTrue((field.value as? String) == draft, "Exact inactive synthetic draft must be entered")
+        let managed = f.label("chat_screen_match_check", "You can only send messages to your current matches.")
+        let note = app.descendants(matching: .any)["chat-closed-note"]
+        XCTAssertTrue(note.waitForExistence(timeout: 15), "Inactive conversation must show the closed note")
+        XCTAssertTrue(note.label.contains(managed), "Closed note must use the exact managed current-matches text")
+        XCTAssertFalse(field.isEnabled, "Inactive conversation must turn the typing box off")
         let send = app.buttons["Send"]
-        XCTAssertTrue(send.exists && send.isEnabled && send.isHittable)
+        XCTAssertTrue(send.exists && !send.isEnabled, "Inactive conversation Send must be grey")
         let before = count("GET /api/users/chats/\(chatID)")
         send.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
-        let managed = f.label("chat_screen_match_check", "You can only send messages to your current matches.")
-        let toast = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", managed)).firstMatch
-        XCTAssertTrue(toast.waitForExistence(timeout: 15), "Inactive send must show the exact managed current-matches restriction")
-        XCTAssertTrue(toast.exists, "Managed transient restriction must exist when its control crop is captured")
-        let proof = XCTAttachment(screenshot: toast.screenshot())
-        proof.name = "owned-\(status)-chat-restriction-only-\(f.role)"; proof.lifetime = .keepAlways; add(proof)
+        let proof = XCTAttachment(screenshot: note.screenshot())
+        proof.name = "owned-\(status)-chat-closed-note-\(f.role)"; proof.lifetime = .keepAlways; add(proof)
         XCTAssertEqual(count("GET /api/users/chats/\(chatID)"), before,
                        "Requirement 14 uses the already loaded inactive relationship without another Send preflight")
         XCTAssertEqual(chatSendAttempts(), 0, "Inactive native guard must prevent every message POST")
-        XCTAssertTrue((field.value as? String) == draft, "Blocked send must preserve the unchanged draft")
-        let after = try ownedChat(chatID, fixture: f, active: false)
-        XCTAssertFalse(chatTexts(after).contains(draft), "Inactive synthetic draft must be absent from persisted messages")
         XCTAssertEqual(try pairStatus(f), status)
         try record("owned-\(status)-native-send-guard-\(f.role)", ["role": f.role, "publicState": status,
             "loadedInactiveMetadataUsed": true, "additionalSendPreflightGETs": 0, "nativeChatSendPOSTs": 0,
-            "managedCurrentMatchesRestrictionObserved": true, "exactDraftPreserved": true,
-            "syntheticDraftAbsentFromBackend": true, "directNegativeBackendPOSTPerformed": false])
+            "managedCurrentMatchesRestrictionObserved": true, "composerDisabled": true,
+            "directNegativeBackendPOSTPerformed": false])
     }
 
     private func preflight(languageID: Int = 1) throws -> Fixture {

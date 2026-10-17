@@ -19,111 +19,112 @@ final class LocationBoundaryUITests: XCTestCase {
     override func setUp() { continueAfterFailure = false; app = XCUIApplication() }
     override func tearDown() { app?.terminate(); super.tearDown() }
 
-    func testControlledCachedPhoneInitializesWizardWithoutOpeningMap() throws {
+    // Parity review v3 (16 Oct 2026) supersedes the October 13 location rules:
+    // F1 the phone location is never filled in by itself and the map opens on the
+    // whole country; F2 a refused permission is explained after My Location; F3
+    // continuing without a location shows `general_location_required`.
+
+    func testControlledCachedPhoneIsNotFilledInAutomatically() throws {
         let f = try fixture()
         try launchSchedule(f, mode: "available")
-        try requireLocationEvent(mode: "available", phase: "cached", accepted: true, stale: false)
-        let coordinate = "39.828300 , -98.579500"
-        let row = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", coordinate)).firstMatch
-        try reveal(row); XCTAssertTrue(row.exists)
+        try assertScheduleNil(f)
         XCTAssertFalse(app.maps.firstMatch.exists, "Wizard initialization must not need map interaction")
-        proof(row, name: "P03-021-controlled-cached-coordinate-only")
+        try assertContinueNeedsLocation(f)
+        try openNoFixMap(f)
+        // The map's provider holds a valid cached phone fix, yet nothing is selected.
+        try requireLocationEvent(mode: "available", phase: "cached", accepted: true, stale: false)
+        XCTAssertTrue((try visibleButton(try f.text("general_continue"))).isEnabled, "A cached fix must not be selected by itself")
+        // The phone position is used only after My Location.
+        try visibleButton("My location").tap()
+        let confirm = try visibleButton(try f.text("general_confirm"))
+        XCTAssertTrue(confirm.isEnabled)
+        confirm.tap()
+        XCTAssertTrue(app.maps.firstMatch.waitForNonExistence(timeout: 10))
+        let row = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "39.828300 , -98.579500")).firstMatch
+        try reveal(row); XCTAssertTrue(row.exists)
+        proof(row, name: "F1-controlled-my-location-coordinate-only")
         try advance(f, step: 3)
-        let value = app.staticTexts[coordinate].firstMatch
-        try reveal(value); XCTAssertTrue(value.exists)
-        proof(value, name: "P03-021-controlled-review-coordinate-only")
         try assertBackendUnchanged(f)
-        try record("P03-021-controlled-cached-native", ["role": f.role, "mapOpened": false, "reviewRetainsExactControlledFix": true, "cachedPublisherAttested": true])
+        try record("F1-controlled-cached-not-automatic", ["role": f.role, "automaticFill": false,
+            "myLocationUsedAfterTap": true, "profileMutations": 0])
     }
 
-    func testStaleCachedLocationIsUsedSilentlyInWizardAndMap() throws {
+    func testStaleCachedLocationIsNotUsedUntilMyLocation() throws {
         let f = try fixture()
         try launchSchedule(f, mode: "stale")
+        try assertScheduleNil(f)
+        try openNoFixMap(f)
         try requireLocationEvent(mode: "stale", phase: "cached", accepted: true, stale: true)
-        let row = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "39.828300 , -98.579500")).firstMatch
-        try reveal(row)
-        XCTAssertFalse(app.staticTexts["Last known location"].exists,
-                       "Oct13 R15: last-known location must initialize silently")
-        row.tap()
-        XCTAssertTrue(app.maps.firstMatch.waitForExistence(timeout: 15))
+        XCTAssertTrue((try visibleButton(try f.text("general_continue"))).isEnabled, "A stale fix must not be selected by itself")
         XCTAssertFalse(app.staticTexts["Last known location"].exists)
-        XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Location is unavailable.")).firstMatch.exists)
-        XCTAssertTrue((try visibleButton(try f.text("general_confirm"))).isEnabled)
         try tapVisibleMapBack()
         try assertBackendUnchanged(f)
-        try record("R15-controlled-stale-silent-native", ["role": f.role,
-            "cachedCoordinateRetained": true, "wizardAndMapNoticesAbsent": true, "profileMutations": 0])
+        try record("F1-controlled-stale-not-automatic", ["role": f.role, "automaticFill": false, "profileMutations": 0])
     }
 
-    func testControlledNoFixMapContinuesSilentlyAndFinalSaveOffersMapWithoutWrites() throws {
+    func testControlledNoFixRequiresLocationAndExplainsRefusedAccess() throws {
         let f = try fixture()
         try launchSchedule(f, mode: "none")
-        try requireLocationEvent(mode: "none", phase: "delivery", accepted: false, stale: false)
+        try assertScheduleNil(f)
+        try assertContinueNeedsLocation(f)
         try openNoFixMap(f)
         XCTAssertFalse(app.buttons.matching(NSPredicate(format: "label == %@", try f.text("general_confirm")))
             .allElementsBoundByIndex.contains { $0.exists && $0.isHittable })
+        try visibleButton("My location").tap()
+        let note = app.staticTexts["location-permission-denied"]
+        XCTAssertTrue(note.waitForExistence(timeout: 5), "F2: refused access must be explained")
+        XCTAssertEqual(note.label, try f.text("general_location_permission_denied"))
+        proof(note, name: "F2-controlled-permission-denied-note-only")
         let mapContinue = try visibleButton(try f.text("general_continue"))
         XCTAssertTrue(mapContinue.isEnabled)
-        proof(mapContinue, name: "P03-026-controlled-unselected-map-continue-only")
         mapContinue.tap()
         XCTAssertTrue(app.maps.firstMatch.waitForNonExistence(timeout: 10))
         try assertScheduleNil(f)
-        try openNoFixMap(f)
-        XCTAssertTrue((try visibleButton(try f.text("general_continue"))).isEnabled,
-                      "Reopened automatic viewport must still have no selected point")
-        try tapVisibleMapBack()
-        try advance(f, step: 3)
-        try assertReviewNil(f)
+        try assertContinueNeedsLocation(f)
         XCTAssertEqual(try profileMutationCount(), 0)
-        let save = try visibleButton(try f.text("general_save"))
-        XCTAssertTrue(save.isEnabled)
-        save.tap()
-        XCTAssertTrue(app.maps.firstMatch.waitForExistence(timeout: 10), "No-fix Save must offer actual manual map selection")
-        XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Location is unavailable.")).firstMatch.exists)
-        XCTAssertTrue((try visibleButton(try f.text("general_continue"))).isEnabled)
-        XCTAssertEqual(try profileMutationCount(), 0)
-        try tapVisibleMapBack()
-        try assertReviewNil(f)
-        let reviewBack = try visibleButton("Back")
-        reviewBack.tap()
-        let scheduleKey = f.role == "client" ? "signup_form_client_schedule_preferences" : "signup_form_caregiver_schedule_title"
-        XCTAssertTrue(app.staticTexts[try f.text(scheduleKey)].waitForExistence(timeout: 10))
-        try openNoFixMap(f)
-        XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Location is unavailable.")).firstMatch.exists)
-        XCTAssertTrue((try visibleButton(try f.text("general_continue"))).isEnabled)
-        XCTAssertEqual(try profileMutationCount(), 0)
-        try tapVisibleMapBack()
-        try assertScheduleNil(f)
         try assertBackendUnchanged(f)
-        try record("P03-023-024-026-controlled-no-fix-native", ["role": f.role,
-            "scheduleContinuedWithoutLocation": true, "automaticMapViewportNeverSelected": true,
-            "mapReopenedUnselected": true, "reviewLocationNil": true, "finalSaveMapOfferedWithoutNotices": true,
-            "manualMapOfferedAfterSave": true, "ordinaryReopenRemainsSilent": true,
-            "englishOnlyNoticesAbsent": true, "actualBackendCoordinateRequirementTested": false])
+        try record("F2-F3-controlled-no-fix-native", ["role": f.role, "continueBlockedWithManagedMessage": true,
+            "refusalExplained": true, "mapUnselected": true, "profileMutations": 0])
     }
 
     func testControlledInvalidAccuracyRangeAndFutureFixNeverBecomeSelections() throws {
         let f = try fixture()
         for mode in ["negative-accuracy", "out-of-range", "future"] {
             try launchSchedule(f, mode: mode)
-            try requireLocationEvent(mode: mode, phase: "delivery", accepted: false, stale: false)
             try assertScheduleNil(f)
             try openNoFixMap(f)
-            XCTAssertTrue((try visibleButton(try f.text("general_continue"))).isEnabled)
+            try visibleButton("My location").tap()
+            try requireLocationEvent(mode: mode, phase: "delivery", accepted: false, stale: false)
+            XCTAssertTrue((try visibleButton(try f.text("general_continue"))).isEnabled, "An invalid fix must not become a selection")
             try tapVisibleMapBack()
-            try advance(f, step: 3)
-            try assertReviewNil(f)
+            try assertScheduleNil(f)
+            try assertContinueNeedsLocation(f)
             try assertBackendUnchanged(f)
             try record("P03-025-controlled-\(mode)-native", ["role": f.role, "invalidFixRejectedByRealFilter": true,
-                "wizardLocationNil": true, "mapUnselected": true, "reviewLocationNil": true])
+                "wizardLocationNil": true, "mapUnselected": true])
         }
+    }
+
+    /// F3: Continue on the schedule step without a location names what is missing.
+    private func assertContinueNeedsLocation(_ f: Fixture) throws {
+        let button = app.buttons[try f.text("signup_form_client_continue")].firstMatch
+        XCTAssertTrue(button.exists && button.isHittable && button.isEnabled)
+        button.tap()
+        let message = app.staticTexts[try f.text("general_location_required")]
+        XCTAssertTrue(message.waitForExistence(timeout: 5), "F3: missing location must be named")
+        let scheduleKey = f.role == "client" ? "signup_form_client_schedule_preferences" : "signup_form_caregiver_schedule_title"
+        XCTAssertTrue(app.staticTexts[try f.text(scheduleKey)].exists, "F3: the step must not advance")
+        XCTAssertEqual(try profileMutationCount(), 0)
+        sleep(5) // let the message clear before the next control is targeted
     }
 
     func testControlledManualMapChoiceSurvivesActualLaterPhoneFixWithoutSaving() throws {
         let f = try fixture()
         try launchSchedule(f, mode: "late-valid")
-        try requireLocationEvent(mode: "late-valid", phase: "waiting-manual", accepted: false, stale: false)
         try openNoFixMap(f)
+        // F1: the phone position is requested only by My Location.
+        try visibleButton("My location").tap()
+        try requireLocationEvent(mode: "late-valid", phase: "waiting-manual", accepted: false, stale: false)
         let map = app.maps.firstMatch
         XCTAssertTrue(map.exists && map.isHittable)
         // Inset points come from the observed native map, away from header/footer controls.

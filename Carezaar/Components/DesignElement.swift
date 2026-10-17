@@ -72,7 +72,7 @@ struct DesignElement: View {
             .overlay { if isSelected { RoundedRectangle(cornerRadius: rendered.radius).stroke(DesignTokens.primary, lineWidth: 2) } }
             .opacity(binder.opacity(rendered) ?? rendered.opacity)
             .transformEffect(CGAffineTransform(a: rendered.matrix[0], b: rendered.matrix[1], c: rendered.matrix[2], d: rendered.matrix[3], tx: 0, ty: 0))
-            .offset(x: rendered.x, y: rendered.y)
+            .offset(x: rendered.x, y: rendered.y + (binder.yOffset(node) ?? 0))
             .onAppear { if binder.binding(rendered) == nil { value = rendered.inputValue ?? "" } }
     }
     @ViewBuilder private var element: some View {

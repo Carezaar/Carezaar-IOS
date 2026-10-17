@@ -52,7 +52,7 @@ struct ChatView: View {
             // The draft lives in its own view: typing re-renders only the composer, not
             // the transcript (a long message there made every keystroke re-lay it out).
             ChatComposer(replyTo: Binding(get: { replyTo }, set: selectReply), focusRequest: focusRequest,
-                         isEnabled: !sending, send: send)
+                         isEnabled: !sending, closedNote: closedNote, send: send)
         }
         .backHeader(loc.t("chat_screen_messages_title", "Chat Messages"))
         .onAppear { visible = true }
@@ -69,11 +69,23 @@ struct ChatView: View {
         }
     }
 
+    /// K2/K3: a conversation that can no longer receive messages is closed with a
+    /// note above the typing box. A deleted account wins over the match check
+    /// (the server also reports `is_match: false` for it).
+    private var closedNote: String? {
+        guard let chat else { return nil }
+        switch ChatAvailability(chat: chat, role: role) {
+        case .open: return nil
+        case .accountDeleted: return loc.t("chat_screen_account_deleted", "This account has been deleted. You can no longer send messages.")
+        case .notMatched: return loc.t("chat_screen_match_check", "You can only send messages to your current matches.")
+        }
+    }
+
     private var partnerBar: some View {
         let partner = chat?.partner(for: role)
         return HStack(spacing: 12) {
             Avatar(url: partner?.photo, size: 44)
-            Text(partner?.fullName ?? "").font(Theme.Typography.title(16))
+            Text(partner?.displayName(loc) ?? "").font(Theme.Typography.title(16))
             Spacer()
             Button { Task { await load() } } label: {
                 AppIcon(name: "ic_refresh", size: 24, tint: Theme.Palette.primary).frame(width: 44, height: 44)
@@ -219,11 +231,9 @@ struct ChatView: View {
             // The loaded conversation already supplies the relationship context.
             // Server authorization remains authoritative; reads are reserved for
             // initial/explicit refresh and uncertain delivery reconciliation.
-            let partnerIsMatch = role == .client ? current.caregiver?.isMatch : current.client?.isMatch
-            guard partnerIsMatch == true else {
-                feedback.toast(loc.t("chat_screen_match_check", "You can only send messages to your current matches."))
-                return false
-            }
+            // K2/K3: a closed conversation disables the composer and shows its note
+            // above the box; this guard only covers a race with a refresh.
+            guard ChatAvailability(chat: current, role: role) == .open else { return false }
             let updated = try await feedback.run(loc.t("loading_chat_send", "Sending a new message")) {
                 try await delivery.submit(chatId: chatId, text: text, parentId: submittedReply.parentId,
                                           baseline: current.messages, role: submittedRole, generation: generation)
@@ -254,13 +264,30 @@ struct ChatView: View {
     }
 }
 
+/// Whether the signed-in user can still write in a conversation.
+enum ChatAvailability: Equatable {
+    case open, notMatched, accountDeleted
+
+    init(chat: ChatFull, role: UserRole) {
+        let partner = role == .client ? chat.caregiver?.user : chat.client?.user
+        let isMatch = role == .client ? chat.caregiver?.isMatch : chat.client?.isMatch
+        if partner?.isDeleted == true { self = .accountDeleted }
+        else if isMatch != true { self = .notMatched }
+        else { self = .open }
+    }
+}
+
 /// Message field + send button, with the draft as local state.
 private struct ChatComposer: View {
     @Binding var replyTo: ChatMessage?
     let focusRequest: Int
     let isEnabled: Bool
+    /// K2/K3: when set, the conversation is closed: the note sits above a disabled
+    /// typing box and a grey send button.
+    let closedNote: String?
     let send: (String) async -> Bool
     @EnvironmentObject private var loc: Localization
+    @EnvironmentObject private var feedback: Feedback
     @State private var draft = ""
     @FocusState private var focused: Bool
 
@@ -268,7 +295,19 @@ private struct ChatComposer: View {
 
     var body: some View {
         VStack(spacing: 6) {
-            if let replyTo {
+            if let closedNote {
+                HStack(alignment: .top, spacing: 8) {
+                    AppIcon(name: "ic_issue", size: 18, tint: Theme.Palette.textSecondary)
+                        .accessibilityHidden(true)
+                    Text(closedNote).font(Theme.Typography.body(13)).foregroundStyle(Theme.Palette.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .padding(10).background(Theme.Palette.clientPanel, in: RoundedRectangle(cornerRadius: 10))
+                .accessibilityElement(children: .combine)
+                .accessibilityIdentifier("chat-closed-note")
+            }
+            if let replyTo, closedNote == nil {
                 HStack(spacing: 8) {
                     AppIcon(name: "ic_reply", size: 18, tint: Theme.Palette.primary)
                     Text(replyTo.message).font(Theme.Typography.caption(13)).lineLimit(1)
@@ -284,12 +323,17 @@ private struct ChatComposer: View {
             HStack(spacing: 10) {
                 TextField(loc.t("chat_screen_message_placeholder", "Type a message..."), text: $draft, axis: .vertical)
                     .lineLimit(1...4).focused($focused)
+                    .disabled(closedNote != nil)
                     .font(Theme.Typography.control(15))
                     .padding(.horizontal, 14).padding(.vertical, 12)
                     .overlay(RoundedRectangle(cornerRadius: 22).stroke(Theme.Palette.line))
                 Button {
                     let text = trimmed, sent = draft
-                    guard !text.isEmpty else { return }
+                    // K4: the button stays tappable and explains an empty message.
+                    guard !text.isEmpty else {
+                        feedback.toast(loc.t("chat_screen_message_required", "Please type a message first."))
+                        return
+                    }
                     Task {
                         guard await send(text) else { return }
                         // The keyboard stays usable behind the busy card: keep anything
@@ -299,17 +343,20 @@ private struct ChatComposer: View {
                 } label: {
                     AppIcon(name: "ic_send", size: 22, tint: .white)
                         .flipsForRightToLeftLayoutDirection(true)
-                        .frame(width: 46, height: 46).background(Theme.Palette.primary, in: Circle())
+                        // K2/K3: grey on a closed conversation, as on Android.
+                        .frame(width: 46, height: 46)
+                        .background(closedNote != nil ? Theme.Palette.textSecondary : Theme.Palette.primary, in: Circle())
                 }
-                .disabled(trimmed.isEmpty || !isEnabled)
-                .opacity(trimmed.isEmpty || !isEnabled ? 0.45 : 1)
+                .disabled(!isEnabled || closedNote != nil)
+                .opacity(!isEnabled ? 0.45 : closedNote != nil ? 0.6 : 1)
                 .accessibilityLabel("Send")
             }
         }
         .padding(.horizontal, 12).padding(.vertical, 8)
         .background(.white)
         .overlay(alignment: .top) { Divider() }
-        .onChange(of: focusRequest) { _, _ in focused = true }
+        .onChange(of: focusRequest) { _, _ in if closedNote == nil { focused = true } }
+        .onChange(of: closedNote) { _, note in if note != nil { focused = false } }
     }
 }
 
@@ -391,7 +438,7 @@ struct ManageMatchesView: View {
                 AdaptiveStack(alignment: .center, spacing: 12) {
                     Avatar(url: partner?.photo, size: 72)
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(partner?.fullName ?? "").font(Theme.Typography.title(16)).foregroundStyle(.black)
+                        Text(partner?.displayName(loc) ?? "").font(Theme.Typography.title(16)).foregroundStyle(.black)
                         Text("\(loc.t("match_start", "Start")): \(ServerTime.local(m.createdAt))").font(Theme.Typography.caption(13)).foregroundStyle(Theme.Palette.textSecondary)
                         if let end = m.finishedAt {
                             Text("\(loc.t("match_end", "End")): \(ServerTime.local(end))").font(Theme.Typography.caption(13)).foregroundStyle(Theme.Palette.textSecondary)
@@ -466,7 +513,7 @@ private struct IntroductionSheet: View {
                 let partner = role == .client ? match.caregiver?.user : match.client?.user
                 HStack(spacing: 12) {
                     Avatar(url: partner?.photo, size: 72)
-                    Text(partner?.fullName ?? "").font(Theme.Typography.title(17))
+                    Text(partner?.displayName(loc) ?? "").font(Theme.Typography.title(17))
                 }
                 Text(match.introduction ?? "").font(Theme.Typography.body(15))
                     .frame(maxWidth: .infinity, alignment: .leading)

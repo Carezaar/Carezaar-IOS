@@ -1,3 +1,7 @@
+## October 17 Parity Review v3.0 (Android reference)
+
+The 17 items of "Carezaar - iOS and Android Parity Review v3.0" (16 October 2026) are mapped item by item, with implementation, tests and evidence, in `IOS-ANDROID-FUNCTIONAL-PARITY.md`; execution details are in `IOS_PARITY_TEST_EXECUTION_REPORT.md`. Fifteen items pass with evidence. C2's in-app Terms of Use / Privacy Policy viewer is implemented, but the documents themselves are BLOCKED until the client supplies them; M1 is BLOCKED because Android's new Messages/Profile header images are not available. Two October 13 rules are superseded by the PDF: continuing the preferences without a location (now F3: "Please select a location to continue.") and keeping the session after a server error during renewal (now Q1: sign out).
+
 ## October 16 shared retry-exhaustion verification
 
 P07-005 is PASS after independently reviewed controlled APIClient tests: 20 passed, zero failures or skips. Exhaustion stopped after four attempts in 1.755 seconds, with measured retry intervals of 0.252, 0.501 and 1.001 seconds. The actual network error routes through managed key `general_network_title` and the canonical connection message. [Anonymous evidence](Proofs/oct16-exhaustion-managed-error-anonymous-proof/index.json). Current original inventory: 112 PASS, 244 NOT RUN, 3 FAIL, 0 BLOCKED, 15 N/A = 374. Application and backend code are unchanged. This verifies shared policy, not native UI or physical-network coverage; full original QA remains incomplete. The latest full 143-unit baseline remains dated October 13.

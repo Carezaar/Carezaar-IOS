@@ -6,9 +6,10 @@ The native iOS app for Carezaar, written in SwiftUI. It connects families who ne
 
 - **Accounts**
   - Sign up as a client or as a caregiver, using email and password with an emailed verification code.
-  - Sign in, forgot password, change password and delete account. Sign In requires both fields and sends the entered values to the backend for validation.
+  - Sign in, forgot password, change password and delete account. Sign In requires both fields and sends the entered values to the backend for validation. Signing in to an account whose sign-up was never finished shows the server's message and resumes sign-up at the profile step.
+  - Create Account checks every field when Continue is tapped and shows each problem under its field. The consent sentence links to the Terms of Use and Privacy Policy, shown in an in-app viewer; their addresses are set in `LegalDocumentConfiguration` (`Core/Networking/APIConfiguration.swift`) and are empty until the client supplies the documents.
 - **Onboarding**
-  - A preferences wizard: needs, availability, location and languages. Users can continue without a location; Save opens the map with guidance if no valid point is selected.
+  - A preferences wizard: needs, availability, location and languages. The location is never filled in automatically: the map opens on the whole country (USA) and uses the phone's position only after My Location. Continuing without a location shows the managed "Please select a location to continue.", and refused location access is explained.
   - A profile with a photo, taken with the camera or picked from the gallery, then cropped.
 - **Discovery:** browse and sort profiles, add favourites, and open profile details.
 - **Matches**
@@ -20,8 +21,8 @@ The native iOS app for Carezaar, written in SwiftUI. It connects families who ne
   - Every action asks for confirmation.
   - Accepting a request opens the "It's a Match!" screen.
   - The Matches list shows cards; tapping a card opens the profile.
-- **Messages:** one-to-one chat between matched users.
-- **Notifications:** an in-app list. Match notifications open the related profile or the "It's a Match!" screen.
+- **Messages:** one-to-one chat between matched users. The conversation list refreshes every 10 seconds while it is on screen. A conversation with a former match or a deleted account is closed with a note above the disabled typing box, and deleted accounts are shown as "Deleted Account".
+- **Notifications:** an in-app list. Match notifications open the related profile or the "It's a Match!" screen. The app asks for notification permission as soon as it opens and carries on whatever the answer.
 - **Settings:** language, Help Center (FAQ, contact, Delete Account) and Report an Issue (on the Profile page).
 - **Languages:** the language list and translations come from the backend. The verified list includes English, Hindi, Chinese, Spanish, French, Russian, Arabic and Persian, with right-to-left layout for Arabic and Persian.
 
@@ -61,7 +62,7 @@ xcodebuild -project Carezaar.xcodeproj -scheme Carezaar \
 
 **Authentication**
 - `auth/login` returns an access token and a refresh token, which are stored in the Keychain (`Core/Session/TokenStore.swift`).
-- APIClient uses one shared session renewal when the server rejects the access token. Connectivity failures preserve credentials and show the managed Connection Problem/Retry window. Server, decoding and local persistence failures retain credentials and surface their managed error; only explicit rejection of the saved session ends sign-in. A known-refused mutation is distinguished from an uncertain write, and late results cannot affect another account.
+- APIClient uses one shared session renewal when the server rejects the access token. If the server answers the renewal with any HTTP error, the person is signed out. Only when the server cannot be reached does the managed Connection Problem/Retry window appear; the request that failed shows its own error and is not repeated, and a successful Retry renews the session and closes the window. A malformed success answer or a local Keychain failure keeps the credentials and shows the managed error. A known-refused mutation is distinguished from an uncertain write, and late results cannot affect another account.
 
 **Localisation**
 - UI text is served by the backend, not bundled. `GET base/contents` returns every label by slug and language (`Core/Storage/Localization.swift`).

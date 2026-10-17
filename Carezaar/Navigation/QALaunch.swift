@@ -213,6 +213,15 @@ enum QANetworkFault {
     /// Bounded failures before real renewal; no successful response is fabricated.
     private static let refreshFailures = QARefreshFailureCounter()
     static func refreshRequest(_ request: URLRequest) -> URLRequest {
+        // `--qa-refresh-http-error`: renewal goes to an unknown path on the real
+        // server, which answers with a genuine HTTP error (404). Nothing is fabricated.
+        if ProcessInfo.processInfo.arguments.contains("--qa-refresh-http-error"),
+           var parts = request.url.flatMap({ URLComponents(url: $0, resolvingAgainstBaseURL: false) }) {
+            parts.path = parts.path.replacingOccurrences(of: "auth/refresh", with: "auth/qa-renewal-http-error")
+            var failed = request
+            failed.url = parts.url
+            return failed
+        }
         guard refreshFailures.consume(),
               var parts = request.url.flatMap({ URLComponents(url: $0, resolvingAgainstBaseURL: false) }) else { return request }
         parts.host = "127.0.0.1"; parts.port = 9
@@ -228,7 +237,17 @@ enum QANetworkFault {
         return Double(args[i + 1])
     }()
 
+    /// `--qa-fail-once <METHOD> <path>`: the first matching request goes to a closed
+    /// local port (a connection failure); later ones reach the server normally.
+    private static let failOnce = QAFailOnce()
+
     static func apply(_ request: URLRequest) -> URLRequest {
+        if failOnce.consume(request), var parts = request.url.flatMap({ URLComponents(url: $0, resolvingAgainstBaseURL: false) }) {
+            parts.host = "127.0.0.1"; parts.port = 9
+            var dead = request
+            dead.url = parts.url
+            return dead
+        }
         guard let window, window.contains(Date().timeIntervalSince(launched)),
               var parts = request.url.flatMap({ URLComponents(url: $0, resolvingAgainstBaseURL: false) }) else { return request }
         parts.host = "127.0.0.1"; parts.port = 9
@@ -396,6 +415,22 @@ struct QARequestCountsView: View {
 #endif
 
 #if DEBUG
+private final class QAFailOnce: @unchecked Sendable {
+    private let lock = NSLock()
+    private var target: (method: String, path: String)? = {
+        let args = ProcessInfo.processInfo.arguments
+        guard let i = args.firstIndex(of: "--qa-fail-once"), i + 2 < args.count else { return nil }
+        return (args[i + 1], args[i + 2])
+    }()
+    func consume(_ request: URLRequest) -> Bool {
+        lock.lock(); defer { lock.unlock() }
+        guard let target, request.httpMethod == target.method,
+              request.url?.path == APIConfiguration.baseURL.appendingPathComponent(target.path).path else { return false }
+        self.target = nil
+        return true
+    }
+}
+
 private final class QARefreshFailureCounter: @unchecked Sendable {
     private let lock = NSLock()
     private var remaining: Int = {

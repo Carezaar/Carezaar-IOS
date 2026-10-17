@@ -91,7 +91,7 @@ final class AuthRuleMatrixUITests: XCTestCase {
             return
         }
         XCTAssertFalse(app.secureTextFields["Confirm Password"].exists, "Confirmation remained secure after its reveal action")
-        let terms = app.buttons["I accept the license agreement"]
+        let terms = app.buttons["signup-consent-checkbox"]
         scrollTo(terms)
         XCTAssertTrue(terms.exists && terms.isHittable, "Terms checkbox missing")
         guard terms.exists && terms.isHittable else { return }
@@ -124,6 +124,7 @@ final class AuthRuleMatrixUITests: XCTestCase {
                 XCTAssertTrue(next.exists, "\(caseID): Continue control missing")
                 let expectedChip = semantic("\(specialRule), \(expectedAllowed ? "met" : "not met")")
                 let updated = deliveryVerified ? expectedChip.waitForExistence(timeout: 5) : expectedChip.exists
+                var reviewOpened = false
                 if deliveryVerified { XCTAssertTrue(updated, "\(caseID): required special-symbol chip semantics missing") }
                 var observedChips = [String]()
                 for rule in otherRules + [specialRule] {
@@ -139,11 +140,19 @@ final class AuthRuleMatrixUITests: XCTestCase {
                 if deliveryVerified {
                     XCTAssertFalse(semantic("\(specialRule), \(expectedAllowed ? "not met" : "met")").exists,
                                    "\(caseID): opposite special-symbol state must be absent")
-                    let eligible = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
-                        next.exists && next.isEnabled == expectedAllowed
-                    }, object: nil)
-                    XCTAssertEqual(XCTWaiter.wait(for: [eligible], timeout: 5), .completed,
-                                   "\(caseID): Continue eligibility differs from the requested contract")
+                    // Parity v3 C1: Continue is always active; a valid password opens
+                    // the email review (closed with Edit), an invalid one names the rule.
+                    XCTAssertTrue(next.isEnabled, "\(caseID): Continue must always be active")
+                    next.tap()
+                    reviewOpened = app.buttons["Confirm"].firstMatch.waitForExistence(timeout: expectedAllowed ? 5 : 2)
+                    XCTAssertEqual(reviewOpened, expectedAllowed, "\(caseID): Continue outcome differs from the requested contract")
+                    if reviewOpened {
+                        app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Edit")).firstMatch.tap()
+                        XCTAssertTrue(app.buttons["Confirm"].firstMatch.waitForNonExistence(timeout: 10))
+                    } else {
+                        XCTAssertEqual(app.staticTexts["signup-error-password"].label, "One special symbol",
+                                       "\(caseID): the first unmet rule is named under Password")
+                    }
                 }
                 XCTAssertEqual(email.value as? String, "someone@example.com", "Email changed during password replacement")
                 XCTAssertTrue(terms.isSelected, "Terms selection changed during password replacement")
@@ -158,7 +167,7 @@ final class AuthRuleMatrixUITests: XCTestCase {
                 let record: [String: Any] = ["case": caseID, "symbol": symbol,
                     "codePoints": symbol.unicodeScalars.map { String(format: "U+%04X", $0.value) },
                     "expectedSpecialMet": expectedAllowed, "observedChips": observedChips,
-                    "continueExists": next.exists, "continueEnabled": next.isEnabled,
+                    "continueExists": next.exists, "continueEnabled": next.isEnabled, "reviewOpened": reviewOpened,
                     "confirmationExact": confirmationExact, "termsSelected": terms.isSelected,
                     "secureInputMethod": inputMethod, "secureMaskCount": maskedCount,
                     "expectedGraphemeCount": input.count, "expectedUTF16Count": input.utf16.count,
@@ -166,7 +175,7 @@ final class AuthRuleMatrixUITests: XCTestCase {
                     "emailUnchanged": emailUnchanged, "noConfirmationAlert": noAlert,
                     "noRegistrationOrOTPTransport": noSubmission,
                     "result": !deliveryVerified ? "INPUT_DELIVERY_FAILURE" : (confirmationExact && updated && oppositeAbsent && otherChipsCorrect
-                        && next.exists && next.isEnabled == expectedAllowed && terms.isSelected
+                        && next.exists && reviewOpened == expectedAllowed && terms.isSelected
                         && emailUnchanged && noAlert && noSubmission ? "PASS" : "POLICY_OR_UI_FAILURE")]
                 ledger.append(record)
                 attach(record, name: caseID, activity: activity)

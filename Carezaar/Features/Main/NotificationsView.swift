@@ -68,7 +68,7 @@ struct NotificationsView: View {
                 .frame(width: 49, height: 49)
                 VStack(alignment: .leading, spacing: 6) {
                     if let partner = n.partner {
-                        Text(partner.fullName).font(Theme.Typography.title(13)).foregroundStyle(Color(hex: 0x111111))
+                        Text(partner.displayName(loc)).font(Theme.Typography.title(13)).foregroundStyle(Color(hex: 0x111111))
                             .fixedSize(horizontal: false, vertical: true)
                     }
                     Text(loc.label(subject)).font(Theme.Typography.body(12)).foregroundStyle(Color(hex: 0x111111))
@@ -115,7 +115,7 @@ struct NotificationsView: View {
                 if let partner = n.partner {
                     HStack(spacing: 12) {
                         Avatar(url: partner.photo, size: 64)
-                        Text(partner.fullName).font(Theme.Typography.title(17))
+                        Text(partner.displayName(loc)).font(Theme.Typography.title(17))
                     }
                 }
                 Text(loc.label(subject)).font(Theme.Typography.body(16))

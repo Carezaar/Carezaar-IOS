@@ -95,7 +95,7 @@ struct CarezaarRoot: View {
         .feedbackOverlay()
         .alert(baseData.localization.t("general_session_renewal_title", "Connection Problem"),
                isPresented: Binding(get: { recovery.isPresented }, set: { _ in })) {
-            Button(baseData.localization.t("general_retry", "Retry")) { recovery.retry() }
+            Button(baseData.localization.t("general_retry", "Retry")) { Task { await recovery.retry() } }
         } message: {
             Text(baseData.localization.t("general_session_renewal_message",
                 "We could not reach the server to renew your sign-in. Please check your internet connection and try again."))
@@ -149,6 +149,9 @@ struct CarezaarRoot: View {
         #if DEBUG
         .task { await QALaunch.run(session: session, router: router) }
         #endif
+        // A1: ask for notification permission at startup, as Android does, and
+        // proceed regardless of the answer.
+        .onAppear { poller.requestPermissionAtLaunch() }
         .onAppear {
             baseData.localization.languageId = language.id
             let loc = baseData.localization

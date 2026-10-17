@@ -21,8 +21,23 @@ final class SignUpFlow: ObservableObject {
     /// must not try to create it again.
     @Published var entityCreated = false
 
+    /// The account was created but its first email code could not be sent (C4):
+    /// the code screen opens anyway and offers Re-send straight away.
+    @Published var otpSendFailed = false
+
+    /// Sign-in found an account whose sign-up was never finished (B1). The profile
+    /// step is keyed by email (anonymous `users/profile` accepts it again), returns
+    /// the user id for the role entity, and the final sign-in uses this password.
+    func resume(role: UserRole, email: String, password: String) {
+        reset()
+        self.role = role
+        self.email = email
+        self.password = password
+    }
+
     func reset() {
         entityCreated = false
+        otpSendFailed = false
         email = ""
         password = ""
         userId = nil

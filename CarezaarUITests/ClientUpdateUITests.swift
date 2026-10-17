@@ -213,3 +213,404 @@ final class ClientUpdateUITests: XCTestCase {
         XCTAssertFalse(counts.label.contains("GET /api/users/matches/"), "Redundant connection lookup before matched screen")
     }
 }
+
+/// iOS and Android Parity Review v3.0 (16 Oct 2026): one test per finding that can be
+/// driven through the UI. Accounts come from the runner environment (`PV3_*`);
+/// `QA_SHOT_DIR` receives screenshots without credentials. `PV3_LANG` (1 English,
+/// 3 Arabic) and `PV3_SIZE` (a content size category) repeat a run for RTL and
+/// Dynamic Type; text assertions then use accessibility identifiers only.
+final class ParityV3UITests: XCTestCase {
+    private var app: XCUIApplication!
+    private var env: [String: String] { ProcessInfo.processInfo.environment }
+    private var language: String { env["PV3_LANG"] ?? "1" }
+    private var english: Bool { language == "1" }
+    private var variant: String {
+        (english ? "" : "-ar") + (env["PV3_SIZE"].map { $0.contains("Accessibility") ? "-axl" : "-\($0)" } ?? "")
+    }
+
+    override func setUp() { continueAfterFailure = false; app = XCUIApplication() }
+    override func tearDown() { app?.terminate() }
+
+    private func value(_ key: String) throws -> String {
+        guard let v = env[key], !v.isEmpty else { throw XCTSkip("\(key) missing from runner environment") }
+        return v
+    }
+
+    private func launch(_ extra: [String], email: String? = nil, password: String? = nil) {
+        var args = ["--qa-signout", "-carezaar.languageId", language, "-carezaar.languageCode", english ? "en" : "ar"]
+        if let size = env["PV3_SIZE"] { args += ["-UIPreferredContentSizeCategoryName", size] }
+        if let email, let password {
+            app.launchEnvironment["QA_EMAIL"] = email
+            app.launchEnvironment["QA_PASSWORD"] = password
+            args.append("--qa-login-env")
+        }
+        app.launchArguments = args + extra
+        app.launch()
+    }
+
+    private func shot(_ name: String) {
+        let attachment = XCTAttachment(screenshot: app.screenshot())
+        attachment.name = name + variant; attachment.lifetime = .keepAlways; add(attachment)
+        if let dir = env["QA_SHOT_DIR"] {
+            try? app.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: "\(dir)/\(name)\(variant).png"))
+        }
+    }
+
+    private func text(_ english: String) -> XCUIElement {
+        app.descendants(matching: .any).matching(NSPredicate(format: "label == %@", english)).firstMatch
+    }
+
+    private func requestCount(_ key: String) -> Int {
+        let summary = app.staticTexts["qa-request-counts"].label
+        guard let line = summary.split(separator: "\n").first(where: { $0.hasPrefix(key + "=") }) else { return 0 }
+        return Int(line.dropFirst(key.count + 1)) ?? -1
+    }
+
+    private func waitFor(_ timeout: TimeInterval, _ condition: @escaping () -> Bool) -> Bool {
+        XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in condition() }, object: nil)],
+                       timeout: timeout) == .completed
+    }
+
+    // MARK: A1 — notification permission asked at launch, before sign-in
+
+    /// Run on a fresh install (the system asks only once per install).
+    func testA1NotificationPermissionAskedAtLaunchAndAppContinuesWhenRefused() throws {
+        guard env["PV3_FRESH_INSTALL"] == "1" else { throw XCTSkip("Needs a freshly installed app") }
+        launch([])
+        let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+        let alert = springboard.alerts.matching(NSPredicate(format: "label CONTAINS[c] %@", "Notifications")).firstMatch
+        XCTAssertTrue(alert.waitForExistence(timeout: 30), "The notification prompt must appear at app launch, signed out")
+        let shotImage = XCUIScreen.main.screenshot()
+        let attachment = XCTAttachment(screenshot: shotImage); attachment.name = "A1-prompt-at-launch"; attachment.lifetime = .keepAlways; add(attachment)
+        if let dir = env["QA_SHOT_DIR"] { try? shotImage.pngRepresentation.write(to: URL(fileURLWithPath: "\(dir)/A1-prompt-at-launch.png")) }
+        let deny = alert.buttons.matching(NSPredicate(format: "label IN %@", ["Don’t Allow", "Don't Allow"])).firstMatch
+        deny.tap()
+        let entry = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "I need care")).firstMatch
+        XCTAssertTrue(entry.waitForExistence(timeout: 40), "The app must carry on after the permission is refused")
+        shot("A1-welcome-after-refusal")
+    }
+
+    // MARK: C1/C2/C3 — sign-up form
+
+    func testC1C2C3SignUpValidationConsentAndConfirmation() throws {
+        launch(["--qa-push", "SignUpCredentials/client"])
+        let continueButton = app.buttons["Continue"].firstMatch
+        XCTAssertTrue(continueButton.waitForExistence(timeout: 60))
+        XCTAssertTrue(continueButton.isEnabled, "C1: Continue is always active")
+        shot("C1-form-empty")
+        continueButton.tap()
+        for field in ["email", "password", "confirmation", "agreement"] {
+            XCTAssertTrue(app.staticTexts["signup-error-\(field)"].waitForExistence(timeout: 5), "C1: \(field) problem under its field")
+        }
+        if english {
+            XCTAssertEqual(app.staticTexts["signup-error-email"].label, "This field is required.")
+            XCTAssertEqual(app.staticTexts["signup-error-password"].label, "This field is required.")
+            XCTAssertEqual(app.staticTexts["signup-error-confirmation"].label, "This field is required.")
+            XCTAssertEqual(app.staticTexts["signup-error-agreement"].label, "Please accept the license agreement to continue.")
+        }
+        shot("C1-all-empty-errors")
+        let email = app.textFields.firstMatch
+        email.tap(); email.typeText("not-an-email")
+        let password = app.secureTextFields.element(boundBy: 0)
+        password.tap()
+        let close = app.buttons["Close"]; if close.waitForExistence(timeout: 2) { close.tap(); password.tap() }
+        password.typeText("abcdefgh")
+        let confirmation = app.secureTextFields.element(boundBy: 1)
+        confirmation.tap(); if close.waitForExistence(timeout: 2) { close.tap(); confirmation.tap() }
+        confirmation.typeText("abcdefgX")
+        app.staticTexts["signup-consent-text"].firstMatch.coordinate(withNormalizedOffset: CGVector(dx: 0.02, dy: 0.02)).tap()
+        continueButton.tap()
+        if english {
+            XCTAssertEqual(app.staticTexts["signup-error-email"].label, "Please enter a valid email address.")
+            XCTAssertEqual(app.staticTexts["signup-error-password"].label, "One uppercase")
+            XCTAssertEqual(app.staticTexts["signup-error-confirmation"].label, "Passwords do not match.")
+        }
+        XCTAssertTrue(app.staticTexts["signup-error-agreement"].exists)
+        shot("C1-invalid-email-rule-mismatch")
+
+        // C2: the two names open the in-app viewer; no document is configured yet.
+        let consent = app.staticTexts["signup-consent-text"]
+        if english {
+            let sentence = "I agree to the Terms of Use and acknowledge that I have read the Privacy Policy."
+            XCTAssertTrue(consent.label.contains(sentence))
+            // VoiceOver: the tick-box speaks the whole managed sentence; the names are links.
+            XCTAssertEqual(app.buttons["signup-consent-checkbox"].label, sentence)
+            XCTAssertTrue(app.links["Terms of Use"].exists && app.links["Privacy Policy"].exists)
+        }
+        print("PV3 consent frame \(consent.frame) links: " + consent.links.allElementsBoundByIndex.map { "\($0.label) \($0.frame)" }.joined(separator: " | "))
+        print("PV3 app links: " + app.links.allElementsBoundByIndex.map { "\($0.label) \($0.frame)" }.joined(separator: " | "))
+        for (index, link) in consent.links.allElementsBoundByIndex.enumerated() {
+            // SwiftUI reports an empty accessibility rect for a link on a wrapped
+            // line; touch hit-testing is unaffected, so tap where the name is drawn.
+            if link.frame.width > 1 { link.tap() }
+            else if english { consent.coordinate(withNormalizedOffset: CGVector(dx: 0.42, dy: 0.75)).tap() }
+            else { continue }
+            let unavailable = app.staticTexts["legal-document-unavailable"]
+            XCTAssertTrue(unavailable.waitForExistence(timeout: 10), "C2: document viewer opens")
+            if english { XCTAssertEqual(unavailable.label, "This item is no longer available.") }
+            shot("C2-viewer-\(index == 0 ? "terms" : "privacy")")
+            app.navigationBars.buttons.firstMatch.tap()
+            XCTAssertTrue(unavailable.waitForNonExistence(timeout: 10))
+        }
+        XCTAssertEqual(consent.links.count, 2, "C2: Terms of Use and Privacy Policy are both links")
+
+        // C3: a valid form opens the confirmation with the managed sentence.
+        for _ in 0..<12 { email.tap(); email.typeText(XCUIKeyboardKey.delete.rawValue) }
+        email.typeText("parity.v3@example.com")
+        password.tap(); for _ in 0..<8 { password.typeText(XCUIKeyboardKey.delete.rawValue) }
+        password.typeText("Abcdefg1!")
+        confirmation.tap(); for _ in 0..<8 { confirmation.typeText(XCUIKeyboardKey.delete.rawValue) }
+        confirmation.typeText("Abcdefg1!")
+        app.buttons["signup-consent-checkbox"].tap()
+        continueButton.tap()
+        let dialogText = english ? text("Please review the details below. The email address will be used to continue.")
+                                 : app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "يرجى مراجعة")).firstMatch
+        XCTAssertTrue(dialogText.waitForExistence(timeout: 10), "C3: managed confirmation sentence")
+        for field in ["email", "password", "confirmation", "agreement"] {
+            XCTAssertFalse(app.staticTexts["signup-error-\(field)"].exists)
+        }
+        shot("C3-confirmation-dialog")
+        app.buttons["Edit"].firstMatch.tap()
+    }
+
+    // MARK: C4 — account created but the first code cannot be sent
+
+    func testC4CodeScreenOpensWhenFirstCodeCannotBeSentAndResendWorks() throws {
+        let accountFile = try value("PV3_C4_ACCOUNT_FILE")
+        let inbox = try MailTM.createInbox()
+        let password = "Pv3C4" + String(Int.random(in: 1000...9999)) + "a!"
+        launch(["--qa-push", "SignUpCredentials/client", "--qa-fail-once", "POST", "users/otp/send"])
+        let email = app.textFields.firstMatch
+        XCTAssertTrue(email.waitForExistence(timeout: 60))
+        email.tap(); email.typeText(inbox.address)
+        let pass = app.secureTextFields.element(boundBy: 0)
+        pass.tap(); let close = app.buttons["Close"]; if close.waitForExistence(timeout: 2) { close.tap(); pass.tap() }
+        pass.typeText(password)
+        let confirmation = app.secureTextFields.element(boundBy: 1)
+        confirmation.tap(); if close.waitForExistence(timeout: 2) { close.tap(); confirmation.tap() }
+        confirmation.typeText(password)
+        app.buttons["signup-consent-checkbox"].tap()
+        app.buttons["Continue"].firstMatch.tap()
+        app.buttons["Confirm"].firstMatch.tap()
+        let record = ["email": inbox.address, "password": password, "role": "client", "inbox_token": inbox.token]
+        // One file per run, so a later run never overwrites credentials needed for cleanup.
+        let runFile = accountFile + ".\(Int(Date().timeIntervalSince1970))"
+        try JSONSerialization.data(withJSONObject: record).write(to: URL(fileURLWithPath: runFile), options: .atomic)
+        try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: runFile)
+        XCTAssertTrue(app.staticTexts["OTP Confirmation"].waitForExistence(timeout: 60), "C4: the code screen opens even though the code was not sent")
+        XCTAssertTrue(text("Cannot communicate with server.").waitForExistence(timeout: 5), "C4: the send failure is reported")
+        let resend = app.buttons["Re-send"]
+        XCTAssertTrue(resend.waitForExistence(timeout: 5), "C4: the person can ask for the code again at once")
+        shot("C4-code-screen-after-send-failure")
+        // The error toast sits over the link for a few seconds; close it first.
+        let closeToast = app.buttons.matching(NSPredicate(format: "label == %@", "Dismiss")).firstMatch
+        if closeToast.exists && closeToast.isHittable { closeToast.tap() } else { sleep(5) }
+        sleep(1)
+        resend.tap()
+        let code = try XCTUnwrap(try MailTM.waitForCode(inbox), "Re-send must deliver a code")
+        let boxes = app.descendants(matching: .any).matching(NSPredicate(format: "label BEGINSWITH %@", "One-time code")).firstMatch
+        boxes.tap(); app.typeText(code)
+        app.buttons["Continue"].firstMatch.tap()
+        XCTAssertTrue(app.textFields["Enter your first name"].waitForExistence(timeout: 30), "Verified code continues to the profile step")
+        shot("C4-profile-step-after-resend")
+    }
+
+    // MARK: F1/F2/F3 — location step (read-only: nothing is saved)
+
+    private func openLocationStep(fixture: String) throws {
+        let email = try value("PV3_CLIENT_EMAIL"), password = try value("PV3_CLIENT_PASSWORD")
+        app.launchEnvironment["QA_CLIENT_USER_ID"] = try value("PV3_CLIENT_ID")
+        app.launchEnvironment["QA_CG_ID"] = try value("PV3_CG_ID")
+        launch(["--qa-request-counts", "--qa-push", "ClientPreferences", "--qa-location-fixture", fixture,
+                "--qa-owned-profile-no-location", "GET", "clients/profile"], email: email, password: password)
+        XCTAssertTrue(app.staticTexts["qa-profile-no-location"].waitForExistence(timeout: 90))
+        for _ in 0..<2 {
+            let next = app.buttons[english ? "Continue" : "متابعة"].firstMatch
+            XCTAssertTrue(next.waitForExistence(timeout: 30)); sleep(2); next.tap(); sleep(1)
+        }
+    }
+
+    func testF1F3NoAutomaticLocationCountryMapAndRequiredMessage() throws {
+        try openLocationStep(fixture: "available")
+        let hint = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", english ? "Tap to select location" : "اضغط لاختيار الموقع")).firstMatch
+        XCTAssertTrue(hint.waitForExistence(timeout: 15))
+        XCTAssertEqual(app.buttons.matching(NSPredicate(format: "label MATCHES %@", ".*-?[0-9]+\\.[0-9]{6} , -?[0-9]+\\.[0-9]{6}.*")).count, 0,
+                       "F1: an available phone fix must not fill the location by itself")
+        shot("F1-location-row-empty")
+        app.buttons["Continue"].firstMatch.tap()
+        if english { XCTAssertTrue(text("Please select a location to continue.").waitForExistence(timeout: 5), "F3") }
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "STEP")).firstMatch.exists || !english)
+        shot("F3-location-required")
+        sleep(4)
+        hint.tap()
+        let myLocation = app.buttons["My location"]
+        XCTAssertTrue(myLocation.waitForExistence(timeout: 15))
+        sleep(3)
+        shot("F1-map-opens-on-country")
+        if english { XCTAssertTrue(app.buttons["Continue"].firstMatch.exists, "F1: no point is chosen until the person acts") }
+        myLocation.tap()
+        XCTAssertTrue(app.buttons["Confirm"].firstMatch.waitForExistence(timeout: 15), "F1: My Location uses the phone position")
+        shot("F1-after-my-location")
+        app.buttons["Back"].firstMatch.tap()
+    }
+
+    func testF2RefusedLocationAccessExplainsAfterMyLocation() throws {
+        try openLocationStep(fixture: "none")
+        let hint = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", english ? "Tap to select location" : "اضغط لاختيار الموقع")).firstMatch
+        XCTAssertTrue(hint.waitForExistence(timeout: 15)); hint.tap()
+        let myLocation = app.buttons["My location"]
+        XCTAssertTrue(myLocation.waitForExistence(timeout: 15))
+        myLocation.tap()
+        let note = app.staticTexts["location-permission-denied"]
+        XCTAssertTrue(note.waitForExistence(timeout: 5), "F2: refusal must be explained")
+        if english { XCTAssertEqual(note.label, "Allow location access to use your current location.") }
+        shot("F2-location-permission-denied")
+        app.buttons["Back"].firstMatch.tap()
+    }
+
+    // MARK: K — messages (client A; chats with caregiver B (active) and C (deleted))
+
+    func testK4EmptySendExplainsAndButtonStaysTappable() throws {
+        launch(["--qa-push", "Chat/\(try value("PV3_CHAT_B"))"], email: try value("PV3_CLIENT_EMAIL"), password: try value("PV3_CLIENT_PASSWORD"))
+        let send = app.buttons["Send"]
+        XCTAssertTrue(send.waitForExistence(timeout: 60))
+        let transcript = app.descendants(matching: .any).matching(NSPredicate(format: "identifier BEGINSWITH %@", "chat-message-")).firstMatch
+        XCTAssertTrue(transcript.waitForExistence(timeout: 60), "conversation loaded")
+        sleep(1)
+        XCTAssertTrue(send.isEnabled, "K4: send stays tappable with an empty message")
+        send.tap()
+        if english { XCTAssertTrue(text("Please type a message first.").waitForExistence(timeout: 5), "K4") }
+        shot("K4-empty-send")
+    }
+
+    func testK1ConversationListRefreshesEveryTenSecondsAndShowsPartnerMessage() throws {
+        launch(["--qa-request-counts", "--qa-tab", "messages"], email: try value("PV3_CLIENT_EMAIL"), password: try value("PV3_CLIENT_PASSWORD"))
+        XCTAssertTrue(app.staticTexts["qa-request-counts"].waitForExistence(timeout: 60))
+        XCTAssertTrue(waitFor(30) { self.requestCount("GET /api/users/chats") >= 1 })
+        let start = requestCount("GET /api/users/chats")
+        let begin = Date()
+        // Cross-role: the caregiver writes while the client's list is open.
+        let marker = "PV3 K1 \(Int(Date().timeIntervalSince1970) % 100000)"
+        let token = try CarezaarAPI.login(try value("PV3_CG_EMAIL"), try value("PV3_CG_PASSWORD"))
+        _ = try CarezaarAPI.call("POST", "users/chats/\(try value("PV3_CHAT_B"))", form: ["message": marker], token: token)
+        let row = app.buttons.matching(NSPredicate(format: "value CONTAINS %@", marker)).firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout: 15), "K1: the partner's message appears without any action within ~10 s")
+        let seconds = Date().timeIntervalSince(begin)
+        print("K1 marker visible after \(Int(seconds)) s")
+        shot("K1-list-refreshed-with-partner-message")
+        XCTAssertTrue(waitFor(25) { self.requestCount("GET /api/users/chats") >= start + 2 })
+        let elapsed = Date().timeIntervalSince(begin)
+        let gained = requestCount("GET /api/users/chats") - start
+        XCTAssertLessThanOrEqual(gained, Int(elapsed / 10) + 1, "K1: a single 10-second timer (no duplicates)")
+        // Hidden: opening Profile stops the timer.
+        app.buttons["Profile"].firstMatch.tap()
+        sleep(2)
+        let hidden = requestCount("GET /api/users/chats")
+        sleep(22)
+        XCTAssertEqual(requestCount("GET /api/users/chats"), hidden, "K1: no refresh while the list is not visible")
+    }
+
+    func testK2UnmatchedConversationIsClosedWithNote() throws {
+        launch(["--qa-push", "Chat/\(try value("PV3_CHAT_B"))"], email: try value("PV3_CLIENT_EMAIL"), password: try value("PV3_CLIENT_PASSWORD"))
+        let note = app.descendants(matching: .any)["chat-closed-note"]
+        XCTAssertTrue(note.waitForExistence(timeout: 60), "K2: closed conversation note")
+        if english { XCTAssertTrue(note.label.contains("You can only send messages to your current matches.")) }
+        XCTAssertFalse(app.buttons["Send"].isEnabled, "K2: send is grey")
+        XCTAssertFalse(app.textFields.firstMatch.isEnabled, "K2: typing box is off")
+        shot("K2-unmatched-conversation")
+    }
+
+    /// Cross-role: the caregiver's side of the same ended match is closed too.
+    func testK2CaregiverSideOfUnmatchedConversationIsClosed() throws {
+        launch(["--qa-push", "Chat/\(try value("PV3_CHAT_B"))"], email: try value("PV3_CG_EMAIL"), password: try value("PV3_CG_PASSWORD"))
+        let note = app.descendants(matching: .any)["chat-closed-note"]
+        XCTAssertTrue(note.waitForExistence(timeout: 60), "K2: closed conversation note (caregiver)")
+        if english { XCTAssertTrue(note.label.contains("You can only send messages to your current matches.")) }
+        XCTAssertFalse(app.buttons["Send"].isEnabled)
+        shot("K2-unmatched-conversation-caregiver")
+    }
+
+    func testK3DeletedAccountShownAndConversationClosed() throws {
+        launch(["--qa-tab", "messages"], email: try value("PV3_CLIENT_EMAIL"), password: try value("PV3_CLIENT_PASSWORD"))
+        let deletedName = english ? "Deleted Account" : "حساب محذوف"
+        let row = app.buttons.matching(NSPredicate(format: "label == %@", deletedName)).firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout: 60), "K3: deleted account named in the list")
+        shot("K3-messages-list")
+        row.tap()
+        let note = app.descendants(matching: .any)["chat-closed-note"]
+        XCTAssertTrue(note.waitForExistence(timeout: 30))
+        if english { XCTAssertTrue(note.label.contains("This account has been deleted. You can no longer send messages.")) }
+        XCTAssertTrue(text(deletedName).exists, "K3: conversation header")
+        XCTAssertFalse(app.buttons["Send"].isEnabled)
+        XCTAssertFalse(app.textFields.firstMatch.isEnabled)
+        shot("K3-conversation-closed")
+        app.terminate()
+        launch(["--qa-push", "Notifications"], email: try value("PV3_CLIENT_EMAIL"), password: try value("PV3_CLIENT_PASSWORD"))
+        XCTAssertTrue(app.navigationBars.firstMatch.waitForExistence(timeout: 60))
+        sleep(5)
+        // Older notifications load page by page while scrolling.
+        for _ in 0..<12 where !text(deletedName).exists { app.swipeUp(velocity: .slow); sleep(2) }
+        XCTAssertTrue(text(deletedName).waitForExistence(timeout: 10), "K3: deleted account named in notifications")
+        shot("K3-notifications")
+    }
+
+    // MARK: M2 — Change Password subtitle
+
+    func testM2ChangePasswordSubtitle() throws {
+        launch(["--qa-tab", "profile"], email: try value("PV3_CLIENT_EMAIL"), password: try value("PV3_CLIENT_PASSWORD"))
+        let subtitle = app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", english ? "Change your current password" : "غيّر كلمة المرور الحالية")).firstMatch
+        XCTAssertTrue(subtitle.waitForExistence(timeout: 30), "M2")
+        sleep(2)
+        // Scroll the personal card (with the email address) out of the evidence.
+        let logOut = app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", english ? "Sign out from your account" : "تسجيل الخروج من حسابك")).firstMatch
+        for _ in 0..<8 where !(logOut.exists && logOut.isHittable) { app.swipeUp(velocity: .slow); sleep(1) }
+        app.swipeUp(velocity: .slow); sleep(1)
+        XCTAssertFalse(app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", "Update your account password")).firstMatch.exists)
+        shot("M2-profile-menu")
+    }
+
+    // MARK: Q1/Q2 — session renewal
+
+    func testQ1RenewalHTTPErrorSignsOutWithoutConnectionWindow() throws {
+        launch(["--qa-request-counts", "--qa-tab", "profile", "--qa-break-access-later", "--qa-refresh-http-error"],
+               email: try value("PV3_CLIENT_EMAIL"), password: try value("PV3_CLIENT_PASSWORD"))
+        try openNotificationsAfterTokenBreak()
+        let entry = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "I need care")).firstMatch
+        XCTAssertTrue(entry.waitForExistence(timeout: 90), "Q1: an HTTP error answer to renewal signs the person out")
+        XCTAssertEqual(app.alerts.count, 0, "Q1: no Connection Problem window for a server answer")
+        let presence = app.staticTexts["qa-token-presence"]
+        XCTAssertTrue(waitFor(5) { presence.label == "accessPresent=false;refreshPresent=false" })
+        XCTAssertGreaterThanOrEqual(requestCount("PUT /api/auth/qa-renewal-http-error"), 1)
+        shot("Q1-signed-out-after-renewal-error")
+    }
+
+    func testQ2RetryClosesWindowAndDoesNotRepeatFailedRequest() throws {
+        launch(["--qa-request-counts", "--qa-tab", "profile", "--qa-break-access-later", "--qa-refresh-failures", "1"],
+               email: try value("PV3_CLIENT_EMAIL"), password: try value("PV3_CLIENT_PASSWORD"))
+        try openNotificationsAfterTokenBreak()
+        let dialog = app.alerts["Connection Problem"]
+        XCTAssertTrue(dialog.waitForExistence(timeout: 90))
+        let reads = requestCount("GET /api/users/notifications")
+        XCTAssertGreaterThanOrEqual(reads, 1)
+        shot("Q2-connection-problem")
+        dialog.buttons["Retry"].tap()
+        XCTAssertTrue(waitFor(30) { self.requestCount("PUT /api/auth/refresh") == 5 && !dialog.exists },
+                      "Q2: one renewal on Retry, then the window closes")
+        sleep(3)
+        XCTAssertEqual(requestCount("GET /api/users/notifications"), reads, "Q2: the failed request is not repeated")
+        let presence = app.staticTexts["qa-token-presence"]
+        XCTAssertTrue(waitFor(5) { presence.label == "accessPresent=true;refreshPresent=true" }, "Still signed in")
+        XCTAssertTrue(text("Cannot communicate with server.").exists, "Q2: the failed request shows its own error")
+        shot("Q2-after-retry")
+    }
+
+    /// `--qa-break-access-later` makes the stored access token invalid ~8 s after
+    /// sign-in; opening Notifications then sends a request the server refuses (403).
+    private func openNotificationsAfterTokenBreak() throws {
+        let bell = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Notifications")).firstMatch
+        XCTAssertTrue(bell.waitForExistence(timeout: 90))
+        XCTAssertTrue(app.staticTexts["qa-request-counts"].waitForExistence(timeout: 10))
+        sleep(14)
+        bell.tap()
+    }
+}

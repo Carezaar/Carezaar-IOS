@@ -15,10 +15,11 @@ final class ChatSettingsTests: XCTestCase {
         }
         let coordinator = ChatSendCoordinator(service: UserService(client: APIClient(tokens: tokens, session: StubHTTP.session())))
         do { _ = try await coordinator.submit(chatId: 42, text: "Retain unsent draft", parentId: nil); XCTFail("Renewal failed") }
-        catch { XCTAssertEqual(Feedback.message(error), Feedback.message(APIError.server(""))) }
+        // Parity v3 Q1: an HTTP error answer to renewal ends the session.
+        catch { XCTAssertEqual(Feedback.message(error), Feedback.message(APIError.unauthenticated(""))) }
         XCTAssertEqual(methods, ["POST", "PUT"], "An explicitly rejected Send needs no delivery reconciliation read")
         XCTAssertFalse(coordinator.uncertain)
-        XCTAssertTrue(tokens.hasSession)
+        XCTAssertFalse(tokens.hasSession)
     }
 
     @MainActor
@@ -400,6 +401,32 @@ final class ChatSettingsTests: XCTestCase {
         let noReply = replies.capture(parentId: nil)
         replies.selectionChanged()
         XCTAssertFalse(replies.canClear(noReply, currentParentId: 9))
+    }
+
+
+    // MARK: Parity v3 K2/K3 — closed conversations and deleted accounts
+
+    private func chat(partnerDeleted: Bool, isMatch: Bool) throws -> ChatFull {
+        let names = partnerDeleted ? #""first_name":null,"last_name":null,"is_deleted":true"# : #""first_name":"Ben","last_name":"PV3","is_deleted":false"#
+        let json = #"{"id":7,"messages":[],"client":{"id":"c","user":{"id":"c","role":"client","first_name":"Ava","last_name":"PV3"},"is_match":true},"caregiver":{"id":"g","user":{"id":"g","role":"caregiver",\#(names),"email":null,"photo":null,"status":"unverified","is_favorite":false},"salary_min":25,"salary_max":60,"distance":0,"is_match":\#(isMatch)}}"#
+        return try JSONDecoder().decode(ChatFull.self, from: Data(json.utf8))
+    }
+
+    func testDeletedAccountDecodesAndWinsOverMatchCheck() throws {
+        let deleted = try chat(partnerDeleted: true, isMatch: false)
+        XCTAssertEqual(deleted.caregiver?.user.isDeleted, true)
+        XCTAssertEqual(ChatAvailability(chat: deleted, role: .client), .accountDeleted)
+        XCTAssertEqual(ChatAvailability(chat: try chat(partnerDeleted: false, isMatch: false), role: .client), .notMatched)
+        XCTAssertEqual(ChatAvailability(chat: try chat(partnerDeleted: false, isMatch: true), role: .client), .open)
+        XCTAssertEqual(try chat(partnerDeleted: false, isMatch: true).caregiver?.user.isDeleted, false)
+    }
+
+    @MainActor func testDeletedAccountNameUsesManagedText() throws {
+        let loc = Localization()
+        let user = try XCTUnwrap(try chat(partnerDeleted: true, isMatch: false).caregiver?.user)
+        XCTAssertEqual(user.displayName(loc), "Deleted Account")
+        XCTAssertEqual(try XCTUnwrap(try chat(partnerDeleted: false, isMatch: true).caregiver?.user).displayName(loc), "Ben PV3")
+        XCTAssertTrue(user.with(isFavorite: true).isDeleted, "Favourite updates keep the deleted flag")
     }
 
 }

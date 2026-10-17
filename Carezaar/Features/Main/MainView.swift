@@ -302,13 +302,13 @@ struct MatchesTab: View {
     private func cardDetails(_ c: Card) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             if typeSize.isAccessibilitySize {
-                Text(c.user.fullName).font(Theme.Typography.title(17)).foregroundStyle(.black)
+                Text(c.user.displayName(loc)).font(Theme.Typography.title(17)).foregroundStyle(.black)
                 if !isClient, let min = c.min {
                     Text("$\(min) - $\(c.max ?? min)").font(Theme.Typography.control(13)).foregroundStyle(Theme.Palette.primaryDark)
                 }
             } else {
                 HStack(alignment: .firstTextBaseline) {
-                    Text(c.user.fullName).font(Theme.Typography.title(17)).foregroundStyle(.black).lineLimit(2)
+                    Text(c.user.displayName(loc)).font(Theme.Typography.title(17)).foregroundStyle(.black).lineLimit(2)
                     Spacer(minLength: 4)
                     if !isClient, let min = c.min {
                         Text("$\(min) - $\(c.max ?? min)").font(Theme.Typography.control(13)).foregroundStyle(Theme.Palette.primaryDark).fixedSize()
@@ -407,7 +407,8 @@ func formatDistance(_ d: Double?) -> String {
 extension User {
     func with(isFavorite: Bool) -> User {
         User(id: id, countryId: countryId, genderId: genderId, role: role, email: email, firstName: firstName,
-             lastName: lastName, photo: photo, bio: bio, dateOfBirth: dateOfBirth, status: status, isFavorite: isFavorite)
+             lastName: lastName, photo: photo, bio: bio, dateOfBirth: dateOfBirth, status: status, isFavorite: isFavorite,
+             isDeleted: isDeleted)
     }
 }
 
@@ -420,6 +421,13 @@ struct MessagesTab: View {
     @EnvironmentObject private var loc: Localization
     @EnvironmentObject private var feedback: Feedback
     @StateObject private var pager = Pager<ChatBrief>()
+    @State private var visible = false
+
+    /// K1: Android refreshes the conversation list every 10 seconds while it is open.
+    static let refreshInterval: Duration = .seconds(10)
+    /// One timer at most: the task restarts (and the old one is cancelled) whenever
+    /// visibility or the scene phase changes, and it does not run while hidden.
+    private var refreshing: Bool { visible && scenePhase == .active }
 
     var body: some View {
         ScrollView {
@@ -439,6 +447,16 @@ struct MessagesTab: View {
         // Back from a chat, or back in the app: previews and unread dots may have changed.
         .onChange(of: router.path.isEmpty) { _, atRoot in if atRoot { Task { await pager.reload(fetch) } } }
         .onChange(of: scenePhase) { _, phase in if phase == .active { Task { await pager.reload(fetch) } } }
+        .onAppear { visible = true }
+        .onDisappear { visible = false }
+        .task(id: refreshing) {
+            guard refreshing else { return }
+            while !Task.isCancelled {
+                do { try await Task.sleep(for: Self.refreshInterval) } catch { return }
+                guard !Task.isCancelled, visible, scenePhase == .active else { return }
+                await pager.refreshQuietly(fetch)
+            }
+        }
     }
 
     private func row(_ chat: ChatBrief) -> some View {
@@ -449,7 +467,7 @@ struct MessagesTab: View {
                 Avatar(url: partner?.photo, size: 60)
                 VStack(alignment: .leading, spacing: 4) {
                     AdaptiveStack(alignment: .center, spacing: 8, stackedSpacing: 2) {
-                        Text(partner?.fullName ?? "").font(Theme.Typography.title(16)).foregroundStyle(.black).lineLimit(2)
+                        Text(partner?.displayName(loc) ?? "").font(Theme.Typography.title(16)).foregroundStyle(.black).lineLimit(2)
                         Spacer(minLength: 0)
                         Text(ServerTime.local(chat.updatedAt)).font(Theme.Typography.caption()).foregroundStyle(Theme.Palette.textSecondary)
                     }
@@ -466,7 +484,7 @@ struct MessagesTab: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(partner?.fullName ?? loc.t("chat_screen_messages_title", "Chat Messages"))
+        .accessibilityLabel(partner?.displayName(loc) ?? loc.t("chat_screen_messages_title", "Chat Messages"))
         .accessibilityValue([chat.lastMessage ?? "", ServerTime.local(chat.updatedAt),
                              unread ? loc.t("messages_unread", "Unread") : ""]
             .filter { !$0.isEmpty }.joined(separator: ". "))
@@ -569,7 +587,7 @@ struct ProfileTab: View {
                     description: isClient ? loc.t("profile_favorites_client_description", "View your saved caregivers")
                                           : loc.t("profile_favorites_caregiver_description", "View your saved clients")) { router.push(.favorites) },
             MenuRow(icon: "ic_lock", title: loc.t("navigation_drawer_password_title", "Change Password"),
-                    description: loc.t("navigation_drawer_password_description", "Update your account password")) { router.push(.changePassword) },
+                    description: loc.t("profile_password_change_description", "Change your current password")) { router.push(.changePassword) },
             MenuRow(icon: "ic_logout", title: loc.t("profile_log_out_title", "Log Out"),
                     description: loc.t("profile_log_out_description", "Sign out from your account"),
                     tint: Theme.Palette.danger, titleColor: Theme.Palette.danger) { confirmingLogout = true },

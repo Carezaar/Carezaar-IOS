@@ -256,6 +256,39 @@ final class SignupTests: XCTestCase {
         try completeSignupProfileAndPreferences(caregiver: role == "caregiver")
     }
 
+    /// Parity v3 B1: signing in to an account whose sign-up was never finished shows
+    /// the server's message and resumes sign-up at the profile step; finishing the
+    /// wizard signs in. `PV3_B1_EMAIL`/`PV3_B1_PASSWORD`/`PV3_B1_ROLE` name a staged,
+    /// email-verified disposable account without a role entity.
+    func testUnfinishedSignupSignInResumesAtProfileStep() throws {
+        let environment = ProcessInfo.processInfo.environment
+        guard let email = environment["PV3_B1_EMAIL"], let password = environment["PV3_B1_PASSWORD"],
+              let role = environment["PV3_B1_ROLE"], environment["QA_SIMULATOR_LOCATION_READY"] == "1" else {
+            throw XCTSkip("Requires a staged unfinished account and simulator location permission/GPS.")
+        }
+        app.launchArguments = ["--qa-signout", "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
+        app.launch()
+        let signIn = app.buttons["Sign in"].firstMatch
+        XCTAssertTrue(signIn.waitForExistence(timeout: 40))
+        signIn.tap()
+        let emailField = app.textFields.firstMatch
+        XCTAssertTrue(emailField.waitForExistence(timeout: 10))
+        emailField.tap(); emailField.typeText(email)
+        let passwordField = app.secureTextFields.firstMatch
+        passwordField.tap(); passwordField.typeText(password)
+        app.buttons.matching(NSPredicate(format: "label == %@", "Sign In")).firstMatch.tap()
+        let message = app.staticTexts["Your registration is not complete. Please complete your profile to continue."]
+        XCTAssertTrue(message.waitForExistence(timeout: 30), "The server's message must be shown")
+        // iOS may offer to save the typed password; a person can decline it.
+        let notNow = app.buttons["Not Now"]
+        if notNow.waitForExistence(timeout: 4) { notNow.tap() }
+        XCTAssertTrue(app.textFields["Enter your first name"].waitForExistence(timeout: 10), "Must open the profile step")
+        if let dir = environment["QA_SHOT_DIR"] {
+            try? app.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: "\(dir)/B1-profile-step-with-server-message.png"))
+        }
+        try completeSignupProfileAndPreferences(caregiver: role == "caregiver")
+    }
+
     /// A newly created disposable account through everything that changes it:
     /// photo upload, a profile save that must keep the photo (BE-15), Change Password,
     /// Forgot Password with the real emailed code (a wrong code first), and Delete.
@@ -549,9 +582,10 @@ final class SignupTests: XCTestCase {
         email.tap(); email.typeText(inbox.address)
         typeSecure(app.secureTextFields["Enter your password..."], password)
         typeSecure(app.secureTextFields["Confirm Password"], password)
-        app.buttons["I accept the license agreement"].tap()
+        // Parity v3 C2: the consent tick-box replaces "I accept the license agreement".
+        app.buttons["signup-consent-checkbox"].tap()
         let next = app.buttons["Continue"].firstMatch
-        XCTAssertTrue(next.isEnabled, "Continue should enable once the form is valid")
+        XCTAssertTrue(next.isEnabled, "Continue is always active (parity v3 C1)")
         next.tap()
         let confirm = app.buttons["Confirm"].firstMatch
         XCTAssertTrue(confirm.waitForExistence(timeout: 10), "Are you sure? dialog")
@@ -585,6 +619,7 @@ final class SignupTests: XCTestCase {
         let last = app.textFields["Enter your last name"]
         let lastName = caregiver ? "Caregiver" : "Client"
         if last.value as? String != lastName { last.tap(); last.typeText(lastName) }
+        dismissKeyboard()
         if app.buttons["Select your gender"].exists {
             app.buttons["Select your gender"].tap()
             XCTAssertTrue(app.buttons["Female"].waitForExistence(timeout: 5)); app.buttons["Female"].tap()
@@ -607,15 +642,23 @@ final class SignupTests: XCTestCase {
         for chip in ["Bathing", "Compassionate", "English", "Less than 1 year", "CNA", "TB Test"] { tapChip(chip) }
         advance()
         // Step 3: location, schedule, pay.
-        // A resolved phone point replaces the hint with a numeric coordinate.
-        // No manual pan or manufactured fallback: root supplies simulator GPS.
-        let location = app.buttons.matching(NSPredicate(format: "label MATCHES %@", ".*-?[0-9]+\\.[0-9]{6} , -?[0-9]+\\.[0-9]{6}.*")).firstMatch
-        XCTAssertTrue(location.waitForExistence(timeout: 40), "Simulator phone location did not resolve; root must inspect permission/GPS setup")
-        scrollTo(location); location.tap()
+        // Parity v3 F1/F3: the phone location is not filled in by itself, and
+        // continuing without one names what is missing.
+        let hint = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Tap to select location")).firstMatch
+        XCTAssertTrue(hint.waitForExistence(timeout: 20), "Location must start empty (no automatic phone location)")
+        app.buttons["Continue"].firstMatch.tap()
+        XCTAssertTrue(app.staticTexts["Please select a location to continue."].waitForExistence(timeout: 5),
+                      "Continuing without a location must say what is missing")
+        scrollTo(hint); hint.tap()
+        // The map opens on the whole country; the phone location is used only after My Location.
+        let myLocation = app.buttons["My location"]
+        XCTAssertTrue(myLocation.waitForExistence(timeout: 15), "map picker")
+        myLocation.tap()
         let confirmMap = app.buttons["Confirm"].firstMatch
-        XCTAssertTrue(confirmMap.waitForExistence(timeout: 15), "map picker")
-        XCTAssertTrue(confirmMap.isEnabled, "Resolved simulator point must be confirmable")
+        XCTAssertTrue(confirmMap.waitForExistence(timeout: 30), "Simulator phone location did not resolve after My Location; root must inspect permission/GPS setup")
         confirmMap.tap()
+        let location = app.buttons.matching(NSPredicate(format: "label MATCHES %@", ".*-?[0-9]+\\.[0-9]{6} , -?[0-9]+\\.[0-9]{6}.*")).firstMatch
+        XCTAssertTrue(location.waitForExistence(timeout: 10), "Confirmed point must fill the location row")
         for chip in ["Up to 5 miles", "Morning: 6 am - 12 pm", "Monday", "One Time"] + (caregiver ? [] : ["Female"]) { tapChip(chip) }
         let minimum = app.textFields["Minimum"]; scrollTo(minimum)
         minimum.tap(); minimum.typeText("20")

@@ -30,6 +30,9 @@ struct SceneBinder {
     /// rules as chips (`8+`, `A`, `a`, `1`, `@`); dimming the unmet ones makes the
     /// designed checklist live without redrawing it.
     var opacity: (DesignNode) -> Double? = { _ in nil }
+    /// Moves a node down by this many scene points, for a control that must make
+    /// room for live content the frame has no slot for (sign-up field errors).
+    var yOffset: (DesignNode) -> Double? = { _ in nil }
 
     /// False only for the design catalog, which keeps the renderer's demo behaviour.
     var isBound = true

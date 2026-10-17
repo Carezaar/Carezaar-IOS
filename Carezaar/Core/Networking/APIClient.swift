@@ -8,19 +8,34 @@ extension Notification.Name {
 }
 
 actor APIClient {
-    static let shared = APIClient(awaitRenewalRetry: { generation in
-        try await SessionRecoveryCoordinator.shared.waitForRetry(generation: generation)
+    static let shared = APIClient(reportRenewalUnreachable: { generation in
+        await SessionRecoveryCoordinator.shared.present(generation: generation)
     })
+
+    /// Result of a renewal requested from the "Connection Problem" window.
+    enum RenewalRetryOutcome: Equatable, Sendable {
+        /// New credentials are stored; the window closes.
+        case renewed
+        /// The server answered with an error; the session has been ended.
+        case rejected
+        /// The server still cannot be reached; the window stays.
+        case unreachable
+        /// A received but unusable answer (malformed, local storage); credentials kept.
+        case failed
+    }
 
     private let session: URLSession
     private let decoder: JSONDecoder
     private let tokens: any SessionTokenStorage
-    private let awaitRenewalRetry: (@Sendable (UUID) async throws -> Bool)?
+    /// Shows the "Connection Problem" window when renewal could not reach the server.
+    /// It never holds the failed request: that request reports its own error and is
+    /// not repeated after Retry (parity review v3, Q2).
+    private let reportRenewalUnreachable: (@Sendable (UUID) async -> Void)?
     /// Single-flight refresh: concurrent 403s must not fire parallel refresh calls.
     private var refreshTask: (generation: UUID, id: UUID, task: Task<Result<Bool, APIError>, Never>)?
 
     init(tokens: any SessionTokenStorage = TokenStore.shared, session: URLSession? = nil,
-         awaitRenewalRetry: (@Sendable (UUID) async throws -> Bool)? = nil) {
+         reportRenewalUnreachable: (@Sendable (UUID) async -> Void)? = nil) {
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = APIConfiguration.requestTimeout
         config.timeoutIntervalForResource = APIConfiguration.requestTimeout
@@ -29,7 +44,7 @@ actor APIClient {
         config.waitsForConnectivity = false
         self.session = session ?? URLSession(configuration: config)
         self.tokens = tokens
-        self.awaitRenewalRetry = awaitRenewalRetry
+        self.reportRenewalUnreachable = reportRenewalUnreachable
         self.decoder = JSONDecoder()
     }
 
@@ -105,33 +120,22 @@ actor APIClient {
                 await expireSession(ifGeneration: attemptedGeneration)
                 throw APIError.unauthenticated(message)
             }
-            var renewed = false
-            while !renewed {
+            try Task.checkCancellation()
+            let renewal = await refreshSession(ifGeneration: attemptedGeneration)
+            guard tokens.generation == attemptedGeneration else { throw CancellationError() }
+            switch renewal {
+            case .success(true): break
+            case .success(false):
+                // Q1: the server answered the renewal with an error: sign out.
+                await expireSession(ifGeneration: attemptedGeneration)
+                throw APIError.unauthenticated(message)
+            case .failure(let error):
                 try Task.checkCancellation()
-                guard tokens.generation == attemptedGeneration else { throw CancellationError() }
-                if tokens.accessToken != attemptedAccess { break }
-                let renewal = await refreshSession(ifGeneration: attemptedGeneration)
-                guard tokens.generation == attemptedGeneration else { throw CancellationError() }
-                func failedRenewal(_ error: APIError) -> any Error {
-                    endpoint.method == .get ? error : AuthorizationRejectedMutationError(cause: error)
-                }
-                switch renewal {
-                case .success(true): renewed = true
-                case .success(false):
-                    await expireSession(ifGeneration: attemptedGeneration)
-                    throw APIError.unauthenticated(message)
-                case .failure(let error):
-                    try Task.checkCancellation()
-                    switch error {
-                    case .network, .timeout, .connectionUnavailable: break
-                    default: throw failedRenewal(error)
-                    }
-                    guard let awaitRenewalRetry,
-                          try await awaitRenewalRetry(attemptedGeneration) else { throw failedRenewal(error) }
-                    // The user explicitly requested another renewal attempt.
-                    // Resume this operation only after valid renewal; the initial
-                    // authorization-rejected action is not repeated while waiting.
-                }
+                // Q1/Q2: only an unreachable server opens "Connection Problem". This
+                // request fails now with its own error; Retry in the window renews
+                // the session but never repeats it.
+                if error.isUnreachable { await reportRenewalUnreachable?(attemptedGeneration) }
+                throw endpoint.method == .get ? error : AuthorizationRejectedMutationError(cause: error)
             }
             guard tokens.generation == attemptedGeneration else { throw CancellationError() }
             return try await replayAfterRenewal(endpoint, generation: attemptedGeneration)
@@ -236,6 +240,9 @@ actor APIClient {
             throw APIError.unauthenticated(message)
         case 404:
             throw APIError.notFound(message)
+        case 409 where endpoint.path == "auth/login":
+            // B1: email verified but the profile/role entity was never finished.
+            throw RegistrationIncompleteError(message: message, role: Self.rawMetaRole(from: data))
         case 422:
             let fields = envelope?.errors ?? Self.rawErrors(from: data) ?? [:]
             throw APIError.validation(message: message, fields: fields)
@@ -247,6 +254,21 @@ actor APIClient {
     }
 
     // MARK: - Refresh
+
+    /// Retry from the "Connection Problem" window: renew the captured session once.
+    /// Nothing that failed while the window was open is replayed.
+    func retryRenewal(generation: UUID) async -> RenewalRetryOutcome {
+        guard tokens.generation == generation, tokens.refreshToken != nil else { return .failed }
+        let renewal = await refreshSession(ifGeneration: generation)
+        guard tokens.generation == generation else { return .failed }
+        switch renewal {
+        case .success(true): return .renewed
+        case .success(false):
+            await expireSession(ifGeneration: generation)
+            return .rejected
+        case .failure(let error): return error.isUnreachable ? .unreachable : .failed
+        }
+    }
 
     /// A lost response to a mutation is ambiguous: it may already have committed.
     /// Retry reads, or failures that establish no connection was made, only.
@@ -281,8 +303,9 @@ actor APIClient {
         }
     }
 
-    /// Only an explicit authentication refusal establishes that renewal is
-    /// rejected. Transport/service/decoding failures preserve the saved pair.
+    /// Any HTTP error answer to renewal (4xx or 5xx) rejects the session, as on
+    /// Android (parity review v3, Q1). Transport failures (server unreachable),
+    /// malformed success bodies and local storage failures preserve the saved pair.
     private func refreshSession(ifGeneration expected: UUID) async -> Result<Bool, APIError> {
         if let existing = refreshTask, existing.generation == expected { return await existing.task.value }
         let id = UUID()
@@ -303,10 +326,7 @@ actor APIClient {
             do {
                 let (data, response) = try await self.transfer(request, safeToReplay: false, generation: expected)
                 guard let http = response as? HTTPURLResponse else { return .failure(.unknown("")) }
-                if http.statusCode == 401 || http.statusCode == 403 { return .success(false) }
-                guard (200..<300).contains(http.statusCode) else {
-                    return .failure(http.statusCode >= 500 ? .server("") : .unknown(""))
-                }
+                guard (200..<300).contains(http.statusCode) else { return .success(false) }
                 guard let envelope = try? self.decoder.decode(APIEnvelope<Session>.self, from: data),
                       let session = envelope.result, !session.accessToken.isEmpty, !session.refreshToken.isEmpty else {
                     return .failure(.decoding(""))
@@ -415,6 +435,11 @@ actor APIClient {
 
     private static func rawMessage(from data: Data) -> String? {
         (try? JSONSerialization.jsonObject(with: data) as? [String: Any])?["message"] as? String
+    }
+
+    private static func rawMetaRole(from data: Data) -> UserRole? {
+        let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+        return ((object?["meta"] as? [String: Any])?["role"] as? String).flatMap { UserRole(rawValue: $0.lowercased()) }
     }
 
     private static func rawErrors(from data: Data) -> [String: [String]]? {

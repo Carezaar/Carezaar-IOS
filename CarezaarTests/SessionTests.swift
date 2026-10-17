@@ -22,36 +22,89 @@ final class SessionTests: XCTestCase {
         XCTAssertEqual(tokens.accessToken, "new-account")
     }
 
-    func testNonConnectivityRenewalFailuresDoNotUseConnectionProblemDialog() async {
-        for serverFailure in [true, false] {
+    /// Parity v3 Q1: any HTTP error answer to renewal signs the person out without the
+    /// Connection Problem window; a malformed 2xx answer keeps the session.
+    func testRenewalHTTPErrorSignsOutButMalformedSuccessKeepsSessionWithoutDialog() async {
+        for status in [400, 404, 500, 503, 200] {
             let tokens = FixtureTokens()
             tokens.save(Session(accessToken: "original-access", refreshToken: "original-refresh"))
             var dialogRequests = 0
             StubHTTP.handler = { request in
                 if request.url!.lastPathComponent == "refresh" {
-                    return serverFailure ? (503, Data(#"{"message":"Service unavailable"}"#.utf8))
-                        : (200, Data(#"{"result":{}}"#.utf8))
+                    return status == 200 ? (200, Data(#"{"result":{}}"#.utf8))
+                        : (status, Data(#"{"message":"Renewal refused"}"#.utf8))
                 }
                 return (403, Data(#"{"message":"Expired access"}"#.utf8))
             }
-            let client = APIClient(tokens: tokens, session: StubHTTP.session(), awaitRenewalRetry: { _ in
+            let client = APIClient(tokens: tokens, session: StubHTTP.session(), reportRenewalUnreachable: { _ in
                 await MainActor.run { dialogRequests += 1 }
-                return false
             })
             do {
                 _ = try await client.sendIgnoringResult(Endpoint(method: .get, path: "auth/info"))
-                XCTFail("Unsuccessful renewal must report its managed error category")
+                XCTFail("Unsuccessful renewal must report an error")
             } catch let error as APIError {
-                if serverFailure {
-                    guard case .server = error else { XCTFail("Expected service error"); continue }
-                } else {
+                if status == 200 {
                     guard case .decoding = error else { XCTFail("Expected malformed-response error"); continue }
+                } else {
+                    guard case .unauthenticated = error else { XCTFail("HTTP \(status) renewal must end the session"); continue }
                 }
             } catch { XCTFail("Unexpected renewal error") }
-            XCTAssertEqual(dialogRequests, 0, "A received service/malformed response is not a connectivity failure")
-            XCTAssertTrue(tokens.hasSession)
-            XCTAssertEqual(tokens.accessToken, "original-access")
+            XCTAssertEqual(dialogRequests, 0, "A received answer is not a connectivity failure (HTTP \(status))")
+            XCTAssertEqual(tokens.hasSession, status == 200, "HTTP \(status)")
         }
+    }
+
+    func testRenewalServerErrorDuringStartupSignsOut() async {
+        let tokens = FixtureTokens()
+        tokens.save(Session(accessToken: "fixture", refreshToken: "fixture-refresh"))
+        StubHTTP.handler = { request in
+            request.url!.lastPathComponent == "refresh" ? (500, Data(#"{"message":"Server error"}"#.utf8))
+                : (403, Data(#"{"message":"Expired"}"#.utf8))
+        }
+        let manager = SessionManager(auth: AuthService(client: APIClient(tokens: tokens, session: StubHTTP.session())), tokens: tokens)
+        await manager.restore()
+        XCTAssertEqual(manager.state, .signedOut)
+        XCTAssertTrue(manager.savedSessionRejected)
+        XCTAssertFalse(tokens.hasSession)
+    }
+
+    /// Parity v3 B1: an unfinished sign-up answers login with 409 and the role in meta.
+    func testIncompleteRegistrationLoginCarriesServerMessageAndRole() async {
+        let tokens = FixtureTokens()
+        StubHTTP.handler = { request in
+            XCTAssertEqual(request.url?.path, "/api/auth/login")
+            return (409, Data(#"{"result":null,"meta":{"role":"caregiver"},"message":"Your registration is not complete. Please complete your profile to continue.","errors":null}"#.utf8))
+        }
+        let manager = SessionManager(auth: AuthService(client: APIClient(tokens: tokens, session: StubHTTP.session())), tokens: tokens)
+        do {
+            try await manager.signIn(email: "unfinished@example.invalid", password: "Aa1!aaaa")
+            XCTFail("An unfinished sign-up cannot sign in")
+        } catch let error as RegistrationIncompleteError {
+            XCTAssertEqual(error, RegistrationIncompleteError(
+                message: "Your registration is not complete. Please complete your profile to continue.", role: .caregiver))
+        } catch { XCTFail("Expected RegistrationIncompleteError, got \(error)") }
+        XCTAssertFalse(tokens.hasSession)
+        XCTAssertEqual(manager.state.user, nil)
+        // 409 elsewhere is not an unfinished sign-up.
+        StubHTTP.handler = { _ in (409, Data(#"{"message":"Conflict","meta":{"role":"client"}}"#.utf8)) }
+        do {
+            try await UserService(client: APIClient(tokens: tokens, session: StubHTTP.session())).sendOTP(email: "x@example.invalid")
+            XCTFail("Conflict must fail")
+        } catch let error as APIError { XCTAssertEqual(error, .unknown("Conflict")) }
+        catch { XCTFail("Unexpected error type") }
+    }
+
+    @MainActor func testSignUpResumeSeedsProfileStepState() {
+        let flow = SignUpFlow()
+        flow.userId = "stale"; flow.entityCreated = true; flow.isPasswordRecovery = true; flow.otpSendFailed = true
+        flow.resume(role: .caregiver, email: "a@example.invalid", password: "Aa1!aaaa")
+        XCTAssertEqual(flow.role, .caregiver)
+        XCTAssertEqual(flow.email, "a@example.invalid")
+        XCTAssertEqual(flow.password, "Aa1!aaaa")
+        XCTAssertNil(flow.userId)
+        XCTAssertFalse(flow.entityCreated)
+        XCTAssertFalse(flow.isPasswordRecovery)
+        XCTAssertFalse(flow.otpSendFailed)
     }
 
     func testLateValidationResponseCannotReachNewAccount() async {
@@ -160,7 +213,9 @@ final class SessionTests: XCTestCase {
         XCTAssertFalse(tokens.hasSession)
     }
 
-    func testRenewalRetryResumesInterruptedReadWithoutSigningOutOrRepeatingInitialRequest() async throws {
+    /// Parity v3 Q2: the request that met an unreachable renewal fails with its own
+    /// error at once; Retry renews the session and the request is never repeated.
+    func testUnreachableRenewalFailsRequestOpensWindowAndRetryRenewsWithoutReplay() async throws {
         let tokens = FixtureTokens()
         tokens.save(Session(accessToken: "old-access", refreshToken: "old-refresh"))
         var recovered = false, callbacks = 0, reads = 0, refreshes = 0
@@ -171,54 +226,71 @@ final class SessionTests: XCTestCase {
                 return (200, Data(#"{"result":{"access_token":"new-access","refresh_token":"new-refresh"}}"#.utf8))
             }
             reads += 1
-            if request.value(forHTTPHeaderField: "Authorization") == "Bearer new-access" {
-                return (200, Data(#"{"result":{"id":"fixture-user","role":"client"}}"#.utf8))
-            }
             return (403, Data(#"{"message":"Expired access token"}"#.utf8))
         }
-        let client = APIClient(tokens: tokens, session: StubHTTP.session(), awaitRenewalRetry: { generation in
+        let client = APIClient(tokens: tokens, session: StubHTTP.session(), reportRenewalUnreachable: { generation in
             await MainActor.run {
                 XCTAssertEqual(generation, tokens.generation)
-                XCTAssertTrue(tokens.hasSession)
                 callbacks += 1
-                recovered = true
             }
-            return true
         })
-        let user: User = try await client.send(Endpoint(method: .get, path: "auth/info"))
-        XCTAssertEqual(user.id, "fixture-user")
-        XCTAssertEqual(callbacks, 1)
-        XCTAssertEqual(refreshes, 2)
-        XCTAssertEqual(reads, 2, "Only the initial rejected read and the resumed authenticated read")
+        do {
+            let _: User = try await client.send(Endpoint(method: .get, path: "auth/info"))
+            XCTFail("The interrupted request must fail")
+        } catch let error as APIError { XCTAssertEqual(error, .timeout) }
+        XCTAssertEqual(callbacks, 1, "Unreachable renewal opens the Connection Problem window")
+        XCTAssertEqual(reads, 1)
         XCTAssertTrue(tokens.hasSession)
+        recovered = true
+        let outcome = await client.retryRenewal(generation: tokens.generation)
+        XCTAssertEqual(outcome, .renewed)
+        XCTAssertEqual(tokens.accessToken, "new-access")
+        XCTAssertEqual(refreshes, 2)
+        XCTAssertEqual(reads, 1, "Retry must not repeat the request that failed")
     }
 
-    func testConcurrentRenewalWaitersShareOnePresentationAndResumeOnlyAfterRetry() async throws {
+    func testRetryRenewalReportsUnreachableAndRejected() async {
+        for (handler, expected) in [
+            ({ (_: URLRequest) throws -> (Int, Data) in throw URLError(.notConnectedToInternet) }, APIClient.RenewalRetryOutcome.unreachable),
+            ({ (_: URLRequest) throws -> (Int, Data) in (500, Data(#"{"message":"down"}"#.utf8)) }, .rejected),
+        ] {
+            let tokens = FixtureTokens()
+            tokens.save(Session(accessToken: "a", refreshToken: "r"))
+            StubHTTP.handler = handler
+            let outcome = await APIClient(tokens: tokens, session: StubHTTP.session()).retryRenewal(generation: tokens.generation)
+            XCTAssertEqual(outcome, expected)
+            XCTAssertEqual(tokens.hasSession, expected == .unreachable)
+        }
+    }
+
+    func testRecoveryWindowPresentsOnceAndSuccessfulRetryClosesIt() async {
         let tokens = FixtureTokens()
         tokens.save(Session(accessToken: "old-access", refreshToken: "old-refresh"))
-        let recovery = SessionRecoveryCoordinator(tokens: tokens)
+        var renewals = 0
+        let recovery = SessionRecoveryCoordinator(tokens: tokens) { _ in renewals += 1; return .renewed }
         recovery.configure(signedIn: true)
         var presentations = 0
-        let shown = expectation(description: "Recovery dialog visible")
-        let observation = recovery.$isPresented.dropFirst().sink {
-            if $0 {
-                presentations += 1
-                if presentations == 1 { shown.fulfill() }
-            }
-        }
-        let first = Task { try await recovery.waitForRetry(generation: tokens.generation) }
-        let second = Task { try await recovery.waitForRetry(generation: tokens.generation) }
-        defer { first.cancel(); second.cancel(); observation.cancel() }
-        await fulfillment(of: [shown], timeout: 1)
+        let observation = recovery.$isPresented.dropFirst().sink { if $0 { presentations += 1 } }
+        defer { observation.cancel() }
+        recovery.present(generation: tokens.generation)
+        recovery.present(generation: tokens.generation)
         XCTAssertTrue(recovery.isPresented)
-        XCTAssertEqual(presentations, 1, "Concurrent API failures share one global dialog")
-        XCTAssertTrue(tokens.hasSession)
-        recovery.retry()
-        let firstRetried = try await first.value, secondRetried = try await second.value
-        XCTAssertTrue(firstRetried)
-        XCTAssertTrue(secondRetried)
+        XCTAssertEqual(presentations, 1, "Concurrent failures share one window")
+        await recovery.retry()
         XCTAssertFalse(recovery.isPresented)
-        XCTAssertTrue(tokens.hasSession)
+        XCTAssertEqual(renewals, 1)
+    }
+
+    func testRecoveryRetryKeepsWindowOnlyWhileServerUnreachable() async {
+        for outcome in [APIClient.RenewalRetryOutcome.unreachable, .rejected, .failed] {
+            let tokens = FixtureTokens()
+            tokens.save(Session(accessToken: "a", refreshToken: "r"))
+            let recovery = SessionRecoveryCoordinator(tokens: tokens) { _ in outcome }
+            recovery.configure(signedIn: true)
+            recovery.present(generation: tokens.generation)
+            await recovery.retry()
+            XCTAssertEqual(recovery.isPresented, outcome == .unreachable, "\(outcome)")
+        }
     }
 
     func testDeletionCannotBorrowCredentialsFromAccountChangedBeforeAPIDispatch() async {
@@ -237,45 +309,22 @@ final class SessionTests: XCTestCase {
         XCTAssertEqual(tokens.accessToken, "new-account-access")
     }
 
-    func testCancellingOneRenewalWaiterKeepsOtherRequestAndDialogAlive() async throws {
+    func testNewSignInDismissesOlderRecoveryWindowWithoutRenewingNewCredentials() async {
         let tokens = FixtureTokens()
         tokens.save(Session(accessToken: "fixture", refreshToken: "fixture-refresh"))
-        let recovery = SessionRecoveryCoordinator(tokens: tokens)
+        var renewals = 0
+        let recovery = SessionRecoveryCoordinator(tokens: tokens) { _ in renewals += 1; return .renewed }
         recovery.configure(signedIn: true)
-        let shown = expectation(description: "dialog shown")
-        let entered = expectation(description: "second waiter entered")
-        let observation = recovery.$isPresented.filter { $0 }.first().sink { _ in shown.fulfill() }
-        let first = Task { try await recovery.waitForRetry(generation: tokens.generation) }
-        let second = Task { entered.fulfill(); return try await recovery.waitForRetry(generation: tokens.generation) }
-        defer { first.cancel(); second.cancel(); observation.cancel() }
-        await fulfillment(of: [shown, entered], timeout: 1)
-        first.cancel()
-        do { _ = try await first.value; XCTFail("Cancelled request must not resume") }
-        catch is CancellationError { }
-        catch { XCTFail("Cancellation must stay distinct from a connection failure") }
+        recovery.present(generation: tokens.generation)
         XCTAssertTrue(recovery.isPresented)
-        recovery.retry()
-        let resumed = try await second.value
-        XCTAssertTrue(resumed)
-        XCTAssertTrue(tokens.hasSession)
-    }
-
-    func testNewSignInCancelsOlderRecoveryWaiterWithoutChangingNewCredentials() async {
-        let tokens = FixtureTokens()
-        tokens.save(Session(accessToken: "fixture", refreshToken: "fixture-refresh"))
-        let recovery = SessionRecoveryCoordinator(tokens: tokens)
-        recovery.configure(signedIn: true)
-        let shown = expectation(description: "dialog shown")
-        let observation = recovery.$isPresented.filter { $0 }.first().sink { _ in shown.fulfill() }
-        let task = Task { try await recovery.waitForRetry(generation: tokens.generation) }
-        defer { task.cancel(); observation.cancel() }
-        await fulfillment(of: [shown], timeout: 1)
+        let old = tokens.generation
         tokens.save(Session(accessToken: "new-account-access", refreshToken: "new-account-refresh"))
         recovery.configure(signedIn: true)
-        do { _ = try await task.value; XCTFail("An older operation cannot resume in the new account") }
-        catch is CancellationError { }
-        catch { XCTFail("Account replacement cancels the old operation") }
         XCTAssertFalse(recovery.isPresented)
+        recovery.present(generation: old)
+        XCTAssertFalse(recovery.isPresented, "A late failure of the old account cannot open the window")
+        await recovery.retry()
+        XCTAssertEqual(renewals, 0)
         XCTAssertEqual(tokens.accessToken, "new-account-access")
     }
 

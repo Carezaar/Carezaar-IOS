@@ -359,3 +359,5 @@ The native Swift checkout is the delivery project. The client brief takes preced
 | Oct15-01 | iterate-until-verified | Separate dropped-read recovery1/2/3 and real monotonic backoff verified; focused8/8 PASS; independent review closes only P07-004 | NetworkTests.swift; four reports; QA manifest; indexed anonymous proof |
 
 | Oct16-01 | iterate-until-verified | Actual exhaustion category, bounded attempts/backoff and managed error routing verified; focused 20/20 PASS; independent result/hash/privacy review closes only P07-005 | NetworkTests.swift; four reports; QA manifest; indexed anonymous proof |
+
+| Oct17-01 | investigate → diagnosing-bugs → tdd → iterate-until-verified | Parity Review v3.0: A1, B1, C1, C3, C4, F1–F3, K1–K4, M2, Q1, Q2 implemented and verified on iPhone 17 Pro and iPhone SE (3rd gen), iOS 26.5, incl. Arabic RTL and Accessibility-L; C2 UI done, documents BLOCKED; M1 BLOCKED (images unavailable). Uncommitted for lead review | Auth/Main/Onboarding/Core sources, unit and UI tests, Docs/Testing/IOS_PARITY_TEST_EXECUTION_REPORT.md, IOS-ANDROID-FUNCTIONAL-PARITY.md |

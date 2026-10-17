@@ -45,8 +45,6 @@ struct PreferencesWizard: View {
     @State private var step = 0
     @State private var picking = false
     @State private var locationPickerGuidance: String?
-    @StateObject private var location = LocationProvider()
-    @State private var coordinateFromPhone = false
     @State private var didInitialize = false
     // Shared selections (client multi-selects everything; caregiver single-selects some).
     @State private var careTypes: [Int] = []
@@ -76,24 +74,19 @@ struct PreferencesWizard: View {
                 wizard
                     .fullScreenCover(isPresented: $picking, onDismiss: { locationPickerGuidance = nil }) {
                         MapLocationPicker(initial: coordinate, unavailableGuidance: locationPickerGuidance) { picked in
-                            coordinate = picked; coordinateFromPhone = false
+                            coordinate = picked
                             locationPickerGuidance = nil; picking = false
                         } onCancel: { locationPickerGuidance = nil; picking = false }
                     }
             }
         }
+        // F1: the phone's location is never filled in by itself; it is used only
+        // when the person taps My Location on the map.
         .task {
             guard !didInitialize else { return }
             didInitialize = true
             await prefill()
-            location.request()
         }
-        .onReceive(location.$coordinate) { phone in
-            guard let phone, coordinate == nil || coordinateFromPhone else { return }
-            coordinate = phone
-            coordinateFromPhone = true
-        }
-        .onDisappear { location.cancel() }
     }
 
     // MARK: intro (v2 "Match Prefs - Step 0")
@@ -297,6 +290,10 @@ struct PreferencesWizard: View {
             }
             return nil
         case 2:
+            // F3: continuing without a location names what is missing.
+            if LocationProvider.initialMapCoordinate(coordinate) == nil {
+                return loc.t("general_location_required", "Please select a location to continue.")
+            }
             if let p = need(commutes, isClient ? "signup_form_client_max_commute" : "signup_form_caregiver_commute")
                 ?? need(shifts, isClient ? "signup_form_client_preferred_shifts" : "signup_form_caregiver_shift")
                 ?? need(days, isClient ? "signup_form_client_care_days" : "signup_form_caregiver_careday")
@@ -330,7 +327,6 @@ struct PreferencesWizard: View {
                 if let lat = p.lat, let lng = p.lng,
                    let saved = LocationProvider.initialMapCoordinate(.init(latitude: lat, longitude: lng)) {
                     coordinate = saved
-                    coordinateFromPhone = false
                 }
             } else {
                 let p = try await feedback.run(loc.t("loading_profile_get", "Getting profile")) { try await CaregiverService().profile() }
@@ -342,7 +338,6 @@ struct PreferencesWizard: View {
                 if let lat = p.lat, let lng = p.lng,
                    let saved = LocationProvider.initialMapCoordinate(.init(latitude: lat, longitude: lng)) {
                     coordinate = saved
-                    coordinateFromPhone = false
                 }
             }
         } catch { feedback.toast(Feedback.message(error)) }
@@ -350,8 +345,8 @@ struct PreferencesWizard: View {
 
     private func save() {
         guard let coordinate = LocationProvider.initialMapCoordinate(coordinate) else {
-            locationPickerGuidance = nil
-            picking = true
+            // F3: say what is missing instead of opening the map.
+            feedback.toast(loc.t("general_location_required", "Please select a location to continue."))
             return
         }
         Task {
@@ -597,6 +592,12 @@ struct MapLocationPicker: View {
     @State private var center: CLLocationCoordinate2D?
     @State private var manuallyPositioned = false
     @State private var requestedPhoneLocation = false
+    @State private var permissionNote: String?
+
+    /// F1: with no location chosen the map opens on the whole country (contiguous
+    /// USA), as the Android and web apps do (web: 39.8283, -98.5795 at zoom 4).
+    static let countryRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 39.8283, longitude: -98.5795),
+                                                  span: MKCoordinateSpan(latitudeDelta: 28, longitudeDelta: 62))
 
     init(initial: CLLocationCoordinate2D?, unavailableGuidance: String? = nil,
          onConfirm: @escaping (CLLocationCoordinate2D) -> Void, onCancel: @escaping () -> Void) {
@@ -606,8 +607,7 @@ struct MapLocationPicker: View {
         _center = State(initialValue: start)
         _position = State(initialValue: start.map {
             .region(MKCoordinateRegion(center: $0, latitudinalMeters: 3_000, longitudinalMeters: 3_000))
-        } ?? .region(MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 20, longitude: 0),
-                                        span: MKCoordinateSpan(latitudeDelta: 120, longitudeDelta: 240))))
+        } ?? .region(Self.countryRegion))
     }
 
     var body: some View {
@@ -637,9 +637,21 @@ struct MapLocationPicker: View {
                 }
                 .padding(12).background(.white, in: RoundedRectangle(cornerRadius: 12)).padding(14)
                 Spacer()
+                if let permissionNote {
+                    Text(permissionNote)
+                        .font(Theme.Typography.body(14)).foregroundStyle(.white)
+                        .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                        .padding(.horizontal, 16).padding(.vertical, 10)
+                        .background(Color.black.opacity(0.8), in: RoundedRectangle(cornerRadius: 12))
+                        .padding(.horizontal, 20)
+                        .accessibilityIdentifier("location-permission-denied")
+                        .onTapGesture { self.permissionNote = nil }
+                }
                 HStack {
                     Spacer()
                     Button {
+                        // F2: access refused: say so instead of appearing not to work.
+                        if location.isDenied { showPermissionDenied(); return }
                         requestedPhoneLocation = true
                         manuallyPositioned = false
                         location.request()
@@ -654,12 +666,26 @@ struct MapLocationPicker: View {
                     .padding(.horizontal, 20).padding(.bottom, 24)
             }
         }
+        // F1: the phone's position is used only after My Location is tapped.
         .onReceive(location.$coordinate) { coordinate in
-            guard let coordinate, !manuallyPositioned, initial == nil || requestedPhoneLocation else { return }
+            guard let coordinate, !manuallyPositioned, requestedPhoneLocation else { return }
             center = coordinate
             position = .region(MKCoordinateRegion(center: coordinate, latitudinalMeters: 2_000, longitudinalMeters: 2_000))
         }
-        .task { if initial == nil { location.request() } }
+        // F2: the person refused the system prompt raised by My Location.
+        .onReceive(location.$status) { _ in
+            if requestedPhoneLocation, location.isDenied { requestedPhoneLocation = false; showPermissionDenied() }
+        }
         .onDisappear { location.cancel() }
+    }
+
+    private func showPermissionDenied() {
+        let note = loc.t("general_location_permission_denied", "Allow location access to use your current location.")
+        permissionNote = note
+        UIAccessibility.post(notification: .announcement, argument: note)
+        Task {
+            try? await Task.sleep(for: .seconds(4))
+            if permissionNote == note { permissionNote = nil }
+        }
     }
 }

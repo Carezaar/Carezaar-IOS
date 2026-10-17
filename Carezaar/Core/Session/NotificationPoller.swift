@@ -47,14 +47,21 @@ final class NotificationPoller: NSObject, ObservableObject, UNUserNotificationCe
         UNUserNotificationCenter.current().delegate = self
     }
 
+    /// Android asks for notification permission as soon as the app opens and carries
+    /// on whatever the answer (parity review v3, A1). The system prompt is
+    /// non-blocking: startup, sign-in and polling never wait for the decision.
+    func requestPermissionAtLaunch() {
+        guard !requestedPermission else { return }
+        requestedPermission = true
+        requestPermission()
+    }
+
     func start(translate: @escaping (String, String) -> String) {
         self.translate = translate
         guard loop == nil else { return }
-        if !requestedPermission {
-            requestedPermission = true
-            // Permission is optional on iOS. Refusal never blocks the timer or app.
-            requestPermission()
-        }
+        // Normally already asked at launch; kept as a fallback for any entry
+        // point that starts polling first. Refusal never blocks the timer or app.
+        requestPermissionAtLaunch()
         generation += 1
         let started = generation
         let sleep = self.sleep

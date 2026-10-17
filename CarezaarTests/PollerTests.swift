@@ -118,6 +118,23 @@ final class PollerTests: XCTestCase {
         XCTAssertEqual(defaults.integer(forKey: "carezaar.notificationCount"), 0)
         gate.advance()
     }
+
+    // MARK: Parity v3 A1 — permission asked at launch, once
+
+    func testPermissionIsRequestedAtLaunchOnceAndPollingDoesNotAskAgain() async {
+        let tokens = FixtureTokens()
+        var permissionRequests = 0
+        let poller = NotificationPoller(service: UserService(client: APIClient(tokens: tokens, session: StubHTTP.session())),
+            tokens: tokens, sleep: { _ in throw CancellationError() },
+            requestPermission: { permissionRequests += 1 }, deliver: { _ in })
+        poller.requestPermissionAtLaunch()
+        poller.requestPermissionAtLaunch()
+        XCTAssertEqual(permissionRequests, 1)
+        poller.start { _, fallback in fallback }
+        XCTAssertEqual(permissionRequests, 1, "Main opening must not ask again")
+        poller.stop()
+    }
+
 }
 
 @MainActor

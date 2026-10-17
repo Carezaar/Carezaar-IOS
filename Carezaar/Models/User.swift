@@ -39,6 +39,9 @@ struct User: Codable, Identifiable, Hashable, Sendable {
     let dateOfBirth: String?
     let status: UserStatus
     let isFavorite: Bool
+    /// The person deleted their account. The API keeps the record with null names
+    /// in chats, notifications and matches (verified live 2026-10-17).
+    var isDeleted: Bool = false
 
     var fullName: String {
         [firstName, lastName].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: " ")
@@ -52,6 +55,15 @@ struct User: Codable, Identifiable, Hashable, Sendable {
         case lastName = "last_name"
         case dateOfBirth = "date_of_birth"
         case isFavorite = "is_favorite"
+        case isDeleted = "is_deleted"
+    }
+}
+
+extension User {
+    /// The name to show for another person: a deleted account is shown as the
+    /// managed "Deleted Account" wherever it appears (parity review v3, K3).
+    @MainActor func displayName(_ loc: Localization) -> String {
+        isDeleted ? loc.t("general_deleted_account", "Deleted Account") : fullName
     }
 }
 
@@ -113,6 +125,7 @@ extension User {
         dateOfBirth = c.lenient(.dateOfBirth)
         status = c.lenient(.status, default: .unverified)
         isFavorite = c.lenient(.isFavorite, default: false)
+        isDeleted = c.lenient(.isDeleted, default: false)
     }
 }
 

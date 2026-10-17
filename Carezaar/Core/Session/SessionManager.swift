@@ -274,64 +274,59 @@ final class SessionManager: ObservableObject {
     }
 }
 
-/// One recovery presentation for all interrupted calls in the current sign-in.
-/// The root controls eligibility so startup uses its own Try Again gate.
+/// One "Connection Problem" window for the current sign-in, shown when renewing the
+/// session could not reach the server. The root controls eligibility so startup
+/// uses its own Try Again gate.
+///
+/// Parity review v3, Q2: requests that failed while the window is open have already
+/// reported their own error and are never resumed or repeated. Retry renews the
+/// session only: success closes the window, an unreachable server keeps it, and an
+/// HTTP error answer ends the session (Q1).
 @MainActor
 final class SessionRecoveryCoordinator: ObservableObject {
     static let shared = SessionRecoveryCoordinator()
     @Published private(set) var isPresented = false
+    @Published private(set) var isRetrying = false
     private let tokens: any SessionTokenStorage
+    private let renew: (UUID) async -> APIClient.RenewalRetryOutcome
     private var enabled = false
-    private struct Waiter {
-        let generation: UUID
-        let continuation: CheckedContinuation<Bool, Error>
-    }
-    private var waiters: [UUID: Waiter] = [:]
+    private var generation: UUID?
 
-    init(tokens: any SessionTokenStorage = TokenStore.shared) { self.tokens = tokens }
+    init(tokens: any SessionTokenStorage = TokenStore.shared,
+         renew: ((UUID) async -> APIClient.RenewalRetryOutcome)? = nil) {
+        self.tokens = tokens
+        self.renew = renew ?? { await APIClient.shared.retryRenewal(generation: $0) }
+    }
 
     func configure(signedIn: Bool) {
         enabled = signedIn
-        let obsolete = waiters.filter { !signedIn || !tokens.hasSession || $0.value.generation != tokens.generation }.map(\.key)
-        for id in obsolete { cancel(id) }
+        if !signedIn || !tokens.hasSession || generation != tokens.generation { dismiss() }
     }
 
-    func waitForRetry(generation: UUID) async throws -> Bool {
-        guard enabled else { return false }
-        guard tokens.hasSession, tokens.generation == generation else { throw CancellationError() }
-        let id = UUID()
-        return try await withTaskCancellationHandler(operation: {
-            try Task.checkCancellation()
-            return try await withCheckedThrowingContinuation { continuation in
-                guard !Task.isCancelled else { continuation.resume(throwing: CancellationError()); return }
-                guard enabled, tokens.hasSession, tokens.generation == generation else {
-                    continuation.resume(returning: false); return
-                }
-                waiters[id] = Waiter(generation: generation, continuation: continuation)
-                if !isPresented { isPresented = true }
-            }
-        }, onCancel: {
-            Task { @MainActor [weak self] in self?.cancel(id) }
-        })
+    /// Called by the API client after a renewal could not reach the server.
+    func present(generation: UUID) {
+        guard enabled, tokens.hasSession, tokens.generation == generation else { return }
+        self.generation = generation
+        if !isPresented { isPresented = true }
     }
 
-    func retry() {
-        let waiting = waiters
-        waiters.removeAll()
+    func retry() async {
+        // The alert closes on any tap; it reopens only if the server is still unreachable.
         if isPresented { isPresented = false }
-        for waiter in waiting.values {
-            if enabled, tokens.hasSession, waiter.generation == tokens.generation {
-                waiter.continuation.resume(returning: true)
-            } else {
-                waiter.continuation.resume(throwing: CancellationError())
-            }
+        guard let generation, !isRetrying else { return }
+        isRetrying = true
+        let outcome = await renew(generation)
+        isRetrying = false
+        guard self.generation == generation else { return }
+        if outcome == .unreachable, enabled, tokens.hasSession, tokens.generation == generation {
+            isPresented = true
+        } else {
+            dismiss()
         }
     }
 
-    private func cancel(_ id: UUID) {
-        guard let waiter = waiters.removeValue(forKey: id) else { return }
-        waiter.continuation.resume(throwing: CancellationError())
-        let stillWaiting = !waiters.isEmpty
-        if isPresented != stillWaiting { isPresented = stillWaiting }
+    private func dismiss() {
+        generation = nil
+        if isPresented { isPresented = false }
     }
 }

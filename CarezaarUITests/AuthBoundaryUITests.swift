@@ -75,24 +75,18 @@ final class AuthBoundaryUITests: XCTestCase {
             setTerms(false)
             assertGate(caseID: "missing-terms-\(role)", expected: false, manifest: "P03-002")
 
-            openLicense()
-            // Actual sheet supports interactive cancellation, not an invented Cancel control.
-            let bar = app.navigationBars["License agreement"]
-            XCTAssertTrue(bar.waitForExistence(timeout: 10), "Native license sheet missing")
-            bar.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
-                .press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.95)))
-            XCTAssertTrue(bar.waitForNonExistence(timeout: 10), "License cancellation did not dismiss sheet")
-            XCTAssertFalse(terms.isSelected, "Cancelling the license must not accept it")
-            assertGate(caseID: "license-dismiss-\(role)", expected: false, manifest: "P03-002")
-
-            openLicense()
-            let licenseConfirm = app.navigationBars["License agreement"].buttons["Confirm"].firstMatch
-            XCTAssertTrue(licenseConfirm.waitForExistence(timeout: 10) && licenseConfirm.isEnabled,
-                          "License Confirm missing or disabled")
-            licenseConfirm.tap()
-            XCTAssertTrue(app.navigationBars["License agreement"].waitForNonExistence(timeout: 10))
-            XCTAssertTrue(terms.isSelected, "License Confirm must accept the checkbox")
-            assertGate(caseID: "license-confirm-\(role)", expected: true, manifest: "P03-002")
+            // Parity v3 C2: the Terms of Use opens in an in-app viewer; viewing it
+            // never ticks the agreement (the old license sheet is gone).
+            openTermsOfUse()
+            let bar = app.navigationBars["Terms of Use"]
+            XCTAssertTrue(bar.waitForExistence(timeout: 10), "In-app Terms of Use viewer missing")
+            XCTAssertTrue(app.staticTexts["legal-document-unavailable"].exists, "Unconfigured document shows the managed text")
+            bar.buttons["OK"].tap()
+            XCTAssertTrue(bar.waitForNonExistence(timeout: 10), "Viewer did not close")
+            XCTAssertFalse(terms.isSelected, "Viewing the Terms of Use must not accept the agreement")
+            assertGate(caseID: "terms-viewer-dismiss-\(role)", expected: false, manifest: "P03-002")
+            setTerms(true)
+            assertGate(caseID: "terms-accepted-\(role)", expected: true, manifest: "P03-002")
 
             next.tap()
             let confirm = app.buttons["Confirm"].firstMatch
@@ -267,7 +261,7 @@ final class AuthBoundaryUITests: XCTestCase {
                        "Secure input must retain the synthetic eight-character value as a mask")
     }
 
-    private var terms: XCUIElement { app.buttons["I accept the license agreement"] }
+    private var terms: XCUIElement { app.buttons["signup-consent-checkbox"] }
     private var next: XCUIElement { app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Continue")).firstMatch }
 
     private func launch(_ route: String) {
@@ -294,24 +288,35 @@ final class AuthBoundaryUITests: XCTestCase {
         XCTAssertEqual(terms.isSelected, selected)
     }
 
-    private func openLicense() {
-        let link = app.buttons["license agreement"]
+    private func openTermsOfUse() {
+        let link = app.links["Terms of Use"]
         scrollTo(link)
         XCTAssertTrue(link.exists && link.isHittable)
         link.tap()
     }
 
+    /// Parity v3 C1: Continue is always active. A valid form opens the email review
+    /// (closed again with Edit, never confirmed); an invalid one shows its problems
+    /// under the fields and opens nothing.
     private func assertGate(caseID: String, expected: Bool, manifest: String, extra: [String: Any] = [:]) {
         scrollTo(next)
-        XCTAssertTrue(next.exists && next.isHittable)
-        let state = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in self.next.isEnabled == expected }, object: nil)
-        XCTAssertEqual(XCTWaiter.wait(for: [state], timeout: 5), .completed, "Unexpected signup Continue eligibility")
-        if !expected { next.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap() }
-        XCTAssertFalse(app.buttons["Confirm"].exists, "Eligibility check must not submit or open registration review")
+        XCTAssertTrue(next.exists && next.isHittable && next.isEnabled, "Continue must always be active")
+        next.tap()
+        let confirm = app.buttons["Confirm"].firstMatch
+        let opened = confirm.waitForExistence(timeout: expected ? 5 : 2)
+        XCTAssertEqual(opened, expected, "Unexpected signup Continue outcome")
+        if opened {
+            let edit = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Edit")).firstMatch
+            edit.tap()
+            XCTAssertTrue(confirm.waitForNonExistence(timeout: 10))
+        } else {
+            let anyError = app.staticTexts.matching(NSPredicate(format: "identifier BEGINSWITH %@", "signup-error-")).firstMatch
+            XCTAssertTrue(anyError.exists, "An invalid form must show its problem under the field")
+        }
         noSubmission()
         var evidence = extra
         evidence["case"] = caseID; evidence["manifest"] = manifest
-        evidence["continueEnabled"] = next.isEnabled; evidence["expectedEnabled"] = expected
+        evidence["reviewOpened"] = opened; evidence["expectedReview"] = expected
         evidence["noSubmission"] = true
         record(evidence)
         let shot = XCTAttachment(screenshot: next.screenshot())

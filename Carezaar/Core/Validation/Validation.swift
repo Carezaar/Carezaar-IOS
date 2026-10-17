@@ -32,6 +32,37 @@ enum PasswordValidator {
     }
 }
 
+/// Sign-up credentials (parity review v3, C1): Continue is always active and checks
+/// every field at once; each problem is shown under its own field. A password that
+/// breaks a rule reports the first unmet rule, by its managed checklist label
+/// (`signup_credentials_password_validation_*`), in the checklist's own order.
+enum SignUpCredentialsValidation {
+    enum Field: Hashable, CaseIterable { case email, password, confirmation, agreement }
+
+    static func problems(email: String, password: String, confirmation: String, accepted: Bool,
+                         text: (String, String) -> String) -> [Field: String] {
+        var problems: [Field: String] = [:]
+        let required = text("general_required", "This field is required.")
+        let trimmed = email.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty { problems[.email] = required }
+        else if FieldValidator.email(trimmed) != nil {
+            problems[.email] = text("signup_credentials_email_invalid", "Please enter a valid email address.")
+        }
+        if password.isEmpty { problems[.password] = required }
+        else if let rule = PasswordValidator.rules(for: password).first(where: { !$0.isSatisfied }) {
+            problems[.password] = text("signup_credentials_password_validation_\(rule.id)", rule.label)
+        }
+        if confirmation.isEmpty { problems[.confirmation] = required }
+        else if confirmation != password {
+            problems[.confirmation] = text("signup_credentials_password_match", "Passwords do not match.")
+        }
+        if !accepted {
+            problems[.agreement] = text("signup_credentials_accept_required", "Please accept the license agreement to continue.")
+        }
+        return problems
+    }
+}
+
 enum FieldValidator {
     /// Matches the Android copy: "Password is required" / "Confirm Password is required".
     static func required(_ value: String, field: String) -> String? {

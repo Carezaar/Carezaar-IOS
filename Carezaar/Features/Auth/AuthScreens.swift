@@ -1,5 +1,6 @@
 import SwiftUI
 import PhotosUI
+import WebKit
 
 // MARK: - Intro
 
@@ -169,6 +170,12 @@ struct SignInView: View {
                 try await feedback.run(loc.t("loading_auth_login", "Signing in")) {
                     try await session.signIn(email: email, password: password)
                 }
+            } catch let incomplete as RegistrationIncompleteError {
+                // B1: show the server's message and resume sign-up at the profile
+                // step with the credentials just entered (the role comes from meta).
+                feedback.toast(incomplete.message.isEmpty ? Feedback.message(APIError.unknown("")) : incomplete.message)
+                signUp.resume(role: incomplete.role ?? .client, email: email.trimmingCharacters(in: .whitespaces), password: password)
+                router.push(.signUpProfile)
             } catch {
                 feedback.toast(Feedback.message(error))
             }
@@ -180,8 +187,15 @@ struct SignInView: View {
 
 /// `SignUpCredentials/{role}` — v2 design 56:84378, which holds the full form and the
 /// "Are you sure?" dialog. Kotlin sequence: register → hold credentials → otp/send → OTP.
+///
+/// Parity review v3: Continue is always active and checks every field at once,
+/// showing each problem under its own field (C1); the consent sentence names the
+/// Terms of Use and Privacy Policy, each opening an in-app viewer (C2); the dialog
+/// uses the managed description (C3); and a created account whose code could not be
+/// sent still opens the code screen (C4).
 struct SignUpCredentialsView: View {
     let role: UserRole
+    typealias Field = SignUpCredentialsValidation.Field
 
     @EnvironmentObject private var router: AppRouter
     @EnvironmentObject private var signUp: SignUpFlow
@@ -196,8 +210,8 @@ struct SignUpCredentialsView: View {
     @State private var revealConfirmation = false
     @State private var accepted = false
     @State private var confirming = false
-    @State private var showLicense = false
-    @State private var error: String?
+    @State private var document: LegalDocument?
+    @State private var errors: [Field: String] = [:]
 
     private let authService = AuthService()
     private let userService = UserService()
@@ -205,9 +219,17 @@ struct SignUpCredentialsView: View {
     /// The frame's rule chips (Frame 5) are drawn in fixed met/unmet states; live
     /// `RuleGlyphChips` replace them.
     private static let ruleChipRow = "56:84399"
-    private var valid: Bool {
-        FieldValidator.email(email) == nil && PasswordValidator.isValid(password) && password == confirmation && accepted
-    }
+    /// The frame's Continue button; it moves down to make room for the consent
+    /// sentence and any errors below the confirmation field.
+    private static let continueButton = "56:84406"
+    private static let continueButtonY: CGFloat = 601
+
+    // Scene geometry below the confirmation field (its box ends at 569).
+    private var confirmErrorHeight: CGFloat { errors[.confirmation] == nil ? 0 : 24 }
+    private var consentY: CGFloat { 572 + confirmErrorHeight }
+    private static let consentHeight: CGFloat = 50
+    private var agreementErrorHeight: CGFloat { errors[.agreement] == nil ? 0 : 24 }
+    private var buttonY: CGFloat { consentY + Self.consentHeight + agreementErrorHeight + 6 }
 
     var body: some View {
         FigmaScreen(key: "v2-56-84378", binder: binder, overlays: [
@@ -217,10 +239,27 @@ struct SignUpCredentialsView: View {
                     .accessibilityLabel(revealPassword ? "Hide password" : "Show password")
                     .hiddenWhile(confirming)
             },
+            SceneOverlay(x: 20, y: 264, width: 372, height: 38) {
+                fieldError(.email).hiddenWhile(confirming)
+            },
+            SceneOverlay(x: 20, y: 386, width: 372, height: 22) {
+                fieldError(.password).hiddenWhile(confirming)
+            },
             // Overlays sit above the frame; keep the chips out of the confirmation dialog.
             // The client removed Country from this step (location is collected in the
             // preferences), so the frame's fields sit 104 pt higher than in Figma.
             SceneOverlay(x: 20, y: 410, width: 372, height: 32) { RuleGlyphChips(password: password).opacity(confirming ? 0 : 1).allowsHitTesting(!confirming) },
+            // C3: the managed sentence as written (the frame's node is styled in
+            // Title Case, which the managed text and Android do not use).
+            SceneOverlay(x: 58, y: 388, width: 296, height: 40) {
+                Text(loc.t("signup_credentials_confirm_dialog_description",
+                           "Please review the details below. The email address will be used to continue."))
+                    .font(.custom("Vazirmatn", fixedSize: 12)).foregroundStyle(.black)
+                    .multilineTextAlignment(.center).minimumScaleFactor(0.7)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .opacity(confirming ? 1 : 0)
+                    .accessibilityHidden(!confirming)
+            },
             SceneOverlay(x: 58, y: 460, width: 296, height: 24) {
                 (Text("\(loc.t("signup_credentials_email", "Email")): ") + Text(email).foregroundColor(Theme.Palette.primaryText))
                     .font(Theme.Typography.body(12)).multilineTextAlignment(.center).minimumScaleFactor(0.7)
@@ -241,33 +280,92 @@ struct SignUpCredentialsView: View {
                     .accessibilityLabel(revealConfirmation ? "Hide password" : "Show password")
                     .hiddenWhile(confirming)
             },
-            SceneOverlay(x: 20, y: 572, width: 372, height: 28) {
-                HStack(spacing: 8) {
-                    Button { accepted.toggle() } label: {
-                        AppIcon(name: accepted ? "ic_checkbox_on" : "ic_checkbox_off", size: 22,
-                                tint: accepted ? Theme.Palette.primary : Theme.Palette.textSecondary)
-                    }
-                    .accessibilityLabel(loc.t("signup_credentials_accept_label", "I accept the") + " " + loc.t("signup_credentials_accept_license", "license agreement"))
-                    .accessibilityAddTraits(accepted ? [.isSelected] : [])
-                    Text(loc.t("signup_credentials_accept_label", "I accept the")).font(Theme.Typography.body(15))
-                    Button(loc.t("signup_credentials_accept_license", "license agreement")) { showLicense = true }
-                        .font(Theme.Typography.control(15)).foregroundStyle(Theme.Palette.primaryText)
-                    Spacer()
-                }
-                .hiddenWhile(confirming)
+            SceneOverlay(x: 20, y: 571, width: 372, height: 22) {
+                fieldError(.confirmation).hiddenWhile(confirming)
+            },
+            SceneOverlay(x: 20, y: consentY, width: 372, height: Self.consentHeight) {
+                consentRow.hiddenWhile(confirming)
+            },
+            SceneOverlay(x: 20, y: consentY + Self.consentHeight, width: 372, height: 22) {
+                fieldError(.agreement).hiddenWhile(confirming)
             },
         ], scrollTopTrigger: confirming)
         .navigationBarBackButtonHidden()
         .toolbar(.hidden, for: .navigationBar)
-        .sheet(isPresented: $showLicense) {
-            NavigationStack {
-                ScrollView { Text(loc.t("signup_credentials_accept_contents", "")).font(Theme.Typography.body()).padding() }
-                    .navigationTitle({ let s = loc.t("signup_credentials_accept_license", "License agreement"); return s.prefix(1).uppercased() + s.dropFirst() }())
-                    .navigationBarTitleDisplayMode(.inline)
-                    .toolbar {
-                        Button(loc.t("general_confirm", "Confirm")) { accepted = true; showLicense = false }
-                    }
+        .sheet(item: $document) { LegalDocumentView(document: $0) }
+        .onChange(of: email) { _, _ in errors[.email] = nil }
+        .onChange(of: password) { _, _ in errors[.password] = nil }
+        .onChange(of: confirmation) { _, _ in errors[.confirmation] = nil }
+        .onChange(of: accepted) { _, on in if on { errors[.agreement] = nil } }
+    }
+
+    /// One field's problem, directly under that field.
+    @ViewBuilder private func fieldError(_ field: Field) -> some View {
+        if let message = errors[field] {
+            Text(message)
+                .font(.custom("Vazirmatn", fixedSize: 12)).foregroundStyle(Theme.Palette.error)
+                .lineLimit(2).minimumScaleFactor(0.7)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                .accessibilityIdentifier("signup-error-\(field)")
+        }
+    }
+
+    // MARK: consent (C2)
+
+    private var termsName: String { loc.t("signup_credentials_terms_of_use", "Terms of Use") }
+    private var privacyName: String { loc.t("signup_credentials_privacy_policy", "Privacy Policy") }
+    private var consentTemplate: String {
+        loc.t("signup_credentials_consent", "I agree to the {TERMS_OF_USE} and acknowledge that I have read the {PRIVACY_POLICY}.")
+    }
+    private var consentPlain: String {
+        consentTemplate.replacingOccurrences(of: "{TERMS_OF_USE}", with: termsName)
+            .replacingOccurrences(of: "{PRIVACY_POLICY}", with: privacyName)
+    }
+
+    /// The managed sentence with the two document names underlined and tappable.
+    private var consentText: AttributedString {
+        var result = AttributedString()
+        var rest = Substring(consentTemplate)
+        let names: [(String, LegalDocument)] = [("{TERMS_OF_USE}", .termsOfUse), ("{PRIVACY_POLICY}", .privacyPolicy)]
+        while !rest.isEmpty {
+            let next = names.compactMap { token, doc in rest.range(of: token).map { ($0, doc) } }
+                .min { $0.0.lowerBound < $1.0.lowerBound }
+            guard let (range, doc) = next else { result += AttributedString(String(rest)); break }
+            result += AttributedString(String(rest[..<range.lowerBound]))
+            var link = AttributedString(doc == .termsOfUse ? termsName : privacyName)
+            link.link = doc.linkURL
+            link.underlineStyle = .single
+            link.foregroundColor = Theme.Palette.primaryText
+            result += link
+            rest = rest[range.upperBound...]
+        }
+        return result
+    }
+
+    private var consentRow: some View {
+        HStack(alignment: .top, spacing: 8) {
+            Button { accepted.toggle() } label: {
+                AppIcon(name: accepted ? "ic_checkbox_on" : "ic_checkbox_off", size: 22,
+                        tint: accepted ? Theme.Palette.primary : Theme.Palette.textSecondary)
+                    .frame(width: 28, height: 28)
             }
+            .accessibilityLabel(consentPlain)
+            .accessibilityAddTraits(accepted ? [.isSelected] : [])
+            .accessibilityIdentifier("signup-consent-checkbox")
+            // The scene has fixed geometry (it does not grow with Dynamic Type), so the
+            // sentence uses the frame's fixed type size; no scale factor, which would
+            // also misplace the link rects.
+            Text(consentText)
+                .font(.custom("Vazirmatn", fixedSize: 14)).foregroundStyle(Theme.Palette.textPrimary)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .environment(\.openURL, OpenURLAction { url in
+                    if let doc = LegalDocument(linkURL: url) { document = doc }
+                    return .handled
+                })
+                .accessibilityAction(named: termsName) { document = .termsOfUse }
+                .accessibilityAction(named: privacyName) { document = .privacyPolicy }
+                .accessibilityIdentifier("signup-consent-text")
         }
     }
 
@@ -289,42 +387,34 @@ struct SignUpCredentialsView: View {
                 if node.isPrimaryButton { proceed(); return true }
                 return false
             },
-            isEnabled: { node in
-                node.isPrimaryButton && !node.semanticLabel.contains("edit") && !node.semanticLabel.contains("confirm") ? valid : true
-            },
-            text: { node in
-                switch node.name {
-                case "Error": return error
-                default:
-                    if node.text?.hasPrefix("Please review the details below") == true {
-                        return loc.t("signup_credentials_confirm_dialog_email_description",
-                                     "Please review your email address below. It will be used to continue.")
-                    }
-                    return nil
-                }
-            },
             isHidden: { node in
                 ((node.name == "Dialog" || node.name == "Rectangle 2931") && !confirming)
                     || node.id == Self.ruleChipRow
                     // Two lines with the values in blue, drawn as an overlay.
                     || node.name == "Credentials"
-                    || (node.name == "Error" && error == nil)
+                    // The dialog description is drawn as an overlay (C3).
+                    || node.id == "56:84503"
+                    // Field errors are drawn under each field as overlays.
+                    || node.name == "Error"
                     || node.text == "Confirm your password..."
                     // No translation exists for this hint; the rule chips carry the same rules.
                     || (loc.languageId != 1 && node.text?.hasPrefix("Use 8 or more characters") == true)
             },
-            opacity: { node in
-                if node.isPrimaryButton, !node.semanticLabel.contains("edit"), !node.semanticLabel.contains("confirm"), !valid { return 0.45 }
-                return nil
+            yOffset: { node in
+                node.id == Self.continueButton ? Double(buttonY - Self.continueButtonY) : nil
             }
         )
     }
 
     private func proceed() {
-        if let problem = FieldValidator.email(email) { error = problem; return }
-        if !PasswordValidator.isValid(password) { error = loc.t("general_required", "This field is required."); return }
-        if password != confirmation { error = loc.t("signup_credentials_password_match", "Passwords do not match."); return }
-        error = nil
+        let problems = SignUpCredentialsValidation.problems(
+            email: email, password: password, confirmation: confirmation, accepted: accepted) { loc.t($0, $1) }
+        errors = problems
+        guard problems.isEmpty else {
+            UIAccessibility.post(notification: .announcement,
+                                 argument: Field.allCases.compactMap { problems[$0] }.joined(separator: ". "))
+            return
+        }
         // The dialog is part of the scrolling frame; with the keyboard up the frame is
         // scrolled to the field being typed in and the dialog would open out of view.
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
@@ -333,21 +423,135 @@ struct SignUpCredentialsView: View {
 
     private func confirm() {
         confirming = false
+        let address = email.trimmingCharacters(in: .whitespaces)
         Task {
             do {
                 try await feedback.run(loc.t("loading_auth_register", "Registering")) {
-                    _ = try await authService.register(role: role, email: email.trimmingCharacters(in: .whitespaces),
-                                                       password: password)
-                    signUp.role = role
-                    signUp.email = email.trimmingCharacters(in: .whitespaces)
-                    signUp.password = password
-                    signUp.isPasswordRecovery = false
-                    try await userService.sendOTP(email: signUp.email)
+                    _ = try await authService.register(role: role, email: address, password: password)
                 }
-                router.push(.otp)
             } catch {
-                self.error = Feedback.message(error)
+                if case .validation(_, let fields) = error as? APIError,
+                   fields["email"] != nil || fields["password"] != nil {
+                    errors[.email] = fields["email"]?.first
+                    errors[.password] = fields["password"]?.first
+                } else {
+                    feedback.toast(Feedback.message(error))
+                }
+                return
             }
+            signUp.role = role
+            signUp.email = address
+            signUp.password = password
+            signUp.isPasswordRecovery = false
+            signUp.otpSendFailed = false
+            do {
+                try await feedback.run(loc.t("loading_user_otp_send", "Sending OTP code")) {
+                    try await userService.sendOTP(email: address)
+                }
+            } catch {
+                // C4: the account exists now; the code screen is where another code
+                // can be requested, so open it anyway and say what went wrong.
+                signUp.otpSendFailed = true
+                feedback.toast(Feedback.message(error))
+            }
+            router.push(.otp)
+        }
+    }
+}
+
+/// The two documents named in the sign-up consent (C2).
+enum LegalDocument: String, Identifiable {
+    case termsOfUse, privacyPolicy
+    var id: String { rawValue }
+
+    var linkURL: URL { URL(string: "carezaar-legal://\(rawValue)")! }
+    init?(linkURL: URL) {
+        guard linkURL.scheme == "carezaar-legal", let doc = LegalDocument(rawValue: linkURL.host ?? "") else { return nil }
+        self = doc
+    }
+
+    var titleSlug: (String, String) {
+        switch self {
+        case .termsOfUse: ("signup_credentials_terms_of_use", "Terms of Use")
+        case .privacyPolicy: ("signup_credentials_privacy_policy", "Privacy Policy")
+        }
+    }
+
+    /// The configured document address, or nil while none has been supplied.
+    var url: URL? {
+        #if DEBUG
+        let args = ProcessInfo.processInfo.arguments
+        if let i = args.firstIndex(of: "--qa-legal-url"), i + 1 < args.count { return URL(string: args[i + 1]) }
+        #endif
+        let raw = self == .termsOfUse ? LegalDocumentConfiguration.termsOfUseURL : LegalDocumentConfiguration.privacyPolicyURL
+        return raw.isEmpty ? nil : URL(string: raw)
+    }
+}
+
+/// In-app document viewer: scrollable and pinch-zoomable. Without a configured
+/// document address it shows the managed "not available" text.
+struct LegalDocumentView: View {
+    let document: LegalDocument
+    @EnvironmentObject private var loc: Localization
+    @Environment(\.dismiss) private var dismiss
+    @State private var failed = false
+
+    var body: some View {
+        NavigationStack {
+            Group {
+                if let url = document.url, !failed {
+                    LegalWebView(url: url, failed: $failed)
+                } else {
+                    VStack(spacing: Theme.Spacing.s) {
+                        AppIcon(name: "ic_info_circle", size: 40, tint: Theme.Palette.textSecondary)
+                            .accessibilityHidden(true)
+                        Text(loc.t("general_error_not_found", "This item is no longer available."))
+                            .font(Theme.Typography.body()).multilineTextAlignment(.center)
+                            .accessibilityIdentifier("legal-document-unavailable")
+                    }
+                    .padding(Theme.Spacing.l)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+            }
+            .navigationTitle(loc.t(document.titleSlug.0, document.titleSlug.1))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(loc.t("general_ok", "OK")) { dismiss() }
+                }
+            }
+        }
+    }
+}
+
+/// WebKit renders HTML and PDF documents with native scrolling and pinch zoom.
+private struct LegalWebView: UIViewRepresentable {
+    let url: URL
+    @Binding var failed: Bool
+
+    func makeUIView(context: Context) -> WKWebView {
+        let view = WKWebView()
+        view.navigationDelegate = context.coordinator
+        view.scrollView.minimumZoomScale = 1
+        view.scrollView.maximumZoomScale = 5
+        view.allowsBackForwardNavigationGestures = false
+        view.load(URLRequest(url: url, timeoutInterval: APIConfiguration.requestTimeout))
+        return view
+    }
+    func updateUIView(_ view: WKWebView, context: Context) {}
+    func makeCoordinator() -> Coordinator { Coordinator(failed: $failed) }
+
+    final class Coordinator: NSObject, WKNavigationDelegate {
+        let failed: Binding<Bool>
+        init(failed: Binding<Bool>) { self.failed = failed }
+        func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) { failed.wrappedValue = true }
+        func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) { failed.wrappedValue = true }
+        func webView(_ webView: WKWebView, decidePolicyFor response: WKNavigationResponse,
+                     decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+            if let http = response.response as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
+                failed.wrappedValue = true
+                decisionHandler(.cancel)
+            } else { decisionHandler(.allow) }
         }
     }
 }
@@ -392,7 +596,11 @@ struct OTPView: View {
         .navigationTitle(loc.t("signup_otp_title", "OTP Confirmation"))
         .navigationBarTitleDisplayMode(.inline)
         .onReceive(ticker) { _ in if secondsLeft > 0 { secondsLeft -= 1 } }
-        .onAppear { focused = true }
+        .onAppear {
+            focused = true
+            // C4: no code was sent, so Re-send is available at once.
+            if signUp.otpSendFailed { secondsLeft = 0 }
+        }
     }
 
     private func submit() {
@@ -412,6 +620,7 @@ struct OTPView: View {
                 try await feedback.run(loc.t("loading_user_otp_send", "Sending OTP code")) {
                     try await userService.sendOTP(email: signUp.email)
                 }
+                signUp.otpSendFailed = false
                 secondsLeft = 120
             } catch { feedback.toast(Feedback.message(error)) }
         }
