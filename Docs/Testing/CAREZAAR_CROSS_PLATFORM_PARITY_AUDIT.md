@@ -65,18 +65,18 @@ Details, code locations and evidence: `CareerZar React App/docs/WEB-ANDROID-FUNC
 
 Details, code locations and evidence: `Carezaar-IOS/Docs/Testing/IOS-ANDROID-FUNCTIONAL-PARITY.md`. Test log: `Carezaar-IOS/Docs/Testing/IOS_PARITY_TEST_EXECUTION_REPORT.md`. Evidence: `test-evidence/ios-parity-v3/`.
 
-Testing ran on the iOS Simulator (iOS 26.5) on two devices: iPhone 17 Pro and iPhone SE (3rd generation). It covered English, Arabic (RTL) and Accessibility-L Dynamic Type, against the live server with real accounts in both roles.
+Testing ran on the iOS Simulator (iOS 26.5) on two devices, iPhone 17 Pro and iPhone SE (3rd generation), and on a physical iPhone 15 (iOS 26.5.2). On the iPhone it covered the real notification and location prompts, plus Apple's accessibility audit of the changed screens, which found no element without a VoiceOver description. It covered English, Arabic (RTL) and Accessibility-L Dynamic Type, against the live server with real accounts in both roles.
 
 | Audit ID | Page | Original issue (iOS today) | Expected (Android) | Status | Retest (final source) |
 |---|---|---|---|---|---|
-| I-A1 | 4 | Asks for notifications only after sign-in | Ask at launch; carry on either way | PASS | pass (refused → app continues) |
+| I-A1 | 4 | Asks for notifications only after sign-in | Ask at launch; carry on either way | PASS | pass on the simulator and on a physical iPhone 15 (the real prompt was refused and the app continued) |
 | I-B1 | 4 | Server's message as an error, stuck on Sign In | Show the message; open the profile step | PASS | pass (client and caregiver, with and without a profile) |
 | I-C1 | 5 | Continue disabled; one problem at a time; English-only wording | Continue active; all problems under their fields | PASS | pass (en, ar, AX-L) |
 | I-C2 | 5 | Licence agreement with an empty window | Terms of Use / Privacy Policy sentence and in-app documents | **BLOCKED** (UI done: WKWebView viewer, scroll and pinch zoom; no documents exist) | UI pass |
 | I-C3 | 5 | Own sentence under a missing text name | Managed confirmation sentence | PASS | pass |
 | I-C4 | 5 | Code not sent → stuck | Code screen opens; Re-send available | PASS | pass (real send failure, then a real code) |
 | I-F1 | 6 | Fills in the phone location by itself; world map | No auto-fill; whole-country map; My Location only on tap | PASS | pass |
-| I-F2 | 6 | Nothing when access is refused | Managed refusal message | PASS | pass (Debug "denied" fixture; a live OS-prompt refusal was not automated) |
+| I-F2 | 6 | Nothing when access is refused | Managed refusal message | PASS | pass on a physical iPhone 15 with the real iOS prompt and "Don't Allow". That device test first found a defect: the note was missing after a live refusal. It was fixed and re-verified; the simulator fixture test also passes |
 | I-F3 | 6 | Carries on, then opens the map on save | "Please select a location to continue." | PASS | pass |
 | I-K1 | 7 | List updates only on pull or reopen | Every 10 s while open | PASS | pass (message from the other role in about 11 s; one timer) |
 | I-K2 | 7 | Box open; pop-up on send | Box off, grey send, note | PASS | pass (both roles). On review, the send button was changed from faded blue to grey and rechecked |

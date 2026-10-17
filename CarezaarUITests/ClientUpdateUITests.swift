@@ -614,3 +614,106 @@ final class ParityV3UITests: XCTestCase {
         bell.tap()
     }
 }
+
+// MARK: - Physical iPhone checks (parity review v3.0, lead review 17 Oct)
+
+/// Run on a real iPhone with a fresh install, so iOS shows its own permission prompts.
+/// Skipped in the Simulator. Accounts come from TEST_RUNNER_PV3_* like the rest of the class.
+extension ParityV3UITests {
+    private var springboard: XCUIApplication { XCUIApplication(bundleIdentifier: "com.apple.springboard") }
+
+    /// Taps the system alert's "Don't Allow" (any apostrophe) if one is showing.
+    @discardableResult
+    private func refuseSystemPrompt(timeout: TimeInterval) -> String? {
+        let alert = springboard.alerts.firstMatch
+        guard alert.waitForExistence(timeout: timeout) else { return nil }
+        let title = alert.label
+        print("DEVICE alert: '\(title)' buttons=\(alert.buttons.allElementsBoundByIndex.map(\.label))")
+        let screen = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        screen.name = "device-system-prompt"; screen.lifetime = .keepAlways; add(screen)
+        alert.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Don")).firstMatch.tap()
+        return title
+    }
+
+    /// A1 + F2 on the device: the notification prompt appears at launch and refusing it lets
+    /// the app carry on; tapping My Location raises the real iOS location prompt, and tapping
+    /// "Don't Allow" shows the managed explanation.
+    func testDeviceA1NotificationPromptAndF2LiveLocationRefusal() throws {
+        #if targetEnvironment(simulator)
+        throw XCTSkip("needs a physical iPhone and a fresh install")
+        #else
+        let email = try value("PV3_CLIENT_EMAIL"), password = try value("PV3_CLIENT_PASSWORD")
+        // No location fixture: the real CLLocationManager answers. The account has a saved
+        // location, so the map opens there; My Location still asks iOS for permission.
+        launch(["--qa-push", "ClientPreferences"], email: email, password: password)
+        let notificationPrompt = refuseSystemPrompt(timeout: 20)
+        XCTAssertNotNil(notificationPrompt, "A1: no notification prompt at launch (is this a fresh install?)")
+        XCTAssertTrue(app.staticTexts["STEP 1"].waitForExistence(timeout: 90), "A1: app did not carry on after refusing")
+        shot("device-A1-after-refusing-notifications")
+        for _ in 0..<2 {
+            let next = app.buttons["Continue"].firstMatch
+            XCTAssertTrue(next.waitForExistence(timeout: 30)); sleep(2); next.tap(); sleep(1)
+        }
+        let row = app.buttons.matching(NSPredicate(format: "label MATCHES %@", ".*[0-9]+\\.[0-9]{6} , -?[0-9]+\\.[0-9]{6}.*")).firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout: 15), "saved location row"); row.tap()
+        let myLocation = app.buttons["My location"]
+        XCTAssertTrue(myLocation.waitForExistence(timeout: 15))
+        shot("device-F1-map-before-my-location")
+        myLocation.tap()
+        let locationPrompt = refuseSystemPrompt(timeout: 15)
+        XCTAssertNotNil(locationPrompt, "F2: no iOS location prompt after My Location")
+        let note = app.staticTexts["location-permission-denied"]
+        var seen = false
+        for i in 0..<20 where !seen {
+            seen = note.exists
+            if !seen { usleep(500_000) }
+            if i == 3 { shot("device-F2-after-dont-allow-2s") }
+        }
+        XCTAssertTrue(seen, "F2: refusal must be explained")
+        if seen { XCTAssertEqual(note.label, "Allow location access to use your current location.") }
+        shot("device-F2-live-dont-allow")
+        print("DEVICE prompts: notification=\(notificationPrompt ?? "-") | location=\(locationPrompt ?? "-")")
+        #endif
+    }
+
+    /// Apple's accessibility audit (VoiceOver labels, contrast, Dynamic Type, hit regions,
+    /// traits) on the screens this review changed, on the real device. Issues are logged
+    /// with their element so each can be judged; the test fails only on missing VoiceOver
+    /// descriptions, which the review's new controls must have.
+    func testDeviceAccessibilityAuditOfChangedScreens() throws {
+        #if targetEnvironment(simulator)
+        throw XCTSkip("needs a physical iPhone")
+        #else
+        let email = try value("PV3_CLIENT_EMAIL"), password = try value("PV3_CLIENT_PASSWORD")
+        var unlabeled: [String] = []
+        func audit(_ screen: String) throws {
+            try app.performAccessibilityAudit { issue in
+                let who = issue.element.map { "\($0.elementType.rawValue) '\($0.label)' id=\($0.identifier)" } ?? "-"
+                print("AUDIT \(screen): \(issue.auditType.rawValue) \(issue.compactDescription) | \(who)")
+                if issue.auditType == .sufficientElementDescription { unlabeled.append("\(screen): \(who)") }
+                return true
+            }
+        }
+        launch(["--qa-push", "SignUpCredentials/client"])
+        refuseSystemPrompt(timeout: 10)
+        let cont = app.buttons["Continue"].firstMatch
+        XCTAssertTrue(cont.waitForExistence(timeout: 60)); cont.tap()
+        XCTAssertTrue(app.staticTexts["signup-error-email"].waitForExistence(timeout: 5))
+        shot("device-audit-create-account"); try audit("create-account")
+        app.terminate()
+        launch(["--qa-tab", "messages"], email: email, password: password)
+        refuseSystemPrompt(timeout: 5)
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label == %@", "Deleted Account")).firstMatch.waitForExistence(timeout: 60))
+        shot("device-audit-messages"); try audit("messages")
+        app.terminate()
+        launch(["--qa-push", "Chat/\(try value("PV3_CHAT_B"))"], email: email, password: password)
+        XCTAssertTrue(app.descendants(matching: .any)["chat-closed-note"].waitForExistence(timeout: 60))
+        shot("device-audit-closed-chat"); try audit("closed-chat")
+        app.terminate()
+        launch(["--qa-tab", "profile"], email: email, password: password)
+        XCTAssertTrue(app.staticTexts["Change your current password"].waitForExistence(timeout: 60))
+        shot("device-audit-profile"); try audit("profile")
+        XCTAssertTrue(unlabeled.isEmpty, "Elements without a VoiceOver description: \(unlabeled)")
+        #endif
+    }
+}

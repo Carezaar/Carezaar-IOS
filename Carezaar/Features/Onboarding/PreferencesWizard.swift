@@ -673,8 +673,12 @@ struct MapLocationPicker: View {
             position = .region(MKCoordinateRegion(center: coordinate, latitudinalMeters: 2_000, longitudinalMeters: 2_000))
         }
         // F2: the person refused the system prompt raised by My Location.
-        .onReceive(location.$status) { _ in
-            if requestedPhoneLocation, location.isDenied { requestedPhoneLocation = false; showPermissionDenied() }
+        // `$status` emits before the property changes, so the emitted value is used:
+        // reading `location.isDenied` here would still see the old status.
+        .onReceive(location.$status) { status in
+            if requestedPhoneLocation, status == .denied || status == .restricted {
+                requestedPhoneLocation = false; showPermissionDenied()
+            }
         }
         .onDisappear { location.cancel() }
     }
