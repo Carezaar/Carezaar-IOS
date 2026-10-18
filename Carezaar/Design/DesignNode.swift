@@ -66,8 +66,10 @@ enum SourceStore {
         }
         return try JSONDecoder().decode(T.self, from: Data(contentsOf: url))
     }
+    /// Scene images shown with a different picture.
+    static let replacements = ["92bf103484e337567f379617f79c6c37ba10484d.jpg": "intro-room.jpg"]
     static func assetURL(_ name: String) -> URL? {
-        Bundle.main.url(forResource: name, withExtension: nil, subdirectory: "Assets")
+        Bundle.main.url(forResource: replacements[name] ?? name, withExtension: nil, subdirectory: "Assets")
     }
 }
 

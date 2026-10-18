@@ -10,7 +10,7 @@ struct HelpCenterView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                AppIcon(name: "ic_support", size: 96, tint: Theme.Palette.primaryDark).padding(.top, 16)
+                AppIcon(name: "ic_message", size: 96, tint: Theme.Palette.primaryDark).padding(.top, 16)
                 Text(loc.t("contact_support_subtitle", "We are here to help")).font(Theme.Typography.heading(22))
                 Text(loc.t("contact_support_description", "")).font(Theme.Typography.body(14))
                     .foregroundStyle(Theme.Palette.textSecondary).multilineTextAlignment(.center)
