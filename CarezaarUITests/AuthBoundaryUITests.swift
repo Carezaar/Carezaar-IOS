@@ -80,7 +80,7 @@ final class AuthBoundaryUITests: XCTestCase {
             openTermsOfUse()
             let bar = app.navigationBars["Terms of Use"]
             XCTAssertTrue(bar.waitForExistence(timeout: 10), "In-app Terms of Use viewer missing")
-            XCTAssertTrue(app.staticTexts["legal-document-unavailable"].exists, "Unconfigured document shows the managed text")
+            XCTAssertTrue(app.webViews["legal-document"].waitForExistence(timeout: 10), "The client's Terms of Use PDF is shown")
             bar.buttons["OK"].tap()
             XCTAssertTrue(bar.waitForNonExistence(timeout: 10), "Viewer did not close")
             XCTAssertFalse(terms.isSelected, "Viewing the Terms of Use must not accept the agreement")

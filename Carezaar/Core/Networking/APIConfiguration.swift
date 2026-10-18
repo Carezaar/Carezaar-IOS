@@ -20,11 +20,9 @@ enum APIConfiguration {
     static let defaultPageSize = 10
 }
 
-/// Where the sign-up consent's documents are loaded from (parity review v3, C2).
-/// The client has not supplied either document yet, so both are empty; while a URL
-/// is empty the in-app viewer shows the managed `general_error_not_found` text.
-/// Set each to the published document's https URL (HTML or PDF) when it exists.
+/// The sign-up consent's documents (parity review v3, C2): the client's Terms of Use
+/// and Privacy Policy PDFs (17 Oct 2026), bundled under `Assets/legal`.
 enum LegalDocumentConfiguration {
-    static let termsOfUseURL = ""
-    static let privacyPolicyURL = ""
+    static let termsOfUseFile = "terms-of-use"
+    static let privacyPolicyFile = "privacy-policy"
 }

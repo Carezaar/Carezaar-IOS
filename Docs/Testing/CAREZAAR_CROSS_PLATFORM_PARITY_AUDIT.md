@@ -38,7 +38,7 @@ Details, code locations and evidence: `CareerZar React App/docs/WEB-ANDROID-FUNC
 | W-B1 | 4 | Server's message as an error, stuck on Sign In | Show the message, go to the profile step | PASS | pass (real 409 account) |
 | W-C1 | 5 | Sign-up progress kept per browser session | Accepted difference | NOT APPLICABLE (agreed) | — |
 | W-C2 | 5 | Continue disabled, one problem at a time, English-only wording | Continue active; every field's problem at once, managed texts | PASS | pass (3 browsers, 2 layouts) |
-| W-C3 | 5 | "I accept the license agreement", empty window | Terms of Use / Privacy Policy sentence; documents open in the app, scrollable and zoomable | **BLOCKED** (UI done and tested; no documents exist) | UI pass |
+| W-C3 | 5 | "I accept the license agreement", empty window | Terms of Use / Privacy Policy sentence; documents open in the app, scrollable and zoomable | PASS (18 Oct, client's documents) | pass (both documents, zoom, scroll, PDF link, keyboard, Arabic, axe) |
 | W-C4 | 5 | Own confirmation sentence under a missing text name | `signup_credentials_confirm_dialog_description` | PASS | pass |
 | W-C5 | 5 | Code not sent → stuck; account already exists | Code screen opens; code can be requested again | PASS | pass |
 | W-E1 | 5 | JPEG/PNG/WebP up to 10 MB | Accepted difference | NOT APPLICABLE (agreed) | — |
@@ -50,14 +50,14 @@ Details, code locations and evidence: `CareerZar React App/docs/WEB-ANDROID-FUNC
 | W-K2 | 7 | Typing box open; pop-up on send | Box off, grey send, note above | PASS | pass (3 browsers) |
 | W-K3 | 7 | Empty name, open for typing | "Deleted Account" everywhere; closed with note | PASS | pass (real deleted account) |
 | W-K4 | 7 | Send disabled, no explanation | "Please type a message first." | PASS | pass (3 browsers) |
-| W-M1 | 8 | My Matches care photos | Phone with a conversation; everyday care scenes | **BLOCKED** (images not available) | — |
+| W-M1 | 8 | My Matches care photos | Phone with a conversation; everyday care scenes | Messages PASS; Profile **left to the client** (the picture shows people; we don't use pictures of people) | pass (Messages) |
 | W-M2 | 8 | "Update your account password" | "Change your current password" | PASS | pass |
 | W-O1 | 8 | Stays signed in after a password change | Signed out, back to the start | PASS | pass (also answer-lost case) |
 | W-Q1 | 9 | Connection Problem for a server error; stays signed in | Renewal error → signed out; window only when unreachable | PASS | pass (browser + unit) |
 | W-Q2 | 9 | Waiting requests carry on after Retry | Window closes; failed requests show their error, not repeated | PASS | pass (browser + unit) |
 | W-Q3 | 9 | Photo read through the site's address | Accepted difference | NOT APPLICABLE (agreed) | — |
 
-**Web totals: 19 items to change, 17 PASS, 2 BLOCKED, 0 FAIL. 3 accepted differences (no change).**
+**Web totals (updated 18 Oct): 19 items to change, 18 PASS, 1 partly done (M1: Messages done; the Profile picture is left to the client), 0 FAIL. 3 accepted differences (no change).**
 
 ---
 
@@ -72,7 +72,7 @@ Testing ran on the iOS Simulator (iOS 26.5) on two devices, iPhone 17 Pro and iP
 | I-A1 | 4 | Asks for notifications only after sign-in | Ask at launch; carry on either way | PASS | pass on the simulator and on a physical iPhone 15 (the real prompt was refused and the app continued) |
 | I-B1 | 4 | Server's message as an error, stuck on Sign In | Show the message; open the profile step | PASS | pass (client and caregiver, with and without a profile) |
 | I-C1 | 5 | Continue disabled; one problem at a time; English-only wording | Continue active; all problems under their fields | PASS | pass (en, ar, AX-L) |
-| I-C2 | 5 | Licence agreement with an empty window | Terms of Use / Privacy Policy sentence and in-app documents | **BLOCKED** (UI done: WKWebView viewer, scroll and pinch zoom; no documents exist) | UI pass |
+| I-C2 | 5 | Licence agreement with an empty window | Terms of Use / Privacy Policy sentence and in-app documents | PASS (18 Oct, client's PDFs bundled) | pass (both documents open, scroll, pinch-zoom; Release bundle checked) |
 | I-C3 | 5 | Own sentence under a missing text name | Managed confirmation sentence | PASS | pass |
 | I-C4 | 5 | Code not sent → stuck | Code screen opens; Re-send available | PASS | pass (real send failure, then a real code) |
 | I-F1 | 6 | Fills in the phone location by itself; world map | No auto-fill; whole-country map; My Location only on tap | PASS | pass |
@@ -82,12 +82,12 @@ Testing ran on the iOS Simulator (iOS 26.5) on two devices, iPhone 17 Pro and iP
 | I-K2 | 7 | Box open; pop-up on send | Box off, grey send, note | PASS | pass (both roles). On review, the send button was changed from faded blue to grey and rechecked |
 | I-K3 | 7 | Empty name; open for typing | "Deleted Account" everywhere; closed with note | PASS | pass (real deleted account; list, header, notifications) |
 | I-K4 | 7 | Send turned off when empty | "Please type a message first." | PASS | pass |
-| I-M1 | 8 | Older empty-room pictures | Phone with a conversation; care scenes | **BLOCKED** (images not available) | — |
+| I-M1 | 8 | Older empty-room pictures | Phone with a conversation; care scenes | Messages PASS; Profile **left to the client** (the picture shows people) | pass (Messages) |
 | I-M2 | 8 | "Update your account password" | "Change your current password" | PASS | pass |
 | I-Q1 | 9 | Renewal error keeps the person signed in | Any HTTP error → signed out; window only when unreachable | PASS | pass (unit tests + real 404 on the simulator) |
 | I-Q2 | 9 | Waiting requests carry on after Retry | Window closes; nothing replayed | PASS | pass (unit tests + simulator) |
 
-**iOS totals: 17 items, 15 PASS, 2 BLOCKED, 0 FAIL.**
+**iOS totals (updated 18 Oct): 17 items, 16 PASS, 1 partly done (M1: Messages done; the Profile picture is left to the client), 0 FAIL.**
 
 **iOS automated tests on the final source:**
 - `CarezaarTests`: 157/157 pass (also re-run independently in review).
@@ -116,11 +116,16 @@ They differ only where the reviews accept platform differences:
   - Web: suites A (78 pass, 1 N/A), B (69/69), ten-change (51/51) and gaps (10/10), plus the parity suites, all on the final build.
   - iOS: the unit target and the UI regression batches listed above.
 
-## Remaining blockers (both platforms)
+## Client material received 17 October and what was done (18 Oct)
 
-1. **Terms of Use and Privacy Policy documents** (W-C3, I-C2). The consent sentence, links and in-app viewer are built. The documents themselves are needed: either their addresses, or the files to bundle. Web: set `VITE_CAREZAAR_TERMS_URL` / `VITE_CAREZAAR_PRIVACY_URL`, and add the documents' origin to `frame-src` in `vercel.json`.
-2. **Header pictures for Messages and Profile** (W-M1, I-M1). The two images from the current Android build are needed.
-3. **Current Android build.** Supplying the build the reviews were made against (after 15 October) would let both teams check the remaining details against it directly.
+1. **Terms of Use and Privacy Policy** (W-C3, I-C2), now done on both apps.
+   - Web shows the text, checked character for character against the client's PDFs, and links the original PDF.
+   - iOS bundles the PDFs and shows them natively.
+2. **Header pictures** (W-M1, I-M1).
+   - The Messages picture (a phone showing a conversation) is used on both apps.
+   - The Profile picture shows people. We don't use pictures of people, so the Profile header is unchanged and the client can add that picture themselves if they want it.
+3. **Final FAQ.** The FAQ is managed on the server (`base/faqs`, with translations) and shown as-is by Android, iOS and the web. The server still has the older 14 questions, while the client's final FAQ has 18. Entering it in the server's content admin is all that's needed; no app change is required.
+4. **Current Android build:** still useful for a side-by-side check, not blocking.
 
 ## Backend notes
 

@@ -345,12 +345,17 @@ final class ParityV3UITests: XCTestCase {
             if link.frame.width > 1 { link.tap() }
             else if english { consent.coordinate(withNormalizedOffset: CGVector(dx: 0.42, dy: 0.75)).tap() }
             else { continue }
-            let unavailable = app.staticTexts["legal-document-unavailable"]
-            XCTAssertTrue(unavailable.waitForExistence(timeout: 10), "C2: document viewer opens")
-            if english { XCTAssertEqual(unavailable.label, "This item is no longer available.") }
+            // C2: the client's bundled PDF opens in the in-app viewer (scroll + pinch zoom).
+            let viewer = app.webViews["legal-document"]
+            XCTAssertTrue(viewer.waitForExistence(timeout: 10), "C2: document viewer opens")
+            XCTAssertFalse(app.staticTexts["legal-document-unavailable"].exists, "C2: the document is bundled")
+            sleep(2)
             shot("C2-viewer-\(index == 0 ? "terms" : "privacy")")
+            viewer.swipeUp(); viewer.pinch(withScale: 2, velocity: 1)
+            shot("C2-viewer-\(index == 0 ? "terms" : "privacy")-zoomed")
+            XCTAssertTrue(viewer.exists, "C2: viewer survives scroll and zoom")
             app.navigationBars.buttons.firstMatch.tap()
-            XCTAssertTrue(unavailable.waitForNonExistence(timeout: 10))
+            XCTAssertTrue(viewer.waitForNonExistence(timeout: 10))
         }
         XCTAssertEqual(consent.links.count, 2, "C2: Terms of Use and Privacy Policy are both links")
 

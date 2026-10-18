@@ -432,7 +432,8 @@ struct MessagesTab: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
-                HeroHeader(image: "bg_messages", icon: "ic_messages_off",
+                // The client's Messages picture (17 Oct, parity review v3.0 M1).
+                HeroHeader(image: "header_messages", icon: "ic_messages_off",
                            title: loc.t("messages_title", "Messages"),
                            subtitle: loc.t("messages_description", "All your conversations in one place"))
                 PagedContent(pager: pager, emptyTitle: loc.t("chat_screen_no_messages_yet", "No Messages Yet"),

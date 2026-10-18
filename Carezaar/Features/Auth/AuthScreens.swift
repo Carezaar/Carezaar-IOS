@@ -477,14 +477,14 @@ enum LegalDocument: String, Identifiable {
         }
     }
 
-    /// The configured document address, or nil while none has been supplied.
+    /// The bundled PDF (nil only if it is missing from the build).
     var url: URL? {
         #if DEBUG
         let args = ProcessInfo.processInfo.arguments
         if let i = args.firstIndex(of: "--qa-legal-url"), i + 1 < args.count { return URL(string: args[i + 1]) }
         #endif
-        let raw = self == .termsOfUse ? LegalDocumentConfiguration.termsOfUseURL : LegalDocumentConfiguration.privacyPolicyURL
-        return raw.isEmpty ? nil : URL(string: raw)
+        let name = self == .termsOfUse ? LegalDocumentConfiguration.termsOfUseFile : LegalDocumentConfiguration.privacyPolicyFile
+        return Bundle.main.url(forResource: name, withExtension: "pdf", subdirectory: "Assets/legal")
     }
 }
 
@@ -535,7 +535,12 @@ private struct LegalWebView: UIViewRepresentable {
         view.scrollView.minimumZoomScale = 1
         view.scrollView.maximumZoomScale = 5
         view.allowsBackForwardNavigationGestures = false
-        view.load(URLRequest(url: url, timeoutInterval: APIConfiguration.requestTimeout))
+        view.accessibilityIdentifier = "legal-document"
+        if url.isFileURL {
+            view.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
+        } else {
+            view.load(URLRequest(url: url, timeoutInterval: APIConfiguration.requestTimeout))
+        }
         return view
     }
     func updateUIView(_ view: WKWebView, context: Context) {}
