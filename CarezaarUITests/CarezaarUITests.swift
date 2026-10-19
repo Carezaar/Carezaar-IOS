@@ -202,7 +202,9 @@ final class CarezaarUITests: XCTestCase {
         XCTAssertTrue(request.waitForExistence(timeout: 20))
         XCTAssertFalse(textContaining("Verified").exists, "verification badge on a profile")
         request.tap()
-        XCTAssertTrue(app.navigationBars["Request a Match"].waitForExistence(timeout: 10), "Request a Match confirmation")
+        let requestHeading = app.staticTexts["match-request-heading"].firstMatch
+        XCTAssertTrue(requestHeading.waitForExistence(timeout: 10), "Request a Match confirmation")
+        XCTAssertEqual(requestHeading.label, "Request a Match")
         XCTAssertFalse(app.navigationBars["Background Check"].exists)
         app.navigationBars.buttons["Cancel"].tap()
         XCTAssertFalse(app.buttons["Message"].exists, "Message must be absent before an active match")
@@ -231,12 +233,12 @@ final class CarezaarUITests: XCTestCase {
     }
 
     /// FAQ answers expand; Report an Issue validates Other → Subject.
-    func testFaqAndReportIssueValidation() {
+    func testFaqAndReportIssueValidation() throws {
         launchSignedIn(["--qa-push", "FAQ"])
         let q = app.buttons["What is Carezaar?"]
         XCTAssertTrue(q.waitForExistence(timeout: 20))
         q.tap()
-        XCTAssertTrue(textContaining("Carezaar is a platform").waitForExistence(timeout: 5), "answer did not expand")
+        XCTAssertTrue(textContaining(try CarezaarAPI.faqAnswerOpening(question: "What is Carezaar?")).waitForExistence(timeout: 5), "answer did not expand")
         app.navigationBars.buttons.element(boundBy: 0).tap()
         XCTAssertTrue(app.buttons["Messages"].waitForExistence(timeout: 10))
         openTab("Profile")

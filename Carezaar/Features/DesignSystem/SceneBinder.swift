@@ -37,6 +37,9 @@ struct SceneBinder {
     /// False only for the design catalog, which keeps the renderer's demo behaviour.
     var isBound = true
 
+    /// Optional screen-owned semantic name for an action-bearing scene node.
+    var accessibilityLabel: (DesignNode) -> String? = { _ in nil }
+
     static let inert = SceneBinder(isBound: false)
 }
 

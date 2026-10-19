@@ -69,6 +69,142 @@ enum MailTM {
     }
 }
 
+/// Test-only native-purpose provenance. Provider creation belongs to the explicit
+/// host preparer; an interrupted registration never silently creates another inbox.
+enum NativeLifecycleFixture {
+    enum Failure: Error { case stopped(String) }
+    static func read(_ file: String) throws -> [String: Any] {
+        let url = URL(fileURLWithPath: file).resolvingSymlinksInPath()
+        let root = URL(fileURLWithPath: "/tmp/carezaar-final-native-lifecycle-20261018").resolvingSymlinksInPath().path + "/"
+        guard url.path.hasPrefix(root),
+              (try FileManager.default.attributesOfItem(atPath: url.deletingLastPathComponent().path)[.posixPermissions] as? NSNumber)?.intValue == 0o700,
+              (try FileManager.default.attributesOfItem(atPath: url.path)[.posixPermissions] as? NSNumber)?.intValue == 0o600,
+              let record = try JSONSerialization.jsonObject(with: Data(contentsOf: url)) as? [String: Any],
+              let provenance = record["native_provenance"] as? [String: Any],
+              provenance["purpose"] as? String == "carezaar-native-final-qa" else {
+            throw Failure.stopped("private-native-provenance-required")
+        }
+        return record
+    }
+    static func save(_ record: [String: Any], _ file: String) throws {
+        try JSONSerialization.data(withJSONObject: record, options: [.sortedKeys, .prettyPrinted])
+            .write(to: URL(fileURLWithPath: file), options: .atomic)
+        try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: file)
+    }
+    private static func provider(_ path: String, token: String) throws -> [String: Any] {
+        var request = URLRequest(url: MailTM.base.appendingPathComponent(path))
+        request.timeoutInterval = 30
+        request.setValue("application/ld+json", forHTTPHeaderField: "Accept")
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        var result: Result<[String: Any], Error> = .failure(Failure.stopped("provider-unavailable"))
+        let done = DispatchSemaphore(value: 0)
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            defer { done.signal() }
+            guard error == nil, let http = response as? HTTPURLResponse, http.statusCode == 200,
+                  let data, let object = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else {
+                result = .failure(Failure.stopped("provider-read-not-http200")); return
+            }
+            result = .success(object)
+        }
+        task.resume()
+        guard done.wait(timeout: .now() + 35) == .success else {
+            task.cancel(); throw Failure.stopped("provider-read-timeout")
+        }
+        return try result.get()
+    }
+    static func inbox(_ file: String, caregiver: Bool, environment: [String: String]) throws -> MailTM.Inbox {
+        let record = try read(file)
+        let provenance = record["native_provenance"] as? [String: Any] ?? [:]
+        let role = caregiver ? "caregiver" : "client"
+        guard provenance["role"] as? String == role, record["role"] as? String == role,
+              provenance["stage"] as? String == "inboxReady",
+              provenance["provider_create_attempts"] as? Int == 1,
+              provenance["app_registration_attempts"] as? Int == 0,
+              let marker = provenance["marker"] as? String,
+              let address = record["email"] as? String, address.hasPrefix("carezaar-native-\(marker)@"),
+              let token = record["inbox_token"] as? String,
+              let id = provenance["provider_account_id"] as? String else {
+            throw Failure.stopped("fresh-native-inbox-required-no-registration-replay")
+        }
+        let retained = ["QA_EMAIL", "QA_CLIENT_EMAIL", "QA_CG_EMAIL"].compactMap { environment[$0]?.lowercased() }
+        guard !retained.contains(address.lowercased()) else { throw Failure.stopped("retained-fixture-refused") }
+        let me = try provider("me", token: token)
+        guard me["id"] as? String == id, me["address"] as? String == address else {
+            throw Failure.stopped("provider-exact-ownership-mismatch")
+        }
+        return MailTM.Inbox(address: address, token: token)
+    }
+    static func stageRegistration(_ file: String, inbox: MailTM.Inbox) throws {
+        var record = try read(file)
+        var provenance = record["native_provenance"] as? [String: Any] ?? [:]
+        guard provenance["stage"] as? String == "inboxReady", record["email"] as? String == inbox.address else {
+            throw Failure.stopped("registration-already-staged-no-replay")
+        }
+        let response = try provider("messages", token: inbox.token)
+        guard let rows = response["hydra:member"] as? [[String: Any]], rows.isEmpty else {
+            throw Failure.stopped("fresh-inbox-has-unexpected-messages")
+        }
+        provenance["message_before_ids"] = [String]()
+        provenance["otp_requested_at"] = ISO8601DateFormatter().string(from: Date())
+        provenance["registration_intent_at"] = provenance["otp_requested_at"]
+        provenance["app_registration_attempts"] = 1
+        provenance["stage"] = "registrationIntent"
+        record["native_provenance"] = provenance
+        try save(record, file)
+    }
+    static func stage(_ name: String, file: String) throws {
+        var record = try read(file)
+        var provenance = record["native_provenance"] as? [String: Any] ?? [:]
+        guard provenance["app_registration_attempts"] as? Int == 1, record["deleted"] as? Bool != true else {
+            throw Failure.stopped("owned-registration-stage-required")
+        }
+        provenance["stage"] = name
+        provenance[name + "_at"] = ISO8601DateFormatter().string(from: Date())
+        record["native_provenance"] = provenance
+        try save(record, file)
+    }
+    static func waitForSignupCode(_ file: String, inbox: MailTM.Inbox, timeout: TimeInterval = 150) throws -> String {
+        var record = try read(file)
+        var provenance = record["native_provenance"] as? [String: Any] ?? [:]
+        let basic = ISO8601DateFormatter()
+        let fractional = ISO8601DateFormatter(); fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        guard let accountID = provenance["provider_account_id"] as? String,
+              let rawBoundary = provenance["otp_requested_at"] as? String,
+              let boundary = basic.date(from: rawBoundary) else { throw Failure.stopped("missing-message-boundary") }
+        let prior = Set(provenance["message_before_ids"] as? [String] ?? [])
+        let deadline = Date().addingTimeInterval(timeout)
+        while Date() < deadline {
+            let response = try provider("messages", token: inbox.token)
+            guard let rows = response["hydra:member"] as? [[String: Any]] else { throw Failure.stopped("malformed-message-list") }
+            let candidates = rows.compactMap { $0["id"] as? String }.filter { !prior.contains($0) }
+            guard candidates.count <= 1 else { throw Failure.stopped("multiple-new-messages-review-before-resend") }
+            if let id = candidates.first {
+                let full = try provider("messages/\(id)", token: inbox.token)
+                let account = full["accountId"] as? String
+                let recipients = (full["to"] as? [[String: Any]] ?? []).compactMap { $0["address"] as? String }
+                let created = (full["createdAt"] as? String).flatMap { fractional.date(from: $0) ?? basic.date(from: $0) }
+                guard full["id"] as? String == id,
+                      account == accountID || account == "/accounts/\(accountID)",
+                      recipients.contains(inbox.address), let created,
+                      created >= boundary.addingTimeInterval(-2) else {
+                    throw Failure.stopped("fresh-message-ownership-or-time-mismatch")
+                }
+                let content = "\(full["text"] ?? "") \(full["html"] ?? "") \(full["subject"] ?? "")"
+                let regex = try NSRegularExpression(pattern: "\\b\\d{5}\\b")
+                let range = NSRange(content.startIndex..<content.endIndex, in: content)
+                let codes = Set(regex.matches(in: content, range: range).compactMap { Range($0.range, in: content).map { String(content[$0]) } })
+                guard codes.count == 1, let code = codes.first else { throw Failure.stopped("message-code-ambiguous") }
+                record["private_otp_values"] = (record["private_otp_values"] as? [String] ?? []) + [code]
+                provenance["consumed_message_id"] = id; provenance["stage"] = "otpReceived"
+                record["native_provenance"] = provenance; try save(record, file)
+                return code
+            }
+            Thread.sleep(forTimeInterval: 3)
+        }
+        throw Failure.stopped("fresh-owned-otp-timeout-no-automatic-resend")
+    }
+}
+
 enum CarezaarAPI {
     static let base = URL(string: "https://new.carezaar.com/api/")!
 
@@ -131,6 +267,25 @@ enum CarezaarAPI {
 
 extension CarezaarAPI {
     static func result(_ response: [String: Any]) -> [String: Any] { response["result"] as? [String: Any] ?? [:] }
+
+    /// The opening of a managed FAQ answer as the app shows it (HTML removed), read from
+    /// the live English FAQ. The FAQ is edited in the admin panel, so tests must not
+    /// hard-code its wording.
+    static func faqAnswerOpening(question: String, length: Int = 24) throws -> String {
+        let languages = try call("GET", "base/languages?ts_cache=0")["result"] as? [[String: Any]] ?? []
+        let english = languages.first { ($0["code"] as? String) == "en" }?["id"] as? Int
+        let faqs = try call("GET", "base/faqs?ts_cache=0")["result"] as? [[String: Any]] ?? []
+        for faq in faqs {
+            for t in faq["translations"] as? [[String: Any]] ?? [] where (t["question"] as? String) == question {
+                if let english, (t["language_id"] as? Int) != english { continue }
+                let plain = ((t["answer"] as? String) ?? "")
+                    .replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                if !plain.isEmpty { return String(plain.prefix(length)) }
+            }
+        }
+        throw URLError(.resourceUnavailable)
+    }
 
     static func me(_ token: String) throws -> [String: Any] { result(try call("GET", "auth/info", token: token)) }
 

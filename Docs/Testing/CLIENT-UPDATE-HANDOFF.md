@@ -1,5 +1,7 @@
 # Carezaar October 10 client updates — engineering handoff
 
+> Historical handoff. The 19 October review is still in progress. Use [the current review checkpoint](CURRENT_REVIEW_STATUS.md) for current results and remaining acceptance work. The commit and delivery claims below refer to their dated revisions.
+
 ## Verified GitHub delivery and final smoke checks
 
 The camera/OTP tests and reviewed evidence are verified on authorized `main` at `5b814a6d876b8fa542bfa0a98db8185f54bd3fc2`. The remote commit and five source/report/proof files matched local bytes. A fresh ARM64 Simulator clean build passed after the initial dual-architecture build failed under disk pressure; that raw failure is retained. Post-push OTP request regression passed in 0.010 seconds, and actual public-field client/caregiver login passed in 27.286/35.559 seconds with one login, one identity request, no refresh and no opposite-role request. Setup API authentication is separate; client list count two does not establish deduplication. Both actual Debug images exclude the temporary sign-in diagnostic prefix. All 628 production files remain unchanged.

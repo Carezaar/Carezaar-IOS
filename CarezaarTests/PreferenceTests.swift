@@ -3,6 +3,23 @@ import CoreLocation
 @testable import Carezaar
 
 final class PreferenceTests: XCTestCase {
+    func testPeopleArtworkRemainsExcludedFromProductResources() {
+        // Explicit product requirement: retain the intentional artwork removals.
+        for name in ["bg_intro", "client_pregnancy", "client_senior", "client_adult", "client_child", "header_pregnancy", "header_senior", "header_adult", "header_child"] {
+            XCTAssertNil(AppImage.load(name), "People artwork must stay out of the app bundle: \(name)")
+        }
+        for name in ["ic_caregiver", "ic_client", "ic_condition_personal_care", "ic_condition_feeding", "ic_condition_companionship", "ic_condition_assessment", "ic_support"] {
+            XCTAssertNil(AndroidVectors.shared.vector(name), "Removed people vector must not be restored: \(name)")
+        }
+        for name in ["brainstorm-needs-quality-9.png", "brainstorm-needs-quality-2.png", "1dd97cfcd4eda6b7fff530d0d8ccb8f25c100ce5.jpg"] {
+            XCTAssertNil(Bundle.main.url(forResource: name, withExtension: nil, subdirectory: "Assets"),
+                         "Facial or unapproved people imagery must not ship: \(name)")
+        }
+        XCTAssertEqual(SourceStore.assetURL("92bf103484e337567f379617f79c6c37ba10484d.jpg")?.lastPathComponent, "intro-room.jpg")
+        XCTAssertNotNil(AppImage.load("header_messages"), "Keep the supplied hands-only Messages image")
+        XCTAssertNotNil(AndroidVectors.shared.vector("ic_user"), "Keep the faceless person outline")
+    }
+
     func testEqualAndReversedPayUseManagedRangeError() {
         for role in [UserRole.client, .caregiver] {
             XCTAssertEqual(PreferenceValidation.payProblem(minimum: 10, maximum: 10, role: role), "general_salary_min_max")

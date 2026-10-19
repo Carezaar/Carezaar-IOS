@@ -115,7 +115,7 @@ struct DesignElement: View {
             } label: { content }
                 .buttonStyle(.plain)
                 .disabled(!binder.isEnabled(rendered))
-                .accessibilityLabel(rendered.label.isEmpty ? rendered.name : rendered.label)
+                .accessibilityLabel(binder.accessibilityLabel(rendered) ?? (rendered.label.isEmpty ? rendered.name : rendered.label))
                 .accessibilityAddTraits(.isButton)
         } else { content }
     }

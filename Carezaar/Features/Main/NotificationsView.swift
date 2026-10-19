@@ -10,6 +10,7 @@ struct NotificationsView: View {
     @StateObject private var pager = Pager<AppNotification>()
     @EnvironmentObject private var poller: NotificationPoller
     @State private var seen: Set<Int> = []
+    @State private var markingSeen: Set<Int> = []
     @State private var selected: AppNotification?
 
     var body: some View {
@@ -102,9 +103,22 @@ struct NotificationsView: View {
 
     private func select(_ n: AppNotification) {
         selected = n
-        if !n.isSeen && !seen.contains(n.id) {
-            seen.insert(n.id)
-            Task { _ = try? await UserService().markNotificationSeen(id: n.id) }
+        if !n.isSeen && !seen.contains(n.id) && !markingSeen.contains(n.id) {
+            markingSeen.insert(n.id)
+            Task {
+                defer { markingSeen.remove(n.id) }
+                do {
+                    _ = try await feedback.run(
+                        loc.t("loading_user_notifications_see", "Marking notification as seen"),
+                        key: "notification-seen-\(n.id)"
+                    ) { try await UserService().markNotificationSeen(id: n.id) }
+                    seen.insert(n.id)
+                } catch is CancellationError {
+                    return
+                } catch {
+                    feedback.toast(Feedback.message(error))
+                }
+            }
         }
     }
 

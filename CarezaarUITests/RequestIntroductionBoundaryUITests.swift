@@ -53,7 +53,9 @@ final class RequestIntroductionBoundaryUITests: XCTestCase {
         XCTAssertTrue(request.waitForExistence(timeout: 45))
         try tapWhenReady(request)
         let title = f.label("match_match_button", "Request a Match")
-        XCTAssertTrue(app.navigationBars[title].waitForExistence(timeout: 10))
+        let heading = app.staticTexts["match-request-heading"].firstMatch
+        XCTAssertTrue(heading.waitForExistence(timeout: 10))
+        XCTAssertEqual(heading.label, title)
         let question = f.label("match_match_message", "Are you sure you want to match with this user? They should accept your request.")
         let questionText = app.staticTexts.matching(NSPredicate(format: "label == %@", question)).firstMatch
         XCTAssertTrue(questionText.exists, "Exact independent managed request confirmation required")
@@ -63,15 +65,16 @@ final class RequestIntroductionBoundaryUITests: XCTestCase {
         let placeholder = f.label("match_introduction_message", "You can introduce yourself here (Optional)")
         XCTAssertTrue((field.value as? String) == placeholder || (field.value as? String) == "",
                       "Optional introduction starts empty, without a synthetic default")
-        let confirm = app.navigationBars[title].buttons["match-request-confirm"]
+        let confirm = app.buttons["match-request-confirm"]
         XCTAssertTrue(confirm.exists && confirm.isEnabled)
         XCTAssertEqual(confirm.label, f.label("match_match_title", "Match"))
         controlProof(questionText, "managed-request-question-only")
-        let cancel = app.navigationBars[title].buttons[f.label("general_cancel", "Cancel")]
+        let cancel = app.buttons["match-request-dismiss"]
+        XCTAssertEqual(cancel.label, f.label("general_cancel", "Cancel"))
         XCTAssertTrue(cancel.exists && cancel.isHittable)
         cancel.tap()
         XCTAssertTrue(request.waitForExistence(timeout: 10))
-        XCTAssertFalse(app.navigationBars[title].exists)
+        XCTAssertFalse(heading.exists)
         XCTAssertEqual(count("POST /api/users/matches"), 0, "Cancel of optional empty introduction must not submit")
         XCTAssertEqual(try profile(f.profileEndpoint, token: f.primaryToken, expectedUser: f.peerID)["match_status"] as? String, "none")
         XCTAssertEqual(try profile(f.peerEndpoint, token: f.peerToken, expectedUser: f.primaryID)["match_status"] as? String, "none")

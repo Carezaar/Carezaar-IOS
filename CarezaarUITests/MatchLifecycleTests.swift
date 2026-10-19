@@ -94,7 +94,8 @@ final class MatchLifecycleTests: XCTestCase {
         assertAbsent(["Unverified", "Background Check", "Cancel", "Accept", "Unmatch"])
         shot("C1-profile-none")
         openSheet(request)
-        XCTAssertTrue(app.navigationBars["Request a Match"].waitForExistence(timeout: 10), "confirmation sheet")
+        XCTAssertTrue(app.staticTexts["match-request-heading"].waitForExistence(timeout: 10), "confirmation sheet")
+        XCTAssertEqual(app.staticTexts["match-request-heading"].label, "Request a Match")
         XCTAssertTrue(text("They should accept your request").exists, "confirmation message")
         shot("C2-request-sheet")
         app.navigationBars.buttons["Cancel"].tap()
@@ -177,7 +178,8 @@ final class MatchLifecycleTests: XCTestCase {
         signIn(env["QA_EMAIL"], env["QA_PASSWORD"], push: "CaregiverDetails/\(t.caregiverId)")
         XCTAssertTrue(button("Request a Match").waitForExistence(timeout: 30), "after reject: Request a Match")
         openSheet(button("Request a Match"))
-        XCTAssertTrue(app.navigationBars["Request a Match"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["match-request-heading"].waitForExistence(timeout: 10))
+        XCTAssertEqual(app.staticTexts["match-request-heading"].label, "Request a Match")
         app.navigationBars.buttons["Match"].tap()
         XCTAssertTrue(button("Cancel").waitForExistence(timeout: 30))
         XCTAssertEqual(try status(of: t.caregiverId, as: t.client), "sent")
@@ -198,7 +200,8 @@ final class MatchLifecycleTests: XCTestCase {
         signIn(env["QA_CG_EMAIL"], env["QA_CG_PASSWORD"], push: "ClientDetails/\(t.clientId)")
         XCTAssertTrue(button("Request a Match").waitForExistence(timeout: 30))
         openSheet(button("Request a Match"))
-        XCTAssertTrue(app.navigationBars["Request a Match"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["match-request-heading"].waitForExistence(timeout: 10))
+        XCTAssertEqual(app.staticTexts["match-request-heading"].label, "Request a Match")
         let field = app.textViews.firstMatch.exists ? app.textViews.firstMatch : app.textFields.firstMatch
         field.tap(); field.typeText("Hi from the caregiver \(run). Available weekdays.")
         app.navigationBars.buttons["Match"].tap()
@@ -454,10 +457,10 @@ final class MatchLifecycleTests: XCTestCase {
 
     /// Taps Request a Match once the busy card is gone; a tap while it shows is ignored.
     private func openSheet(_ request: XCUIElement) {
-        for _ in 0..<3 where !app.navigationBars["Request a Match"].exists {
+        for _ in 0..<3 where !app.staticTexts["match-request-heading"].exists {
             _ = busy.waitForNonExistence(timeout: 30)
             request.tap()
-            _ = app.navigationBars["Request a Match"].waitForExistence(timeout: 5)
+            _ = app.staticTexts["match-request-heading"].waitForExistence(timeout: 5)
         }
     }
 

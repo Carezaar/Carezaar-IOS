@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CarezaarTermsOfUseURL</key>
+    <string>$(CAREZAAR_TERMS_OF_USE_URL)</string>
+    <key>CarezaarPrivacyPolicyURL</key>
+    <string>$(CAREZAAR_PRIVACY_POLICY_URL)</string>
+</dict>
+</plist>

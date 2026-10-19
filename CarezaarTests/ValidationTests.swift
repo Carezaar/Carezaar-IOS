@@ -25,7 +25,7 @@ final class ValidationTests: XCTestCase {
     func testSignUpContinueReportsEveryEmptyFieldAtOnce() {
         let problems = SignUpCredentialsValidation.problems(email: " ", password: "", confirmation: "", accepted: false, text: text)
         XCTAssertEqual(problems, [.email: "<general_required>", .password: "<general_required>",
-                                  .confirmation: "<general_required>", .agreement: "<signup_credentials_accept_required>"])
+                                  .confirmation: "<general_required>"])
     }
 
     func testSignUpInvalidEmailMismatchAndFirstUnmetPasswordRule() {
@@ -44,9 +44,47 @@ final class ValidationTests: XCTestCase {
                        "<signup_credentials_password_validation_1_special_symbol>")
     }
 
+    func testAgreementIsLastGateAfterValidFields() {
+        let result = SignUpCredentialsValidation.problems(email: "test@example.com", password: "Abcdefg1!", confirmation: "Abcdefg1!", accepted: false, text: text)
+        XCTAssertEqual(result, [.agreement: "<signup_credentials_accept_required>"])
+    }
+
     func testSignUpValidFormHasNoProblems() {
         XCTAssertTrue(SignUpCredentialsValidation.problems(email: " a@b.co ", password: "Abcdefg1!", confirmation: "Abcdefg1!",
                                                            accepted: true, text: text).isEmpty)
     }
 
+}
+
+
+final class LegalConfigurationTests: XCTestCase {
+    func testBuiltApplicationContainsLegalURLConfigurationKeysEvenWhenUnconfigured() throws {
+        XCTAssertEqual(Bundle.main.bundleIdentifier, "com.aariz51.carezaar", "Inspect the built application host, not a fabricated configuration dictionary")
+        for key in [LegalDocumentConfiguration.termsURLKey, LegalDocumentConfiguration.privacyURLKey] {
+            let value = try XCTUnwrap(Bundle.main.object(forInfoDictionaryKey: key) as? String,
+                                     "Built app Info.plist must contain \(key), including an empty string when unconfigured")
+            XCTAssertFalse(value.contains("$("), "Built URL setting was not expanded")
+            XCTAssertNoThrow(try LegalDocumentConfiguration.httpsURL(value))
+        }
+    }
+    func testMissingLegalAddressDiffersFromInvalidConfiguredAddress() throws {
+        XCTAssertNil(try LegalDocumentConfiguration.httpsURL(nil))
+        XCTAssertNil(try LegalDocumentConfiguration.httpsURL("  "))
+        XCTAssertEqual(try LegalDocumentConfiguration.httpsURL(" https://documents.example/terms.pdf ")?.absoluteString,
+                       "https://documents.example/terms.pdf")
+        for value in ["http://documents.example/terms", "file:///terms.pdf", "javascript:alert(1)", "https://user:secret@documents.example/terms"] {
+            XCTAssertThrowsError(try LegalDocumentConfiguration.httpsURL(value))
+        }
+    }
+    func testEveryLegalOpeningBuildsCacheBypassingRequestWithoutAuthorization() throws {
+        let url = try XCTUnwrap(URL(string: "https://documents.example/privacy.pdf"))
+        for _ in 0..<2 {
+            let request = LegalDocumentConfiguration.request(for: url)
+            XCTAssertEqual(request.url, url)
+            XCTAssertEqual(request.cachePolicy, .reloadIgnoringLocalAndRemoteCacheData)
+            XCTAssertEqual(request.value(forHTTPHeaderField: "Cache-Control"), "no-cache, no-store")
+            XCTAssertEqual(request.value(forHTTPHeaderField: "Pragma"), "no-cache")
+            XCTAssertNil(request.value(forHTTPHeaderField: "Authorization"))
+        }
+    }
 }

@@ -73,7 +73,7 @@ final class AuthBoundaryUITests: XCTestCase {
             assertGate(caseID: "missing-confirmation-\(role)", expected: false, manifest: "P06-037 (confirmation subset)")
             enterPasswords(validPassword, confirmation: validPassword)
             setTerms(false)
-            assertGate(caseID: "missing-terms-\(role)", expected: false, manifest: "P03-002")
+            assertGate(caseID: "missing-terms-\(role)", expected: false, manifest: "P03-002", agreementOnly: true)
 
             // Parity v3 C2: the Terms of Use opens in an in-app viewer; viewing it
             // never ticks the agreement (the old license sheet is gone).
@@ -84,7 +84,7 @@ final class AuthBoundaryUITests: XCTestCase {
             bar.buttons["OK"].tap()
             XCTAssertTrue(bar.waitForNonExistence(timeout: 10), "Viewer did not close")
             XCTAssertFalse(terms.isSelected, "Viewing the Terms of Use must not accept the agreement")
-            assertGate(caseID: "terms-viewer-dismiss-\(role)", expected: false, manifest: "P03-002")
+            assertGate(caseID: "terms-viewer-dismiss-\(role)", expected: false, manifest: "P03-002", agreementOnly: true)
             setTerms(true)
             assertGate(caseID: "terms-accepted-\(role)", expected: true, manifest: "P03-002")
 
@@ -219,6 +219,80 @@ final class AuthBoundaryUITests: XCTestCase {
         }
     }
 
+    /// Capture-only diagnosis: PASS establishes delivered values/state and paired
+    /// screenshots, never that secure dots painted. Independent raster review is required.
+    func testSyntheticSecurePaintAcrossVisibilityAndFocusTransitions() throws {
+        let environment = ProcessInfo.processInfo.environment
+        guard environment["QA_HOST_MASK_CAPTURE"] == "1",
+              let directory = environment["QA_SHOT_DIR"] else {
+            throw XCTSkip("Run only with the approved paired host simulator-capture coordinator")
+        }
+        let folder = URL(fileURLWithPath: directory)
+        func capture(_ role: String, _ name: String, _ phase: String, _ field: XCUIElement) throws {
+            XCTAssertTrue(field.exists && field.isHittable)
+            let tag = "secure-paint-\(role)-\(name)-\(phase)"
+            let crop = XCTAttachment(screenshot: field.screenshot())
+            crop.name = tag + "-xctest-field"; crop.lifetime = .keepAlways; add(crop)
+            let whole = XCTAttachment(screenshot: app.screenshot())
+            whole.name = tag + "-xctest-screen"; whole.lifetime = .keepAlways; add(whole)
+            let request = folder.appendingPathComponent(tag + ".capture-request.json")
+            let acknowledgement = folder.appendingPathComponent(tag + ".capture-complete.json")
+            let payload: [String: Any] = ["stage": tag, "fieldFrame": [field.frame.minX,
+                field.frame.minY, field.frame.width, field.frame.height], "syntheticOnly": true]
+            try JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys]).write(to: request, options: .atomic)
+            let captured = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+                FileManager.default.fileExists(atPath: acknowledgement.path)
+            }, object: nil)
+            XCTAssertEqual(XCTWaiter.wait(for: [captured], timeout: 20), .completed,
+                           "Actual paired simctl screenshot is required; no fabricated capture acknowledgement")
+            let data = try Data(contentsOf: acknowledgement)
+            let result = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+            XCTAssertEqual(result["captured"] as? Bool, true)
+            XCTAssertEqual(result["stage"] as? String, tag)
+            noSubmission()
+            for rule in rules { XCTAssertTrue(semantic("\(rule), met").exists) }
+            record(["case": tag, "syntheticValueRetained": true, "actualHostCapture": true,
+                    "noSubmission": true, "rasterVerdict": "independent review required"])
+        }
+        for role in ["client", "caregiver"] {
+            launch("SignUpCredentials/\(role)")
+            replace(app.textFields["Enter your email address..."], with: "someone@example.com")
+            enterPasswords(validPassword, confirmation: validPassword)
+            setTerms(true)
+            for (name, identifier) in [("password", "Enter your password..."), ("confirmation", "Confirm Password")] {
+                let secure = app.secureTextFields[identifier]
+                scrollTo(secure); assertEightCharacterMask(secure)
+                try capture(role, name, "default-secure", secure)
+                try tapPasswordEye("Show password", beside: secure)
+                let visible = app.textFields[identifier]
+                XCTAssertTrue(visible.waitForExistence(timeout: 5))
+                XCTAssertEqual(visible.value as? String, validPassword)
+                try capture(role, name, "revealed-exact", visible)
+                try tapPasswordEye("Hide password", beside: visible)
+                let hidden = app.secureTextFields[identifier]
+                XCTAssertTrue(hidden.waitForExistence(timeout: 5)); assertEightCharacterMask(hidden)
+                try capture(role, name, "hide-before-further-actions", hidden)
+                Thread.sleep(forTimeInterval: 1)
+                assertEightCharacterMask(hidden)
+                try capture(role, name, "hide-after-one-second", hidden)
+                replace(app.textFields["Enter your email address..."], with: "someone@example.com")
+                scrollTo(hidden); hidden.tap()
+                if app.buttons["Close"].exists { app.buttons["Close"].tap(); hidden.tap() }
+                dismissKeyboard(); assertEightCharacterMask(hidden)
+                try capture(role, name, "blur-refocus", hidden)
+                // Reproduce the original captures' review/Edit transition too.
+                assertGate(caseID: "secure-paint-review-\(role)-\(name)", expected: true, manifest: "P06-037")
+                scrollTo(hidden); assertEightCharacterMask(hidden)
+                try capture(role, name, "review-edit-return", hidden)
+                try tapPasswordEye("Show password", beside: hidden)
+                XCTAssertEqual(app.textFields[identifier].value as? String, validPassword,
+                               "Final plaintext witness must prove all capture stages retained the exact synthetic value")
+                try tapPasswordEye("Hide password", beside: app.textFields[identifier])
+                assertEightCharacterMask(app.secureTextFields[identifier])
+            }
+        }
+    }
+
     private func tapPasswordEye(_ label: String, beside field: XCUIElement) throws {
         scrollTo(field)
         XCTAssertTrue(field.exists && field.isHittable, "Eye target input is unavailable")
@@ -298,7 +372,7 @@ final class AuthBoundaryUITests: XCTestCase {
     /// Parity v3 C1: Continue is always active. A valid form opens the email review
     /// (closed again with Edit, never confirmed); an invalid one shows its problems
     /// under the fields and opens nothing.
-    private func assertGate(caseID: String, expected: Bool, manifest: String, extra: [String: Any] = [:]) {
+    private func assertGate(caseID: String, expected: Bool, manifest: String, agreementOnly: Bool = false, extra: [String: Any] = [:]) {
         scrollTo(next)
         XCTAssertTrue(next.exists && next.isHittable && next.isEnabled, "Continue must always be active")
         next.tap()
@@ -311,7 +385,14 @@ final class AuthBoundaryUITests: XCTestCase {
             XCTAssertTrue(confirm.waitForNonExistence(timeout: 10))
         } else {
             let anyError = app.staticTexts.matching(NSPredicate(format: "identifier BEGINSWITH %@", "signup-error-")).firstMatch
-            XCTAssertTrue(anyError.exists, "An invalid form must show its problem under the field")
+            if agreementOnly {
+                // iOS v4 C1 supersedes the former inline agreement error.
+                XCTAssertTrue(app.staticTexts["Please accept the license agreement to continue."].waitForExistence(timeout: 5))
+                XCTAssertFalse(app.staticTexts["signup-error-agreement"].exists)
+                XCTAssertFalse(anyError.exists, "Valid credential fields must not acquire errors for unaccepted consent")
+            } else {
+                XCTAssertTrue(anyError.exists, "An invalid field must show its problem under the field")
+            }
         }
         noSubmission()
         var evidence = extra
@@ -376,7 +457,11 @@ final class AuthBoundaryUITests: XCTestCase {
         guard app.keyboards.firstMatch.exists else { return }
         let done = app.buttons.matching(NSPredicate(format: "label IN %@", ["Done", "OK"])).firstMatch
         if done.exists && done.isHittable { done.tap() }
-        else if app.keyboards.buttons["Return"].exists { app.keyboards.buttons["Return"].tap() }
+        else if app.keyboards.buttons["Return"].exists,
+                app.keyboards.buttons["Return"].isHittable,
+                app.frame.intersects(app.keyboards.buttons["Return"].frame) {
+            app.keyboards.buttons["Return"].tap()
+        }
         else { app.swipeDown(velocity: .slow) }
     }
 

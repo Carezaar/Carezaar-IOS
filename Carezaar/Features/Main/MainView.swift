@@ -330,11 +330,11 @@ struct MatchesTab: View {
     }
 
     private func meta(_ icon: String, bold: String, rest: String) -> some View {
-        HStack(spacing: 6) {
-            AppIcon(name: icon, size: 20, tint: Theme.Palette.primary)
-            Text(bold).font(Theme.Typography.title(18)).foregroundStyle(Color(hex: 0x5A6069))
-            Text(rest).font(Theme.Typography.body(13)).foregroundStyle(Theme.Palette.textSecondary)
-                .lineLimit(typeSize.isAccessibilitySize ? nil : 1)
+        HStack(alignment: .top, spacing: 6) {
+            AppIcon(name: icon, size: 20, tint: Theme.Palette.primary).fixedSize()
+            Text("\(Text(bold).font(Theme.Typography.title(18)).foregroundStyle(Color(hex: 0x5A6069))) \(Text(rest).font(Theme.Typography.body(13)).foregroundStyle(Theme.Palette.textSecondary))")
+                .fixedSize(horizontal: false, vertical: true)
+                .multilineTextAlignment(.leading)
         }
     }
 

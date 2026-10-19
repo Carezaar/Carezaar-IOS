@@ -1,4 +1,5 @@
 import XCTest
+import UIKit
 
 /// Native read-only boundaries shared by both roles. The runner selects the role
 /// through QA_EMAIL/QA_PASSWORD. No issue submission, account deletion or mail send.
@@ -117,7 +118,7 @@ final class HelpSettingsBoundaryUITests: XCTestCase {
         try launch("FAQ")
         let question = app.buttons["What is Carezaar?"]
         XCTAssertTrue(question.waitForExistence(timeout: 45))
-        let answer = app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "Carezaar is a platform")).firstMatch
+        let answer = app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", try CarezaarAPI.faqAnswerOpening(question: "What is Carezaar?"))).firstMatch
         XCTAssertFalse(question.isSelected); XCTAssertFalse(answer.exists)
         let baseline = count("GET /api/base/faqs")
         question.tap()
@@ -186,6 +187,102 @@ final class HelpSettingsBoundaryUITests: XCTestCase {
         try evidence("P15-003-category-boundary", ["categoriesChecked": checked, "allSelectedAfterReset": all.isSelected,
                      "extraFAQGETs": count("GET /api/base/faqs") - faqBaseline,
                      "extraCategoryGETs": count("GET /api/base/faq_categories") - categoryBaseline])
+    }
+
+    /// P04-024 needs every actual FAQ action, beyond the existing one-answer
+    /// boundary. Independent public HTML decoding verifies complete answer text.
+    func testEveryManagedFAQAnswerExpandsCollapsesAndBackReturnsWithoutRefetch() throws {
+        let response = try CarezaarAPI.callWithHTTPStatus("GET", "base/faqs?ts_cache=0")
+        XCTAssertEqual(response.status, 200)
+        let rows = try XCTUnwrap(response.body["result"] as? [[String: Any]])
+        XCTAssertEqual(rows.count, 14, "The reviewed live FAQ inventory changed; reconcile every identity before acceptance")
+        func normalized(_ text: String) -> String {
+            text.replacingOccurrences(of: "•", with: " ")
+                .split(whereSeparator: { $0.isWhitespace }).joined(separator: " ")
+        }
+        let references = try rows.map { row -> (id: Int, question: String, answer: String) in
+            let id = try XCTUnwrap((row["id"] as? NSNumber)?.intValue)
+            let translation = try XCTUnwrap((row["translations"] as? [[String: Any]])?.first {
+                ($0["language_id"] as? NSNumber)?.intValue == 1
+            })
+            let question = try XCTUnwrap(translation["question"] as? String)
+            let html = try XCTUnwrap(translation["answer"] as? String)
+            let decoded = try NSAttributedString(data: Data(html.utf8), options: [
+                .documentType: NSAttributedString.DocumentType.html,
+                .characterEncoding: String.Encoding.utf8.rawValue
+            ], documentAttributes: nil).string
+            XCTAssertFalse(question.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            XCTAssertFalse(normalized(decoded).isEmpty)
+            return (id, question, normalized(decoded))
+        }
+        XCTAssertEqual(Set(references.map(\.id)).count, 14)
+        XCTAssertEqual(Set(references.map(\.question)).count, 14, "Every managed question needs a distinct native target")
+        try launch("FAQ")
+        XCTAssertTrue(app.buttons["All"].waitForExistence(timeout: 45))
+        XCTAssertTrue(app.buttons["All"].isSelected)
+        let faqBaseline = count("GET /api/base/faqs")
+        let categoryBaseline = count("GET /api/base/faq_categories")
+        func answer(_ reference: (id: Int, question: String, answer: String)) -> XCUIElement? {
+            app.staticTexts.allElementsBoundByIndex.first { normalized($0.label) == reference.answer }
+        }
+        func revealQuestion(_ question: XCUIElement) {
+            for _ in 0..<24 {
+                let top = app.navigationBars.firstMatch.exists ? app.navigationBars.firstMatch.frame.maxY + 4 : app.frame.minY + 80
+                let viewport = CGRect(x: app.frame.minX + 8, y: top,
+                    width: app.frame.width - 16, height: app.frame.maxY - top - 24)
+                let visible = question.frame.intersection(viewport)
+                if question.exists && question.isHittable && !visible.isNull
+                    && visible.height >= min(44, question.frame.height) { return }
+                if question.frame.midY < viewport.midY { app.swipeDown(velocity: .slow) }
+                else { app.swipeUp(velocity: .slow) }
+            }
+            XCTFail("Exact managed FAQ question never became genuinely reachable")
+        }
+        var checked = [[String: Any]]()
+        for reference in references {
+            let question = app.buttons[reference.question]
+            XCTAssertTrue(question.exists, "Managed FAQ question is missing from the actual All list")
+            revealQuestion(question)
+            XCTAssertTrue(question.isHittable)
+            XCTAssertFalse(question.isSelected)
+            XCTAssertNil(answer(reference), "Collapsed question must not already expose its answer")
+            question.tap()
+            let expanded = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+                question.isSelected && answer(reference) != nil
+            }, object: nil)
+            XCTAssertEqual(XCTWaiter.wait(for: [expanded], timeout: 5), .completed,
+                           "The complete rendered answer must match this exact managed question")
+            let text = try XCTUnwrap(answer(reference))
+            XCTAssertEqual(normalized(text.label), reference.answer)
+            let image = XCTAttachment(screenshot: app.screenshot())
+            image.name = "FAQ-\(reference.id)-actual-expanded-public-content"
+            image.lifetime = .keepAlways; add(image)
+            revealQuestion(question)
+            XCTAssertTrue(question.isHittable)
+            question.tap()
+            let collapsed = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+                !question.isSelected && answer(reference) == nil
+            }, object: nil)
+            XCTAssertEqual(XCTWaiter.wait(for: [collapsed], timeout: 5), .completed)
+            XCTAssertEqual(count("GET /api/base/faqs"), faqBaseline)
+            XCTAssertEqual(count("GET /api/base/faq_categories"), categoryBaseline)
+            let record: [String: Any] = ["faqID": reference.id, "question": reference.question,
+                "fullManagedAnswerMatched": true, "expandedSelected": true,
+                "collapsedDeselectedAndAnswerAbsent": true, "extraFAQGETs": 0, "extraCategoryGETs": 0]
+            checked.append(record)
+            try evidence("P04-024-FAQ-\(reference.id)-actual-toggle", record)
+        }
+        XCTAssertEqual(checked.count, 14)
+        let back = app.buttons["BackButton"]
+        XCTAssertTrue(back.exists && back.isHittable); back.tap()
+        XCTAssertTrue(app.buttons["Messages"].firstMatch.waitForExistence(timeout: 10))
+        XCTAssertFalse(app.buttons["All"].exists)
+        XCTAssertFalse(app.navigationBars["FAQ"].exists)
+        XCTAssertEqual(count("GET /api/base/faqs"), faqBaseline)
+        XCTAssertEqual(count("GET /api/base/faq_categories"), categoryBaseline)
+        try evidence("P04-024-all-managed-FAQ-controls", ["questions": checked,
+            "checkedCount": checked.count, "backReturnedToMain": true,
+            "extraFAQGETs": 0, "extraCategoryGETs": 0])
     }
 
     /// Support-form required gates complement the prior blank Subject test:

@@ -86,12 +86,18 @@ struct UserService: Sendable {
         return data
     }
 
-    /// Start-of-day in UTC, as epoch seconds — matches
-    /// `LocalDate.atStartOfDay(ZoneOffset.UTC).toEpochSecond()` in the Android client.
-    static func epochDay(_ date: Date) -> String {
-        var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
-        let start = calendar.startOfDay(for: date)
+    /// Preserve the selected local calendar day, then encode its UTC midnight.
+    /// Rounding the Date's instant in UTC can move a date-only picker to the
+    /// preceding/following day because it also carries an unshown clock time.
+    /// This matches Android's LocalDate.atStartOfDay(ZoneOffset.UTC).
+    static func epochDay(_ date: Date, timeZone: TimeZone = .current) -> String {
+        var selectedCalendar = Calendar(identifier: .gregorian)
+        selectedCalendar.timeZone = timeZone
+        let day = selectedCalendar.dateComponents([.era, .year, .month, .day], from: date)
+        var utc = Calendar(identifier: .gregorian)
+        utc.timeZone = TimeZone(secondsFromGMT: 0)!
+        // Components extracted from a Gregorian date always form a valid UTC day.
+        let start = utc.date(from: day)!
         return String(Int(start.timeIntervalSince1970))
     }
 

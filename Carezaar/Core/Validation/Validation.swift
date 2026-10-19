@@ -56,7 +56,7 @@ enum SignUpCredentialsValidation {
         else if confirmation != password {
             problems[.confirmation] = text("signup_credentials_password_match", "Passwords do not match.")
         }
-        if !accepted {
+        if problems.isEmpty && !accepted {
             problems[.agreement] = text("signup_credentials_accept_required", "Please accept the license agreement to continue.")
         }
         return problems

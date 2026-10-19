@@ -11,10 +11,12 @@ final class SessionNetworkTests: XCTestCase {
     private var password: String { env["QA_PASSWORD"] ?? "" }
     private let run = "n\(Int(Date().timeIntervalSince1970) % 1_000_000)"
     private var anonymousLogoutEvidenceOnly = false
+    private var actualRevocationRecovered = false
 
     override func setUp() {
         continueAfterFailure = false
         app = XCUIApplication()
+        actualRevocationRecovered = false
     }
 
     override func tearDown() {
@@ -395,6 +397,78 @@ final class SessionNetworkTests: XCTestCase {
         XCTAssertEqual(requestCount("POST /api/auth/login"), 1)
         XCTAssertGreaterThanOrEqual(requestCount("GET /api/auth/info"), 1)
         recordSessionEvidence("dead-session-fresh-login", fixture: fixture)
+    }
+
+    /// Actual official logout invalidates an owned access credential while the
+    /// Debug seam preserves its saved pair. No locally corrupted JWT is used.
+    func testActualServerRevokedSavedSessionReturnsToIntroAndFreshLoginRecovers() throws {
+        anonymousLogoutEvidenceOnly = true
+        let fixture = try ownedPrimaryFixture()
+        let expectedID = try XCTUnwrap(env[fixture.role == "client" ? "QA_CLIENT_USER_ID" : "QA_CG_ID"])
+        app.launchEnvironment["QA_REVOKE_EXPECTED_ROLE"] = fixture.role
+        app.launchEnvironment["QA_REVOKE_EXPECTED_USER_ID"] = expectedID
+        // A fatal assertion must still recover this exact owned account. This
+        // creates a fresh auth session only; no relationship/profile write.
+        addTeardownBlock { [self] in
+            if !actualRevocationRecovered {
+                launchPrimarySession(["--qa-signout", "--qa-login-env"])
+                XCTAssertTrue(app.buttons["Messages"].waitForExistence(timeout: 60),
+                              "Owned session recovery failed after revocation test")
+                waitForMatchesLoaded(fixture)
+                assertNativeStoredTokenPresence(access: true, refresh: true)
+            }
+        }
+        launchPrimarySession(["--qa-signout", "--qa-login-env", "--qa-revoke-owned-saved-session"])
+        let witness = app.staticTexts["qa-owned-revocation"]
+        XCTAssertTrue(witness.waitForExistence(timeout: 60), "Actual server revocation staging did not finish")
+        let stagingProof = XCTAttachment(string: witness.label)
+        stagingProof.name = "actual-server-revocation-anonymous-witness"
+        stagingProof.lifetime = .keepAlways; add(stagingProof)
+        XCTAssertEqual(witness.label, "result=revoked;ownedIdentity=true;priorAccessVerified=true;postAccessRejected=true;savedPairUnchanged=true;generationUnchanged=true;logoutAttempts=1",
+                       "Actual server rejection and unchanged saved pair are prerequisites, not assumed")
+        XCTAssertEqual(requestCount("DELETE /api/auth/logout"), 1)
+        assertNativeStoredTokenPresence(access: true, refresh: true)
+        // launch() terminates immediately; no signout, hidden login or token
+        // corruption can manufacture the following ordinary restoration verdict.
+        launchPrimarySession([])
+        XCTAssertFalse(app.launchArguments.contains("--qa-signout"))
+        XCTAssertFalse(app.launchArguments.contains("--qa-login-env"))
+        XCTAssertFalse(app.launchArguments.contains("--qa-revoke-owned-saved-session"))
+        let signIn = app.buttons["Sign in"].firstMatch
+        let settled = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            self.requestCount("GET /api/auth/info") >= 1
+                && self.requestCount("PUT /api/auth/refresh") >= 1
+                && (signIn.exists || self.app.buttons["Messages"].exists)
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [settled], timeout: 60), .completed)
+        recordSessionEvidence("actual-revoked-pair-ordinary-relaunch-outcome", fixture: fixture)
+        XCTAssertTrue(signIn.exists,
+                      "Actual server logout did not invalidate the saved refresh pair; preserve this genuine outcome")
+        XCTAssertFalse(app.buttons["Messages"].exists)
+        XCTAssertEqual(requestCount("PUT /api/auth/refresh"), 1, "One bounded actual renewal attempt required")
+        XCTAssertEqual(requestCount("POST /api/auth/login"), 0)
+        XCTAssertEqual(requestCount("DELETE /api/auth/logout"), 0)
+        assertNativeStoredTokenPresence(access: false, refresh: false)
+        let unstable = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            !signIn.exists || self.app.buttons["Messages"].exists
+                || self.requestCount("PUT /api/auth/refresh") != 1
+        }, object: nil)
+        unstable.isInverted = true
+        XCTAssertEqual(XCTWaiter.wait(for: [unstable], timeout: 3), .completed)
+        launchPrimarySession([])
+        XCTAssertTrue(signIn.waitForExistence(timeout: 60))
+        assertNativeStoredTokenPresence(access: false, refresh: false)
+        for path in ["GET /api/auth/info", "PUT /api/auth/refresh", "POST /api/auth/login", "DELETE /api/auth/logout"] {
+            XCTAssertEqual(requestCount(path), 0, "Cleared revoked pair must not be retried on the next launch")
+        }
+        recordSessionEvidence("actual-revoked-pair-next-launch-no-auth", fixture: fixture)
+        launchPrimarySession(["--qa-login-env"])
+        XCTAssertTrue(app.buttons["Messages"].waitForExistence(timeout: 60))
+        waitForMatchesLoaded(fixture)
+        XCTAssertEqual(requestCount("POST /api/auth/login"), 1)
+        assertNativeStoredTokenPresence(access: true, refresh: true)
+        recordSessionEvidence("actual-revoked-pair-fresh-login-recovered", fixture: fixture)
+        actualRevocationRecovered = true
     }
 
     /// Force quit and relaunch, and background/foreground, keep the session and screen.

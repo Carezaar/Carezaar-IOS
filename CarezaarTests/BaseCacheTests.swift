@@ -229,6 +229,110 @@ final class BaseCacheTests: XCTestCase {
         for path in ["languages", "states", "media", "faqs", "faq_categories"] { XCTAssertEqual(paths.filter { $0 == path }.count, 1) }
     }
 
+    func testMalformedChangedSnapshotsStayAtomicAndConcurrentFreshRetryRecovers() async throws {
+        let variants: [(String, Data)] = [
+            ("malformed-json", Data("{".utf8)),
+            ("null-result", Data(#"{"result":null,"message":"Successful Operation"}"#.utf8)),
+            ("invalid-id-type", Data(#"{"result":[{"id":{"unexpected":1},"translations":[]}],"message":"Successful Operation"}"#.utf8))
+        ]
+        let datasets = BaseTable.allCases.map(\.rawValue)
+            + ["languages", "states", "media", "faqs", "faq_categories"]
+        XCTAssertEqual(datasets.count, 22)
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+        func memory(_ store: BaseDataStore) throws -> [String: Data] {
+            var result: [String: Data] = [:]
+            for table in BaseTable.allCases { result[table.rawValue] = try encoder.encode(store.items(table)) }
+            result["languages"] = try encoder.encode(store.languages)
+            result["states"] = try encoder.encode(store.states)
+            result["media"] = try encoder.encode(store.media)
+            result["faqs"] = try encoder.encode(store.faqs)
+            result["faq_categories"] = try encoder.encode(store.faqCategories)
+            return result
+        }
+        let service = BaseService(client: APIClient(session: StubHTTP.session()))
+        let oldURL = folder.appendingPathComponent("valid-before-malformed.json")
+        StubHTTP.handler = { request in (200, Self.response(path: request.url!.lastPathComponent, stamp: 10)) }
+        let old = BaseDataStore(service: service, cacheURL: oldURL)
+        await old.bootstrap()
+        XCTAssertTrue(old.isReady)
+        let oldMemory = try memory(old)
+        let oldBytes = try Data(contentsOf: oldURL)
+
+        for (name, bad) in variants {
+            // A changed marker must not expose partial new lists or commit its marker.
+            StubHTTP.handler = { request in
+                let path = request.url!.lastPathComponent
+                return (200, path == "roles" ? bad : Self.response(path: path, stamp: 11))
+            }
+            await old.bootstrap()
+            XCTAssertTrue(old.isReady, name + ": valid old snapshot remains usable")
+            XCTAssertFalse(old.failed, name + ": this is not an uncached failure")
+            XCTAssertEqual(try memory(old), oldMemory, name + ": all22 public datasets remain atomic")
+            XCTAssertEqual(try Data(contentsOf: oldURL), oldBytes, name + ": disk/marker unchanged")
+
+            let freshURL = folder.appendingPathComponent("fresh-" + name + ".json")
+            let fresh = BaseDataStore(service: service, cacheURL: freshURL)
+            let firstInfoStarted = expectation(description: name + " first info held")
+            let secondCallerEntered = expectation(description: name + " second bootstrap entered")
+            let releaseInfo = DispatchSemaphore(value: 0)
+            let lock = NSLock()
+            var calls: [String] = []
+            var gateReleased = false
+            StubHTTP.handler = { request in
+                let path = request.url!.lastPathComponent
+                lock.lock(); calls.append(path); let first = path == "info" && calls.filter { $0 == "info" }.count == 1; lock.unlock()
+                if first {
+                    firstInfoStarted.fulfill()
+                    let released = releaseInfo.wait(timeout: .now() + 5) == .success
+                    lock.lock(); gateReleased = released; lock.unlock()
+                }
+                return (200, path == "roles" ? bad : Self.response(path: path, stamp: 11))
+            }
+            // Begin one public call, keep info pending, then enter the second on MainActor.
+            // Fulfilling secondCallerEntered is synchronous immediately before bootstrap;
+            // bootstrap must join the installed task before its first suspension.
+            let first = Task { await fresh.bootstrap() }
+            await fulfillment(of: [firstInfoStarted], timeout: 2)
+            let second = Task { secondCallerEntered.fulfill(); await fresh.bootstrap() }
+            await fulfillment(of: [secondCallerEntered], timeout: 2)
+            releaseInfo.signal()
+            await first.value
+            await second.value
+            XCTAssertTrue(gateReleased, name + ": barrier must not expire")
+            XCTAssertEqual(calls.filter { $0 == "info" }.count, 1, name + ": two failed callers share one info request")
+            XCTAssertEqual(calls.filter { $0 != "info" }.sorted(), datasets.sorted(), name + ": one complete attempt, no decoding retries/duplicate lists")
+            XCTAssertFalse(fresh.isReady)
+            XCTAssertTrue(fresh.failed)
+            XCTAssertTrue(fresh.tables.isEmpty && fresh.languages.isEmpty && fresh.media.isEmpty && fresh.states.isEmpty && fresh.faqs.isEmpty && fresh.faqCategories.isEmpty)
+            XCTAssertFalse(FileManager.default.fileExists(atPath: freshURL.path), name + ": invalid first snapshot must not persist")
+
+            // Same instance: a stale completed failed task must not suppress a real retry.
+            calls = []
+            StubHTTP.handler = { request in
+                let path = request.url!.lastPathComponent
+                lock.lock(); calls.append(path); lock.unlock()
+                return (200, Self.response(path: path, stamp: 11))
+            }
+            await fresh.bootstrap()
+            XCTAssertTrue(fresh.isReady)
+            XCTAssertFalse(fresh.failed)
+            XCTAssertEqual(calls.filter { $0 == "info" }.count, 1)
+            XCTAssertEqual(calls.filter { $0 != "info" }.sorted(), datasets.sorted(), name + ": healthy retry downloads each required dataset exactly once")
+            XCTAssertEqual(fresh.items(.roles).first?.code, "stamp-11")
+            let persisted = try Data(contentsOf: freshURL)
+            let reopened = BaseDataStore(service: service, cacheURL: freshURL)
+            XCTAssertEqual(try memory(reopened), try memory(fresh), name + ": persisted complete snapshot reopens exactly")
+            XCTAssertEqual(try Data(contentsOf: freshURL), persisted)
+        }
+        // The rejected changed marker remains eligible: one final healthy retry commits it.
+        StubHTTP.handler = { request in (200, Self.response(path: request.url!.lastPathComponent, stamp: 11)) }
+        await old.bootstrap()
+        XCTAssertTrue(old.isReady)
+        XCTAssertEqual(old.items(.roles).first?.code, "stamp-11")
+        XCTAssertNotEqual(try Data(contentsOf: oldURL), oldBytes)
+    }
+
     func testMissingReferenceInfoCannotCreateUnversionedFirstSnapshot() async {
         let lock = NSLock()
         var paths: [String] = []

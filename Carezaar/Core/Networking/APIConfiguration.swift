@@ -20,9 +20,28 @@ enum APIConfiguration {
     static let defaultPageSize = 10
 }
 
-/// The sign-up consent's documents (parity review v3, C2): the client's Terms of Use
-/// and Privacy Policy PDFs (17 Oct 2026), bundled under `Assets/legal`.
+/// Client-supplied PDFs remain the interim fallback only when no server URL is
+/// configured. A configured invalid URL or remote failure must never show stale text.
 enum LegalDocumentConfiguration {
     static let termsOfUseFile = "terms-of-use"
     static let privacyPolicyFile = "privacy-policy"
+    static let termsURLKey = "CarezaarTermsOfUseURL"
+    static let privacyURLKey = "CarezaarPrivacyPolicyURL"
+
+    static func httpsURL(_ raw: String?) throws -> URL? {
+        guard let value = raw?.trimmingCharacters(in: .whitespacesAndNewlines), !value.isEmpty else { return nil }
+        guard let url = URL(string: value), url.scheme?.lowercased() == "https",
+              let host = url.host, !host.isEmpty, url.user == nil, url.password == nil else {
+            throw URLError(.badURL)
+        }
+        return url
+    }
+
+    static func request(for url: URL) -> URLRequest {
+        var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData,
+                                 timeoutInterval: APIConfiguration.requestTimeout)
+        request.setValue("no-cache, no-store", forHTTPHeaderField: "Cache-Control")
+        request.setValue("no-cache", forHTTPHeaderField: "Pragma")
+        return request
+    }
 }

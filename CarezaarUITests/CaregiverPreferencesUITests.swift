@@ -9,11 +9,15 @@ import UIKit
 final class CaregiverPreferencesUITests: XCTestCase {
     private var app: XCUIApplication!
     private var restoreFixture: Fixture?
+    private var persistenceBackupURL: URL?
+    private var persistenceStages: [[String: Any]] = []
     private var env: [String: String] { ProcessInfo.processInfo.environment }
 
     override func setUp() {
         continueAfterFailure = false
         app = XCUIApplication()
+        persistenceBackupURL = nil
+        persistenceStages = []
     }
 
     override func tearDown() {
@@ -31,6 +35,9 @@ final class CaregiverPreferencesUITests: XCTestCase {
         }
         XCTAssertNotNil(number(fixture.original["lat"]), "Persistence requires a saved fixture latitude")
         XCTAssertNotNil(number(fixture.original["lng"]), "Persistence requires a saved fixture longitude")
+        // Durable private full profile + exact official service payload precedes
+        // every possible mutation, including an interrupted/lost-ack native Save.
+        try preservePersistenceBaseline(fixture)
         // One -> multiple -> empty proves clearing a populated server selection,
         // rather than merely reopening a fixture that started empty.
         for count in [1, 2, 0] {
@@ -46,6 +53,7 @@ final class CaregiverPreferencesUITests: XCTestCase {
             // Re-check bearer identity immediately before every production UI save.
             try verifyIdentity(fixture)
             restoreFixture = fixture
+            try savePersistenceProgress(restored: false) // before possible transfer/lost ACK
             save.tap()
             XCTAssertTrue(save.waitForNonExistence(timeout: 60), "Native caregiver preference save did not return")
             try assertServerUnchanged(fixture, certificationIds: wanted)
@@ -62,6 +70,10 @@ final class CaregiverPreferencesUITests: XCTestCase {
                 proof(control, name: "saved-reopened-certifications-\(count)-chip-\(index + 1)")
             }
             try assertServerUnchanged(fixture, certificationIds: wanted)
+            persistenceStages.append(["savedCertificationCount": count,
+                "savedCertificationIDs": wanted.sorted(), "actualNativeSaveAndReopen": true,
+                "allNonCertificationFieldsUnchanged": true])
+            try savePersistenceProgress(restored: false)
         }
     }
 
@@ -437,6 +449,10 @@ final class CaregiverPreferencesUITests: XCTestCase {
         for key in ["lat", "lng"] {
             XCTAssertEqual(number(current[key]), number(fixture.original[key]), "Navigation changed saved caregiver coordinate")
         }
+        if persistenceBackupURL != nil {
+            let changed = try fullProfileDifferences(current, fixture.original, excludingCertifications: true)
+            XCTAssertTrue(changed.isEmpty, "Native certification update changed unrelated profile fields: \(changed.joined(separator: ","))")
+        }
     }
 
     private func verifyIdentity(_ fixture: Fixture) throws {
@@ -460,9 +476,68 @@ final class CaregiverPreferencesUITests: XCTestCase {
             XCTAssertEqual(response.status, 200, "Owned caregiver preference restoration was rejected")
             XCTAssertFalse(CarezaarAPI.result(response.body).isEmpty, "Restoration response has no caregiver profile")
             try assertServerUnchanged(fixture)
+            if persistenceBackupURL != nil {
+                let restored = try profile(fixture.token)
+                let changed = try fullProfileDifferences(restored, fixture.original, excludingCertifications: false)
+                guard changed.isEmpty else {
+                    try savePersistenceProgress(restored: false, failureKeys: changed)
+                    throw NSError(domain: "CaregiverBaselineRestoration", code: 1)
+                }
+                try savePersistenceProgress(restored: true)
+            }
         } catch {
-            XCTFail("Owned caregiver restoration failed; inspect the retained fixture privately before subsequent mutation tests")
+            try? savePersistenceProgress(restored: false, failureKeys: ["restoration-exception"])
+            XCTFail("Owned caregiver restoration failed; inspect the retained private baseline before subsequent mutation tests")
         }
+    }
+
+    private func preservePersistenceBaseline(_ fixture: Fixture) throws {
+        guard let path = env["QA_CAREGIVER_SKILLS_BACKUP_FILE"], path.hasPrefix("/") else {
+            throw XCTSkip("Explicit private durable QA_CAREGIVER_SKILLS_BACKUP_FILE required before any native Save")
+        }
+        let url = URL(fileURLWithPath: path)
+        guard !FileManager.default.fileExists(atPath: path) else {
+            throw NSError(domain: "CaregiverBaselineMustNotBeOverwritten", code: 1)
+        }
+        try verifyIdentity(fixture)
+        let current = try profile(fixture.token)
+        XCTAssertTrue(try fullProfileDifferences(current, fixture.original, excludingCertifications: false).isEmpty)
+        let form = try preferenceForm(fixture) // exact CaregiverService.sharedFields contract
+        let record: [String: Any] = ["schemaVersion": 1, "ownedCaregiverUserID": fixture.userId,
+            "fullProfile": fixture.original, "officialServiceFields": form,
+            "endpoint": "PUT caregivers/profile", "passwordsOrAuthTokensIncluded": false]
+        let data = try JSONSerialization.data(withJSONObject: record, options: [.sortedKeys, .prettyPrinted])
+        try data.write(to: url, options: .atomic)
+        try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: path)
+        persistenceBackupURL = url
+        try savePersistenceProgress(restored: true)
+    }
+
+    private func fullProfileDifferences(_ current: [String: Any], _ baseline: [String: Any],
+                                        excludingCertifications: Bool) throws -> [String] {
+        var different: [String] = []
+        for key in Set(current.keys).union(baseline.keys).sorted() {
+            if excludingCertifications && key == "certification_ids" { continue }
+            if current[key] == nil || baseline[key] == nil { different.append(key); continue }
+            func canonical(_ row: [String: Any]) throws -> Data {
+                let value: Any = key.hasSuffix("_ids") ? ids(row[key]).sorted() : (row[key] ?? NSNull())
+                return try JSONSerialization.data(withJSONObject: ["value": value], options: [.sortedKeys])
+            }
+            if try canonical(current) != canonical(baseline) { different.append(key) }
+        }
+        return different
+    }
+
+    private func savePersistenceProgress(restored: Bool, failureKeys: [String] = []) throws {
+        guard let backup = persistenceBackupURL else { return }
+        let record: [String: Any] = ["nativeSavedReopenedStates": persistenceStages,
+            "fullProfileRestoredAndVerified": restored, "failureKeys": failureKeys,
+            "unrelatedFieldsCompared": "all top-level and nested user fields; selection arrays sorted without dropping duplicates",
+            "officialServiceRestore": "PUT caregivers/profile (all15sharedFields)"]
+        let data = try JSONSerialization.data(withJSONObject: record, options: [.sortedKeys, .prettyPrinted])
+        let url = backup.appendingPathExtension("progress.json")
+        try data.write(to: url, options: .atomic)
+        try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: url.path)
     }
 
     private func profile(_ token: String) throws -> [String: Any] {

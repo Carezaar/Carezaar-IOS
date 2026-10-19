@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0E1226B72608415288618F7A /* OwnedClientRecoveryUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4A04F618D1841E2AD382857 /* OwnedClientRecoveryUITests.swift */; };
+		A016F9866044443599E314FE /* OwnedClientRecoveryJournal.swift in Sources */ = {isa = PBXBuildFile; fileRef = D733C495E32B4A4AAB3B8C51 /* OwnedClientRecoveryJournal.swift */; };
+		193B0EB7CE2C4B3887206EB7 /* NotificationSeenFailureUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19E31D39C9C148F99E4D2C17 /* NotificationSeenFailureUITests.swift */; };
+		87AF80A990D2867C95BE5AB3 /* NativeSavedCGProfileTransitionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51957FED9C8FCCB3275D5F8C /* NativeSavedCGProfileTransitionUITests.swift */; };
+		F01800112233445566778801 /* LegalRemoteUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F01800112233445566778802 /* LegalRemoteUITests.swift */; };
 		01355DB9A8DD1117E6114E09 /* Feedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2AFE40A366F4D2A3BCC0FFF /* Feedback.swift */; };
 		086A55E2E8BDCE398EFD9068 /* SessionNetworkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E048BFBBF614F7F29D13BF /* SessionNetworkTests.swift */; };
 		0A39CAF8E2CECD8046A8300D /* SelectionControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB10D89E7471F0CAF6774EA7 /* SelectionControls.swift */; };
@@ -114,6 +119,10 @@
 		745A8DE9EF3C4BB4BEFE3DA2 /* NativeBranchAcceptanceUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2007A79716F44CA7B4F23104 /* NativeBranchAcceptanceUITests.swift */; };
 		203191E391D249F190FA2ED9 /* PermissionSettingsBoundaryUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 769FB64717F24182A1788F99 /* PermissionSettingsBoundaryUITests.swift */; };
 		A86ECF822C264D61B78CD403 /* NotificationFallbackUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24A407C2DD36444AA92CDA89 /* NotificationFallbackUITests.swift */; };
+		00B3182E4417F5A51F06C13D /* NativeOwnedGraphJournal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E8B8E7E5A23E0EB1D0FF3DD /* NativeOwnedGraphJournal.swift */; };
+		C81CF8959A5B5F7898327468 /* NativeOwnedGraphJourneyUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FCB6A22CBF7313182E5BBD9 /* NativeOwnedGraphJourneyUITests.swift */; };
+		44FB36CD7D220E810E5562F2 /* NativeOwnedGraphPhaseJournal.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEB8E7331C5B16CBC56EAEB2 /* NativeOwnedGraphPhaseJournal.swift */; };
+		0FCC030AAF2693BDB168D257 /* NativeOwnedGraphPhasesUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DAEB29DA187E664F0239948 /* NativeOwnedGraphPhasesUITests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -134,6 +143,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		E4A04F618D1841E2AD382857 /* OwnedClientRecoveryUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OwnedClientRecoveryUITests.swift; sourceTree = "<group>"; };
+		D733C495E32B4A4AAB3B8C51 /* OwnedClientRecoveryJournal.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OwnedClientRecoveryJournal.swift; sourceTree = "<group>"; };
+		19E31D39C9C148F99E4D2C17 /* NotificationSeenFailureUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NotificationSeenFailureUITests.swift; sourceTree = "<group>"; };
+		51957FED9C8FCCB3275D5F8C /* NativeSavedCGProfileTransitionUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NativeSavedCGProfileTransitionUITests.swift; sourceTree = "<group>"; };
+		F01800112233445566778802 /* LegalRemoteUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LegalRemoteUITests.swift; sourceTree = "<group>"; };
 		02DE019E8CF40741FAEAEF05 /* AuthService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AuthService.swift; path = Services/AuthService.swift; sourceTree = "<group>"; };
 		040659663A5EDF7F521D7027 /* BaseDataStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BaseDataStore.swift; path = Core/Storage/BaseDataStore.swift; sourceTree = "<group>"; };
 		043F5CDB2226A260428F5607 /* DeviceCameraTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DeviceCameraTests.swift; sourceTree = "<group>"; };
@@ -243,6 +257,10 @@
 		2007A79716F44CA7B4F23104 /* NativeBranchAcceptanceUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeBranchAcceptanceUITests.swift; sourceTree = "<group>"; };
 		769FB64717F24182A1788F99 /* PermissionSettingsBoundaryUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionSettingsBoundaryUITests.swift; sourceTree = "<group>"; };
 		24A407C2DD36444AA92CDA89 /* NotificationFallbackUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationFallbackUITests.swift; sourceTree = "<group>"; };
+		6E8B8E7E5A23E0EB1D0FF3DD /* NativeOwnedGraphJournal.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NativeOwnedGraphJournal.swift; sourceTree = "<group>"; };
+		3FCB6A22CBF7313182E5BBD9 /* NativeOwnedGraphJourneyUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NativeOwnedGraphJourneyUITests.swift; sourceTree = "<group>"; };
+		AEB8E7331C5B16CBC56EAEB2 /* NativeOwnedGraphPhaseJournal.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NativeOwnedGraphPhaseJournal.swift; sourceTree = "<group>"; };
+		3DAEB29DA187E664F0239948 /* NativeOwnedGraphPhasesUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NativeOwnedGraphPhasesUITests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -404,9 +422,18 @@
 				370E31E44B39DF74E0EA9B8B /* CarezaarUITests.swift */,
 				043F5CDB2226A260428F5607 /* DeviceCameraTests.swift */,
 				8C12E7A213DE92E3653CE11B /* LiveAPI.swift */,
+				3FCB6A22CBF7313182E5BBD9 /* NativeOwnedGraphJourneyUITests.swift */,
+				6E8B8E7E5A23E0EB1D0FF3DD /* NativeOwnedGraphJournal.swift */,
+				3DAEB29DA187E664F0239948 /* NativeOwnedGraphPhasesUITests.swift */,
+				19E31D39C9C148F99E4D2C17 /* NotificationSeenFailureUITests.swift */,
+				E4A04F618D1841E2AD382857 /* OwnedClientRecoveryUITests.swift */,
+				D733C495E32B4A4AAB3B8C51 /* OwnedClientRecoveryJournal.swift */,
+				51957FED9C8FCCB3275D5F8C /* NativeSavedCGProfileTransitionUITests.swift */,
+				AEB8E7331C5B16CBC56EAEB2 /* NativeOwnedGraphPhaseJournal.swift */,
 				E0777E82702305DE66754FB9 /* MatchLifecycleTests.swift */,
 				3526773254951D939ADD03F5 /* RoleWalkthroughTests.swift */,
 				650EC760D3B1539CF491B1D0 /* ScreenSweepTests.swift */,
+				F01800112233445566778802 /* LegalRemoteUITests.swift */,
 				28E048BFBBF614F7F29D13BF /* SessionNetworkTests.swift */,
 				317D61B0D1FC5B5923605A71 /* SignupTests.swift */,
 				1C9089F81EE02078D9B52623 /* ClientUpdateUITests.swift */,
@@ -668,9 +695,18 @@
 				F8D6B5479228E9462FB76D3B /* CarezaarUITests.swift in Sources */,
 				8BB1D19E83DACAEB9063244C /* DeviceCameraTests.swift in Sources */,
 				8315D22239338AA27F4E0EB0 /* LiveAPI.swift in Sources */,
+				C81CF8959A5B5F7898327468 /* NativeOwnedGraphJourneyUITests.swift in Sources */,
+				00B3182E4417F5A51F06C13D /* NativeOwnedGraphJournal.swift in Sources */,
+				0FCC030AAF2693BDB168D257 /* NativeOwnedGraphPhasesUITests.swift in Sources */,
+				193B0EB7CE2C4B3887206EB7 /* NotificationSeenFailureUITests.swift in Sources */,
+				0E1226B72608415288618F7A /* OwnedClientRecoveryUITests.swift in Sources */,
+				A016F9866044443599E314FE /* OwnedClientRecoveryJournal.swift in Sources */,
+				87AF80A990D2867C95BE5AB3 /* NativeSavedCGProfileTransitionUITests.swift in Sources */,
+				44FB36CD7D220E810E5562F2 /* NativeOwnedGraphPhaseJournal.swift in Sources */,
 				45C280B36E0E7013779322B0 /* MatchLifecycleTests.swift in Sources */,
 				819935D98413CB574FEBD7EF /* RoleWalkthroughTests.swift in Sources */,
 				87CD9E6FF416E78E4AF707BD /* ScreenSweepTests.swift in Sources */,
+				F01800112233445566778801 /* LegalRemoteUITests.swift in Sources */,
 				086A55E2E8BDCE398EFD9068 /* SessionNetworkTests.swift in Sources */,
 				76EDDE7D5F58B60E34E66D88 /* SignupTests.swift in Sources */,
 				B37DB555365F4824509CF793 /* ClientUpdateUITests.swift in Sources */,
@@ -796,6 +832,9 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				CAREZAAR_TERMS_OF_USE_URL = "";
+				CAREZAAR_PRIVACY_POLICY_URL = "";
+				INFOPLIST_FILE = Carezaar/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Carezaar needs camera access so you can take a profile picture.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Carezaar uses your location to find care matches near you.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Carezaar needs access to your photos so you can set a profile picture.";
@@ -854,6 +893,9 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				CAREZAAR_TERMS_OF_USE_URL = "";
+				CAREZAAR_PRIVACY_POLICY_URL = "";
+				INFOPLIST_FILE = Carezaar/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Carezaar needs camera access so you can take a profile picture.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Carezaar uses your location to find care matches near you.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Carezaar needs access to your photos so you can set a profile picture.";

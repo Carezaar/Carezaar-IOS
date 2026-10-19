@@ -66,6 +66,336 @@ final class MatchStateMatrixUITests: XCTestCase {
             "chatSendCovered": false, "confirmationCovered": false, "greenRasterReviewRequired": true])
     }
 
+    /// Bounded Small exposure proof only; never touches deletion inputs/actions.
+    func testSmallDeletionFinalLossRowFullyExposesAboveFooterWithoutSubmission() throws {
+        let f = try preflight()
+        guard let folder = env["QA_SHOT_DIR"], folder.hasPrefix("/") else {
+            throw XCTSkip("Explicit private raster folder required")
+        }
+        let text = try XCTUnwrap(f.labels["delete_account_data_settings"])
+        XCTAssertFalse(text.isEmpty)
+        launchOwnedRoute("DeleteAccount")
+        XCTAssertTrue(app.navigationBars["Delete Account"].waitForExistence(timeout: 60))
+        XCTAssertLessThanOrEqual(app.frame.width, 400, "This allocation must use the actual Small viewport")
+        XCTAssertLessThanOrEqual(app.frame.height, 700)
+        let scroll = app.scrollViews.firstMatch
+        let footer = app.buttons[f.label("delete_account_action_delete", "Delete Account")].firstMatch
+        XCTAssertTrue(scroll.exists && footer.waitForExistence(timeout: 15))
+        XCTAssertFalse(footer.isEnabled, "No reason/acknowledgment was provided; deletion must remain disabled")
+        let ready = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            !self.app.staticTexts["Please wait..."].exists && footer.exists
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 45), .completed)
+        let target = app.staticTexts.matching(NSPredicate(format: "label == %@", text)).firstMatch
+        func frame(_ rect: CGRect) -> [Double] {
+            [Double(rect.minX), Double(rect.minY), Double(rect.width), Double(rect.height)]
+        }
+        func safeViewport() -> CGRect {
+            let navigation = app.navigationBars.firstMatch
+            let top = max(scroll.frame.minY, navigation.frame.maxY + 4)
+            let bottom = min(scroll.frame.maxY, footer.frame.minY - 8)
+            return CGRect(x: scroll.frame.minX + 1, y: top,
+                          width: scroll.frame.width - 2, height: max(0, bottom - top))
+        }
+        func save(_ name: String) throws {
+            let screenshot = app.screenshot()
+            let proof = XCTAttachment(screenshot: screenshot)
+            proof.name = "small-deletion-\(f.role)-\(name)"; proof.lifetime = .keepAlways; add(proof)
+            let url = URL(fileURLWithPath: folder).appendingPathComponent("small-deletion-\(f.role)-\(name).png")
+            try screenshot.pngRepresentation.write(to: url, options: .atomic)
+            try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: url.path)
+        }
+        let initial: [String: Any] = ["targetExists": target.exists,
+            "targetFrame": target.exists ? frame(target.frame) : [0.0, 0.0, 0.0, 0.0], "footerFrame": frame(footer.frame),
+            "safeViewport": frame(safeViewport()), "targetHittable": target.exists && target.isHittable]
+        try save("before-scroll")
+        var drags = 0
+        for _ in 0..<12 {
+            let safe = safeViewport()
+            if target.exists && target.isHittable && safe.contains(target.frame) { break }
+            XCTAssertGreaterThan(safe.height, 60)
+            let upward = !target.exists || target.frame.maxY > safe.maxY
+            let fromY = safe.minY + safe.height * (upward ? 0.75 : 0.25)
+            let toY = safe.minY + safe.height * (upward ? 0.25 : 0.75)
+            let origin = app.coordinate(withNormalizedOffset: .zero)
+            origin.withOffset(CGVector(dx: safe.midX, dy: fromY)).press(forDuration: 0.05,
+                thenDragTo: origin.withOffset(CGVector(dx: safe.midX, dy: toY)))
+            drags += 1
+        }
+        XCTAssertTrue(target.exists && target.isHittable)
+        XCTAssertEqual(target.label, text, "Complete managed final loss label must remain available")
+        XCTAssertTrue(safeViewport().contains(target.frame), "Complete final loss label must be above the actual fixed footer")
+        XCTAssertFalse(footer.isEnabled)
+        XCTAssertTrue(app.staticTexts["qa-request-counts"].exists)
+        let deleteRequests = app.staticTexts["qa-request-counts"].label.split(separator: "\n")
+            .filter { $0.hasPrefix("DELETE /api/") }
+            .compactMap { Int($0.split(separator: "=").last ?? "") }.reduce(0, +)
+        XCTAssertEqual(deleteRequests, 0, "Exposure navigation must never attempt deletion")
+        try save("fully-exposed")
+        let evidence: [String: Any] = ["role": f.role, "viewportPoints": frame(app.frame),
+            "managedTarget": text, "before": initial, "afterTargetFrame": frame(target.frame),
+            "afterFooterFrame": frame(footer.frame), "afterSafeViewport": frame(safeViewport()),
+            "nativeScrollDrags": drags, "completeLabelFullyAboveFooter": true,
+            "deleteRemainedDisabled": true, "nativeDELETERequests": deleteRequests,
+            "reasonAndAcknowledgmentNeverChanged": true, "sourceOrAuditFiltering": false]
+        let data = try JSONSerialization.data(withJSONObject: evidence, options: [.sortedKeys, .prettyPrinted])
+        let url = URL(fileURLWithPath: folder).appendingPathComponent("small-deletion-\(f.role)-exposure.json")
+        try data.write(to: url, options: .atomic)
+        let proof = XCTAttachment(data: data, uniformTypeIdentifier: "public.json")
+        proof.name = "small-deletion-final-label-exposure-\(f.role)"; proof.lifetime = .keepAlways; add(proof)
+    }
+
+    /// Separate diagnostic: actual OS font category is set/read/restored by root.
+    /// Never taps a notification; the unchanged strict audit remains authoritative.
+    func testExactLowerNotificationLabelsScaleAndRemainExposedWithoutOpening() throws {
+        let f = try preflight()
+        guard let phase = env["QA_NOTIFICATION_FONT_PHASE"], ["large", "a5"].contains(phase),
+              let baselinePath = env["QA_NOTIFICATION_FONT_BASELINE_FILE"], baselinePath.hasPrefix("/"),
+              let folder = env["QA_SHOT_DIR"], folder.hasPrefix("/") else {
+            throw XCTSkip("Explicit phase, private baseline file and raster folder required")
+        }
+        let baselineURL = URL(fileURLWithPath: baselinePath)
+        var baselineRows: [[String: Any]] = []
+        if phase == "a5" {
+            let baseline = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(contentsOf: baselineURL)) as? [String: Any])
+            XCTAssertEqual(baseline["role"] as? String, f.role)
+            XCTAssertEqual(baseline["owner"] as? String, f.primaryID)
+            baselineRows = try XCTUnwrap(baseline["rows"] as? [[String: Any]])
+        }
+        let response = try CarezaarAPI.callWithHTTPStatus("GET", "users/notifications?page=1&perPage=10", token: f.primaryToken)
+        XCTAssertEqual(response.status, 200)
+        let rows = try XCTUnwrap(response.body["result"] as? [[String: Any]])
+        let ids: [Int]
+        if phase == "large" {
+            ids = rows.prefix(8).dropFirst(4).compactMap { ($0["id"] as? NSNumber)?.intValue }
+            guard ids.count == 4 else { throw XCTSkip("Four existing lower first-page owned notifications required; no data seeded") }
+        } else {
+            ids = try baselineRows.map { try XCTUnwrap(($0["id"] as? NSNumber)?.intValue) }
+            let available = Set(rows.compactMap { ($0["id"] as? NSNumber)?.intValue })
+            XCTAssertTrue(ids.allSatisfy { available.contains($0) }, "Exact baseline notifications must remain in native first page")
+        }
+        launchOwnedRoute("Notifications")
+        XCTAssertTrue(app.navigationBars["Notifications"].waitForExistence(timeout: 60))
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "notification-row-")).firstMatch.waitForExistence(timeout: 30))
+        let initialRaster = XCTAttachment(screenshot: app.screenshot())
+        initialRaster.name = "notification-font-initial-viewport-\(phase)"
+        initialRaster.lifetime = .keepAlways; add(initialRaster)
+        let initialHierarchy = XCTAttachment(string: app.debugDescription)
+        initialHierarchy.name = "notification-font-initial-hierarchy-\(phase)"
+        initialHierarchy.lifetime = .keepAlways; add(initialHierarchy)
+        let scroll = app.scrollViews.firstMatch
+        XCTAssertTrue(scroll.exists)
+        func expose(_ element: XCUIElement) throws {
+            for _ in 0..<24 {
+                let viewport = scroll.frame.intersection(app.frame).insetBy(dx: 1, dy: 8)
+                if element.exists && element.isHittable && viewport.contains(element.frame) { return }
+                if element.exists && element.frame.minY < viewport.minY { scroll.swipeDown(velocity: .slow) }
+                else { scroll.swipeUp(velocity: .slow) }
+            }
+            XCTFail("Exact notification text must become fully exposed within the actual scroll viewport")
+            throw NSError(domain: "NotificationFontExposure", code: 1)
+        }
+        var results: [[String: Any]] = []
+        for (index, id) in ids.enumerated() {
+            let row = app.buttons.matching(identifier: "notification-row-\(id)").firstMatch
+            // Offscreen lower rows can be absent from UIKit's AX snapshot at A5.
+            // Scroll the exact existing ID into the tree; do not fabricate a row.
+            for _ in 0..<24 where !row.exists { scroll.swipeUp(velocity: .slow) }
+            XCTAssertTrue(row.exists, "Exact existing notification must become materialized after bounded native scrolling")
+            let initialLabels = row.staticTexts.allElementsBoundByIndex.map(\.label)
+            let labels = Array(Set(initialLabels)).sorted()
+            XCTAssertEqual(labels.count, 3, "Expected complete partner, event and timestamp text nodes")
+            if phase == "a5" {
+                let previous = try XCTUnwrap(baselineRows[index]["labels"] as? [[String: Any]])
+                XCTAssertEqual(Set(labels), Set(previous.compactMap { $0["text"] as? String }), "Exact managed/name/timestamp text must survive actual OS scaling")
+            }
+            var measurements: [[String: Any]] = []
+            for (labelIndex, text) in labels.enumerated() {
+                let element = row.staticTexts.matching(NSPredicate(format: "label == %@", text)).firstMatch
+                try expose(element)
+                XCTAssertEqual(element.label, text)
+                let frame = element.frame
+                XCTAssertGreaterThan(frame.width, 0); XCTAssertGreaterThan(frame.height, 0)
+                if phase == "a5" {
+                    let previous = try XCTUnwrap(baselineRows[index]["labels"] as? [[String: Any]])
+                    let old = try XCTUnwrap(previous.first { $0["text"] as? String == text })
+                    XCTAssertGreaterThan(Double(frame.height), try XCTUnwrap(old["height"] as? Double), "Actual OS A5 must enlarge the same text's rendered frame")
+                }
+                let shot = element.screenshot()
+                let name = "notification-font-\(phase)-row-\(index + 1)-text-\(labelIndex + 1)"
+                let proof = XCTAttachment(screenshot: shot); proof.name = name; proof.lifetime = .keepAlways; add(proof)
+                let file = URL(fileURLWithPath: folder).appendingPathComponent(name + ".png")
+                try shot.pngRepresentation.write(to: file, options: .atomic)
+                try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: file.path)
+                measurements.append(["text": text, "x": Double(frame.minX), "y": Double(frame.minY),
+                    "width": Double(frame.width), "height": Double(frame.height), "fullyExposed": true,
+                    "viewport": [Double(scroll.frame.minX), Double(scroll.frame.minY), Double(scroll.frame.width), Double(scroll.frame.height)]])
+            }
+            results.append(["id": id, "labels": measurements])
+        }
+        XCTAssertEqual(totalMutationCount(method: "POST"), 0)
+        XCTAssertEqual(totalMutationCount(method: "PATCH"), 0)
+        XCTAssertEqual(totalMutationCount(method: "DELETE"), 0)
+        for id in ids { XCTAssertEqual(count("PATCH /api/users/notifications/\(id)/see"), 0) }
+        let record: [String: Any] = ["role": f.role, "owner": f.primaryID, "phase": phase,
+            "rows": results, "notificationTaps": 0, "actualOSReadbackRequired": true,
+            "strictAccessibilityAuditUnchanged": true]
+        let data = try JSONSerialization.data(withJSONObject: record, options: [.sortedKeys, .prettyPrinted])
+        let output = phase == "large" ? baselineURL : URL(fileURLWithPath: folder).appendingPathComponent("a5-exact-notification-measurements-private.json")
+        try data.write(to: output, options: .atomic)
+        try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: output.path)
+        let proof = XCTAttachment(data: data, uniformTypeIdentifier: "public.json")
+        proof.name = "notification-font-exact-lower-rows-\(phase)"; proof.lifetime = .keepAlways; add(proof)
+    }
+
+    /// Read-only fresh screenshots for the explicitly people-free product baseline.
+    /// Raster review remains separate from successful navigation assertions.
+    func testCapturePeopleFreeIntroMatchesProfileAndHelpWithoutMutations() throws {
+        let f = try preflight()
+        guard let folder = env["QA_SHOT_DIR"], folder.hasPrefix("/") else {
+            throw XCTSkip("Explicit private absolute QA_SHOT_DIR required for requested raster evidence")
+        }
+        func save(_ screen: String) throws {
+            if screen != "intro" {
+                let notificationPoll = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+                    self.count("GET /api/users/notifications/count") >= 1
+                }, object: nil)
+                XCTAssertEqual(XCTWaiter.wait(for: [notificationPoll], timeout: 15), .completed)
+            }
+            // Keep the actual app/OS notification behavior; wait for its banner
+            // to settle so the requested artwork/header raster is unobstructed.
+            let banner = XCUIApplication(bundleIdentifier: "com.apple.springboard").descendants(matching: .any)
+                .matching(identifier: "NotificationShortLookView").firstMatch
+            if banner.waitForExistence(timeout: 2) {
+                XCTAssertTrue(banner.waitForNonExistence(timeout: 15), "System notification must finish before the evidence screenshot")
+            }
+            let image = app.screenshot()
+            let name = "people-free-\(f.role)-\(screen)"
+            let attachment = XCTAttachment(screenshot: image)
+            attachment.name = name; attachment.lifetime = .keepAlways; add(attachment)
+            let url = URL(fileURLWithPath: folder).appendingPathComponent(name + ".png")
+            try image.pngRepresentation.write(to: url, options: .atomic)
+            try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: url.path)
+        }
+        app.launchArguments = ["--qa-signout", "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
+        app.launch()
+        XCTAssertTrue(app.buttons["Sign in"].firstMatch.waitForExistence(timeout: 60))
+        try save("intro")
+        app.terminate()
+        app.launchEnvironment["QA_EMAIL"] = env["QA_EMAIL"]
+        app.launchEnvironment["QA_PASSWORD"] = env["QA_PASSWORD"]
+        app.launchArguments = ["--qa-signout", "--qa-login-env", "--qa-request-counts", "--qa-tab", "matches",
+                               "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
+        app.launch()
+        let matchesReady = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            self.app.buttons["Messages"].exists && self.count("GET /api/" + f.listEndpoint) >= 1
+                && !self.app.staticTexts["Please wait..."].exists
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [matchesReady], timeout: 60), .completed)
+        try save("matches")
+        let profileTab = try XCTUnwrap(app.buttons.matching(identifier: "Profile").allElementsBoundByIndex.first {
+            $0.isHittable && $0.frame.midY > app.frame.midY
+        }, "Actual bottom Profile tab must be visible")
+        XCTAssertTrue(profileTab.exists && profileTab.isHittable)
+        profileTab.tap()
+        let edit = app.buttons[f.label("profile_edit", "Edit")]
+        XCTAssertTrue(edit.waitForExistence(timeout: 30))
+        try save("profile")
+        launchOwnedRoute("HelpCenter")
+        XCTAssertTrue(app.navigationBars["Help Center"].waitForExistence(timeout: 45))
+        XCTAssertTrue(app.buttons["Delete Account"].firstMatch.waitForExistence(timeout: 15))
+        try save("help")
+        XCTAssertEqual(totalMutationCount(method: "POST"), 0)
+        XCTAssertEqual(totalMutationCount(method: "PATCH"), 0)
+        XCTAssertEqual(totalMutationCount(method: "DELETE"), 0)
+        try record("people-free-screen-capture-scope-\(f.role)", ["role": f.role,
+            "screens": ["intro", "matches", "profile", "help"], "renderedArtworkReviewRequired": true,
+            "profileOrRelationshipMutations": false, "privateFixtureScreenshotPermission": "0600"])
+    }
+
+    /// P23-011: direct owned profile coverage does not depend on compatible-list placement.
+    /// The unchanged card matrix remains separate and may legitimately skip.
+    func testOwnedOutgoingCancelUsesManagedLabelAndDismissThenConfirmRestoresNone() throws {
+        let f = try preflight()
+        let initial = try profile(f.profileEndpoint, token: f.primaryToken, expectedUser: f.peerID)
+        let other = try profile(f.peerEndpoint, token: f.peerToken, expectedUser: f.primaryID)
+        guard initial["match_status"] as? String == "none", other["match_status"] as? String == "none" else {
+            throw XCTSkip("Outgoing Cancel requires exact retained pair NONE; preserving existing relationship")
+        }
+        let cancel = try XCTUnwrap(f.labels["general_cancel"], "Managed Cancel must exist")
+        let obsolete = try XCTUnwrap(f.labels["match_withdraw_title"], "Current managed withdrawal label must exist for the regression guard")
+        XCTAssertEqual(cancel, "Cancel", "This English allocation must retain the governing Cancel contract")
+        XCTAssertNotEqual(cancel, obsolete, "Live CMS fixture must expose the distinct Withdraw regression trigger")
+        cleanupFixture = f
+        let edge = try createRequest(f, fromPrimary: true)
+        XCTAssertEqual(try pairStatus(f), "sent") // also asserts the peer is RECEIVED
+        _ = try ownedEdge(edge, fixture: f)
+        launchOwnedRoute((f.role == "client" ? "CaregiverDetails/" : "ClientDetails/") + f.peerID)
+        let outgoing = app.buttons["match-withdraw"]
+        XCTAssertTrue(outgoing.waitForExistence(timeout: 45))
+        let ready = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            outgoing.isHittable && !self.app.staticTexts["Please wait..."].exists
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 20), .completed)
+        XCTAssertEqual(outgoing.label, cancel)
+        XCTAssertNotEqual(outgoing.label, obsolete)
+        let endpoint = "DELETE /api/users/matches/\(edge)/withdraw"
+        XCTAssertEqual(count(endpoint), 0)
+        for shouldConfirm in [false, true] {
+            XCTAssertTrue(outgoing.isHittable)
+            outgoing.tap()
+            let dialog = app.alerts[cancel]
+            XCTAssertTrue(dialog.waitForExistence(timeout: 10), "Outgoing confirmation title must be managed Cancel")
+            XCTAssertTrue(dialog.staticTexts[cancel].exists)
+            let dismiss = dialog.buttons.matching(identifier: "match-confirm-dismiss").firstMatch
+            let confirm = dialog.buttons.matching(identifier: "match-action-confirm").firstMatch
+            let hierarchy = XCTAttachment(string: dialog.debugDescription)
+            hierarchy.name = "owned-outgoing-cancel-alert-hierarchy-\(f.role)"
+            hierarchy.lifetime = .keepAlways; add(hierarchy)
+            let initialProof = XCTAttachment(screenshot: dialog.screenshot())
+            initialProof.name = "owned-outgoing-cancel-before-target-assertion-\(f.role)"
+            initialProof.lifetime = .keepAlways; add(initialProof)
+            XCTAssertTrue(dismiss.exists && dismiss.isHittable)
+            XCTAssertTrue(confirm.exists && confirm.isHittable)
+            XCTAssertEqual(dismiss.label, cancel)
+            XCTAssertEqual(confirm.label, cancel)
+            // UIKit exposes each SwiftUI alert action as nested Button nodes
+            // with identical identifier/label/frame. Count distinct hit targets,
+            // retaining strict exact-label/identifier assertions on every node.
+            let actionNodes = dialog.buttons.allElementsBoundByIndex
+            XCTAssertEqual(Set(actionNodes.map(\.identifier)), Set(["match-confirm-dismiss", "match-action-confirm"]))
+            XCTAssertTrue(actionNodes.allSatisfy { $0.label == cancel })
+            let distinctTargets = Set(actionNodes.map { "\($0.identifier):\(NSCoder.string(for: $0.frame))" })
+            XCTAssertEqual(distinctTargets.count, 2)
+            XCTAssertFalse(dialog.staticTexts[obsolete].exists)
+            let proof = XCTAttachment(screenshot: dialog.screenshot())
+            proof.name = "owned-outgoing-cancel-\(shouldConfirm ? "confirm" : "dismiss")-\(f.role)"
+            proof.lifetime = .keepAlways; add(proof)
+            if shouldConfirm {
+                _ = try ownedEdge(edge, fixture: f) // verify exact marker ownership immediately before native mutation
+                confirm.tap()
+                XCTAssertTrue(dialog.waitForNonExistence(timeout: 10))
+                let request = app.buttons["match-request"]
+                XCTAssertTrue(request.waitForExistence(timeout: 45), "Confirmed Cancel must restore the NONE profile action")
+                XCTAssertFalse(outgoing.exists)
+                XCTAssertEqual(count(endpoint), 1, "One actual confirmation must send exactly one withdrawal")
+                XCTAssertEqual(try pairStatus(f), "none") // both exact public profiles
+            } else {
+                dismiss.tap()
+                XCTAssertTrue(dialog.waitForNonExistence(timeout: 10))
+                XCTAssertEqual(count(endpoint), 0, "Dialog Cancel must preserve the outgoing request without a DELETE")
+                XCTAssertEqual(try pairStatus(f), "sent")
+                XCTAssertTrue(outgoing.exists && outgoing.isHittable)
+            }
+        }
+        cleanupFixture = nil
+        try record("P23-011-native-outgoing-cancel-\(f.role)", ["role": f.role,
+            "source": "exact-owned-profile-direct-route", "managedGeneralCancelUsed": true,
+            "distinctCMSWithdrawRejected": true, "titleAndBothDialogActionsCancel": true,
+            "dismissPreservedSentReceivedWithoutDELETE": true, "confirmedWithdrawalDELETEs": 1,
+            "bothProfilesFinalNone": true, "compatibleCardCoverage": false])
+    }
+
     /// R10 uses only the exact retained fixture pair and restores its staged edge.
     /// This checks settled geometry/navigation; raster review verifies the slide itself.
     func testOwnedActiveMatchedCardsRemainBalancedAcrossForegroundAndReopening() throws {
@@ -551,7 +881,7 @@ final class MatchStateMatrixUITests: XCTestCase {
             XCTAssertEqual(app.buttons[id].exists, expectedIDs.contains(id), "Profile action set must match exact public state")
         }
         let expectedLabels = ["match-request": f.label("match_match_button", "Request a Match"),
-            "match-withdraw": f.label("match_withdraw_title", "Cancel"),
+            "match-withdraw": f.label("general_cancel", "Cancel"),
             "match-reject": f.label("match_reject_title", f.label("match_reject", "Reject")),
             "match-accept": f.label("match_accept_title", "Accept"), "match-unmatch": f.label("match_unmatch_title", "Unmatch")]
         for id in expectedIDs {

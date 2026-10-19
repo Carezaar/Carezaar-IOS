@@ -64,10 +64,61 @@ enum QALaunch {
         for id in value("--qa-push")?.split(separator: ",").map(String.init) ?? [] {
             if let route = route(id) { router.push(route) }
         }
+        if args.contains("--qa-revoke-owned-saved-session") {
+            await revokeOwnedSavedSession(session)
+        }
         if args.contains("--qa-break-access-later") {
             try? await Task.sleep(for: .seconds(8))
             breakTokens(refreshToo: false)
         }
+    }
+
+    /// Actual server revocation, retaining the original saved pair only in RAM.
+    /// No credential value or server error body enters the accessibility witness.
+    private static func revokeOwnedSavedSession(_ session: SessionManager) async {
+        let ledger = QARequestLedger.shared
+        func fail(_ reason: String) { ledger.recordOwnedRevocation("result=failed;reason=\(reason)") }
+        let env = ProcessInfo.processInfo.environment
+        guard let role = env["QA_REVOKE_EXPECTED_ROLE"], ["client", "caregiver"].contains(role),
+              let id = env["QA_REVOKE_EXPECTED_USER_ID"], !id.isEmpty,
+              let email = env["QA_EMAIL"], !email.isEmpty,
+              let current = session.state.user,
+              current.id == id, current.role.rawValue == role, current.email == email else {
+            fail("owned-identity"); return
+        }
+        // Let the initial Main reads finish before revocation; production polling
+        // remains active. Any competing token change fails the unchanged-pair gate.
+        do { try await Task.sleep(for: .seconds(3)) } catch { fail("cancelled"); return }
+        let store = TokenStore.shared
+        guard let access = store.accessToken, !access.isEmpty,
+              let refresh = store.refreshToken, !refresh.isEmpty else { fail("missing-pair"); return }
+        let generation = store.generation
+        let client = APIClient.shared
+        do {
+            let verified = try await client.verifyUser(accessToken: access)
+            guard verified.id == id, verified.role.rawValue == role, verified.email == email else {
+                fail("verified-identity"); return
+            }
+        } catch { fail("preflight-rejected-or-unreachable"); return }
+        guard store.accessToken == access, store.refreshToken == refresh, store.generation == generation else {
+            fail("preflight-pair-changed"); return
+        }
+        let before = ledger.counts["DELETE /api/auth/logout", default: 0]
+        await AuthService(client: client).logout(accessToken: access)
+        do {
+            _ = try await client.verifyUser(accessToken: access)
+            fail("server-still-accepts-access"); return
+        } catch APIError.unauthenticated {
+            // verifyUser performs directly: this is actual HTTP401/403, without
+            // automatic renewal or clearing the saved global credentials.
+        } catch { fail("postflight-not-auth-rejection"); return }
+        guard ledger.counts["DELETE /api/auth/logout", default: 0] - before == 1 else {
+            fail("logout-count"); return
+        }
+        guard store.accessToken == access, store.refreshToken == refresh, store.generation == generation else {
+            fail("saved-pair-raced"); return
+        }
+        ledger.recordOwnedRevocation("result=revoked;ownedIdentity=true;priorAccessVerified=true;postAccessRejected=true;savedPairUnchanged=true;generationUnchanged=true;logoutAttempts=1")
     }
 
     private static func route(_ id: String) -> Route? {
@@ -89,6 +140,7 @@ enum QALaunch {
         case "ClientPreferences": return .clientPreferences
         case "CaregiverSkills": return .caregiverSkills
         case "SignUpCredentials": return .signUpCredentials(role: arg == "caregiver" ? .caregiver : .client)
+        case "SignUpFormClient": return .signUpFormClient
         case "SignUpFormCaregiver": return .signUpFormCaregiver
         case "Chat": return Int(arg).map { .chat(chatId: $0) }
         case "Matched":
@@ -344,6 +396,18 @@ final class QARequestLedger: ObservableObject {
     @Published private(set) var notificationFallback = ""
     @Published private(set) var profileWithoutLocation = ""
     @Published private(set) var locationFixtures: [String] = []
+    @Published private(set) var ownedRevocation = ""
+    @Published private(set) var referenceCompletion = ""
+    func recordReferenceCompletion(decoded: Bool, cached: Bool, markerMatches: Bool) {
+        guard ProcessInfo.processInfo.arguments.contains("--qa-reference-completion"),
+              ProcessInfo.processInfo.arguments.contains("--qa-request-counts") else { return }
+        referenceCompletion = "completed=true;decoded=\(decoded);cached=\(cached);markerMatches=\(markerMatches)"
+    }
+    func recordOwnedRevocation(_ witness: String) {
+        guard ProcessInfo.processInfo.arguments.contains("--qa-revoke-owned-saved-session"),
+              ProcessInfo.processInfo.arguments.contains("--qa-request-counts") else { return }
+        ownedRevocation = witness
+    }
     func record(_ request: URLRequest) {
         guard ProcessInfo.processInfo.arguments.contains("--qa-request-counts") else { return }
         let key = "\(request.httpMethod ?? "GET") \(request.url?.path ?? "")"
@@ -405,6 +469,18 @@ struct QARequestCountsView: View {
                         .frame(width: 1, height: 1).clipped()
                         .accessibilityLabel(ledger.notificationFallback)
                         .accessibilityIdentifier("qa-notification-fallback")
+                }
+                if !ledger.referenceCompletion.isEmpty {
+                    Text("·")
+                        .frame(width: 1, height: 1).clipped()
+                        .accessibilityLabel(ledger.referenceCompletion)
+                        .accessibilityIdentifier("qa-reference-completion")
+                }
+                if !ledger.ownedRevocation.isEmpty {
+                    Text("·")
+                        .frame(width: 1, height: 1).clipped()
+                        .accessibilityLabel(ledger.ownedRevocation)
+                        .accessibilityIdentifier("qa-owned-revocation")
                 }
             }
             .font(.system(size: 7)).frame(width: 1, height: 2).clipped()

@@ -178,7 +178,7 @@ struct PartnerDetailsView: View {
                 }
                 .accessibilityIdentifier("match-request")
             case .sent:
-                WideButton(title: loc.t("match_withdraw_title", "Cancel"), icon: "ic_match_off", style: .outline) { ask(.withdraw) }
+                WideButton(title: loc.t("general_cancel", "Cancel"), icon: "ic_match_off", style: .outline) { ask(.withdraw) }
                     .accessibilityIdentifier("match-withdraw")
             case .received:
                 WideButton(title: loc.t("match_reject_title", loc.t("match_reject", "Reject")), style: .danger) { ask(.reject) }
@@ -199,7 +199,7 @@ struct PartnerDetailsView: View {
         case .request: return loc.t("match_match_button", "Request a Match")
         case .accept: return loc.t("match_accept_title", "Accept")
         case .reject: return loc.t("match_reject_title", loc.t("match_reject", "Reject"))
-        case .withdraw: return loc.t("match_withdraw_title", "Cancel")
+        case .withdraw: return loc.t("general_cancel", "Cancel")
         case .unmatch: return loc.t("match_unmatch_title", "Unmatch")
         }
     }
@@ -207,7 +207,7 @@ struct PartnerDetailsView: View {
     private func confirmLabel(_ which: MatchMutation) -> String {
         switch which {
         case .request: return loc.t("match_match_title", "Match")
-        case .withdraw: return loc.t("match_withdraw_title", "Cancel")
+        case .withdraw: return loc.t("general_cancel", "Cancel")
         case .accept: return loc.t("match_accept_title", "Accept")
         case .reject: return loc.t("match_reject_title", loc.t("match_reject", "Reject"))
         case .unmatch: return loc.t("match_unmatch_title", "Unmatch")
@@ -653,6 +653,13 @@ struct MatchRequestSheet: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 14) {
+                    // A long localized action can consume the native toolbar's
+                    // title space. Keep this task heading in the full-width form.
+                    Text(loc.t("match_match_button", "Request a Match"))
+                        .font(Theme.Typography.title(20))
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityAddTraits(.isHeader)
+                        .accessibilityIdentifier("match-request-heading")
                     Text(loc.t("match_match_message", "Are you sure you want to match with this user? They should accept your request."))
                         .font(Theme.Typography.body(15)).foregroundStyle(Theme.Palette.textSecondary)
                     Text(loc.t("match_introduction_title", "Introduction")).font(Theme.Typography.title(15))
@@ -670,11 +677,11 @@ struct MatchRequestSheet: View {
                 }
                 .padding(20)
             }
-            .navigationTitle(loc.t("match_match_button", "Request a Match"))
-            .navigationBarTitleDisplayMode(.inline)
+            .accessibilityIdentifier("match-request-content")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(loc.t("general_cancel", "Cancel"), action: onCancel)
+                        .accessibilityIdentifier("match-request-dismiss")
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button(loc.t("match_match_title", "Match"), action: onMatch).fontWeight(.semibold)

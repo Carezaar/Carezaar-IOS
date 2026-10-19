@@ -3,6 +3,19 @@ import XCTest
 
 @MainActor
 final class FeedbackTests: XCTestCase {
+    private var originalTranslation: ((String, String) -> String)?
+    override func setUp() {
+        super.setUp()
+        originalTranslation = Feedback.translate
+        // Each test chooses its own managed translator; the host app may restore
+        // any previously selected language while loading its scene.
+        Feedback.translate = { _, fallback in fallback }
+    }
+    override func tearDown() {
+        if let originalTranslation { Feedback.translate = originalTranslation }
+        super.tearDown()
+    }
+
     func testCommonFailuresNeverShowRawImplementationWording() {
         for error in [APIError.unknown("Database lookup failed"), .validation(message: "Internal query failed", fields: [:]), .server("Internal query failed")] {
             XCTAssertEqual(Feedback.message(error), "Something went wrong. Please try again.")

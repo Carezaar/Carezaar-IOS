@@ -4,6 +4,9 @@ import XCTest
 /// disposable mail.tm inbox) → profile → care wizard with the map → Main.
 final class SignupTests: XCTestCase {
     var app: XCUIApplication!
+    private var nativeSignupAccountFile: String?
+    private var expectedSyntheticLocation: (lat: Double, lng: Double)?
+    private var signupAllMatchesLabel: String?
 
     override func setUp() {
         continueAfterFailure = false
@@ -195,6 +198,247 @@ final class SignupTests: XCTestCase {
         XCTAssertTrue(textContaining("Manage your personal information").exists)
         XCTAssertFalse(welcomeSignIn.exists)
 
+    }
+
+    /// Opt-in repair of the exact new caregiver fixture after the retained DOB failure.
+    /// Never re-registers or resubmits a role entity; one profile save is journaled first.
+    func testRepairOwnedCaregiverBirthDateWithSingleNativeProfileSave() throws {
+        let env = ProcessInfo.processInfo.environment
+        guard env["QA_OWNED_CAREGIVER_DOB_REPAIR"] == "1", let file = env["QA_ACCOUNT_FILE"] else {
+            throw XCTSkip("Primary must authorize this exact new-owned caregiver DOB repair")
+        }
+        var record = try NativeLifecycleFixture.read(file)
+        let provenance = try XCTUnwrap(record["native_provenance"] as? [String: Any])
+        let email = try XCTUnwrap(record["email"] as? String)
+        let password = try XCTUnwrap(record["password"] as? String)
+        let id = try XCTUnwrap(record["user_id"] as? String)
+        let marker = try XCTUnwrap(provenance["marker"] as? String)
+        try requirePasswordProof(provenance["purpose"] as? String == "carezaar-native-final-qa"
+            && provenance["role"] as? String == "caregiver" && record["role"] as? String == "caregiver"
+            && provenance["size"] as? String == "modern"
+            && provenance["stage"] as? String == "mainIdentityVerified"
+            && provenance["provider_create_attempts"] as? Int == 1
+            && provenance["app_registration_attempts"] as? Int == 1
+            && email.hasPrefix("carezaar-native-\(marker)@") && !id.isEmpty
+            && id != env["QA_CG_ID"] && id != env["QA_CLIENT_USER_ID"]
+            && record["native_dob_repair"] == nil && record["deleted"] as? Bool != true,
+            "Exact unmodified new caregiver checkpoint is required; no repair replay")
+        let retained = ["QA_EMAIL", "QA_CLIENT_EMAIL", "QA_CG_EMAIL"].compactMap { env[$0]?.lowercased() }
+        try requirePasswordProof(!retained.contains(email.lowercased()), "Retained fixture refused")
+        let token = try requireAcceptedLogin(email, password: password, role: "caregiver")
+        func ownRead(_ path: String) throws -> [String: Any] {
+            let response = try CarezaarAPI.callWithHTTPStatus("GET", path, token: token)
+            try requirePasswordProof(response.status == 200, "Owned profile proof requires HTTP200")
+            let result = CarezaarAPI.result(response.body)
+            let user: [String: Any]
+            if path == "auth/info" { user = result }
+            else { user = try XCTUnwrap(result["user"] as? [String: Any]) }
+            try requirePasswordProof(user["id"].map { String(describing: $0) } == id,
+                                    "Exact owned immutable identity must match before/after repair")
+            if path == "auth/info" {
+                try requirePasswordProof(user["email"] as? String == email && user["role"] as? String == "caregiver",
+                                         "Owned auth identity must retain its exact email/role")
+            }
+            return result
+        }
+        let contents = try CarezaarAPI.callWithHTTPStatus("GET", "base/contents?ts_cache=0")
+        try requirePasswordProof(contents.status == 200, "Managed labels must load before repair")
+        let rows = try XCTUnwrap(contents.body["result"] as? [[String: Any]])
+        let label = try XCTUnwrap(rows.first { $0["slug"] as? String == "caregiver_matches_all_matches" })
+        signupAllMatchesLabel = try XCTUnwrap((label["translations"] as? [[String: Any]])?.first {
+            ($0["language_id"] as? NSNumber)?.intValue == 1 || ($0["language_id"] as? String) == "1"
+        }?["name"] as? String)
+        app.launchArguments = ["--qa-request-counts", "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
+        app.launch()
+        var nativeSetupLoginAttempts = 0
+        if !app.buttons["Messages"].waitForExistence(timeout: 20) {
+            let welcome = app.buttons["Sign in"].firstMatch
+            try requirePasswordProof(welcome.exists && welcome.isHittable, "Unknown startup state; stop before profile mutation")
+            welcome.tap()
+            let field = app.textFields["Enter your email address..."]
+            try requirePasswordProof(field.waitForExistence(timeout: 20) && field.isHittable, "Native sign-in email field must be available"); field.tap(); field.typeText(email)
+            typeSecure(app.secureTextFields["Enter your password..."], password)
+            dismissKeyboard()
+            try requirePasswordProof(nativeSignupRequestCount("POST /api/auth/login") == 0, "No native login may precede its journaled intent")
+            nativeSetupLoginAttempts = 1
+            record["native_dob_repair"] = ["stage": "nativeLoginIntent", "profilePostAttempts": 0, "nativeSetupLoginAttempts": 1]
+            try NativeLifecycleFixture.save(record, file)
+            app.buttons["Sign In"].firstMatch.tap()
+            try requirePasswordProof(app.buttons["Messages"].waitForExistence(timeout: 60), "Native sign-in must reach Main before repair")
+            try requirePasswordProof(nativeSignupRequestCount("POST /api/auth/login") == 1, "Exactly one native setup login is allowed")
+        }
+        requireNativeSignupMainLoaded(caregiver: true)
+        openProfileTab()
+        let ownEmail = app.descendants(matching: .any).matching(NSPredicate(
+            format: "label CONTAINS %@ OR value CONTAINS %@", email, email)).firstMatch
+        try requirePasswordProof(ownEmail.exists, "The actual native Profile must identify this new caregiver")
+        // Snapshot after any necessary visible sign-in, before entering the edit form.
+        let beforeAuth = try ownRead("auth/info")
+        let before = try ownRead("caregivers/profile")
+        let beforeUser = try XCTUnwrap(before["user"] as? [String: Any])
+        try requirePasswordProof(beforeUser["date_of_birth"] as? String == "10/11/1990", "Expected exact pre-repair date_of_birth")
+        try requirePasswordProof(beforeAuth["date_of_birth"] as? String == "10/11/1990", "Both GETs must preserve the diagnosed pre-repair day")
+        try requirePasswordProof(beforeAuth["first_name"] as? String == "Ios" && beforeAuth["last_name"] as? String == "Caregiver", "Both GETs must identify the expected names")
+        try requirePasswordProof(beforeUser["gender_id"] != nil && beforeAuth["gender_id"] != nil && String(describing: beforeUser["gender_id"]!) == String(describing: beforeAuth["gender_id"]!), "Both GETs must agree on the existing gender")
+        try requirePasswordProof(beforeUser["first_name"] as? String == "Ios", "Expected exact pre-repair first_name")
+        try requirePasswordProof(beforeUser["last_name"] as? String == "Caregiver", "Expected exact pre-repair last_name")
+        let photo = beforeUser["photo"]
+        try requirePasswordProof(photo == nil || photo is NSNull || (photo as? String)?.isEmpty == true,
+                                 "Unexpected photo: stop rather than alter an unreviewed uploaded image")
+        let backupFolder = URL(fileURLWithPath: file).deletingLastPathComponent()
+            .appendingPathComponent("dob-repair-modern-caregiver", isDirectory: true)
+        try requirePasswordProof(!FileManager.default.fileExists(atPath: backupFolder.path), "Existing repair evidence preserved; no replay")
+        try FileManager.default.createDirectory(at: backupFolder, withIntermediateDirectories: false,
+                                               attributes: [.posixPermissions: 0o700])
+        let backup = backupFolder.appendingPathComponent("before-private.json")
+        try JSONSerialization.data(withJSONObject: ["authInfo": beforeAuth, "caregiverProfile": before], options: [.sortedKeys])
+            .write(to: backup, options: .withoutOverwriting)
+        try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: backup.path)
+        openProfileEdit()
+        try requirePasswordProof(app.textFields["Enter your first name"].value as? String == beforeUser["first_name"] as? String, "First name must remain prefilled")
+        try requirePasswordProof(app.textFields["Enter your last name"].value as? String == beforeUser["last_name"] as? String, "Last name must remain prefilled")
+        try requirePasswordProof(app.buttons["Female"].exists, "The original chosen gender must remain prefilled")
+        try requirePasswordProof(!app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Remove Photo")).firstMatch.exists, "No existing photo may be removed")
+        selectAdultDateOfBirth()
+        let selected = XCTAttachment(screenshot: app.datePickers.firstMatch.screenshot())
+        selected.name = "owned-caregiver-selected-birth-date-before-one-save"
+        selected.lifetime = .keepAlways; add(selected)
+        let displayedDate = app.datePickers.firstMatch.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "Date Picker")).firstMatch
+        let observedDate = (displayedDate.value as? String ?? "").lowercased()
+        try requirePasswordProof(displayedDate.exists && observedDate.contains("1990") && observedDate.contains("12") && observedDate.contains("oct"), "Actual English DatePicker must display October 12, 1990 before Save")
+        let forbidden = ["POST /api/auth/register", "POST /api/users/otp/send", "POST /api/users/otp/verify",
+            "POST /api/clients", "POST /api/caregivers", "PUT /api/clients/profile", "PUT /api/caregivers/profile",
+            "PATCH /api/users/password/change", "POST /api/users/password/reset", "POST /api/users/issues", "DELETE /api/users"]
+        for route in forbidden { try requirePasswordProof(nativeSignupRequestCount(route) == 0, "Forbidden mutation before Save") }
+        try requirePasswordProof(nativeSignupRequestCount("POST /api/users/profile") == 0, "No profile Save may precede the intent")
+        let actualSave = app.buttons["Save"].firstMatch
+        try requirePasswordProof(actualSave.waitForExistence(timeout: 10) && actualSave.isHittable && actualSave.isEnabled, "Exact native Save must be ready before journaling its single intent")
+        record = try NativeLifecycleFixture.read(file)
+        record["native_dob_repair"] = ["stage": "saveIntent", "profilePostAttempts": 1,
+            "baselineFile": backup.path, "nativeSetupLoginAttempts": nativeSetupLoginAttempts, "originalSignupFailureRetained": true]
+        try NativeLifecycleFixture.save(record, file)
+        saveProfile() // Exactly one real native Save tap; never retry this mutation.
+        XCTAssertEqual(nativeSignupRequestCount("POST /api/users/profile"), 1)
+        for route in forbidden { XCTAssertEqual(nativeSignupRequestCount(route), 0) }
+        let writeCounts = app.staticTexts["qa-request-counts"].label
+        let afterAuth = try ownRead("auth/info")
+        let after = try ownRead("caregivers/profile")
+        try JSONSerialization.data(withJSONObject: ["authInfo": afterAuth, "caregiverProfile": after], options: [.sortedKeys])
+            .write(to: backupFolder.appendingPathComponent("after-private.json"), options: .withoutOverwriting)
+        try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: backupFolder.appendingPathComponent("after-private.json").path)
+        let afterUser = try XCTUnwrap(after["user"] as? [String: Any])
+        XCTAssertEqual(afterAuth["date_of_birth"] as? String, "10/12/1990")
+        XCTAssertEqual(afterUser["date_of_birth"] as? String, "10/12/1990")
+        func businessFields(_ input: [String: Any]) throws -> Data {
+            var copy = input
+            copy.removeValue(forKey: "updated_at") // Expected write clock, not a business field.
+            if var user = copy["user"] as? [String: Any] {
+                user.removeValue(forKey: "date_of_birth"); user.removeValue(forKey: "updated_at")
+                copy["user"] = user
+            } else { copy.removeValue(forKey: "date_of_birth") }
+            return try JSONSerialization.data(withJSONObject: copy, options: [.sortedKeys])
+        }
+        XCTAssertTrue(try businessFields(before) == businessFields(after), "Every other caregiver/profile field must remain unchanged")
+        XCTAssertTrue(try businessFields(beforeAuth) == businessFields(afterAuth), "Names, gender, bio, photo and other user fields must remain unchanged")
+        expectedSyntheticLocation = (37.7749, -122.4194)
+        try verifyNativeSavedProfileAndOrdinaryRelaunch(accountFile: file, email: email,
+            password: password, caregiver: true, expectedID: id)
+        record = try NativeLifecycleFixture.read(file)
+        record["native_dob_repair"] = ["stage": "complete", "profilePostAttempts": 1,
+            "baselineFile": backup.path, "nativeSetupLoginAttempts": nativeSetupLoginAttempts, "originalSignupFailureRetained": true]
+        try NativeLifecycleFixture.save(record, file)
+        let proof = XCTAttachment(string: "role=caregiver;exactOwnedIdentity=true;DOBBefore11After12=true;nativeProfilePOSTs=1;otherProfileFieldsUnchanged=true;signupEntityOTPWrites=0;ordinaryRelaunchVerified=true;hiddenLogin=false;appResponseHTTPStatusNotExported=true\n" + writeCounts)
+        proof.name = "owned-caregiver-single-DOB-repair-anonymous"; proof.lifetime = .keepAlways; add(proof)
+    }
+
+    /// Existing new caregiver only. No login, profile/entity/provider mutation or journal write.
+    func testOwnedCaregiverCurrentListTabsAndOrdinaryRelaunchReadOnly() throws {
+        let env = ProcessInfo.processInfo.environment
+        guard env["QA_OWNED_CAREGIVER_READONLY_LISTS"] == "1", let file = env["QA_ACCOUNT_FILE"] else {
+            throw XCTSkip("Primary must select the exact preserved caregiver fixture")
+        }
+        let original = try Data(contentsOf: URL(fileURLWithPath: file))
+        let record = try NativeLifecycleFixture.read(file)
+        let provenance = try XCTUnwrap(record["native_provenance"] as? [String: Any])
+        let repair = try XCTUnwrap(record["native_dob_repair"] as? [String: Any])
+        let email = try XCTUnwrap(record["email"] as? String)
+        let id = try XCTUnwrap(record["user_id"] as? String)
+        let marker = try XCTUnwrap(provenance["marker"] as? String)
+        try requirePasswordProof(provenance["purpose"] as? String == "carezaar-native-final-qa"
+            && provenance["role"] as? String == "caregiver" && record["role"] as? String == "caregiver"
+            && provenance["size"] as? String == "modern" && provenance["stage"] as? String == "signupComplete"
+            && provenance["provider_create_attempts"] as? Int == 1 && provenance["app_registration_attempts"] as? Int == 1
+            && repair["stage"] as? String == "complete" && repair["profilePostAttempts"] as? Int == 1
+            && email.hasPrefix("carezaar-native-\(marker)@") && !id.isEmpty
+            && id != env["QA_CG_ID"] && id != env["QA_CLIENT_USER_ID"] && record["deleted"] as? Bool != true,
+            "Exact completed new-owned caregiver fixture required")
+        let retained = ["QA_EMAIL", "QA_CLIENT_EMAIL", "QA_CG_EMAIL"].compactMap { env[$0]?.lowercased() }
+        try requirePasswordProof(!retained.contains(email.lowercased()), "Retained fixture refused")
+        let contents = try CarezaarAPI.callWithHTTPStatus("GET", "base/contents?ts_cache=0")
+        try requirePasswordProof(contents.status == 200, "Public managed labels must load")
+        let rows = try XCTUnwrap(contents.body["result"] as? [[String: Any]])
+        func managed(_ key: String) throws -> String {
+            let row = try XCTUnwrap(rows.first { $0["slug"] as? String == key })
+            return try XCTUnwrap((row["translations"] as? [[String: Any]])?.first {
+                ($0["language_id"] as? NSNumber)?.intValue == 1 || ($0["language_id"] as? String) == "1"
+            }?["name"] as? String)
+        }
+        signupAllMatchesLabel = try managed("caregiver_matches_all_matches")
+        let messagesLabel = try managed("bottom_navigation_messages")
+        let matchesLabel = try managed("bottom_navigation_matches")
+        let profileLabel = try managed("bottom_navigation_profile")
+        let emptyMessages = try managed("chat_screen_no_messages_yet")
+        let emptyDescription = try managed("chat_screen_empty_description")
+        func readOnly() throws {
+            let ledger = app.staticTexts["qa-request-counts"]
+            try requirePasswordProof(ledger.exists, "Native request witness missing")
+            let lines = ledger.label.split(separator: "\n").map(String.init)
+            try requirePasswordProof(!lines.isEmpty && lines.allSatisfy { $0.hasPrefix("GET ") }, "Only app GETs allowed; no renew/login/logout/read receipt or mutation")
+            try requirePasswordProof(app.staticTexts["qa-token-presence"].label == "accessPresent=true;refreshPresent=true", "Existing saved caregiver pair must remain present")
+        }
+        func tab(_ label: String) throws {
+            let target = try XCTUnwrap(app.buttons.matching(identifier: label).allElementsBoundByIndex
+                .filter { $0.isHittable }.max { $0.frame.minY < $1.frame.minY })
+            try requirePasswordProof(target.isEnabled, "Native bottom tab unavailable")
+            target.tap()
+        }
+        func owner() throws {
+            try tab(profileLabel)
+            let ownEmail = app.descendants(matching: .any).matching(NSPredicate(
+                format: "label CONTAINS %@ OR value CONTAINS %@", email, email)).firstMatch
+            try requirePasswordProof(ownEmail.waitForExistence(timeout: 15), "Native displayed owner must match exact private caregiver")
+            try readOnly()
+        }
+        func capture(_ name: String) {
+            let shot = XCTAttachment(screenshot: app.screenshot()); shot.name = name; shot.lifetime = .keepAlways; add(shot)
+        }
+        app.launchArguments = ["--qa-request-counts", "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
+        app.launch()
+        try requirePasswordProof(app.buttons[messagesLabel].waitForExistence(timeout: 60), "Stored caregiver session must already restore; never login to repair this test")
+        requireNativeSignupMainLoaded(caregiver: true)
+        try readOnly(); try owner()
+        try tab(matchesLabel); requireNativeSignupMainLoaded(caregiver: true); try readOnly()
+        capture("current-owned-caregiver-loaded-matches-list")
+        try tab(messagesLabel)
+        let messagesReady = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            self.nativeSignupRequestCount("GET /api/users/chats") >= 1
+                && self.app.staticTexts[emptyMessages].exists && self.app.staticTexts[emptyDescription].exists
+                && !self.app.buttons.matching(NSPredicate(format: "label ==[c] %@", "Try again")).firstMatch.exists
+                && !self.app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Please wait")).firstMatch.exists
+        }, object: nil)
+        try requirePasswordProof(XCTWaiter.wait(for: [messagesReady], timeout: 40) == .completed,
+            "This unused owned account must load the real empty conversation list; unexpected rows require diagnosis, never opening a chat")
+        try readOnly(); capture("current-owned-caregiver-loaded-empty-messages-list")
+        try tab(matchesLabel); requireNativeSignupMainLoaded(caregiver: true); try readOnly()
+        try owner()
+        let before = app.staticTexts["qa-request-counts"].label
+        app.terminate(); app.launch()
+        try requirePasswordProof(app.buttons[messagesLabel].waitForExistence(timeout: 60), "Ordinary relaunch must retain saved session without login")
+        requireNativeSignupMainLoaded(caregiver: true)
+        try readOnly(); try owner()
+        try requirePasswordProof(try Data(contentsOf: URL(fileURLWithPath: file)) == original, "Read-only proof must preserve exact fixture journal bytes")
+        let proof = XCTAttachment(string: "role=caregiver;exactNativeDisplayedOwner=true;currentMatchesLoaded=true;realEmptyMessagesLoaded=true;chatOpened=false;allAppRequestsGET=true;ordinaryRelaunch=true;hiddenLogin=false;fixtureJournalUnchanged=true\nBEFORE\n" + before + "\nRELAUNCH\n" + app.staticTexts["qa-request-counts"].label)
+        proof.name = "current-owned-caregiver-list-tabs-readonly-anonymous"; proof.lifetime = .keepAlways; add(proof)
     }
 
     private enum PasswordProofError: Error { case failed(String) }
@@ -558,15 +802,34 @@ final class SignupTests: XCTestCase {
     }
 
     @discardableResult
-    private func signUp(caregiver: Bool, password: String = newPassword()) throws -> MailTM.Inbox {
+    private func signUp(caregiver: Bool, password requestedPassword: String? = nil) throws -> MailTM.Inbox {
         let environment = ProcessInfo.processInfo.environment
         guard environment["QA_SIMULATOR_LOCATION_READY"] == "1",
-              let accountFile = environment["QA_ACCOUNT_FILE"], !accountFile.isEmpty else {
+              let accountFile = environment["QA_ACCOUNT_FILE"], !accountFile.isEmpty,
+              let lat = environment["QA_EXPECTED_SIM_LAT"].flatMap(Double.init),
+              let lng = environment["QA_EXPECTED_SIM_LNG"].flatMap(Double.init),
+              lat.isFinite, lng.isFinite, (-90...90).contains(lat), (-180...180).contains(lng),
+              !(lat == 0 && lng == 0) else {
             throw XCTSkip("Root must configure simulator GPS/location permission and provide a private QA_ACCOUNT_FILE before creating a disposable signup account.")
         }
-        let inbox = try MailTM.createInbox()
+        expectedSyntheticLocation = (lat, lng)
+        let inbox = try NativeLifecycleFixture.inbox(accountFile, caregiver: caregiver, environment: environment)
+        nativeSignupAccountFile = accountFile
+        var nativeRecord = try NativeLifecycleFixture.read(accountFile)
+        let password = try XCTUnwrap(requestedPassword ?? nativeRecord["password"] as? String)
+        try requirePasswordProof(!password.isEmpty, "Native disposable password is missing")
+        nativeRecord["password"] = password
+        try NativeLifecycleFixture.save(nativeRecord, accountFile)
+        let contents = try CarezaarAPI.callWithHTTPStatus("GET", "base/contents?ts_cache=0")
+        XCTAssertEqual(contents.status, 200)
+        let labels = try XCTUnwrap(contents.body["result"] as? [[String: Any]])
+        let slug = "\(caregiver ? "caregiver" : "client")_matches_all_matches"
+        let row = try XCTUnwrap(labels.first { $0["slug"] as? String == slug })
+        signupAllMatchesLabel = try XCTUnwrap((row["translations"] as? [[String: Any]])?.first {
+            ($0["language_id"] as? NSNumber)?.intValue == 1 || ($0["language_id"] as? String) == "1"
+        }?["name"] as? String)
         print("Signup started for disposable \(caregiver ? "caregiver" : "client") role; credentials omitted.")
-        app.launchArguments = ["--qa-signout", "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
+        app.launchArguments = ["--qa-signout", "--qa-request-counts", "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
         app.launch()
         let entry = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", caregiver ? "I’m a caregiver" : "I need care")).firstMatch
         XCTAssertTrue(entry.waitForExistence(timeout: 40))
@@ -589,6 +852,7 @@ final class SignupTests: XCTestCase {
         next.tap()
         let confirm = app.buttons["Confirm"].firstMatch
         XCTAssertTrue(confirm.waitForExistence(timeout: 10), "Are you sure? dialog")
+        try NativeLifecycleFixture.stageRegistration(accountFile, inbox: inbox)
         confirm.tap()
 
         // Disposable credentials, to a file outside the project, as soon as the account
@@ -597,7 +861,10 @@ final class SignupTests: XCTestCase {
 
         // OTP from the real email.
         XCTAssertTrue(app.staticTexts["OTP Confirmation"].waitForExistence(timeout: 40), "OTP screen")
-        let code = try XCTUnwrap(try MailTM.waitForCode(inbox), "no OTP email arrived")
+        XCTAssertTrue(app.staticTexts["qa-request-counts"].exists)
+        XCTAssertEqual(nativeSignupRequestCount("POST /api/auth/register"), 1, "Exactly one native registration request required")
+        XCTAssertEqual(nativeSignupRequestCount("POST /api/users/otp/send"), 1, "Exactly one native signup OTP send required")
+        let code = try NativeLifecycleFixture.waitForSignupCode(accountFile, inbox: inbox)
         let otpBoxes = app.descendants(matching: .any).matching(NSPredicate(format: "label BEGINSWITH %@", "One-time code")).firstMatch
         XCTAssertTrue(otpBoxes.waitForExistence(timeout: 10), "Native OTP boxes did not appear")
         otpBoxes.tap()
@@ -607,7 +874,116 @@ final class SignupTests: XCTestCase {
         otpContinue.tap()
 
         try completeSignupProfileAndPreferences(caregiver: caregiver)
+        // Preserve the actual native onboarding transport cardinality before
+        // the independent owned-identity proof obtains its separate API token.
+        XCTAssertEqual(nativeSignupRequestCount("POST /api/auth/register"), 1)
+        XCTAssertEqual(nativeSignupRequestCount("POST /api/users/otp/send"), 1)
+        XCTAssertEqual(nativeSignupRequestCount("POST /api/users/profile"), 1,
+                       "Native signup must submit its profile exactly once")
+        XCTAssertEqual(nativeSignupRequestCount(caregiver ? "POST /api/caregivers" : "POST /api/clients"), 1,
+                       "Native signup must create its selected role entity exactly once")
+        XCTAssertEqual(nativeSignupRequestCount(caregiver ? "POST /api/clients" : "POST /api/caregivers"), 0,
+                       "Native signup must not create the opposite role entity")
+        try verifyNativeSavedProfileAndOrdinaryRelaunch(accountFile: accountFile, email: inbox.address,
+                                                      password: password, caregiver: caregiver)
         return inbox
+    }
+
+    /// Recovery of the exact first native fixture after a test-only date-format
+    /// assertion failure. This method cannot register, resend, or submit a profile.
+    func testResumeOwnedNativeSignupSavedProfileAndOrdinaryRelaunchWithoutRegistration() throws {
+        let environment = ProcessInfo.processInfo.environment
+        let file = try XCTUnwrap(environment["QA_ACCOUNT_FILE"])
+        let record = try NativeLifecycleFixture.read(file)
+        let provenance = try XCTUnwrap(record["native_provenance"] as? [String: Any])
+        let email = try XCTUnwrap(record["email"] as? String)
+        let marker = try XCTUnwrap(provenance["marker"] as? String)
+        let id = try XCTUnwrap(record["user_id"] as? String)
+        try requirePasswordProof(record["role"] as? String == "client"
+            && provenance["role"] as? String == "client"
+            && provenance["size"] as? String == "modern"
+            && provenance["stage"] as? String == "mainIdentityVerified"
+            && provenance["app_registration_attempts"] as? Int == 1
+            && provenance["provider_create_attempts"] as? Int == 1
+            && email.hasPrefix("carezaar-native-\(marker)@") && !id.isEmpty,
+            "Recovery requires the exact existing first Modern/client signup checkpoint")
+        let retained = ["QA_EMAIL", "QA_CLIENT_EMAIL", "QA_CG_EMAIL"].compactMap { environment[$0]?.lowercased() }
+        try requirePasswordProof(!retained.contains(email.lowercased()), "Retained fixture refused")
+        expectedSyntheticLocation = (37.7749, -122.4194)
+        let contents = try CarezaarAPI.callWithHTTPStatus("GET", "base/contents?ts_cache=0")
+        XCTAssertEqual(contents.status, 200)
+        let rows = try XCTUnwrap(contents.body["result"] as? [[String: Any]])
+        let row = try XCTUnwrap(rows.first { $0["slug"] as? String == "client_matches_all_matches" })
+        signupAllMatchesLabel = try XCTUnwrap((row["translations"] as? [[String: Any]])?.first {
+            ($0["language_id"] as? NSNumber)?.intValue == 1 || ($0["language_id"] as? String) == "1"
+        }?["name"] as? String)
+        try verifyNativeSavedProfileAndOrdinaryRelaunch(accountFile: file, email: email,
+            password: try XCTUnwrap(record["password"] as? String), caregiver: false, expectedID: id)
+    }
+
+    private func verifyNativeSavedProfileAndOrdinaryRelaunch(accountFile: String, email: String,
+        password: String, caregiver: Bool, expectedID: String? = nil) throws {
+        let environment = ProcessInfo.processInfo.environment
+        let role = caregiver ? "caregiver" : "client"
+        let token = try requireAcceptedLogin(email, password: password, role: role)
+        let identity = try CarezaarAPI.callWithHTTPStatus("GET", "auth/info", token: token)
+        let user = CarezaarAPI.result(identity.body)
+        let id = try XCTUnwrap(user["id"].map { String(describing: $0) })
+        try requirePasswordProof(!id.isEmpty && id != environment["QA_CLIENT_USER_ID"] && id != environment["QA_CG_ID"],
+                                 "Native signup must not authenticate a retained fixture identity")
+        var nativeRecord = try NativeLifecycleFixture.read(accountFile)
+        if let expectedID {
+            try requirePasswordProof(id == expectedID, "Read-only signup recovery authenticated a different immutable identity")
+        }
+        nativeRecord["user_id"] = id
+        var provenance = nativeRecord["native_provenance"] as? [String: Any] ?? [:]
+        provenance["stage"] = "mainIdentityVerified"
+        nativeRecord["native_provenance"] = provenance
+        try NativeLifecycleFixture.save(nativeRecord, accountFile)
+        let profileResponse = try CarezaarAPI.callWithHTTPStatus("GET", caregiver ? "caregivers/profile" : "clients/profile", token: token)
+        XCTAssertEqual(profileResponse.status, 200)
+        let profile = CarezaarAPI.result(profileResponse.body)
+        let profileUser = try XCTUnwrap(profile["user"] as? [String: Any])
+        XCTAssertTrue(profileUser["id"].map { String(describing: $0) } == id, "Owned saved-profile identity mismatch")
+        XCTAssertTrue(profileUser["first_name"] as? String == "Ios", "Native entered first name was not persisted")
+        XCTAssertTrue(profileUser["last_name"] as? String == (caregiver ? "Caregiver" : "Client"), "Native entered last name was not persisted")
+        // The live profile returns MM/dd/yyyy, also consumed by ProfileFormView.prefill.
+        // Keep the explicit selected year/day contract rather than assuming ISO wire text.
+        let birthFormatter = DateFormatter()
+        birthFormatter.locale = Locale(identifier: "en_US_POSIX")
+        birthFormatter.calendar = Calendar(identifier: .gregorian)
+        birthFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+        birthFormatter.dateFormat = "MM/dd/yyyy"
+        birthFormatter.isLenient = false
+        let rawBirthDate = try XCTUnwrap(profileUser["date_of_birth"] as? String)
+        let savedBirthDate = try XCTUnwrap(birthFormatter.date(from: rawBirthDate), "Saved birth date must use the documented profile format")
+        XCTAssertEqual(birthFormatter.string(from: savedBirthDate), rawBirthDate, "Saved birth date must round-trip exactly")
+        let birthComponents = birthFormatter.calendar.dateComponents([.year, .day], from: savedBirthDate)
+        XCTAssertTrue(birthComponents.year == 1990 && birthComponents.day == 12,
+                      "Native explicitly selected adult birth year/day was not persisted")
+        func number(_ value: Any?) -> Double? {
+            (value as? NSNumber)?.doubleValue ?? (value as? String).flatMap(Double.init)
+        }
+        XCTAssertEqual(try XCTUnwrap(number(profile["salary_min"])), 20)
+        XCTAssertEqual(try XCTUnwrap(number(profile["salary_max"])), 40)
+        let expected = try XCTUnwrap(expectedSyntheticLocation)
+        XCTAssertEqual(try XCTUnwrap(number(profile["lat"])), expected.lat, accuracy: 0.00001)
+        XCTAssertEqual(try XCTUnwrap(number(profile["lng"])), expected.lng, accuracy: 0.00001)
+        try NativeLifecycleFixture.stage("savedPayLocationVerified", file: accountFile)
+        app.terminate()
+        app.launchArguments = ["--qa-request-counts", "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
+        app.launch()
+        XCTAssertTrue(app.buttons["Messages"].waitForExistence(timeout: 60), "New signup saved session must restore on ordinary launch")
+        XCTAssertTrue(app.staticTexts["My Matches"].waitForExistence(timeout: 30))
+        requireNativeSignupMainLoaded(caregiver: caregiver)
+        let restoredCounts = app.staticTexts["qa-request-counts"].label
+        XCTAssertFalse(restoredCounts.contains("POST /api/auth/login="), "Ordinary new-account restore must not perform a hidden login")
+        XCTAssertTrue(restoredCounts.contains("GET /api/auth/info="))
+        XCTAssertEqual(app.staticTexts["qa-token-presence"].label, "accessPresent=true;refreshPresent=true")
+        let proof = XCTAttachment(string: "role=\(role);exactIdentityVerified=true;savedPayLocationVerified=true;ordinaryRelaunchVerified=true;hiddenLogin=false\n" + restoredCounts)
+        proof.name = "native-owned-signup-saved-profile-and-relaunch-anonymous"
+        proof.lifetime = .keepAlways; add(proof)
+        try NativeLifecycleFixture.stage("signupComplete", file: accountFile)
     }
 
     private func completeSignupProfileAndPreferences(caregiver: Bool) throws {
@@ -628,11 +1004,13 @@ final class SignupTests: XCTestCase {
         dismissKeyboard()
         let profileContinue = app.buttons["Continue"].firstMatch
         XCTAssertTrue(profileContinue.isEnabled, "profile Continue disabled")
+        if let file = nativeSignupAccountFile { try NativeLifecycleFixture.stage("profileSubmitIntent", file: file) }
         profileContinue.tap()
 
         // Wizard intro (v2 "Find Your Ideal Caregiver").
         let start = app.buttons["Get Started"].firstMatch
         XCTAssertTrue(start.waitForExistence(timeout: 40), "wizard intro")
+        if let file = nativeSignupAccountFile { try NativeLifecycleFixture.stage("profileSubmittedWizardIntro", file: file) }
         start.tap()
 
         // Step 1: care type.
@@ -654,11 +1032,31 @@ final class SignupTests: XCTestCase {
         let myLocation = app.buttons["My location"]
         XCTAssertTrue(myLocation.waitForExistence(timeout: 15), "map picker")
         myLocation.tap()
+        let locationPrompt = XCUIApplication(bundleIdentifier: "com.apple.springboard").alerts.matching(NSPredicate(
+            format: "label CONTAINS[c] %@ AND label CONTAINS[c] %@", "Carezaar", "location")).firstMatch
+        if locationPrompt.waitForExistence(timeout: 5) {
+            let allow = locationPrompt.buttons.matching(NSPredicate(format: "label IN %@",
+                ["Allow While Using App", "Allow While Using the App"])).firstMatch
+            XCTAssertTrue(allow.exists && allow.isHittable, "Actual location prompt must offer While Using")
+            allow.tap()
+            XCTAssertTrue(locationPrompt.waitForNonExistence(timeout: 10))
+        }
         let confirmMap = app.buttons["Confirm"].firstMatch
         XCTAssertTrue(confirmMap.waitForExistence(timeout: 30), "Simulator phone location did not resolve after My Location; root must inspect permission/GPS setup")
         confirmMap.tap()
         let location = app.buttons.matching(NSPredicate(format: "label MATCHES %@", ".*-?[0-9]+\\.[0-9]{6} , -?[0-9]+\\.[0-9]{6}.*")).firstMatch
         XCTAssertTrue(location.waitForExistence(timeout: 10), "Confirmed point must fill the location row")
+        if let expected = expectedSyntheticLocation {
+            let regex = try NSRegularExpression(pattern: "(-?[0-9]+\\.[0-9]{6}) , (-?[0-9]+\\.[0-9]{6})")
+            let label = location.label
+            let match = try XCTUnwrap(regex.firstMatch(in: label, range: NSRange(label.startIndex..<label.endIndex, in: label)))
+            let latRange = try XCTUnwrap(Range(match.range(at: 1), in: label))
+            let lngRange = try XCTUnwrap(Range(match.range(at: 2), in: label))
+            XCTAssertEqual(try XCTUnwrap(Double(label[latRange])), expected.lat, accuracy: 0.00001,
+                           "Actual native selected latitude differs from the explicitly seeded synthetic fix")
+            XCTAssertEqual(try XCTUnwrap(Double(label[lngRange])), expected.lng, accuracy: 0.00001,
+                           "Actual native selected longitude differs from the explicitly seeded synthetic fix")
+        }
         for chip in ["Up to 5 miles", "Morning: 6 am - 12 pm", "Monday", "One Time"] + (caregiver ? [] : ["Female"]) { tapChip(chip) }
         let minimum = app.textFields["Minimum"]; scrollTo(minimum)
         minimum.tap(); minimum.typeText("20")
@@ -670,19 +1068,40 @@ final class SignupTests: XCTestCase {
         // Review, then Save creates the client entity and signs in.
         XCTAssertTrue(textContaining("Review").waitForExistence(timeout: 10), "review step")
         XCTAssertTrue(textContaining("Senior Care").exists, "review shows the care type")
+        if let file = nativeSignupAccountFile { try NativeLifecycleFixture.stage("roleEntitySaveIntent", file: file) }
         app.buttons["Save"].firstMatch.tap()
         let allow = XCUIApplication(bundleIdentifier: "com.apple.springboard").buttons["Allow"]
         if allow.waitForExistence(timeout: 20) { allow.tap() }
         XCTAssertTrue(app.buttons["Messages"].waitForExistence(timeout: 60), "did not reach Main after Save")
+        if let file = nativeSignupAccountFile { try NativeLifecycleFixture.stage("roleEntitySavedMain", file: file) }
         XCTAssertTrue(app.staticTexts["My Matches"].waitForExistence(timeout: 30), "Signup did not open the actual Matches screen")
         XCTAssertTrue(app.buttons.matching(identifier: "Matches").allElementsBoundByIndex.contains { $0.isSelected }, "Matches tab is not selected after signup")
 
         // The list reflects the backend: cards, or the empty state for a remote location.
+        requireNativeSignupMainLoaded(caregiver: caregiver)
+    }
+
+    private func requireNativeSignupMainLoaded(caregiver: Bool) {
+        let prefix = "GET /api/\(caregiver ? "caregivers" : "clients")/matches="
+        let emptyLabel = (signupAllMatchesLabel ?? "All Matches") + " (0)"
         let card = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "mile(s) away")).firstMatch
-        let empty = textContaining("All Matches (0)")
-        let loaded = NSPredicate { _, _ in card.exists || empty.exists }
-        XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: loaded, object: nil)], timeout: 40), .completed,
-                       "Matches list did not load cards or the actual managed empty state")
+        let retry = app.buttons.matching(NSPredicate(format: "label ==[c] %@", "Try again")).firstMatch
+        let busy = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Please wait")).firstMatch
+        let loaded = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            let lines = self.app.staticTexts["qa-request-counts"].label.split(separator: "\n")
+            let attempts = lines.first { $0.hasPrefix(prefix) }.flatMap { Int($0.dropFirst(prefix.count)) } ?? 0
+            let empty = self.app.staticTexts.matching(NSPredicate(format: "label == %@", emptyLabel))
+            let actualEmpty = empty.count >= 2 && empty.allElementsBoundByIndex.contains { $0.isHittable }
+            return attempts >= 1 && (card.exists || actualEmpty) && !retry.exists && !busy.exists
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [loaded], timeout: 40), .completed,
+                       "Native signup Main needs a completed role list with cards or real empty content, not its header alone")
+    }
+
+    private func nativeSignupRequestCount(_ path: String) -> Int {
+        let prefix = path + "="
+        let line = app.staticTexts["qa-request-counts"].label.split(separator: "\n").first { $0.hasPrefix(prefix) }
+        return line.flatMap { Int($0.dropFirst(prefix.count)) } ?? 0
     }
 
     private func selectAdultDateOfBirth() {
@@ -716,8 +1135,15 @@ final class SignupTests: XCTestCase {
     private func saveDisposableAccount(_ inbox: MailTM.Inbox, password: String, caregiver: Bool) throws {
         guard let file = ProcessInfo.processInfo.environment["QA_ACCOUNT_FILE"] else { return }
         let url = URL(fileURLWithPath: file)
-        let record = ["email": inbox.address, "password": password, "role": caregiver ? "caregiver" : "client",
-                      "inbox_token": inbox.token]
+        var record = (try? JSONSerialization.jsonObject(with: Data(contentsOf: url))) as? [String: Any] ?? [:]
+        if record["native_provenance"] != nil {
+            try requirePasswordProof(record["email"] as? String == inbox.address
+                && record["role"] as? String == (caregiver ? "caregiver" : "client"),
+                "Cannot overwrite another native disposable fixture")
+        }
+        record["email"] = inbox.address; record["password"] = password
+        record["role"] = caregiver ? "caregiver" : "client"; record["inbox_token"] = inbox.token
+        if record["pending_password"] as? String == password { record.removeValue(forKey: "pending_password") }
         try JSONSerialization.data(withJSONObject: record).write(to: url, options: .atomic)
         try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: file)
     }

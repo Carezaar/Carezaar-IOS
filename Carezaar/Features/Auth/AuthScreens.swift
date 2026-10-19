@@ -159,7 +159,10 @@ struct SignInView: View {
             isEnabled: { node in node.isPrimaryButton ? canSubmit : true },
             // The content table has no translation for this subtitle; English only.
             isHidden: { node in loc.languageId != 1 && node.text == "Sign in to continue to Carezaar." },
-            opacity: { node in node.isPrimaryButton && !canSubmit ? 0.45 : nil }
+            opacity: { node in node.isPrimaryButton && !canSubmit ? 0.45 : nil },
+            // The action-bearing Header combines an unlabelled Back glyph and logo.
+            // Match the existing native Back semantics without changing its geometry.
+            accessibilityLabel: { node in node.isBackButton ? "Back" : nil }
         )
     }
 
@@ -355,14 +358,9 @@ struct SignUpCredentialsView: View {
             // The scene has fixed geometry (it does not grow with Dynamic Type), so the
             // sentence uses the frame's fixed type size; no scale factor, which would
             // also misplace the link rects.
-            Text(consentText)
-                .font(.custom("Vazirmatn", fixedSize: 14)).foregroundStyle(Theme.Palette.textPrimary)
+            LegalConsentLinks(text: consentText) { document = $0 }
                 .fixedSize(horizontal: false, vertical: true)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .environment(\.openURL, OpenURLAction { url in
-                    if let doc = LegalDocument(linkURL: url) { document = doc }
-                    return .handled
-                })
                 .accessibilityAction(named: termsName) { document = .termsOfUse }
                 .accessibilityAction(named: privacyName) { document = .privacyPolicy }
                 .accessibilityIdentifier("signup-consent-text")
@@ -409,7 +407,12 @@ struct SignUpCredentialsView: View {
     private func proceed() {
         let problems = SignUpCredentialsValidation.problems(
             email: email, password: password, confirmation: confirmation, accepted: accepted) { loc.t($0, $1) }
-        errors = problems
+        errors = problems.filter { $0.key != .agreement }
+        if let agreement = problems[.agreement] {
+            feedback.toast(agreement)
+            UIAccessibility.post(notification: .announcement, argument: agreement)
+            return
+        }
         guard problems.isEmpty else {
             UIAccessibility.post(notification: .announcement,
                                  argument: Field.allCases.compactMap { problems[$0] }.joined(separator: ". "))
@@ -459,6 +462,61 @@ struct SignUpCredentialsView: View {
     }
 }
 
+/// A native inline-link view owns both link hit testing and activation. This
+/// avoids SwiftUI attributed-Text URL dispatch inside the scaled Figma scene.
+private struct LegalConsentLinks: UIViewRepresentable {
+    let text: AttributedString
+    let onOpen: (LegalDocument) -> Void
+    @Environment(\.layoutDirection) private var direction
+
+    func makeUIView(context: Context) -> UITextView {
+        let view = UITextView()
+        view.isEditable = false
+        view.isSelectable = true
+        view.isScrollEnabled = false
+        view.dataDetectorTypes = []
+        view.backgroundColor = .clear
+        view.textContainerInset = .zero
+        view.textContainer.lineFragmentPadding = 0
+        view.textContainer.lineBreakMode = .byWordWrapping
+        view.delegate = context.coordinator
+        view.accessibilityIdentifier = "signup-consent-text"
+        view.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        return view
+    }
+    func updateUIView(_ view: UITextView, context: Context) {
+        context.coordinator.onOpen = onOpen
+        let value = NSMutableAttributedString(attributedString: NSAttributedString(text))
+        let fullRange = NSRange(location: 0, length: value.length)
+        let paragraph = NSMutableParagraphStyle()
+        paragraph.baseWritingDirection = direction == .rightToLeft ? .rightToLeft : .leftToRight
+        paragraph.alignment = .natural
+        value.addAttributes([.font: UIFont(name: "Vazirmatn-Regular", size: 14) ?? .systemFont(ofSize: 14),
+                             .foregroundColor: UIColor.black, .paragraphStyle: paragraph], range: fullRange)
+        let color = UIColor(Theme.Palette.primaryText)
+        value.enumerateAttribute(.link, in: fullRange) { url, range, _ in
+            if url != nil { value.addAttributes([.foregroundColor: color, .underlineStyle: NSUnderlineStyle.single.rawValue], range: range) }
+        }
+        view.linkTextAttributes = [.foregroundColor: color, .underlineStyle: NSUnderlineStyle.single.rawValue]
+        view.semanticContentAttribute = direction == .rightToLeft ? .forceRightToLeft : .forceLeftToRight
+        if view.attributedText != value { view.attributedText = value }
+    }
+    func sizeThatFits(_ proposal: ProposedViewSize, uiView: UITextView, context: Context) -> CGSize? {
+        let width = proposal.width ?? 336
+        let measured = uiView.sizeThatFits(CGSize(width: width, height: .greatestFiniteMagnitude))
+        return CGSize(width: width, height: measured.height)
+    }
+    func makeCoordinator() -> Coordinator { Coordinator(onOpen: onOpen) }
+    final class Coordinator: NSObject, UITextViewDelegate {
+        var onOpen: (LegalDocument) -> Void
+        init(onOpen: @escaping (LegalDocument) -> Void) { self.onOpen = onOpen }
+        func textView(_ textView: UITextView, primaryActionFor textItem: UITextItem, defaultAction: UIAction) -> UIAction? {
+            guard case .link(let url) = textItem.content, let document = LegalDocument(linkURL: url) else { return nil }
+            return UIAction { [weak self] _ in self?.onOpen(document) }
+        }
+    }
+}
+
 /// The two documents named in the sign-up consent (C2).
 enum LegalDocument: String, Identifiable {
     case termsOfUse, privacyPolicy
@@ -477,12 +535,16 @@ enum LegalDocument: String, Identifiable {
         }
     }
 
-    /// The bundled PDF (nil only if it is missing from the build).
+    /// Configured server document, with the supplied PDF used only while unconfigured.
     var url: URL? {
         #if DEBUG
         let args = ProcessInfo.processInfo.arguments
         if let i = args.firstIndex(of: "--qa-legal-url"), i + 1 < args.count { return URL(string: args[i + 1]) }
         #endif
+        let key = self == .termsOfUse ? LegalDocumentConfiguration.termsURLKey : LegalDocumentConfiguration.privacyURLKey
+        do {
+            if let remote = try LegalDocumentConfiguration.httpsURL(Bundle.main.object(forInfoDictionaryKey: key) as? String) { return remote }
+        } catch { return nil }
         let name = self == .termsOfUse ? LegalDocumentConfiguration.termsOfUseFile : LegalDocumentConfiguration.privacyPolicyFile
         return Bundle.main.url(forResource: name, withExtension: "pdf", subdirectory: "Assets/legal")
     }
@@ -495,12 +557,16 @@ struct LegalDocumentView: View {
     @EnvironmentObject private var loc: Localization
     @Environment(\.dismiss) private var dismiss
     @State private var failed = false
+    @State private var loading = true
+    @State private var loadID = UUID()
 
     var body: some View {
         NavigationStack {
             Group {
                 if let url = document.url, !failed {
-                    LegalWebView(url: url, failed: $failed)
+                    LegalWebView(url: url, failed: $failed, loading: $loading)
+                        .id(loadID)
+                        .overlay { if loading { ProgressView().accessibilityIdentifier("legal-document-loading") } }
                 } else {
                     VStack(spacing: Theme.Spacing.s) {
                         AppIcon(name: "ic_info_circle", size: 40, tint: Theme.Palette.textSecondary)
@@ -508,6 +574,10 @@ struct LegalDocumentView: View {
                         Text(loc.t("general_error_not_found", "This item is no longer available."))
                             .font(Theme.Typography.body()).multilineTextAlignment(.center)
                             .accessibilityIdentifier("legal-document-unavailable")
+                        Button(loc.t("general_try_again", "Try Again")) {
+                            loading = true; failed = false; loadID = UUID()
+                        }
+                        .accessibilityIdentifier("legal-document-retry")
                     }
                     .padding(Theme.Spacing.l)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -528,9 +598,13 @@ struct LegalDocumentView: View {
 private struct LegalWebView: UIViewRepresentable {
     let url: URL
     @Binding var failed: Bool
+    @Binding var loading: Bool
 
     func makeUIView(context: Context) -> WKWebView {
-        let view = WKWebView()
+        let configuration = WKWebViewConfiguration()
+        configuration.websiteDataStore = .nonPersistent()
+        configuration.defaultWebpagePreferences.allowsContentJavaScript = false
+        let view = WKWebView(frame: .zero, configuration: configuration)
         view.navigationDelegate = context.coordinator
         view.scrollView.minimumZoomScale = 1
         view.scrollView.maximumZoomScale = 5
@@ -539,22 +613,48 @@ private struct LegalWebView: UIViewRepresentable {
         if url.isFileURL {
             view.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
         } else {
-            view.load(URLRequest(url: url, timeoutInterval: APIConfiguration.requestTimeout))
+            view.load(LegalDocumentConfiguration.request(for: url))
         }
         return view
     }
     func updateUIView(_ view: WKWebView, context: Context) {}
-    func makeCoordinator() -> Coordinator { Coordinator(failed: $failed) }
+    static func dismantleUIView(_ view: WKWebView, coordinator: Coordinator) {
+        view.stopLoading()
+        view.navigationDelegate = nil
+    }
+    func makeCoordinator() -> Coordinator { Coordinator(failed: $failed, loading: $loading, initialURL: url) }
 
     final class Coordinator: NSObject, WKNavigationDelegate {
         let failed: Binding<Bool>
-        init(failed: Binding<Bool>) { self.failed = failed }
-        func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) { failed.wrappedValue = true }
-        func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) { failed.wrappedValue = true }
+        let loading: Binding<Bool>
+        let initialURL: URL
+        init(failed: Binding<Bool>, loading: Binding<Bool>, initialURL: URL) {
+            self.failed = failed; self.loading = loading; self.initialURL = initialURL
+        }
+        func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction,
+                     decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+            guard let url = action.request.url else { decisionHandler(.cancel); return }
+            var allowed = url.scheme == "https" || (initialURL.isFileURL && url.isFileURL)
+            #if DEBUG
+            // Only the explicit QA document hook can use a loopback HTTP fixture.
+            if initialURL.scheme == "http", ["127.0.0.1", "localhost"].contains(initialURL.host ?? ""),
+               url.scheme == "http", url.host == initialURL.host { allowed = true }
+            #endif
+            if !allowed { failed.wrappedValue = true; loading.wrappedValue = false }
+            decisionHandler(allowed ? .allow : .cancel)
+        }
+        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) { loading.wrappedValue = false }
+        func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+            failed.wrappedValue = true; loading.wrappedValue = false
+        }
+        func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+            failed.wrappedValue = true; loading.wrappedValue = false
+        }
         func webView(_ webView: WKWebView, decidePolicyFor response: WKNavigationResponse,
                      decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
             if let http = response.response as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
                 failed.wrappedValue = true
+                loading.wrappedValue = false
                 decisionHandler(.cancel)
             } else { decisionHandler(.allow) }
         }
@@ -603,8 +703,7 @@ struct OTPView: View {
         .onReceive(ticker) { _ in if secondsLeft > 0 { secondsLeft -= 1 } }
         .onAppear {
             focused = true
-            // C4: no code was sent, so Re-send is available at once.
-            if signUp.otpSendFailed { secondsLeft = 0 }
+            // v4 C2: the initial wait also applies when the first send failed.
         }
     }
 

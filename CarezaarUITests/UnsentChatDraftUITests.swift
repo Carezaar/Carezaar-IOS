@@ -134,6 +134,14 @@ final class UnsentChatDraftUITests: XCTestCase {
         XCTAssertTrue(row.waitForExistence(timeout: 15), "Back must restore the Messages conversation list")
         XCTAssertFalse(field.exists, "Back must leave the conversation rather than merely dismiss the keyboard")
         XCTAssertEqual(count(fixture.postPath), 0, "Leaving must never send the draft")
+        // Preserved red run's recording shows the native Getting list of chats
+        // busy overlay after Back. Existing row != completed navigation/reload.
+        let returnedReady = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            row.isHittable && self.app.frame.contains(row.frame)
+                && !self.app.staticTexts["Please wait..."].exists
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [returnedReady], timeout: 20), .completed,
+                       "Exact owned Messages row must become hittable after its actual reload completes")
         XCTAssertTrue(row.isHittable)
         row.tap()
         XCTAssertTrue(field.waitForExistence(timeout: 30), "Owned conversation must reopen")
@@ -153,16 +161,32 @@ final class UnsentChatDraftUITests: XCTestCase {
         // placeholder; neither permits any retained whitespace/synthetic text.
         let reset = field.placeholderValue == placeholder && (observed.isEmpty || observed == placeholder)
         let replyReset = !app.buttons["Cancel"].exists
-        let sendDisabled = !app.buttons["Send"].isEnabled
-        record(role: fixture.role, reset: reset, sendAttempts: count(fixture.postPath),
-               replyCovered: withReply, replyReset: replyReset, sendDisabled: sendDisabled)
+        let send = app.buttons["Send"]
+        let sendEnabled = send.exists && send.isEnabled
         // Field-only screenshots contain synthetic input/placeholder, never peer
         // identity, transcript, credentials, conversation IDs or profile data.
         attachField(field, name: "P08-007-synthetic-draft-after-revisit")
         XCTAssertTrue(reset, "Reopened chat must reset to the exact empty composer/placeholder, matching APK source behavior")
         XCTAssertFalse(observed.contains(draft), "Reopened composer must not retain the prior synthetic draft")
         XCTAssertTrue(replyReset, "Reopened chat must have no selected-reply Cancel banner")
-        XCTAssertTrue(app.buttons["Send"].exists && sendDisabled, "Empty reopened composer must keep Send disabled")
+        // Governing iOS audit K4, p7 (ios-v3-prior.txt:358-360), retained by
+        // ClientUpdateUITests.testK4EmptySendExplainsAndButtonStaysTappable and
+        // ChatView.swift's chat_screen_message_required guard: active empty Send
+        // remains tappable and shows the managed explanation, without a POST.
+        XCTAssertTrue(sendEnabled && send.isHittable, "K4 requires empty Send to remain tappable after revisit")
+        send.tap()
+        let required = app.staticTexts.matching(NSPredicate(format: "label == %@", fixture.emptyMessage)).firstMatch
+        let validationObserved = required.waitForExistence(timeout: 10)
+        XCTAssertTrue(validationObserved, "Empty Send must show the exact independently read managed message")
+        XCTAssertEqual(count(fixture.postPath), 0, "An empty Send action must never issue a message POST")
+        XCTAssertTrue((field.value as? String).map { $0.isEmpty || $0 == placeholder } ?? false)
+        XCTAssertFalse(app.buttons["Cancel"].exists, "Empty validation must not restore the prior selected reply")
+        let proof = XCTAttachment(screenshot: required.screenshot())
+        proof.name = "K4-empty-revisited-send-managed-validation-only"
+        proof.lifetime = .keepAlways; add(proof)
+        record(role: fixture.role, reset: reset, sendAttempts: count(fixture.postPath),
+               replyCovered: withReply, replyReset: replyReset, sendEnabled: sendEnabled,
+               managedEmptyValidationObserved: validationObserved)
     }
 
     private struct Fixture {
@@ -172,6 +196,7 @@ final class UnsentChatDraftUITests: XCTestCase {
         let caregiverID: String
         let chatID: Int
         let partnerName: String
+        let emptyMessage: String
         var getPath: String { "GET /api/users/chats/\(chatID)" }
         var postPath: String { "POST /api/users/chats/\(chatID)" }
     }
@@ -212,8 +237,17 @@ final class UnsentChatDraftUITests: XCTestCase {
         XCTAssertFalse(partnerName.isEmpty)
         XCTAssertEqual(rows.filter { name($0) == partnerName }.count, 1,
                        "Visible partner label must uniquely identify the owned conversation")
+        let contents = try CarezaarAPI.callWithHTTPStatus("GET", "base/contents?ts_cache=0", token: token)
+        XCTAssertEqual(contents.status, 200)
+        let managedRows = try XCTUnwrap(contents.body["result"] as? [[String: Any]])
+        let managed = try XCTUnwrap(managedRows.first { $0["slug"] as? String == "chat_screen_message_required" })
+        let translation = try XCTUnwrap((managed["translations"] as? [[String: Any]])?.first {
+            ($0["language_id"] as? NSNumber)?.intValue == 1 || ($0["language_id"] as? String) == "1"
+        })
+        let emptyMessage = try XCTUnwrap(translation["name"] as? String)
+        XCTAssertEqual(emptyMessage, "Please type a message first.", "English K4 fixture must match the governing managed message")
         return Fixture(token: token, role: role, clientID: clientID, caregiverID: caregiverID,
-                       chatID: chatID, partnerName: partnerName)
+                       chatID: chatID, partnerName: partnerName, emptyMessage: emptyMessage)
     }
 
     private func userID(_ row: [String: Any], side: String) -> String {
@@ -251,15 +285,16 @@ final class UnsentChatDraftUITests: XCTestCase {
         }
     }
 
-    private func record(role: String, reset: Bool, sendAttempts: Int, replyCovered: Bool, replyReset: Bool, sendDisabled: Bool) {
+    private func record(role: String, reset: Bool, sendAttempts: Int, replyCovered: Bool, replyReset: Bool, sendEnabled: Bool, managedEmptyValidationObserved: Bool) {
         let data: [String: Any] = ["case": "P08-007", "role": role, "navigation": "Back-to-Messages-and-revisit",
-            "expectedRevisitBehavior": "empty-draft-no-selected-reply-Send-disabled",
+            "expectedRevisitBehavior": "empty-draft-no-selected-reply-Send-tappable-managed-empty-validation",
             "nativeDraftResetToExactEmptyPlaceholder": reset, "nativeSendPOSTs": sendAttempts,
             "exactUnchangedSyntheticBaselineVerifiedImmediatelyBeforeBack": true,
             "syntheticTextAbsentFromBackend": true, "ownedPairIndependentlyVerified": true,
             "replySelectionCovered": replyCovered, "nativeSelectedReplyAbsentAfterRevisit": replyReset,
-            "nativeSendDisabledAfterRevisit": sendDisabled,
-            "AndroidExpectationBasis": "decompiled-APK-composer-state-and-popBackStack-source",
+            "nativeSendEnabledAfterRevisit": sendEnabled,
+            "managedEmptyValidationObserved": managedEmptyValidationObserved, "emptySendTaps": 1,
+            "AndroidExpectationBasis": "decompiled-APK-composer-state-and-popBackStack-source; empty-Send contract from governing iOS K4 audit p7",
             "AndroidRuntimeExecuted": false,
             "processRelaunchCovered": false]
         guard let json = try? JSONSerialization.data(withJSONObject: data, options: [.sortedKeys]) else {

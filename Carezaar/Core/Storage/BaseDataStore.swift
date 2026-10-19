@@ -47,6 +47,10 @@ final class BaseDataStore: ObservableObject {
         // A complete disk snapshot is safe offline; an incomplete legacy cache is not.
         isReady = cached
         let info = try? await service.info()
+        #if DEBUG
+        QARequestLedger.shared.recordReferenceCompletion(decoded: info != nil, cached: cached,
+            markerMatches: cached && info?.tsCache == snapshot?.tsCache)
+        #endif
         if cached, !force, info == nil || info?.tsCache == snapshot?.tsCache { return }
         // Without the server marker/counts a first download cannot establish a
         // versioned complete snapshot. A previously validated cache remains usable.

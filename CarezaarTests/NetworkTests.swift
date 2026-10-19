@@ -35,6 +35,49 @@ final class StubHTTP: URLProtocol {
     }
 }
 final class NetworkTests: XCTestCase {
+    /// P07-009: actual public service transport, with no live API calls.
+    @MainActor func testTypedServiceRejectsMalformedEmptyNullAndInvalidFieldsWithoutReplay() async throws {
+        let fixtures: [(String, Data)] = [
+            ("empty-body", Data()),
+            ("malformed-json", Data("{".utf8)),
+            ("null-envelope", Data("null".utf8)),
+            ("missing-result", Data("{}".utf8)),
+            ("null-result", Data(#"{"result":null}"#.utf8)),
+            ("wrong-result-shape", Data(#"{"result":{}}"#.utf8)),
+            ("invalid-identity-type", Data(#"{"result":[{"id":{"unexpected":1}}]}"#.utf8)),
+            ("html-success-body", Data("<html>internal fixture</html>".utf8))
+        ]
+        for (name, body) in fixtures {
+            var attempts = 0
+            StubHTTP.handler = { request in
+                attempts += 1
+                XCTAssertEqual(request.httpMethod, "GET", name)
+                XCTAssertEqual(request.url?.path, "/api/base/roles", name)
+                XCTAssertNil(request.value(forHTTPHeaderField: "Authorization"), name)
+                return (200, body)
+            }
+            let service = BaseService(client: APIClient(session: StubHTTP.session()))
+            do {
+                _ = try await service.items(.roles)
+                XCTFail(name + ": unusable typed results must not become success")
+            } catch let error as APIError {
+                guard case .decoding = error else { XCTFail(name + ": expected decoding failure"); continue }
+                let message = Feedback.message(error)
+                XCTAssertFalse(message.isEmpty, name)
+                XCTAssertFalse(message.contains("internal fixture"), name)
+                XCTAssertFalse(message.contains("base/roles"), name)
+            } catch { XCTFail(name + ": unexpected error type") }
+            XCTAssertEqual(attempts, 1, name + ": decoding failures must not replay")
+        }
+        // Empty typed lists and no-content write acknowledgements are valid.
+        StubHTTP.handler = { _ in (200, Data(#"{"result":[]}"#.utf8)) }
+        let service = BaseService(client: APIClient(session: StubHTTP.session()))
+        let items = try await service.items(.roles)
+        XCTAssertTrue(items.isEmpty)
+        StubHTTP.handler = { _ in (204, Data()) }
+        try await UserService(client: APIClient(session: StubHTTP.session())).sendOTP(email: "decoder@example.test")
+    }
+
     /// Exercises the production service/URLSession boundary without sending mail.
     /// Acceptance proves request handling, not delivery to the recipient's inbox.
     @MainActor func testYahooOTPPreservesEmailAndSurfacesServerFailureWithoutReplay() async throws {
@@ -71,6 +114,78 @@ final class NetworkTests: XCTestCase {
         }
     }
 
+    /// Exercises the actual multipart service with early/late times on the local
+    /// selected day. Expected UTC-midnight epochs are independent literals.
+    @MainActor func testProfileBirthDatePreservesSelectedLocalDayInMultipartTransport() async throws {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.timeZone = .current
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        formatter.isLenient = false
+        let cases = ["1990-10-12 00:05:00", "1990-10-12 23:55:00"]
+        for localSelection in cases {
+            let selected = try XCTUnwrap(formatter.date(from: localSelection))
+            var attempts = 0
+            StubHTTP.handler = { request in
+                attempts += 1
+                XCTAssertEqual(request.httpMethod, "POST")
+                XCTAssertEqual(request.url?.path, "/api/users/profile")
+                XCTAssertNil(request.value(forHTTPHeaderField: "Authorization"))
+                XCTAssertTrue(request.value(forHTTPHeaderField: "Content-Type")?.hasPrefix("multipart/form-data;") == true)
+                let body = StubHTTP.body(request)
+                let pattern = #"name="([^"]+)"\r\n\r\n([^\r\n]*)\r\n"#
+                let regex = try NSRegularExpression(pattern: pattern)
+                let matches = regex.matches(in: body, range: NSRange(body.startIndex..<body.endIndex, in: body))
+                var fields = [String: String]()
+                for match in matches {
+                    let key = String(body[try XCTUnwrap(Range(match.range(at: 1), in: body))])
+                    let value = String(body[try XCTUnwrap(Range(match.range(at: 2), in: body))])
+                    XCTAssertNil(fields.updateValue(value, forKey: key), "Multipart fields must not be duplicated")
+                }
+                XCTAssertEqual(fields, ["email": "fixture@example.com", "gender_id": "2",
+                    "first_name": "Synthetic", "last_name": "Calendar", "bio": "Object-only fixture",
+                    "date_of_birth": "655689600"],
+                    "Selected date must survive the actual profile wire body in \(TimeZone.current.identifier) at \(localSelection)")
+                return (422, Data(#"{"message":"Fixture only","errors":{"date_of_birth":["Fixture refusal"]}}"#.utf8))
+            }
+            let service = UserService(client: APIClient(session: StubHTTP.session()))
+            do {
+                _ = try await service.setProfile(email: "fixture@example.com", genderId: 2,
+                    firstName: "Synthetic", lastName: "Calendar", bio: "Object-only fixture",
+                    dateOfBirth: selected, photo: nil, anonymous: true)
+                XCTFail("The explicit fixture refusal must remain a refusal")
+            } catch {
+                guard case APIError.validation = error else {
+                    XCTFail("Actual profile transport must reach the fixture's validation response"); continue
+                }
+            }
+            XCTAssertEqual(attempts, 1, "A date conversion must not retry profile submission")
+        }
+    }
+
+    func testProfileDateOnlyEpochPreservesCalendarDayAcrossTimeZoneBoundaries() throws {
+        // Literal UTC-midnight results independently checked with Python calendar.timegm.
+        let cases: [(zone: String, selected: String, epoch: String)] = [
+            ("GMT", "1990-10-12T00:00:00Z", "655689600"),
+            ("GMT", "1990-10-12T23:59:59Z", "655689600"),
+            ("Asia/Kolkata", "1990-10-12T00:05:00+05:30", "655689600"),
+            ("Asia/Kolkata", "1990-10-12T23:55:00+05:30", "655689600"),
+            ("America/Los_Angeles", "1990-10-12T23:55:00-07:00", "655689600"),
+            ("Pacific/Kiritimati", "2026-01-01T00:05:00+14:00", "1767225600"),
+            ("America/New_York", "2026-03-08T03:15:00-04:00", "1772928000"),
+            ("America/New_York", "2026-11-01T23:55:00-05:00", "1793491200"),
+            ("Pacific/Auckland", "2000-02-29T00:05:00+13:00", "951782400"),
+            ("America/Adak", "2026-12-31T23:55:00-10:00", "1798675200")
+        ]
+        for fixture in cases {
+            let zone = try XCTUnwrap(TimeZone(identifier: fixture.zone))
+            let selected = try XCTUnwrap(ISO8601DateFormatter().date(from: fixture.selected))
+            XCTAssertEqual(UserService.epochDay(selected, timeZone: zone), fixture.epoch,
+                           "Keep the selected date across UTC, local-midnight, DST and calendar boundaries: \(fixture.zone) \(fixture.selected)")
+        }
+    }
+
     func testClientCertificationsUseOnlyDocumentedSnakeCaseForNoneOneAndMany() async {
         for ids in [[], [1], [1, 3]] {
             let captured = expectation(description: "captured actual preference body")
@@ -80,14 +195,34 @@ final class NetworkTests: XCTestCase {
                 XCTAssertTrue(body.contains("certification_ids="))
                 XCTAssertFalse(body.contains("certificationIds="))
                 let components = URLComponents(string: "https://fixture.invalid/?" + body)!
-                XCTAssertEqual(components.queryItems?.first { $0.name == "certification_ids" }?.value, ids.map(String.init).joined(separator: ","))
-                XCTAssertTrue(body.contains("clienttype_id=1"))
+                let items = components.queryItems ?? []
+                let actual = items.reduce(into: [String: String]()) { fields, item in
+                    fields[item.name] = item.value ?? ""
+                }
+                let expected: [String: String] = [
+                    "clienttype_id": "1", "lat": "12.5", "lng": "77.5",
+                    "salary_min": "20", "salary_max": "40",
+                    "carecondition_ids": "2,4", "careday_ids": "1,5",
+                    "carespecial_ids": "3", "certification_ids": ids.map(String.init).joined(separator: ","),
+                    "commute_ids": "2", "experience_ids": "4", "gender_ids": "1,2",
+                    "languageskill_ids": "1,3", "role_ids": "2,5",
+                    "shift_ids": "1,3", "worktype_ids": "2"
+                ]
+                XCTAssertEqual(request.url?.path, "/api/clients/profile")
+                XCTAssertEqual(items.count, actual.count, "Form keys must not be duplicated")
+                XCTAssertEqual(actual, expected, "Changing certification cardinality must preserve every other field")
                 captured.fulfill()
                 return (422, Data(#"{"message":"Fixture validation","errors":{"lat":["Fixture validation"]}}"#.utf8))
             }
             let service = ClientService(client: APIClient(session: StubHTTP.session()))
             do {
-                _ = try await service.updateProfile(ClientPreferences(clienttypeId: 1, lat: 12.5, lng: 77.5, certificationIds: ids))
+                _ = try await service.updateProfile(ClientPreferences(
+                    clienttypeId: 1, lat: 12.5, lng: 77.5, salaryMin: 20, salaryMax: 40,
+                    careconditionIds: [2, 4], caredayIds: [1, 5], carespecialIds: [3],
+                    certificationIds: ids, commuteIds: [2], experienceIds: [4],
+                    genderIds: [1, 2], languageskillIds: [1, 3], roleIds: [2, 5],
+                    shiftIds: [1, 3], worktypeIds: [2]
+                ))
                 XCTFail("Fixture must reject to avoid changing profile")
             } catch {}
             await fulfillment(of: [captured], timeout: 2)
@@ -101,7 +236,65 @@ final class NetworkTests: XCTestCase {
     }
 }
 
+final class DelayedHealthyProtocol: URLProtocol, @unchecked Sendable {
+    private static let lock = NSLock()
+    private static var attempts: [String: Int] = [:]
+    private static var timeouts: [String: TimeInterval] = [:]
+    private static let queue = DispatchQueue(label: "qa.delayed-healthy-response")
+    private var work: DispatchWorkItem?
+    static func reset() { lock.lock(); defer { lock.unlock() }; attempts = [:]; timeouts = [:] }
+    static func snapshot() -> ([String: Int], [String: TimeInterval]) {
+        lock.lock(); defer { lock.unlock() }; return (attempts, timeouts)
+    }
+    override class func canInit(with request: URLRequest) -> Bool { true }
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+    override func startLoading() {
+        let name = request.url!.lastPathComponent
+        Self.lock.lock()
+        Self.attempts[name, default: 0] += 1
+        Self.timeouts[name] = request.timeoutInterval
+        Self.lock.unlock()
+        let responseWork = DispatchWorkItem { [weak self] in
+            guard let self else { return }
+            let response = HTTPURLResponse(url: self.request.url!, statusCode: 200, httpVersion: nil, headerFields: ["Content-Type": "application/json"])!
+            self.client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+            self.client?.urlProtocol(self, didLoad: Data(#"{"message":"Successful Operation"}"#.utf8))
+            self.client?.urlProtocolDidFinishLoading(self)
+        }
+        work = responseWork
+        // Return immediately from startLoading; do not block the URLSession delegate.
+        Self.queue.asyncAfter(deadline: .now() + (name == "healthy-hold" ? 110 : 0), execute: responseWork)
+    }
+    override func stopLoading() { work?.cancel() }
+}
+
+
 final class NetworkPolicyTests: XCTestCase {
+    func testHealthyResponseHeld110SecondsCompletesOnceWithin120AndFastControlReturns() async throws {
+        executionTimeAllowance = 145
+        DelayedHealthyProtocol.reset()
+        let config = URLSessionConfiguration.ephemeral
+        config.protocolClasses = [DelayedHealthyProtocol.self]
+        config.timeoutIntervalForRequest = 120
+        config.timeoutIntervalForResource = 120
+        let session = URLSession(configuration: config)
+        defer { session.invalidateAndCancel() }
+        let api = APIClient(session: session)
+        let fastStart = ProcessInfo.processInfo.systemUptime
+        _ = try await api.sendIgnoringResult(Endpoint(method: .get, path: "fixture/healthy-fast", requiresAuth: false))
+        let fastElapsed = ProcessInfo.processInfo.systemUptime - fastStart
+        XCTAssertLessThan(fastElapsed, 2, "A healthy fast response is not deliberately held")
+        let holdStart = ProcessInfo.processInfo.systemUptime
+        _ = try await api.sendIgnoringResult(Endpoint(method: .get, path: "fixture/healthy-hold", requiresAuth: false))
+        let heldElapsed = ProcessInfo.processInfo.systemUptime - holdStart
+        print("QA_HEALTHY_RESPONSE_TIMING fastSeconds=\(fastElapsed) heldSeconds=\(heldElapsed)")
+        XCTAssertGreaterThanOrEqual(heldElapsed, 109, "Real monotonic elapsed time, not fake clock")
+        XCTAssertLessThan(heldElapsed, 120, "Healthy release occurs below the two-minute boundary")
+        let (attempts, timeouts) = DelayedHealthyProtocol.snapshot()
+        XCTAssertEqual(attempts, ["healthy-fast": 1, "healthy-hold": 1], "No automatic retry for a still-healthy response")
+        XCTAssertEqual(timeouts, ["healthy-fast": 120, "healthy-hold": 120])
+    }
+
     func testDroppedReadRecoversOnFirstRetryWithBoundedBackoff() async {
         await assertDroppedReadRecovers(drops: 1)
     }

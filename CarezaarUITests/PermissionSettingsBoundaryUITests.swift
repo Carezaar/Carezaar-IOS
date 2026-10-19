@@ -35,6 +35,269 @@ final class PermissionSettingsBoundaryUITests: XCTestCase {
         try verifySettingsChange(owner: owner, allow: decision == "allow", initialPromptObserved: false)
     }
 
+    /// Explicit recovery only from the separately retained observed baseline.
+    /// This is not initial-decision or revoke/re-enable acceptance evidence.
+    func testRestoreExplicitRecordedNotificationBaselineAfterInterruptedRun() throws {
+        _ = try ownedFixture()
+        guard let value = env["QA_NOTIFICATION_RESTORE_ALLOWED"], ["true", "false"].contains(value) else {
+            throw XCTSkip("Exact previously observed native baseline required for recovery")
+        }
+        let original = value == "true"
+        let control = try notificationSettingsSwitch()
+        if try switchState(control) != original { try tapNotificationToggle(control) }
+        try waitSwitch(control, equals: original)
+        proof(control, "notification-explicit-recorded-baseline-restored")
+        try record("notification-explicit-recovery", ["originalAllowed": original,
+            "actualNativeSwitchVerified": true, "acceptanceCoverageClaimed": false])
+    }
+
+    /// Decided-state P11-003/004 coverage. The baseline comes from actual
+    /// Settings, never an injected permission value or an assumed earlier run.
+    func testActualOSNotificationRevokeAndReenableRestoresObservedBaseline() throws {
+        let owner = try ownedFixture()
+        launchOwned()
+        XCTAssertFalse(notificationAlert().waitForExistence(timeout: 3),
+                       "This method requires a decided device; do not answer a fresh prompt implicitly")
+        try assertSessionUsable()
+        let baseline = try switchState(notificationSettingsSwitch())
+        try record("notification-observed-baseline", ["role": owner.role,
+            "allowed": baseline, "initialPromptClaimed": false])
+        var changed = false
+        addTeardownBlock { [self] in
+            if changed {
+                do {
+                    let control = try notificationSettingsSwitch()
+                    if try switchState(control) != baseline { try tapNotificationToggle(control) }
+                    try waitSwitch(control, equals: baseline)
+                    proof(control, "notification-failure-path-baseline-restored")
+                } catch { XCTFail("Actual notification baseline restoration failed: \(error)") }
+            }
+        }
+        // Each state is reached through a real native Settings switch. Starting
+        // allowed exercises revoke first; starting denied exercises enable first.
+        for allowed in [!baseline, baseline] {
+            let control = try notificationSettingsSwitch()
+            changed = true // before possible UI transfer / failure
+            if try switchState(control) != allowed { try tapNotificationToggle(control) }
+            try waitSwitch(control, equals: allowed)
+            proof(control, allowed ? "actual-notifications-enabled" : "actual-notifications-revoked")
+            app.activate()
+            try assertSessionUsable()
+            try assertNoRepeatedPrompt()
+            try relaunchPersistedSession()
+            try record("notification-settings-state-return", ["role": owner.role,
+                "allowed": allowed, "nativeSwitchObserved": true,
+                "ordinaryRelaunchUsable": true, "noRepeatedPrompt": true,
+                "remotePushDeliveryVerified": false])
+        }
+        let restored = try notificationSettingsSwitch()
+        try waitSwitch(restored, equals: baseline)
+        proof(restored, "notification-observed-baseline-restored")
+        changed = false
+        try record("notification-two-state-complete", ["role": owner.role,
+            "observedOriginalAllowed": baseline, "originalRestored": true,
+            "bothStatesReturnedAndRelaunched": true, "initialPromptClaimed": false])
+    }
+
+    /// Actual Settings Never / While Using round trip. Saved profile coordinates
+    /// remain real and unchanged; no injected nil profile or location provider.
+    /// Authorized simulator state is not evidence of physical GPS delivery.
+    func testActualOSLocationRevokeAndReenableRestoresObservedBaseline() throws {
+        let owner = try ownedFixture()
+        let endpoint = owner.role == "client" ? "clients/profile" : "caregivers/profile"
+        let original = try profile(owner, endpoint)
+        let originalSelection = try observedLocationSelection()
+        try record("location-observed-baseline", ["role": owner.role,
+            "selection": originalSelection, "initialPromptClaimed": false])
+        var changed = false
+        addTeardownBlock { [self] in
+            if changed {
+                do {
+                    try chooseActualLocation(originalSelection)
+                    XCTAssertEqual(try observedLocationSelection(), originalSelection)
+                    try record("location-failure-path-baseline-restored", ["originalRestored": true])
+                } catch { XCTFail("Actual location baseline restoration failed: \(error)") }
+            }
+        }
+        // Require both genuine Settings choices before making the first change.
+        try openAppSettings(); try tapSettingsRow("Location")
+        _ = try revealSettingsRow("Never")
+        _ = try revealSettingsRow("While Using the App")
+        _ = try revealSettingsRow(originalSelection) // recovery choice must exist before mutation
+        for selection in ["Never", "While Using the App"] {
+            changed = true
+            try chooseActualLocation(selection)
+            XCTAssertEqual(try observedLocationSelection(), selection)
+            try openRealSavedLocationMap(owner)
+            let locate = try requireVisible(app.buttons["My location"])
+            locate.tap()
+            let osLocationAlert = springboard.alerts.matching(NSPredicate(
+                format: "label CONTAINS[c] %@ AND label CONTAINS[c] %@", "Carezaar", "location")).firstMatch
+            XCTAssertFalse(osLocationAlert.waitForExistence(timeout: 2),
+                           "A decided Settings permission must not repeat its initial prompt")
+            let denied = app.staticTexts["location-permission-denied"]
+            if selection == "Never" {
+                XCTAssertTrue(denied.waitForExistence(timeout: 8), "Actual denial needs visible native guidance")
+                proof(denied, "actual-location-never-guidance")
+            } else {
+                XCTAssertFalse(denied.exists, "Re-enabled actual permission must not retain denied guidance")
+                proof(locate, "actual-location-while-using-map")
+            }
+            XCTAssertFalse(app.staticTexts["qa-location-fixture"].exists)
+            XCTAssertFalse(app.staticTexts["qa-profile-no-location"].exists)
+            try requireVisible(app.buttons["Back"].firstMatch).tap()
+            XCTAssertTrue(app.maps.firstMatch.waitForNonExistence(timeout: 10))
+            try assertNoProfileWrites()
+            let after = try profile(owner, endpoint)
+            for key in ["lat", "lng", "shift_ids", "careday_ids", "commute_id", "commute_ids",
+                        "worktype_id", "worktype_ids", "salary_min", "salary_max"] {
+                XCTAssertEqual(try JSONSerialization.data(withJSONObject: [original[key] ?? NSNull()], options: [.sortedKeys]),
+                    try JSONSerialization.data(withJSONObject: [after[key] ?? NSNull()], options: [.sortedKeys]),
+                    "Read-only permission flow changed saved preference: \(key)")
+            }
+            try relaunchPersistedSession()
+            try record("location-settings-state-return", ["role": owner.role, "selection": selection,
+                "actualSettingsObserved": true, "mapExitedWithoutSelection": true,
+                "ordinaryRelaunchUsable": true, "profileMutationRequests": 0,
+                "physicalGPSVerified": false, "controlledLocationProviderUsed": false])
+        }
+        try chooseActualLocation(originalSelection)
+        XCTAssertEqual(try observedLocationSelection(), originalSelection)
+        changed = false
+        try record("location-two-state-complete", ["role": owner.role,
+            "originalSelection": originalSelection, "originalRestored": true,
+            "initialPromptClaimed": false, "physicalGPSVerified": false])
+    }
+
+    private func observedLocationSelection() throws -> String {
+        try openAppSettings()
+        let row = try revealSettingsRow("Location")
+        proof(row, "location-actual-native-selection")
+        let label = row.label
+        if label == "Location, Never" { return "Never" }
+        if label == "Location, While Using" || label == "Location, While Using the App" { return "While Using the App" }
+        if label == "Location, Ask Next Time Or When I Share" || label == "Location, Ask Next Time" {
+            return "Ask Next Time Or When I Share"
+        }
+        if label == "Location, Always" { return "Always" }
+        privateSettingsAX("location-baseline-unrecognized-before-mutation")
+        throw XCTSkip("Actual native location summary must identify a restorable existing choice before mutation")
+    }
+
+    private func chooseActualLocation(_ selection: String) throws {
+        try openAppSettings(); try tapSettingsRow("Location")
+        let row = try revealSettingsRow(selection)
+        proof(row, "location-native-choice-before-tap")
+        row.tap()
+        XCTAssertEqual(try observedLocationSelection(), selection,
+                       "Native app Settings summary must confirm the selected permission")
+    }
+
+    private func openRealSavedLocationMap(_ owner: Owner) throws {
+        let contents = try CarezaarAPI.callWithHTTPStatus("GET", "base/contents?ts_cache=0", token: owner.token)
+        XCTAssertEqual(contents.status, 200)
+        let rows = try XCTUnwrap(contents.body["result"] as? [[String: Any]])
+        func text(_ key: String) throws -> String {
+            let row = try XCTUnwrap(rows.first { $0["slug"] as? String == key })
+            return try XCTUnwrap((row["translations"] as? [[String: Any]])?.first {
+                ($0["language_id"] as? NSNumber)?.intValue == 1 || ($0["language_id"] as? String) == "1"
+            }?["name"] as? String)
+        }
+        launchOwned(extra: ["--qa-push", owner.role == "client" ? "ClientPreferences" : "CaregiverSkills"])
+        let next = app.buttons[try text("signup_form_client_continue")].firstMatch
+        let loaded = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            next.exists && next.isEnabled && next.isHittable && !self.app.staticTexts["Please wait..."].exists
+                && self.app.buttons.allElementsBoundByIndex.contains { $0.exists && $0.isSelected }
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [loaded], timeout: 30), .completed)
+        next.tap()
+        XCTAssertTrue(app.staticTexts[try text(owner.role == "client"
+            ? "signup_form_client_tell_us_about_needs" : "signup_form_caregiver_skill_title")].waitForExistence(timeout: 15))
+        next.tap()
+        // LocationRow shows the actual saved coordinate instead of the empty
+        // hint (PreferencesWizard.swift). Resolve that exact owned value rather
+        // than injecting a nil-profile response to manufacture an empty field.
+        let endpoint = owner.role == "client" ? "clients/profile" : "caregivers/profile"
+        let saved = try profile(owner, endpoint)
+        func decimal(_ value: Any?) -> Double? {
+            if let number = value as? NSNumber { return number.doubleValue }
+            if let string = value as? String { return Double(string) }
+            return nil
+        }
+        let locationLabel: String
+        if let lat = decimal(saved["lat"]), let lng = decimal(saved["lng"]),
+           lat.isFinite, lng.isFinite, abs(lat) <= 90, abs(lng) <= 180,
+           !(lat == 0 && lng == 0) {
+            locationLabel = String(format: "%.6f , %.6f", lat, lng)
+        } else { locationLabel = try text("signup_form_client_location_hint") }
+        let row = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", locationLabel)).firstMatch
+        try reveal(row); row.tap()
+        XCTAssertTrue(app.maps.firstMatch.waitForExistence(timeout: 15))
+    }
+
+    private func assertNoProfileWrites() throws {
+        let ledger = app.staticTexts["qa-request-counts"]
+        XCTAssertTrue(ledger.exists)
+        let writes = ledger.label.split(separator: "\n").filter {
+            ($0.contains(" /api/clients") || $0.contains(" /api/caregivers")) && !$0.hasPrefix("GET ")
+        }
+        XCTAssertTrue(writes.allSatisfy { $0.hasSuffix("=0") }, "Permission navigation must not save profiles")
+    }
+
+    func testFreshOSLocationAllowKeepsOwnedSessionUsableWithoutProfileWrites() throws {
+        try freshLocationDecision(allow: true)
+    }
+
+    func testFreshOSLocationDenyKeepsOwnedSessionUsableWithoutProfileWrites() throws {
+        try freshLocationDecision(allow: false)
+    }
+
+    private func freshLocationDecision(allow: Bool) throws {
+        guard env["QA_FRESH_PERMISSION_DISPOSABLE"] == "true",
+              env["QA_EXPECT_LOCATION_DECISION"] == (allow ? "allow" : "deny") else {
+            throw XCTSkip("Fresh task-owned disposable simulator and explicit actual OS decision required")
+        }
+        let owner = try ownedFixture()
+        let endpoint = owner.role == "client" ? "clients/profile" : "caregivers/profile"
+        let original = try profile(owner, endpoint)
+        try openRealSavedLocationMap(owner)
+        let locate = try requireVisible(app.buttons["My location"])
+        locate.tap()
+        let alert = springboard.alerts.matching(NSPredicate(
+            format: "label CONTAINS[c] %@ AND label CONTAINS[c] %@", "Carezaar", "location")).firstMatch
+        XCTAssertTrue(alert.waitForExistence(timeout: 60),
+                      "Actual notDetermined location system prompt required; never substitute a launch fixture")
+        let yes = alert.buttons.matching(NSPredicate(format: "label IN %@",
+            ["Allow While Using App", "Allow While Using the App"])).firstMatch
+        let no = alert.buttons.matching(NSPredicate(format: "label IN %@", ["Don’t Allow", "Don't Allow"])).firstMatch
+        XCTAssertTrue(yes.exists && yes.isHittable && no.exists && no.isHittable)
+        proof(alert, "actual-location-initial-system-alert")
+        (allow ? yes : no).tap()
+        XCTAssertTrue(alert.waitForNonExistence(timeout: 10))
+        let denied = app.staticTexts["location-permission-denied"]
+        if allow { XCTAssertFalse(denied.exists) }
+        else { XCTAssertTrue(denied.waitForExistence(timeout: 8)); proof(denied, "actual-location-initial-denial-guidance") }
+        XCTAssertFalse(app.staticTexts["qa-location-fixture"].exists)
+        XCTAssertFalse(app.staticTexts["qa-profile-no-location"].exists)
+        try requireVisible(app.buttons["Back"].firstMatch).tap()
+        XCTAssertTrue(app.maps.firstMatch.waitForNonExistence(timeout: 10))
+        try assertNoProfileWrites()
+        let after = try profile(owner, endpoint)
+        for key in ["lat", "lng", "shift_ids", "careday_ids", "commute_id", "commute_ids",
+                    "worktype_id", "worktype_ids", "salary_min", "salary_max"] {
+            XCTAssertEqual(try JSONSerialization.data(withJSONObject: [original[key] ?? NSNull()], options: [.sortedKeys]),
+                try JSONSerialization.data(withJSONObject: [after[key] ?? NSNull()], options: [.sortedKeys]),
+                "Initial permission decision changed saved preference: \(key)")
+        }
+        try relaunchPersistedSession()
+        XCTAssertEqual(try observedLocationSelection(), allow ? "While Using the App" : "Never")
+        try record("actual-location-initial-decision-complete", ["role": owner.role,
+            "initialSystemPromptObserved": true, "initialDecisionAllowed": allow,
+            "ordinaryRelaunchUsable": true, "nativeSettingsDecisionConfirmed": true,
+            "profileMutationRequests": 0, "controlledLocationProviderUsed": false,
+            "physicalGPSVerified": false, "freshDisposableRequired": true])
+    }
+
     private func notificationDecision(allow: Bool, initialOnly: Bool = false) throws {
         let owner = try ownedFixture()
         guard env["QA_EXPECT_NOTIFICATION_DECISION"] == (allow ? "allow" : "deny") else {
@@ -68,7 +331,7 @@ final class PermissionSettingsBoundaryUITests: XCTestCase {
         XCTAssertEqual(original, allow, "Actual Settings state must agree with the observed system decision")
         proof(toggle, "notification-settings-original-switch-only")
         var needsRestore = false
-        defer {
+        addTeardownBlock { [self] in
             if needsRestore {
                 do {
                     settings.activate()
@@ -311,7 +574,11 @@ final class PermissionSettingsBoundaryUITests: XCTestCase {
         proof(matches, "permission-authenticated-matches-tab-only")
     }
     private func relaunchPersistedSession() throws {
-        app.terminate(); app.launchEnvironment = [:]; app.launchArguments = ["--qa-request-counts"]
+        app.terminate(); app.launchEnvironment = [:]
+        // Keep the test's English presentation override on an ordinary saved-
+        // session launch too. No signout/login argument is added: the account's
+        // saved language may differ, while these exact native AX labels are English.
+        app.launchArguments = ["--qa-request-counts", "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
         app.launch(); try assertSessionUsable(); try assertNoRepeatedPrompt()
     }
     private func assertNoRepeatedPrompt() throws {

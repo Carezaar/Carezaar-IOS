@@ -219,6 +219,14 @@ final class ScreenSweepTests: XCTestCase {
                 report.append("\(name)\tReadiness FAILED: expected screen did not load within 60 seconds; audit skipped to avoid attributing another page's issues to this screen.")
                 continue
             }
+            // Keep the actual audited raster; source colour constants alone cannot
+            // explain a framework contrast or clipping finding.
+            let raster = XCTAttachment(screenshot: app.screenshot())
+            raster.name = "\(prefix)-audit-\(name)-viewport"
+            raster.lifetime = .keepAlways; add(raster)
+            if let dir = env["QA_SHOT_DIR"] {
+                try app.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: "\(dir)/\(prefix)-audit-\(name)-viewport.png"))
+            }
             do {
                 try app.performAccessibilityAudit { issue in
                     let el = issue.element.map {
@@ -325,6 +333,7 @@ final class ScreenSweepTests: XCTestCase {
                 let end = origin.withOffset(CGVector(dx: x - scroll.frame.minX, dy: endY - scroll.frame.minY))
                 start.press(forDuration: 0.1, thenDragTo: end, withVelocity: .slow, thenHoldForDuration: 0.1)
             }
+            saveReadabilityEvidence("A5-diagnostic-exposure-failure")
             XCTFail("Exact diagnostic text could not be fully exposed between header and action footer")
             throw NSError(domain: "A5Readability", code: 1)
         }

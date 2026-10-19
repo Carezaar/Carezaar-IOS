@@ -113,11 +113,12 @@ final class ClientUpdateUITests: XCTestCase {
         XCTAssertEqual(try CarezaarAPI.me(token)["role"] as? String, "caregiver")
         try launch("")
         let state = app.staticTexts["qa-matches-header"]
-        let expected = ["header_pregnancy", "header_senior", "header_adult", "header_child"]
+        let expected = env["QA_BANNER_IMAGES"]?.split(separator: ",").map(String.init) ?? ["header_pregnancy", "header_senior", "header_adult", "header_child"]
+        XCTAssertGreaterThan(expected.count, 1, "Rotation requires multiple saved care types")
         let configured = expected.joined(separator: ",") + ";current="
         let ready = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in state.exists && state.label.hasPrefix(configured) }, object: nil)
         XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 45), .completed,
-                       "The owned caregiver must be configured for all four supported client types")
+                       "The owned caregiver must have the explicitly expected saved client types")
         func current() -> String { state.label.components(separatedBy: ";current=").last ?? "" }
         func transition(after previous: String) throws -> (String, Date) {
             let changed = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in current() != previous }, object: nil)
@@ -292,6 +293,33 @@ final class ParityV3UITests: XCTestCase {
 
     // MARK: C1/C2/C3 — sign-up form
 
+    func testV4AgreementWaitsForValidFieldsAndUsesToast() throws {
+        launch(["--qa-push", "SignUpCredentials/client"])
+        let next = app.buttons["Continue"].firstMatch
+        XCTAssertTrue(next.waitForExistence(timeout: 60))
+        next.tap()
+        for name in ["email", "password", "confirmation"] {
+            XCTAssertTrue(app.staticTexts["signup-error-\(name)"].exists)
+        }
+        XCTAssertFalse(app.staticTexts["signup-error-agreement"].exists)
+        XCTAssertFalse(text("Please accept the license agreement to continue.").exists)
+        let email = app.textFields.firstMatch
+        email.tap(); email.typeText("audit@example.com")
+        let password = app.secureTextFields.element(boundBy: 0)
+        password.tap()
+        let close = app.buttons["Close"]
+        if close.waitForExistence(timeout: 2) { close.tap(); password.tap() }
+        password.typeText("Abcdefg1!")
+        let confirmation = app.secureTextFields.element(boundBy: 1)
+        confirmation.tap()
+        if close.waitForExistence(timeout: 2) { close.tap(); confirmation.tap() }
+        confirmation.typeText("Abcdefg1!")
+        next.tap()
+        XCTAssertTrue(text("Please accept the license agreement to continue.").waitForExistence(timeout: 5))
+        XCTAssertFalse(app.staticTexts["signup-error-agreement"].exists)
+        shot("V4-C1-valid-fields-agreement-toast")
+    }
+
     func testC1C2C3SignUpValidationConsentAndConfirmation() throws {
         launch(["--qa-push", "SignUpCredentials/client"])
         let continueButton = app.buttons["Continue"].firstMatch
@@ -299,14 +327,14 @@ final class ParityV3UITests: XCTestCase {
         XCTAssertTrue(continueButton.isEnabled, "C1: Continue is always active")
         shot("C1-form-empty")
         continueButton.tap()
-        for field in ["email", "password", "confirmation", "agreement"] {
+        for field in ["email", "password", "confirmation"] {
             XCTAssertTrue(app.staticTexts["signup-error-\(field)"].waitForExistence(timeout: 5), "C1: \(field) problem under its field")
         }
         if english {
             XCTAssertEqual(app.staticTexts["signup-error-email"].label, "This field is required.")
             XCTAssertEqual(app.staticTexts["signup-error-password"].label, "This field is required.")
             XCTAssertEqual(app.staticTexts["signup-error-confirmation"].label, "This field is required.")
-            XCTAssertEqual(app.staticTexts["signup-error-agreement"].label, "Please accept the license agreement to continue.")
+            XCTAssertFalse(app.staticTexts["signup-error-agreement"].exists)
         }
         shot("C1-all-empty-errors")
         let email = app.textFields.firstMatch
@@ -318,21 +346,22 @@ final class ParityV3UITests: XCTestCase {
         let confirmation = app.secureTextFields.element(boundBy: 1)
         confirmation.tap(); if close.waitForExistence(timeout: 2) { close.tap(); confirmation.tap() }
         confirmation.typeText("abcdefgX")
-        app.staticTexts["signup-consent-text"].firstMatch.coordinate(withNormalizedOffset: CGVector(dx: 0.02, dy: 0.02)).tap()
+        app.descendants(matching: .any).matching(identifier: "signup-consent-text").firstMatch.coordinate(withNormalizedOffset: CGVector(dx: 0.02, dy: 0.02)).tap()
         continueButton.tap()
         if english {
             XCTAssertEqual(app.staticTexts["signup-error-email"].label, "Please enter a valid email address.")
             XCTAssertEqual(app.staticTexts["signup-error-password"].label, "One uppercase")
             XCTAssertEqual(app.staticTexts["signup-error-confirmation"].label, "Passwords do not match.")
         }
-        XCTAssertTrue(app.staticTexts["signup-error-agreement"].exists)
+        XCTAssertFalse(app.staticTexts["signup-error-agreement"].exists)
         shot("C1-invalid-email-rule-mismatch")
 
         // C2: the two names open the in-app viewer; no document is configured yet.
-        let consent = app.staticTexts["signup-consent-text"]
+        let consent = app.descendants(matching: .any).matching(identifier: "signup-consent-text").firstMatch
         if english {
             let sentence = "I agree to the Terms of Use and acknowledge that I have read the Privacy Policy."
-            XCTAssertTrue(consent.label.contains(sentence))
+            let accessibleSentence = consent.label + " " + (consent.value as? String ?? "")
+            XCTAssertTrue(accessibleSentence.contains(sentence), "C2: the complete managed sentence must remain accessible")
             // VoiceOver: the tick-box speaks the whole managed sentence; the names are links.
             XCTAssertEqual(app.buttons["signup-consent-checkbox"].label, sentence)
             XCTAssertTrue(app.links["Terms of Use"].exists && app.links["Privacy Policy"].exists)
@@ -405,7 +434,9 @@ final class ParityV3UITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["OTP Confirmation"].waitForExistence(timeout: 60), "C4: the code screen opens even though the code was not sent")
         XCTAssertTrue(text("Cannot communicate with server.").waitForExistence(timeout: 5), "C4: the send failure is reported")
         let resend = app.buttons["Re-send"]
-        XCTAssertTrue(resend.waitForExistence(timeout: 5), "C4: the person can ask for the code again at once")
+        XCTAssertFalse(resend.exists, "v4 C2: resend must remain locked after initial send failure")
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Wait for 0")).firstMatch.waitForExistence(timeout: 5))
+        XCTAssertTrue(resend.waitForExistence(timeout: 125), "v4 C2: resend unlocks only after two minutes")
         shot("C4-code-screen-after-send-failure")
         // The error toast sits over the link for a few seconds; close it first.
         let closeToast = app.buttons.matching(NSPredicate(format: "label == %@", "Dismiss")).firstMatch

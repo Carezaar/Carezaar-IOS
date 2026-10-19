@@ -48,7 +48,7 @@ final class Pager<Item: Identifiable>: ObservableObject where Item.ID: Hashable 
     func refreshQuietly(_ fetch: Fetch) async {
         guard !isLoading, loadedOnce else { return }
         let g = generation
-        guard let (result, meta) = try? await fetch(1), g == generation, !isLoading else { return }
+        guard let (result, meta) = try? await fetch(1), g == generation, !isLoading, !Task.isCancelled else { return }
         var seen = Set<Item.ID>()
         items = result.filter { seen.insert($0.id).inserted }
         page = 1
@@ -69,6 +69,7 @@ final class Pager<Item: Identifiable>: ObservableObject where Item.ID: Hashable 
         defer { if g == generation { isLoading = false } }
         do {
             let (result, meta) = try await fetch(requestedPage)
+            try Task.checkCancellation()
             guard g == generation else { return }
             loadedOnce = true
             page = requestedPage
@@ -259,25 +260,49 @@ struct MenuRow: View {
     var tint: Color = .black
     var titleColor: Color = .black
     let action: () -> Void
+    @Environment(\.dynamicTypeSize) private var textSize
+
+    private var leadingIcon: some View {
+        AppIcon(name: icon, size: 28, tint: tint)
+            .frame(width: 48, height: 48)
+            .background(Theme.Palette.clientPanel, in: Circle())
+    }
+
+    private var chevron: some View {
+        AppIcon(name: "ic_chevron_forward", size: 18, tint: Theme.Palette.textSecondary)
+            .flipsForRightToLeftLayoutDirection(true)
+    }
+
+    private var labels: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(title).font(Theme.Typography.title(16)).foregroundStyle(titleColor)
+                .fixedSize(horizontal: false, vertical: true)
+            if !description.isEmpty {
+                Text(description).font(Theme.Typography.caption(13)).foregroundStyle(Theme.Palette.textSecondary)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 14) {
-                AppIcon(name: icon, size: 28, tint: tint)
-                    .frame(width: 48, height: 48)
-                    .background(Theme.Palette.clientPanel, in: Circle())
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(title).font(Theme.Typography.title(16)).foregroundStyle(titleColor)
-                        .fixedSize(horizontal: false, vertical: true)
-                    if !description.isEmpty {
-                        Text(description).font(Theme.Typography.caption(13)).foregroundStyle(Theme.Palette.textSecondary)
-                            .multilineTextAlignment(.leading)
-                            .fixedSize(horizontal: false, vertical: true)
+            Group {
+                if textSize.isAccessibilitySize {
+                    // Large text needs the full card width; the normal icon/text
+                    // row left only182pt for the Help description on small phones.
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack { leadingIcon; Spacer(minLength: 8); chevron }
+                        labels.frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                } else {
+                    HStack(spacing: 14) {
+                        leadingIcon
+                        labels
+                        Spacer(minLength: 8)
+                        chevron
                     }
                 }
-                Spacer(minLength: 8)
-                AppIcon(name: "ic_chevron_forward", size: 18, tint: Theme.Palette.textSecondary)
-                    .flipsForRightToLeftLayoutDirection(true)
             }
             .padding(.vertical, 12).padding(.horizontal, 16)
             .contentShape(Rectangle())
