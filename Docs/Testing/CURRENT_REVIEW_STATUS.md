@@ -4,7 +4,7 @@ This file supersedes the status sections of earlier handoffs. Nothing here has b
 
 ## Build and tests
 
-- All 172 unit tests pass (`CarezaarTests`, iPhone 17 Pro Max simulator, iOS 26.5).
+- All 171 unit tests in this commit pass (`CarezaarTests`, iOS 26.5 simulator).
 - Debug build-for-testing and Release build succeed. Warnings: Xcode's App Intents metadata notice, and one unused local in a UI test.
 - QA launch arguments (`Navigation/QALaunch.swift`) are compiled only in Debug; the Release binary contains none of them.
 - The Release bundle's built-in images are the logo, rooms, a desk, abstract shapes and the hands-only Messages header. No people or faces (see `ARTWORK_POLICY.md`).
@@ -41,13 +41,15 @@ Devices: iPhone 17 Pro Max ("Pro Max") and iPhone SE 3rd generation ("SE"), both
 | Physical iPhone 15 (iOS 26.5.2), both roles: camera prompt, Don't Allow, Allow with capture/Retake/crop/Cancel, Camera off and on again in Settings, notification banner; Mail hand-off from Help Center; Siri and a real incoming phone call during an unsaved edit; FAQ, language and splash smoke | Pass (nothing uploaded; camera images not kept) |
 | Physical iPhone 15, owner at the phone: mobile data off and on during use | Pass (list kept, managed message, recovery) |
 | Owner-approved test data: QA support issue submitted once and listed once; a deleted partner shown as "Deleted Account" with the chat closed; another pair's chat refused with nothing shown or sent; quitting mid-sign-up creates nothing | Pass |
-| Slow start-up, failed save then retry, photo add/remove, interrupted photo picker, launch timings; favourite while offline (client) | Pass |
-| Still running at the time of writing: unfinished sign-up resume, favourite while offline (caregiver), sort under slow responses (caregiver, Pro Max), bio change seen by the partner, caregiver saved location, client with empty preferences | See `IOS_FINAL_QA_REPORT.md` in the delivery folder |
+| Slow start-up, failed save then retry, photo add/remove, interrupted photo picker, launch timings, favourite while offline, caregiver saved location | Pass, both sizes and roles where the case applies |
+| Unfinished sign-up resumes at the profile step; a bio edited by the caregiver appears for the client (then removed); a client with no gender/experience/role preference shows none | Pass on both sizes (preferences cleared for the run and restored, no differences) |
+| Sort changed while every response is slowed: the sort control is blocked while a page loads and the list ends in the last choice's order | Pass on both sizes |
 
 ## Not yet accepted
 
 - **Terms of Use / Privacy Policy URLs** from the client.
-- **Apple's strict accessibility audit** still fails on every screen set. Measured on the audited screenshots, the grey text it flags is #595959 on white (about 7:1) and only white on the brand blue is 4.03:1 (bold ≥ 14 pt, WCAG large text; the brand colour is the owner's decision). The other findings are the intentional one-line message preview and notification rows marked "partly unsupported" for Dynamic Type although they scale. A spoken VoiceOver review by a person has not been done.
+- **Final FAQ**: the client's final FAQ has 18 questions; the server (`base/faqs`, managed with translations) still serves the earlier 14. It is entered in the server's content admin; the app shows whatever the server sends.
+- **Apple's strict accessibility audit** still fails on every screen set. Measured on the audited screenshots, the grey text it flags is #595959 on white (about 7:1) and only white on the brand blue is 4.03:1 (bold ≥ 14 pt, WCAG large text). Proposed to the client: #0071EC, the nearest shade of the brand blue at 4.59:1; not applied until the client confirms. The other findings are the intentional one-line message preview and notification rows marked "partly unsupported" for Dynamic Type although they scale. A spoken VoiceOver review by a person has not been done.
 - **Physical device**: a true Wi-Fi-to-mobile handover was not possible (the test iPhone was not on Wi-Fi). The app has no remote push (the backend has no iOS push channel); its foreground notification banner works on the device.
-- **Other role's screen**: reaching the other role's preferences screen (only possible through a QA hook) signs the user out after the server refuses it twice; see the 403 note above.
+- **Other role's screen**: reaching the other role's preferences screen (only possible through a QA hook) leaks nothing, but signs the user out after the server refuses it twice; see the 403 note above. Recorded as a failing case until the owner decides whether to keep the session there as the web does.
 - **Built-in artwork**: by the owner's instruction, the parity items asking to restore people images (A1, F1, F2, G1, M1, M2) are intentionally not implemented. User-uploaded photos are unaffected.
