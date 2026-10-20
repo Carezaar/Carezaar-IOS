@@ -75,6 +75,9 @@ final class ProfileFieldBoundaryUITests: XCTestCase {
         selectAdultDate()
         XCTAssertFalse(next.isEnabled, "Missing gender alone must keep Continue disabled")
         let gender = app.buttons["Select your gender"]
+        // The calendar popover fades out after the day tap; until it is gone nothing
+        // behind it is hittable, so wait for that before deciding to scroll.
+        _ = XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate(format: "isHittable == true"), object: gender)], timeout: 5)
         for _ in 0..<5 where !gender.isHittable { app.swipeUp() }
         XCTAssertTrue(gender.isHittable); gender.tap()
         let female = app.buttons["Female"]

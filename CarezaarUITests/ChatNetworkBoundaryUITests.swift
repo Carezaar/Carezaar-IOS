@@ -837,19 +837,24 @@ final class ChatNetworkBoundaryUITests: XCTestCase {
         waitUntilLaunchPlus(38)
         let send = app.buttons["Send"]
         XCTAssertTrue(send.exists && send.isEnabled && send.isHittable)
-        let getBefore = count("GET /api/users/chats/\(chatID)")
         send.tap()
-        let networkCopy = f.label("general_network_title", "Cannot communicate with server.") + " "
-            + f.label("error_check_connection", "Check your internet connection and try again.")
+        // Connection failures show the managed title alone (Feedback.message; FeedbackTests).
+        let networkCopy = f.label("general_network_title", "Cannot communicate with server.")
         let error = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", networkCopy)).firstMatch
         XCTAssertTrue(error.waitForExistence(timeout: 15), "Failed native preflight must show independently managed network feedback")
         XCTAssertTrue(error.exists, "Transient managed feedback must still exist for its control proof")
         controlProof(error, "owned-offline-managed-network-error-only-\(f.role)")
-        XCTAssertGreaterThan(count("GET /api/users/chats/\(chatID)"), getBefore)
-        XCTAssertEqual(messagePOSTs(chatID), 0, "Offline metadata failure must prevent delivery POST")
-        XCTAssertTrue((field.value as? String) == message, "Offline preflight must preserve exact draft")
+        // No read-count check here: an open chat re-reads itself every 10 s (ChatView
+        // pollInterval), so chat GETs around a send are not attributable to it. The send
+        // itself makes no pre-send read (ChatView.send); the outcome checks follow.
+        // There is no pre-send check: the POST itself is refused before any connection, and
+        // APIClient.transfer retries only such pre-connection failures (1 + 3 attempts), as
+        // the direct-send test asserts. None reached the server (checked just below).
+        let failedAttempts = messagePOSTs(chatID)
+        XCTAssertEqual(failedAttempts, 4, "One refused send plus three pre-connection retries, never more")
+        XCTAssertTrue((field.value as? String) == message, "Offline send must preserve exact draft")
         XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "Couldn't confirm whether your message was sent")).firstMatch.exists,
-                       "Zero-POST preflight failure must not be mislabeled as uncertain delivery")
+                       "A send refused before connecting must not be mislabeled as uncertain delivery")
         XCTAssertFalse(try chatTexts(ownedChat(chatID, fixture: f, active: true)).contains(message))
         waitUntilLaunchPlus(72) // app initialization begins after the test launch clock
         XCTAssertTrue(send.isEnabled && send.isHittable)
@@ -858,11 +863,11 @@ final class ChatNetworkBoundaryUITests: XCTestCase {
         let bubble = app.staticTexts[message]
         XCTAssertTrue(bubble.waitForExistence(timeout: 10) && bubble.isHittable,
                       "Acknowledged retry must reveal the complete own synthetic bubble")
-        XCTAssertEqual(messagePOSTs(chatID), 1)
+        XCTAssertEqual(messagePOSTs(chatID), failedAttempts + 1, "The explicit retry sends exactly once")
         // Parity v3 K4: Send stays tappable with an empty draft and explains itself.
         XCTAssertTrue(send.isEnabled)
         send.doubleTap()
-        let duplicate = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in self.messagePOSTs(chatID) != 1 }, object: nil)
+        let duplicate = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in self.messagePOSTs(chatID) != failedAttempts + 1 }, object: nil)
         duplicate.isInverted = true
         XCTAssertEqual(XCTWaiter.wait(for: [duplicate], timeout: 3), .completed)
         XCTAssertTrue(app.staticTexts[f.label("chat_screen_message_required", "Please type a message first.")].exists,
@@ -871,7 +876,7 @@ final class ChatNetworkBoundaryUITests: XCTestCase {
         controlProof(bubble, "owned-offline-retry-synthetic-bubble-only-\(f.role)")
         try record("owned-offline-preflight-retry-\(f.role)", ["role": f.role,
             "offlineInjection": "Debug native transport closed-local-port 30-to-60-seconds",
-            "deviceWiFiOrCellularChanged": false, "failedPreflightMessagePOSTs": 0,
+            "deviceWiFiOrCellularChanged": false, "refusedPreconnectionPOSTAttempts": failedAttempts,
             "exactDraftPreserved": true, "explicitNativeRetryPOSTs": 1,
             "backendExactMessageOccurrencesBothOwnedPerspectives": 1,
             "emptyDraftRepeatedSendTapsExtraPOSTs": 0, "uncertainPOSTRecoveryCovered": false])
@@ -994,7 +999,11 @@ final class ChatNetworkBoundaryUITests: XCTestCase {
         XCTAssertTrue(replyBannerContains(bText, near: field), "A future reply may be selected after acknowledgement")
         XCTAssertTrue(app.buttons["Cancel"].exists)
         XCTAssertEqual(messagePOSTs(chatID), 1, "Selecting a future reply cannot send another message")
-        XCTAssertFalse(send.isEnabled, "Future reply still requires deliberate draft entry and send")
+        // Parity K4: Send stays tappable with an empty draft (an empty send explains
+        // "Please type a message first."), so a future reply still needs a typed draft.
+        XCTAssertTrue(send.isEnabled, "K4: Send remains tappable with an empty draft")
+        XCTAssertTrue(((field.value as? String) ?? "").isEmpty || (field.value as? String) == field.placeholderValue,
+                      "Future reply still requires deliberate draft entry")
         let primary = try ownedChat(chatID, fixture: f, active: true)
         let peerResponse = try CarezaarAPI.callWithHTTPStatus("GET", "users/chats/\(chatID)", token: f.peerToken)
         XCTAssertEqual(peerResponse.status, 200)

@@ -53,6 +53,7 @@ final class ManagedLanguageMatrixUITests: XCTestCase {
     /// Never capture the full page, partner identity, messages, or account data.
     private func captureControl(_ element: XCUIElement, identifier: String,
                                 expected: String, language: Language) {
+        waitForBannerToClear()
         let visible = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
             element.exists && element.isHittable
         }, object: nil)
@@ -141,10 +142,31 @@ final class ManagedLanguageMatrixUITests: XCTestCase {
         }
         tab.tap(); XCTAssertTrue(tab.isSelected)
     }
+    /// The app's own "New Notification(s)" system banner follows each sign-in poll and
+    /// sits over the top of the app; let it finish before scrolling or cropping controls.
+    private func waitForBannerToClear() {
+        let banner = XCUIApplication(bundleIdentifier: "com.apple.springboard").descendants(matching: .any)
+            .matching(identifier: "NotificationShortLookView").firstMatch
+        let clear = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in !banner.exists || !banner.isHittable }, object: nil)
+        _ = XCTWaiter.wait(for: [clear], timeout: 12)
+    }
     private func menu(_ key: String, _ language: Language) throws {
-        let row = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", try text(key, language))).firstMatch
-        for _ in 0..<8 where !row.isHittable { app.swipeUp() }
-        XCTAssertTrue(row.exists && row.isHittable); row.tap()
+        waitForBannerToClear()
+        // On Small the first match stayed non-hittable while the row was on screen (batch4h
+        // recording), so use whichever matching element is actually hittable, as tapTab does.
+        let rows = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", try text(key, language)))
+        func visibleRow() -> XCUIElement? { rows.allElementsBoundByIndex.first { $0.isHittable } }
+        // Full swipes move the 4.7-inch menu by about half a screen, so a row can jump from
+        // below the fold to under the top header and never be sampled in the open area
+        // (batch4h/4i recordings). Short drags inside the menu let it pass through.
+        let menuView = try verticalScrollView()
+        for _ in 0..<24 where visibleRow() == nil {
+            let start = menuView.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.62))
+            let end = menuView.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.42))
+            start.press(forDuration: 0.05, thenDragTo: end, withVelocity: .slow, thenHoldForDuration: 0.1)
+        }
+        guard let row = visibleRow() else { XCTFail("Managed menu row must be reachable on screen"); return }
+        row.tap()
     }
     private func verticalScrollView() throws -> XCUIElement {
         let views = app.scrollViews.allElementsBoundByIndex.filter {

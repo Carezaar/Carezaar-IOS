@@ -50,18 +50,27 @@ struct FAQView: View {
     private var categories: [FaqCategory] { baseData.faqCategories }
     @State private var active: Int?
     @State private var expanded: Set<Int> = []
+    private static let allChip = "faq-category-all"
 
     var body: some View {
         ScrollView {
             if baseData.isReady {
                 VStack(alignment: .leading, spacing: 12) {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 8) {
-                            chip(loc.t("general_all", "All"), on: active == nil) { active = nil }
-                            ForEach(categories) { c in
-                                chip(pick(c.translations.map { ($0.languageId, $0.title) }) ?? "", on: active == c.id) { active = c.id }
+                    // In right-to-left languages a strip wider than the screen can open at its
+                    // far end, leaving the selected "All" chip off-screen (seen in Farsi), so
+                    // bring the first chip into view on appear and on language change.
+                    ScrollViewReader { strip in
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 8) {
+                                chip(loc.t("general_all", "All"), on: active == nil) { active = nil }
+                                    .id(Self.allChip)
+                                ForEach(categories) { c in
+                                    chip(pick(c.translations.map { ($0.languageId, $0.title) }) ?? "", on: active == c.id) { active = c.id }
+                                }
                             }
                         }
+                        .onAppear { strip.scrollTo(Self.allChip) }
+                        .onChange(of: loc.languageId) { strip.scrollTo(Self.allChip) }
                     }
                     ForEach(faqs.filter { active == nil || $0.faqCategoryId == active }) { f in
                         let question = pick(f.translations.map { ($0.languageId, $0.question ?? "") }) ?? ""

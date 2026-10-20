@@ -1361,9 +1361,14 @@ final class NativeOwnedGraphPhasesUITests: XCTestCase {
         try visibleMessageAndTimestamp(bottomID, timestamp: bottomTime, field: field)
         let area = try transcript(above: field), anchorID = try XCTUnwrap(firstSeed), anchor = messageRow(anchorID)
         var established = false
-        for _ in 0..<12 {
+        // Short drags: on the 6.9-inch screen one swipe moved the transcript about a full
+        // viewport, so the anchor went from visible to below the fold in a single step and
+        // the away-from-bottom state was never sampled (modern-C-v3a, v5a).
+        for _ in 0..<36 {
             if anchor.exists && anchor.isHittable && area.frame.contains(anchor.frame) && !messageRow(bottomID).isHittable { established = true; break }
-            area.swipeDown(velocity: .slow)
+            let start = area.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.40))
+            let end = area.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.58))
+            start.press(forDuration: 0.05, thenDragTo: end, withVelocity: .slow, thenHoldForDuration: 0.1)
         }
         try Guard.require(established, "actual-older-reader-away-from-bottom-required-before-incoming")
         let oldY = anchor.frame.midY, readsBefore = count("GET /api/users/chats/\(j.chatID!)")

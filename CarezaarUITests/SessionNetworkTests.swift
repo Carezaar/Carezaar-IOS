@@ -301,12 +301,14 @@ final class SessionNetworkTests: XCTestCase {
         let logout = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", logoutLabel)).firstMatch
         let scroll = app.scrollViews.firstMatch
         XCTAssertTrue(scroll.exists)
+        // A partly visible row is already "hittable", but its centre can sit below the scroll
+        // view on SE (tapping the tab bar instead). Scroll until the whole row is inside it.
         for _ in 0..<12 {
-            if logout.exists && logout.isHittable && app.frame.contains(logout.frame) && !busy.exists { break }
+            if logout.exists && logout.isHittable && scroll.frame.contains(logout.frame) && !busy.exists { break }
             scroll.swipeUp(velocity: .slow)
         }
-        XCTAssertTrue(logout.exists && logout.isHittable && app.frame.contains(logout.frame),
-                      "Actual native Log Out menu row must be reached")
+        XCTAssertTrue(logout.exists && logout.isHittable && scroll.frame.contains(logout.frame),
+                      "Actual native Log Out menu row must be fully reached")
         XCTAssertFalse(busy.exists, "Profile loading must finish before opening logout")
         logout.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
         XCTAssertTrue(app.alerts.firstMatch.waitForExistence(timeout: 5), "Native logout confirmation missing")

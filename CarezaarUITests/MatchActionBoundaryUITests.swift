@@ -47,8 +47,12 @@ final class MatchActionBoundaryUITests: XCTestCase {
         XCTAssertTrue(cancel.waitForExistence(timeout: 10))
         XCTAssertEqual(cancel.label, "Cancel")
         XCTAssertFalse(app.alerts.buttons["Close"].exists)
-        let labels = Set(app.alerts.firstMatch.buttons.allElementsBoundByIndex.map { $0.label })
-        XCTAssertEqual(labels, ["Cancel", "Withdraw"], "Exactly the two intended actions, ignoring nested AX wrappers")
+        // Since REG-MATCH-CANCEL-001 the destructive action uses the managed general_cancel
+        // label, as Android does, so both buttons read "Cancel"; tell them apart by identifier.
+        let actions = app.alerts.firstMatch.buttons.allElementsBoundByIndex.filter { !$0.identifier.isEmpty }
+        XCTAssertEqual(Set(actions.map(\.identifier)), ["match-confirm-dismiss", "match-action-confirm"],
+                       "Exactly the dismiss and confirm actions, ignoring nested AX wrappers")
+        XCTAssertTrue(actions.allSatisfy { $0.label == "Cancel" }, "Both actions use the managed Cancel label")
         let proof = XCTAttachment(screenshot: app.alerts.firstMatch.screenshot())
         proof.name = "owned-withdraw-two-button-cancel-confirmation"; proof.lifetime = .keepAlways; add(proof)
         cancel.tap()

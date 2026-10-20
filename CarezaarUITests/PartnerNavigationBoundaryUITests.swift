@@ -198,7 +198,7 @@ final class PartnerNavigationBoundaryUITests: XCTestCase {
         }
         launch("ManageMatches")
         let tab = app.buttons[sourceTab].firstMatch
-        XCTAssertTrue(tab.waitForExistence(timeout: 45)); tab.tap()
+        XCTAssertTrue(tab.waitForExistence(timeout: 45)); waitForBannerToClear(); tab.tap()
         let card = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", partnerName)).firstMatch
         for _ in 0..<8 where !card.isHittable { app.swipeUp() }
         XCTAssertTrue(card.exists && card.isHittable, "Existing owned relation card must expose its native profile entry")
@@ -236,6 +236,15 @@ final class PartnerNavigationBoundaryUITests: XCTestCase {
                               "partnerActionsAbsent": true, "emptyIDGETs": count])
     }
 
+    /// The app's own "New Notification(s)" system banner follows the sign-in poll and
+    /// makes XCTest hit-testing unreliable while it is shown; let it finish first.
+    private func waitForBannerToClear() {
+        let banner = XCUIApplication(bundleIdentifier: "com.apple.springboard").descendants(matching: .any)
+            .matching(identifier: "NotificationShortLookView").firstMatch
+        let clear = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in !banner.exists || !banner.isHittable }, object: nil)
+        _ = XCTWaiter.wait(for: [clear], timeout: 12)
+    }
+
     func testInactiveMatchedThenUnavailableProfileReturnsOnceWithoutLoop() throws {
         let f = try fixture()
         let endpoint = "\(f.endpoint)/\(f.partnerID)"
@@ -247,6 +256,7 @@ final class PartnerNavigationBoundaryUITests: XCTestCase {
         // envelope, so that profile must return once to the preceding Help Center.
         let failure = app.staticTexts.matching(NSPredicate(format: "label == %@", expectedFailure)).firstMatch
         XCTAssertTrue(failure.waitForExistence(timeout: 45), "Second controlled profile must show the managed failure")
+        waitForBannerToClear()
         let entry = app.buttons["Delete Account"].firstMatch
         let returned = XCTNSPredicateExpectation(predicate: NSPredicate(format: "isHittable == true"), object: entry)
         XCTAssertEqual(XCTWaiter.wait(for: [returned], timeout: 45), .completed)
