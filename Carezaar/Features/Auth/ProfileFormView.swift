@@ -129,8 +129,15 @@ struct ProfileFormView: View {
         }
         .onChange(of: pickerItem) { _, item in
             Task {
-                guard let data = try? await item?.loadTransferable(type: Data.self) else { return }
-                cropping = UIImage(data: data).map(CropItem.init)
+                guard let item else { return }
+                // A file the system cannot load or decode (corrupt, unsupported) used to do
+                // nothing at all; say so with the managed general error and keep the form.
+                guard let data = try? await item.loadTransferable(type: Data.self), let image = UIImage(data: data) else {
+                    pickerItem = nil
+                    feedback.toast(loc.t("general_error_general", "Something went wrong. Please try again."))
+                    return
+                }
+                cropping = CropItem(image: image)
             }
         }
         .fullScreenCover(item: $cropping) { item in

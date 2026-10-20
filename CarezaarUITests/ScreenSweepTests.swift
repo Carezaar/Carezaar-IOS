@@ -1,4 +1,5 @@
 import XCTest
+import UIKit
 
 /// Opens every screen directly and saves its top and bottom (`QA_SHOT_DIR`), for
 /// visual review at whatever text size and language the simulator is set to (the
@@ -1143,6 +1144,227 @@ final class TakeoverHarnessUITests: XCTestCase {
         XCTAssertEqual("\(try me()["photo"] ?? "nil")", photoBefore)
     }
 
+    // MARK: Photo fixtures (P12-004…007). Synthetic images without people, added once to each QA
+    // simulator's library with their own capture dates (fixtures-photo/ in the evidence folder):
+    // corrupt 1 Jan 2001, truncated 2 Feb 2002, orientation 6 on 5 May 2005, landscape circle 6 Jun 2006.
+
+    private var uploadButton: XCUIElement { app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Upload Photo")).firstMatch }
+    private var removeButton: XCUIElement { app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Remove Photo")).firstMatch }
+    /// Opens the gallery and taps the fixture taken on that day. False when the library has no such photo.
+    private func pickFixture(_ monthDay: String, _ year: String) -> Bool {
+        uploadButton.tap()
+        XCTAssertTrue(app.buttons["Gallery"].waitForExistence(timeout: 5)); app.buttons["Gallery"].tap()
+        let cells = app.images.matching(identifier: "PXGGridLayout-Info")
+        XCTAssertTrue(cells.firstMatch.waitForExistence(timeout: 15), "photo grid")
+        if app.buttons["Close"].exists { app.buttons["Close"].tap() }
+        let withYear = cells.matching(NSPredicate(format: "label CONTAINS %@ AND label CONTAINS %@", monthDay, year)).firstMatch
+        var cell = withYear.exists ? withYear : cells.matching(NSPredicate(format: "label CONTAINS %@", monthDay)).firstMatch
+        // On the small screen the grid is longer than the sheet. Short drags inside the grid scroll
+        // it (a full swipe down from the top would close the sheet), first one way, then the other.
+        let grid = cells.firstMatch
+        for dy in [-0.25, 0.25] where !(withYear.exists && withYear.isHittable) {
+            for _ in 0..<6 where !(withYear.exists && withYear.isHittable) && grid.exists {
+                let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.55))
+                start.press(forDuration: 0.05, thenDragTo: start.withOffset(CGVector(dx: 0, dy: dy * app.frame.height)))
+            }
+        }
+        if withYear.exists { cell = withYear }
+        guard cell.exists && cell.isHittable else {
+            let labels = XCTAttachment(string: cells.allElementsBoundByIndex.map(\.label).joined(separator: "\n"))
+            labels.name = "library-labels-missing-\(monthDay)"; labels.lifetime = .keepAlways; add(labels)
+            return false
+        }
+        cell.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+        return true
+    }
+    private func photoPath() -> String? { ((try? me())?["photo"] as? String).flatMap { $0.isEmpty ? nil : $0 } }
+    private func serverPhoto() throws -> CGImage? {
+        guard let path = try me()["photo"] as? String, !path.isEmpty else { return nil }
+        let url = path.hasPrefix("http") ? URL(string: path)! : URL(string: path, relativeTo: URL(string: "https://new.carezaar.com/"))!
+        return UIImage(data: try Data(contentsOf: url))?.cgImage
+    }
+    private func rgb(_ image: CGImage, _ x: CGFloat, _ y: CGFloat) -> (Int, Int, Int) {
+        var px = [UInt8](repeating: 0, count: 4)
+        let ctx = CGContext(data: &px, width: 1, height: 1, bitsPerComponent: 8, bytesPerRow: 4, space: CGColorSpaceCreateDeviceRGB(),
+                            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
+        ctx.draw(image, in: CGRect(x: -x * CGFloat(image.width), y: -(1 - y) * CGFloat(image.height), width: CGFloat(image.width), height: CGFloat(image.height)))
+        return (Int(px[0]), Int(px[1]), Int(px[2]))
+    }
+    private func saveAndWait(_ check: @escaping () -> Bool, _ message: String) {
+        app.buttons["Save"].firstMatch.tap()
+        let done = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in check() }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [done], timeout: 60), .completed, message)
+    }
+    /// The owned QA accounts have no photo by design (testPhotoAddRemoveSaveAndReopen asserts it),
+    /// so a photo here was left by an interrupted run of these tests: remove it first, recorded.
+    private func startWithoutPhoto() throws {
+        if photoPath() != nil {
+            let note = XCTAttachment(string: "leftover photo removed before the test"); note.name = "leftover-photo"; note.lifetime = .keepAlways; add(note)
+            try removePhotoAndSave()
+        }
+        XCTAssertNil(photoPath(), "start without a photo")
+        addTeardownBlock { [weak self] in try? self?.removePhotoAndSave() }
+    }
+    /// Taps Confirm once the crop screen has finished appearing (a tap during the presentation is lost).
+    private func confirmCrop() {
+        let confirm = app.buttons["Confirm"]
+        XCTAssertTrue(confirm.waitForExistence(timeout: 30), "crop screen")
+        XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in confirm.isHittable }, object: nil)], timeout: 10), .completed)
+        sleep(1); confirm.tap()
+    }
+    private func removePhotoAndSave() throws {
+        app.terminate(); launch(["--qa-push", "ProfileEdit"]); clearBanner(); waitForm()
+        if removeButton.exists {
+            removeButton.tap(); XCTAssertTrue(uploadButton.waitForExistence(timeout: 10))
+            saveAndWait({ self.photoPath() == nil }, "photo removed again on the server")
+        }
+        XCTAssertNil(try me()["photo"] as? String, "account ends without a photo, as it started")
+    }
+
+    /// P12-004: a corrupt file and a truncated file are offered from the library. Each outcome is
+    /// recorded: the system refuses to import it, the system picker cannot load it and keeps it,
+    /// the app shows the managed general error, or (decoded in part) the crop screen. In every case
+    /// the app keeps running, keeps the form and uploads nothing. The oversized 24 MP HEIC is
+    /// testPhotoCancelLargeHeicAndUploadFailure.
+    func testCorruptAndTruncatedImagesAreRefusedSafelyAndUploadNothing() throws {
+        try startWithoutPhoto()
+        let before = "\(try me()["photo"] ?? "nil")"
+        launch(["--qa-push", "ProfileEdit"]); clearBanner(); waitForm()
+        var notes: [String] = []
+        for (name, day, year) in [("corrupt", "January 01", "2001"), ("truncated", "February 02", "2002")] {
+            guard pickFixture(day, year) else {
+                notes.append("\(name): not in the photo library (the system did not import it)")
+                if app.buttons["Cancel"].exists { app.buttons["Cancel"].tap() }
+                continue
+            }
+            let error = app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", "Something went wrong")).firstMatch
+            let crop = app.buttons["Confirm"]
+            let grid = app.images.matching(identifier: "PXGGridLayout-Info").firstMatch
+            let outcome = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in error.exists || crop.exists }, object: nil)
+            if XCTWaiter.wait(for: [outcome], timeout: 15) != .completed {
+                // The system picker could not load the file and kept it: it is never handed to the app.
+                XCTAssertTrue(grid.exists, "\(name): neither an error, the crop screen nor the open picker")
+                notes.append("\(name): the system picker did not deliver the file (stays open); closed")
+                let close = app.buttons.matching(NSPredicate(format: "label IN %@", ["Close", "Cancel"])).firstMatch
+                XCTAssertTrue(close.exists, "\(name): the picker can be closed"); close.tap()
+            } else if crop.exists {
+                notes.append("\(name): decoded by the system, crop screen shown, cancelled")
+                app.buttons["Cancel"].firstMatch.tap()
+            } else { notes.append("\(name): managed general error shown") }
+            XCTAssertEqual(app.state, .runningForeground, "\(name): the app keeps running")
+            XCTAssertTrue(uploadButton.waitForExistence(timeout: 15) || removeButton.exists, "\(name): the form is kept")
+            _ = error.waitForNonExistence(timeout: 10)
+        }
+        XCTAssertFalse(notes.allSatisfy { $0.contains("not in the photo library") }, "no fixture could be chosen: \(notes)")
+        XCTAssertEqual(writes(), 0, "nothing uploaded or saved")
+        let note = XCTAttachment(string: notes.joined(separator: "\n")); note.name = "corrupt-truncated-outcomes"; note.lifetime = .keepAlways; add(note)
+        app.terminate()
+        XCTAssertEqual("\(try me()["photo"] ?? "nil")", before, "server photo unchanged")
+    }
+
+    /// P12-005: an image stored landscape with EXIF orientation 6 (shown portrait: red top, blue
+    /// bottom) and a plain landscape with a centred circle are cropped square and saved. The saved
+    /// photo is square, upright and the circle stays round. The photo is removed again afterwards.
+    func testOrientationTaggedAndLandscapeImagesCropSquareUprightAndUnstretched() throws {
+        try startWithoutPhoto()
+        launch(["--qa-push", "ProfileEdit"]); clearBanner(); waitForm()
+        XCTAssertTrue(pickFixture("May 05", "2005"), "orientation fixture in the library")
+        confirmCrop()
+        XCTAssertTrue(removeButton.waitForExistence(timeout: 15))
+        saveAndWait({ self.photoPath() != nil }, "photo saved")
+        let upright = try XCTUnwrap(try serverPhoto(), "saved photo downloads")
+        XCTAssertEqual(upright.width, upright.height, "square crop")
+        let top = rgb(upright, 0.5, 0.15), bottom = rgb(upright, 0.5, 0.85), left = rgb(upright, 0.15, 0.25), right = rgb(upright, 0.85, 0.25)
+        XCTAssertTrue(top.0 > 200 && top.2 < 60, "top is red (upright): \(top)")
+        XCTAssertTrue(bottom.2 > 200 && bottom.0 < 60, "bottom is blue (upright): \(bottom)")
+        XCTAssertTrue(left.0 > 200 && right.0 > 200, "no sideways split, the orientation tag was applied: \(left) \(right)")
+
+        app.terminate(); launch(["--qa-push", "ProfileEdit"]); clearBanner(); waitForm()
+        XCTAssertTrue(removeButton.exists, "the saved photo is shown"); removeButton.tap()
+        XCTAssertTrue(uploadButton.waitForExistence(timeout: 10))
+        XCTAssertTrue(pickFixture("June 06", "2006"), "landscape fixture in the library")
+        confirmCrop()
+        XCTAssertTrue(removeButton.waitForExistence(timeout: 15))
+        let previous = try me()["photo"] as? String
+        saveAndWait({ self.photoPath() != previous }, "second photo saved")
+        let circle = try XCTUnwrap(try serverPhoto())
+        XCTAssertEqual(circle.width, circle.height, "square crop")
+        func dark(_ x: CGFloat, _ y: CGFloat) -> Bool { let c = rgb(circle, x, y); return c.0 + c.1 + c.2 < 200 }
+        let steps = 200
+        let across = (0..<steps).filter { dark(CGFloat($0) / CGFloat(steps), 0.5) }.count
+        let down = (0..<steps).filter { dark(0.5, CGFloat($0) / CGFloat(steps)) }.count
+        XCTAssertGreaterThan(across, 0)
+        XCTAssertEqual(Double(across) / Double(max(down, 1)), 1, accuracy: 0.05, "the circle stays round: \(across) × \(down) of \(steps)")
+        try removePhotoAndSave()
+    }
+
+    /// P12-006: a photo is chosen and Save is tapped while offline: the managed message, the form and
+    /// the chosen photo are kept, nothing is stored. Back online, Save stores the photo once.
+    func testPhotoUploadFailsOfflineThenRetrySavesOnceKeepingFields() throws {
+        try startWithoutPhoto()
+        let account = try me()
+        let launched = Date()
+        launch(["--qa-push", "ProfileEdit", "--qa-offline", "40", "85"]); clearBanner(); waitForm()
+        let first = (account["first_name"] as? String) ?? "\u{0}"
+        XCTAssertTrue(pickFixture("June 06", "2006"))
+        confirmCrop()
+        XCTAssertTrue(removeButton.waitForExistence(timeout: 15))
+        let offlineAt = launched.addingTimeInterval(44).timeIntervalSinceNow
+        XCTAssertGreaterThan(offlineAt, 0, "photo chosen before the offline window"); if offlineAt > 0 { Thread.sleep(forTimeInterval: offlineAt) }
+        app.buttons["Save"].firstMatch.tap()
+        let error = app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", "Cannot communicate")).firstMatch
+        XCTAssertTrue(error.waitForExistence(timeout: 40), "managed connection message")
+        let refused = writes()
+        XCTAssertGreaterThan(refused, 0)
+        XCTAssertTrue(removeButton.exists, "the chosen photo is kept")
+        XCTAssertTrue(app.textFields.matching(NSPredicate(format: "value == %@", first)).firstMatch.exists, "first name kept")
+        XCTAssertNil(try me()["photo"] as? String, "nothing stored while offline")
+        let onlineAt = launched.addingTimeInterval(90).timeIntervalSinceNow; if onlineAt > 0 { Thread.sleep(forTimeInterval: onlineAt) }
+        _ = error.waitForNonExistence(timeout: 10)
+        saveAndWait({ self.photoPath() != nil }, "retry stores the photo")
+        XCTAssertEqual(writes() - refused, 1, "one save after reconnecting, no duplicate: \(counts())")
+        let note = XCTAttachment(string: "refused pre-connection attempts \(refused); counts \(counts())"); note.name = "upload-retry-counts"; note.lifetime = .keepAlways; add(note)
+        XCTAssertEqual(try me()["first_name"] as? String, account["first_name"] as? String, "fields unchanged on the server")
+        try removePhotoAndSave()
+    }
+
+    /// P12-007: Camera chosen on the simulator. The iOS 26 simulator reports a camera, so the
+    /// system permission prompt can appear; whatever the simulator offers (prompt, the app's
+    /// explanation, a camera screen or the library) is recorded and closed, and the app must keep
+    /// running with the form intact and nothing uploaded. No physical-camera result is inferred:
+    /// the real camera is P11-013…016 and P12-008 on the iPhone.
+    func testCameraChoiceOnSimulatorIsDisclosedAndClosesSafely() throws {
+        try startWithoutPhoto()
+        let before = "\(try me()["photo"] ?? "nil")"
+        launch(["--qa-push", "ProfileEdit"]); clearBanner(); waitForm()
+        uploadButton.tap()
+        XCTAssertTrue(app.buttons["Camera"].waitForExistence(timeout: 5)); app.buttons["Camera"].tap()
+        var seen: [String] = []
+        let prompt = springboard.alerts.firstMatch
+        if prompt.waitForExistence(timeout: 5) {
+            seen.append("system prompt: \(prompt.label)")
+            let allow = prompt.buttons["Allow"]; (allow.exists ? allow : prompt.buttons.element(boundBy: 0)).tap()
+        }
+        let explanation = app.alerts.firstMatch
+        let library = app.images.matching(identifier: "PXGGridLayout-Info").firstMatch
+        let cancel = app.buttons["Cancel"].firstMatch
+        let shutter = app.buttons.matching(NSPredicate(format: "label CONTAINS[c] %@ OR identifier CONTAINS[c] %@", "Take Picture", "Shutter")).firstMatch
+        let shown = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in explanation.exists || library.exists || shutter.exists || cancel.exists }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [shown], timeout: 20), .completed, "something is offered after choosing Camera")
+        if explanation.exists { seen.append("app explanation: \(explanation.label)") }
+        if shutter.exists { seen.append("camera screen") }
+        if library.exists { seen.append("photo library") }
+        let shot = XCTAttachment(screenshot: app.screenshot()); shot.name = "simulator-camera-choice"; shot.lifetime = .keepAlways; add(shot)
+        let note = XCTAttachment(string: seen.joined(separator: "\n")); note.name = "simulator-camera-behaviour"; note.lifetime = .keepAlways; add(note)
+        if explanation.exists { (explanation.buttons["Cancel"].exists ? explanation.buttons["Cancel"] : explanation.buttons.element(boundBy: explanation.buttons.count - 1)).tap() }
+        else if cancel.exists { cancel.tap() } else if app.buttons["Close"].exists { app.buttons["Close"].tap() }
+        XCTAssertEqual(app.state, .runningForeground, "the app keeps running")
+        XCTAssertTrue(uploadButton.waitForExistence(timeout: 15) || removeButton.exists, "the form is intact")
+        XCTAssertEqual(writes(), 0, "nothing uploaded")
+        app.terminate()
+        XCTAssertEqual("\(try me()["photo"] ?? "nil")", before)
+    }
+
     /// P19-003: the caregiver edits the bio in the app; the client then opens that caregiver and
     /// sees the new bio. The bio is removed again in the app afterwards.
     func testBioEditedInOneSessionAppearsForPartner() throws {
@@ -1225,5 +1447,46 @@ final class TakeoverHarnessUITests: XCTestCase {
         let user = (again.body["result"] as? [String: Any])?["user"] as? [String: Any]
         XCTAssertNil(user?["client"] ?? nil, "no client entity created")
         XCTAssertNil(user?["caregiver"] ?? nil, "no caregiver entity created")
+    }
+}
+
+/// P18-005: the Modern and Small simulators run at the same time, one signed in as the client and
+/// the other as the caregiver, in the owned pair's chat (staged ACTIVE by pair-stage.py, ended
+/// afterwards). Each side sends a marked message and sees the other side's message arrive live.
+final class SimultaneousCrossRoleUITests: XCTestCase {
+    private var app: XCUIApplication!
+    private var env: [String: String] { ProcessInfo.processInfo.environment }
+    override func setUp() { continueAfterFailure = false; app = XCUIApplication() }
+    override func tearDown() { app?.terminate() }
+
+    func testBothRolesChatLiveOnTwoSimulatorsAtOnce() throws {
+        guard let marker = env["QA_SIM_MARKER"], let chat = env["QA_CHAT_ID"], let email = env["QA_EMAIL"], let password = env["QA_PASSWORD"] else {
+            throw XCTSkip("QA_SIM_MARKER, QA_CHAT_ID and the account are set by the parallel runner")
+        }
+        let role = try CarezaarAPI.me(try CarezaarAPI.login(email, password))["role"] as? String ?? ""
+        let mine = "\(marker) from \(role)", theirs = "\(marker) from \(role == "client" ? "caregiver" : "client")"
+        var log: [String] = []
+        func stamp(_ s: String) { log.append("\(ISO8601DateFormatter().string(from: Date())) \(s)") }
+        app.launchEnvironment["QA_EMAIL"] = email; app.launchEnvironment["QA_PASSWORD"] = password
+        app.launchArguments = ["--qa-signout", "--qa-login-env", "--qa-push", "Chat/\(chat)", "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
+        app.launch()
+        let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+        if springboard.buttons["Allow"].waitForExistence(timeout: 5) { springboard.buttons["Allow"].tap() }
+        let field = app.textFields.firstMatch
+        XCTAssertTrue(field.waitForExistence(timeout: 60), "chat open"); stamp("chat open as \(role)")
+        func text(_ s: String) -> XCUIElement { app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", s)).firstMatch }
+        func send() {
+            field.tap(); field.typeText(mine); app.buttons["Send"].tap()
+            XCTAssertTrue(text(mine).waitForExistence(timeout: 30), "own message shown"); stamp("sent and shown: \(mine)")
+        }
+        if role == "client" {
+            send()
+            XCTAssertTrue(text(theirs).waitForExistence(timeout: 180), "the caregiver's reply arrives live"); stamp("received: \(theirs)")
+        } else {
+            XCTAssertTrue(text(theirs).waitForExistence(timeout: 180), "the client's message arrives live"); stamp("received: \(theirs)")
+            send()
+        }
+        let shot = XCTAttachment(screenshot: app.screenshot()); shot.name = "simultaneous-chat-\(role)"; shot.lifetime = .keepAlways; add(shot)
+        let note = XCTAttachment(string: log.joined(separator: "\n")); note.name = "simultaneous-timeline-\(role)"; note.lifetime = .keepAlways; add(note)
     }
 }
