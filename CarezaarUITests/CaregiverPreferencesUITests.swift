@@ -297,6 +297,40 @@ final class CaregiverPreferencesUITests: XCTestCase {
         }
     }
 
+    /// P03-028 / P03-029 (caregiver): the saved location is kept when the map is opened and
+    /// cancelled, and when it is confirmed without moving; nothing is saved (mirrors the client test).
+    func testCaregiverSavedLocationPickerCancelAndConfirmKeepSavedPointWithoutSaving() throws {
+        let fixture = try ownedFixture()
+        let latitude = try XCTUnwrap(number(fixture.original["lat"])), longitude = try XCTUnwrap(number(fixture.original["lng"]))
+        let coordinateLabel = String(format: "%.6f , %.6f", latitude, longitude)
+        let confirmLabel = fixture.text("general_confirm")
+        try launchSkills(fixture)
+        advance(fixture, title: "signup_form_caregiver_schedule_title")
+        let locationRow = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", coordinateLabel)).firstMatch
+        scrollTo(locationRow)
+        XCTAssertTrue(locationRow.waitForExistence(timeout: 10), "Schedule shows the caregiver's exact saved coordinate")
+        let original = locationRow.label
+        locationRow.tap()
+        let confirm = app.buttons[confirmLabel].firstMatch
+        XCTAssertTrue(confirm.waitForExistence(timeout: 15), "The saved point opens the map with Confirm")
+        XCTAssertTrue(app.maps.firstMatch.waitForExistence(timeout: 10), "Native map opened")
+        let back = app.buttons["Back"].firstMatch
+        XCTAssertTrue(back.exists && back.isHittable, "Map offers cancellation")
+        back.tap()
+        XCTAssertTrue(confirm.waitForNonExistence(timeout: 10), "Map closed after cancellation")
+        XCTAssertEqual(locationRow.label, original, "Cancel kept the saved location")
+        locationRow.tap()
+        XCTAssertTrue(confirm.waitForExistence(timeout: 15))
+        confirm.tap() // no panning, no My Location: the saved point stays selected
+        XCTAssertTrue(confirm.waitForNonExistence(timeout: 10))
+        XCTAssertEqual(locationRow.label, original, "Confirm without moving kept the saved point")
+        advance(fixture, title: "signup_form_caregiver_review_title")
+        let review = app.staticTexts[coordinateLabel].firstMatch
+        scrollTo(review)
+        XCTAssertTrue(review.waitForExistence(timeout: 10), "Review keeps the exact saved coordinate")
+        try assertServerUnchanged(fixture)
+    }
+
     func testCaregiverEmptyRequiredLanguageShowsManagedValidationWithoutSaving() throws {
         let fixture = try ownedFixture()
         try launchSkills(fixture)

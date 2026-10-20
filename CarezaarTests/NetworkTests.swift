@@ -383,6 +383,28 @@ final class NetworkPolicyTests: XCTestCase {
         catch {}
         XCTAssertEqual(attempts, 1)
     }
+    func testRecordForbidden403WithFieldErrorsKeepsSessionWithoutRenewal() async {
+        let tokens = FixtureTokens()
+        tokens.save(Session(accessToken: "valid-access", refreshToken: "valid-refresh"))
+        var refreshes = 0, writes = 0
+        StubHTTP.handler = { request in
+            if request.url!.lastPathComponent == "refresh" { refreshes += 1; return (200, Data(#"{"result":{"access_token":"a","refresh_token":"b"}}"#.utf8)) }
+            writes += 1
+            return (403, Data(#"{"result":null,"message":"The selected id is invalid.","errors":{"id":["The selected id is invalid."]}}"#.utf8))
+        }
+        do {
+            try await APIClient(tokens: tokens, session: StubHTTP.session()).sendIgnoringResult(
+                Endpoint(method: .delete, path: "users/matches/1/withdraw"))
+            XCTFail("A refused record change must fail")
+        } catch let error as APIError {
+            guard case .validation(_, let fields) = error else { return XCTFail("Expected a field error, got \(error)") }
+            XCTAssertEqual(fields["id"], ["The selected id is invalid."])
+        } catch { XCTFail("Unexpected \(error)") }
+        XCTAssertEqual(refreshes, 0, "A record-level 403 is not a session problem")
+        XCTAssertEqual(writes, 1, "Never replayed")
+        XCTAssertTrue(tokens.hasSession, "The user stays signed in")
+    }
+
     func testPermanentValidationIsNotRetried() async {
         var attempts = 0
         StubHTTP.handler = { _ in attempts += 1; return (422, Data(#"{"message":"Invalid input","errors":{"email":["Invalid email"]}}"#.utf8)) }

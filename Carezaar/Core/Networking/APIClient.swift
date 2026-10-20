@@ -236,6 +236,11 @@ actor APIClient {
                 throw APIError.decoding("Could not decode \(T.self) from \(endpoint.path).")
             }
             return envelope
+        case 403 where !(envelope?.errors ?? Self.rawErrors(from: data) ?? [:]).isEmpty:
+            // 403 also means "not allowed to touch this record" (e.g. withdrawing a request
+            // that has just changed), and then the backend names the field. That is not a
+            // session problem: no renewal, no sign-out — as the web app does.
+            throw APIError.validation(message: message, fields: envelope?.errors ?? Self.rawErrors(from: data) ?? [:])
         case 401, 403:
             throw APIError.unauthenticated(message)
         case 404:

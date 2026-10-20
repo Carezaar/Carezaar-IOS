@@ -353,7 +353,12 @@ struct MatchesTab: View {
 
     private func reload(quiet: Bool = false) async {
         let label = "\(loc.t("loading_matches", "Getting list of matches - Page")) 1"
-        if quiet { await pager.reload(fetch) }
+        if quiet {
+            await pager.reload(fetch)
+            // Pull-to-refresh keeps the current matches when it fails, but says so: offline the
+            // user otherwise saw an unchanged list and no sign the refresh did not happen.
+            if let error = pager.error, !pager.items.isEmpty { feedback.toast(Feedback.message(error)) }
+        }
         else { try? await feedback.run(label) { await pager.reload(fetch) } }
     }
 

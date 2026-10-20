@@ -771,3 +771,449 @@ final class ScreenSweepTests: XCTestCase {
         try? app.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: "\(dir)/\(prefix)-\(name).png"))
     }
 }
+
+
+/// Cases that need test-only records on the live backend, run only after the owner approved
+/// creating them (20 October 2026; the app is not live). Each test is gated by its own
+/// environment flag so it never runs by accident, and checks the server directly where the
+/// row is about what the backend stores or refuses.
+final class OwnerApprovedFixtureUITests: XCTestCase {
+    private var app: XCUIApplication!
+    private var env: [String: String] { ProcessInfo.processInfo.environment }
+
+    override func setUp() { continueAfterFailure = false; app = XCUIApplication() }
+    override func tearDown() { app?.terminate() }
+
+    private func require(_ key: String) throws -> String {
+        guard let v = env[key], !v.isEmpty else { throw XCTSkip("\(key) not set: owner-approved fixture not configured") }
+        return v
+    }
+    private func launch(_ extra: [String], email: String, password: String) {
+        app.launchEnvironment["QA_EMAIL"] = email
+        app.launchEnvironment["QA_PASSWORD"] = password
+        app.launchArguments = ["--qa-signout", "--qa-login-env", "--qa-request-counts",
+                               "-carezaar.languageId", "1", "-carezaar.languageCode", "en"] + extra
+        app.launch()
+        let banner = XCUIApplication(bundleIdentifier: "com.apple.springboard").descendants(matching: .any)
+            .matching(identifier: "NotificationShortLookView").firstMatch
+        if banner.waitForExistence(timeout: 8) { _ = banner.waitForNonExistence(timeout: 20) }
+    }
+    private func count(_ key: String) -> Int {
+        let ledger = app.staticTexts["qa-request-counts"]
+        guard ledger.exists else { return -1 }
+        return ledger.label.split(separator: "\n").first { $0.hasPrefix(key + "=") }.flatMap { Int($0.dropFirst(key.count + 1)) } ?? 0
+    }
+    private func screenText() -> String {
+        app.staticTexts.allElementsBoundByIndex.map(\.label).joined(separator: "\n")
+    }
+    private func issues(_ token: String) throws -> [[String: Any]] {
+        try CarezaarAPI.call("GET", "users/issues", token: token)["result"] as? [[String: Any]] ?? []
+    }
+
+    /// P04-031: one QA issue through the native composer; stored once and listed once.
+    func testApprovedQAIssueSubmitsOnceAndAppearsInList() throws {
+        guard env["QA_APPROVED_TEST_ISSUE"] == "1" else { throw XCTSkip("Owner-approved test issue not enabled") }
+        let email = try require("QA_EMAIL"), password = try require("QA_PASSWORD")
+        let token = try CarezaarAPI.login(email, password)
+        let marker = "QA test issue \(Int(Date().timeIntervalSince1970) % 1_000_000) – please ignore"
+        let before = try issues(token)
+        launch(["--qa-push", "ReportAnIssue"], email: email, password: password)
+        let add = app.buttons["Report An Issue"].firstMatch
+        XCTAssertTrue(add.waitForExistence(timeout: 40), "Report An Issue entry")
+        add.tap()
+        let subject = app.textFields["Enter your issue subject..."]
+        XCTAssertTrue(subject.waitForExistence(timeout: 15), "composer with the Other type and a subject")
+        subject.tap(); subject.typeText(marker)
+        let body = app.textFields["Write your issue here..."].exists ? app.textFields["Write your issue here..."] : app.textViews.firstMatch
+        body.tap(); body.typeText("Owner-approved QA check of the Report an Issue flow. No action needed.")
+        let ok = app.toolbars.buttons["OK"]; if ok.exists { ok.tap() }
+        let submit = app.buttons["Submit"].firstMatch
+        XCTAssertTrue(submit.waitForExistence(timeout: 5))
+        submit.tap(); if submit.exists && submit.isHittable { submit.tap() } // a rapid second tap must not submit twice
+        let stored = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            ((try? self.issues(token)) ?? []).contains { ($0["title"] as? String) == marker }
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [stored], timeout: 30), .completed, "the issue must be stored")
+        sleep(3)
+        let after = try issues(token)
+        XCTAssertEqual(after.filter { ($0["title"] as? String) == marker }.count, 1, "stored exactly once")
+        XCTAssertEqual(after.count, before.count + 1, "exactly one new issue")
+        XCTAssertEqual(count("POST /api/users/issues"), 1, "one native POST")
+        let listed = app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", marker))
+        XCTAssertTrue(listed.firstMatch.waitForExistence(timeout: 20), "the new issue appears in the list")
+        XCTAssertEqual(listed.count, 1, "listed once")
+    }
+
+    /// P16-016 / P21-005: a chat ID that belongs to another pair shows nothing of that chat.
+    func testForeignChatIDShowsNoMessagesOrPartnerData() throws {
+        let chatID = try require("QA_FOREIGN_CHAT_ID")
+        let ownerToken = try CarezaarAPI.login(try require("QA_FOREIGN_OWNER_EMAIL"), try require("QA_FOREIGN_OWNER_PASSWORD"))
+        let foreign = CarezaarAPI.result(try CarezaarAPI.call("GET", "users/chats/\(chatID)", token: ownerToken))
+        let foreignTexts = (foreign["messages"] as? [[String: Any]] ?? []).compactMap { $0["message"] as? String }.filter { $0.count >= 4 }
+        XCTAssertFalse(foreignTexts.isEmpty, "the foreign chat must have messages to look for")
+        let email = try require("QA_EMAIL"), password = try require("QA_PASSWORD")
+        let viewer = try CarezaarAPI.login(email, password)
+        let direct = try CarezaarAPI.callWithHTTPStatus("GET", "users/chats/\(chatID)", token: viewer)
+        XCTAssertNotEqual(direct.status, 200, "the backend must refuse another pair's chat")
+        launch(["--qa-push", "Chat/\(chatID)"], email: email, password: password)
+        sleep(12)
+        let text = screenText()
+        for t in foreignTexts.prefix(8) { XCTAssertFalse(text.contains(t), "a foreign message is visible") }
+        // Even if a composer is shown, nothing may be sent to a chat the user does not own.
+        let field = app.textFields.firstMatch
+        if field.exists && field.isHittable {
+            field.tap(); field.typeText("QA foreign-chat probe")
+            let send = app.buttons["Send"]
+            if send.exists && send.isHittable { send.tap(); sleep(4) }
+        }
+        XCTAssertEqual(count("POST /api/users/chats/\(chatID)"), 0, "nothing sent to another pair's chat")
+        let afterText = screenText()
+        for t in foreignTexts.prefix(8) { XCTAssertFalse(afterText.contains(t), "a foreign message became visible") }
+    }
+
+    /// P16-015: the other role's preference screen pushed through the QA route hook (there is
+    /// no deep link). The server must return no data, nothing is written, and the session stays.
+    func testOtherRolePreferenceRouteLeaksNothingAndKeepsSession() throws {
+        guard env["QA_WRONG_ROLE_ROUTE"] == "1" else { throw XCTSkip("Wrong-role route check not enabled") }
+        let email = try require("QA_EMAIL"), password = try require("QA_PASSWORD")
+        let token = try CarezaarAPI.login(email, password)
+        let role = (try CarezaarAPI.me(token))["role"] as? String ?? ""
+        let otherPath = role == "client" ? "caregivers/profile" : "clients/profile"
+        let route = role == "client" ? "CaregiverSkills" : "ClientPreferences"
+        let direct = try CarezaarAPI.callWithHTTPStatus("GET", otherPath, token: token)
+        let leaked = (direct.body["result"] as? [String: Any]).map { !$0.isEmpty } ?? false
+        XCTAssertFalse(direct.status == 200 && leaked, "the backend must not return another role's profile")
+        launch(["--qa-push", route], email: email, password: password)
+        sleep(15)
+        for method in ["POST", "PUT", "PATCH"] {
+            XCTAssertEqual(count("\(method) /api/\(otherPath)"), 0, "nothing written to the other role's profile")
+        }
+        let back = app.buttons["BackButton"].firstMatch
+        if back.exists && back.isHittable { back.tap() } else { app.terminate(); app.launchArguments = ["--qa-request-counts"]; app.launch() }
+        XCTAssertTrue(app.buttons["Profile"].firstMatch.waitForExistence(timeout: 40), "still signed in")
+    }
+
+    /// P16-019: a client with no gender, experience or role preferences, seen by a caregiver:
+    /// those sections are left out, not filled with invented values.
+    func testClientWithMissingPreferencesShowsNoInventedValues() throws {
+        let clientID = try require("QA_SPARSE_CLIENT_ID")
+        let email = try require("QA_CG_EMAIL"), password = try require("QA_CG_PASSWORD")
+        let token = try CarezaarAPI.login(email, password)
+        let client = CarezaarAPI.result(try CarezaarAPI.call("GET", "caregivers/clients/\(clientID)", token: token))
+        func empty(_ keys: [String]) -> Bool { keys.allSatisfy { ((client[$0] as? [Any]) ?? []).isEmpty } }
+        let missing = ["Gender Preferences": empty(["gender_ids", "genders"]),
+                       "Minimum Experience": empty(["experience_ids", "experiences"]),
+                       "Preferred Caregiver Role": empty(["role_ids", "roles"])]
+        guard missing.values.contains(true) else { throw XCTSkip("Fixture client has all three preferences set") }
+        launch(["--qa-push", "ClientDetails/\(clientID)"], email: email, password: password)
+        let name = app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", (client["first_name"] as? String) ?? "\u{0}")).firstMatch
+        XCTAssertTrue(name.waitForExistence(timeout: 40), "client profile loaded")
+        for (heading, isMissing) in missing where isMissing {
+            XCTAssertFalse(app.staticTexts[heading].exists, "\(heading) shown although the client has none")
+        }
+    }
+}
+
+/// Takeover harness cases (20 October 2026) built on the existing QA hooks (`--qa-latency`,
+/// `--qa-offline`, `--qa-request-counts`). Owned QA accounts only; each test leaves the account
+/// as it found it and checks the server where the row is about stored state.
+final class TakeoverHarnessUITests: XCTestCase {
+    private var app: XCUIApplication!
+    private var env: [String: String] { ProcessInfo.processInfo.environment }
+    private let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+    override func setUp() { continueAfterFailure = false; app = XCUIApplication() }
+    override func tearDown() { app?.terminate() }
+
+    private func value(_ key: String) throws -> String {
+        guard let v = env[key], !v.isEmpty else { throw XCTSkip("\(key) missing") }; return v
+    }
+    private func launch(_ extra: [String], signedIn: Bool = true) {
+        if signedIn { app.launchEnvironment["QA_EMAIL"] = env["QA_EMAIL"]; app.launchEnvironment["QA_PASSWORD"] = env["QA_PASSWORD"] }
+        app.launchArguments = (signedIn ? ["--qa-signout", "--qa-login-env"] : ["--qa-signout"]) + ["--qa-request-counts",
+            "-carezaar.languageId", "1", "-carezaar.languageCode", "en"] + extra
+        app.launch()
+        if springboard.buttons["Allow"].waitForExistence(timeout: 5) { springboard.buttons["Allow"].tap() }
+    }
+    private func clearBanner() {
+        let banner = springboard.descendants(matching: .any).matching(identifier: "NotificationShortLookView").firstMatch
+        if banner.waitForExistence(timeout: 8) { _ = banner.waitForNonExistence(timeout: 20) }
+    }
+    private func counts() -> [String: Int] {
+        var out: [String: Int] = [:]
+        for line in app.staticTexts["qa-request-counts"].label.split(separator: "\n") {
+            let p = line.split(separator: "=", maxSplits: 1); if p.count == 2, let n = Int(p[1]) { out[String(p[0])] = n }
+        }
+        return out
+    }
+    /// Data writes only: signing in and renewing the session (auth/*) are not uploads or saves.
+    private func writes() -> Int {
+        counts().filter { key, _ in
+            ["POST", "PUT", "PATCH", "DELETE"].contains { key.hasPrefix($0 + " ") } && !key.contains(" /api/auth/")
+        }.values.reduce(0, +)
+    }
+    private func waitForm() {
+        let action = app.buttons.matching(NSPredicate(format: "label CONTAINS %@ OR label CONTAINS %@", "Upload Photo", "Remove Photo")).firstMatch
+        XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            action.exists && action.isHittable && !self.app.staticTexts["Please wait..."].exists }, object: nil)], timeout: 60), .completed, "profile form loaded")
+    }
+    private func me() throws -> [String: Any] { try CarezaarAPI.me(try CarezaarAPI.login(try value("QA_EMAIL"), try value("QA_PASSWORD"))) }
+    private func dismissKeyboard() {
+        guard app.keyboards.firstMatch.exists else { return }
+        let done = app.buttons.matching(NSPredicate(format: "label IN %@", ["Done", "OK"])).firstMatch
+        if done.exists && done.isHittable { done.tap() } else { app.swipeDown(velocity: .slow) }
+        _ = app.keyboards.firstMatch.waitForNonExistence(timeout: 5)
+    }
+    /// Match cards carry no identifier; find them by the partner's first name.
+    private func matchesFirstNames(_ sort: String) throws -> [String] {
+        let token = try CarezaarAPI.login(try value("QA_EMAIL"), try value("QA_PASSWORD"))
+        let role = (try CarezaarAPI.me(token))["role"] as? String ?? "client"
+        let path = role == "client" ? "clients/matches" : "caregivers/matches"
+        let r = try CarezaarAPI.call("GET", "\(path)?sort=\(sort)&page=1&perPage=10", token: token)["result"] as? [[String: Any]] ?? []
+        return r.compactMap { (($0["user"] as? [String: Any])?["first_name"] as? String) ?? ($0["first_name"] as? String) }
+    }
+    private func topCard(among names: [String]) -> String? {
+        let cards = names.flatMap { name in
+            app.buttons.matching(NSPredicate(format: "label CONTAINS %@", name)).allElementsBoundByIndex.filter { $0.exists && $0.isHittable }.map { (name, $0.frame.minY) }
+        }
+        return cards.min { $0.1 < $1.1 }?.0
+    }
+
+    /// P01-011: every request is slowed by 2 s on a first launch with no stored lists. The splash
+    /// stays on screen and responsive, Welcome waits for every list, and each list is read once.
+    func testSlowReferenceStartupStaysResponsiveAndWaitsForEveryDataset() throws {
+        launch(["--qa-clear-reference-cache", "--qa-latency", "2"], signedIn: false)
+        let entry = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "I need care")).firstMatch
+        sleep(3)
+        XCTAssertFalse(entry.exists, "Welcome must wait while the lists are still loading")
+        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 1) && app.windows.firstMatch.isHittable, "the app stays responsive")
+        XCTAssertTrue(entry.waitForExistence(timeout: 180), "Welcome opens once every list has loaded")
+        let base = counts().filter { $0.key.hasPrefix("GET /api/base/") && !$0.key.hasPrefix("GET /api/base/info") }
+        XCTAssertGreaterThanOrEqual(base.count, 20, "every reference list was downloaded")
+        XCTAssertTrue(base.values.allSatisfy { $0 == 1 }, "each list read exactly once under slow responses: \(base)")
+    }
+
+    /// P15-002: with every response slowed, Sort is changed to Pay Rate and straight back to
+    /// Distance. The list that remains is the Distance one (the last choice), not a late Pay page.
+    func testRapidSortChangeDuringSlowResponsesShowsLastChoice() throws {
+        let distance = try matchesFirstNames("distance"), pay = try matchesFirstNames("pay")
+        // Two matches whose order differs between the two sorts tell the lists apart.
+        var pair: (String, String)?
+        outer: for (i, x) in distance.enumerated() { for y in distance[(i + 1)...] where x != y {
+            if let px = pay.firstIndex(of: x), let py = pay.firstIndex(of: y), py < px { pair = (x, y); break outer }
+        } }
+        guard let (first, second) = pair else { throw XCTSkip("Distance and Pay give the same order on the first page; the last choice cannot be told apart") }
+        launch(["--qa-latency", "3"]); clearBanner()
+        let sort = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Sort")).firstMatch
+        XCTAssertTrue(sort.waitForExistence(timeout: 90))
+        // Cards further down a lazy list are not in the hierarchy yet; the top card shows the page loaded.
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label CONTAINS %@", distance[0])).firstMatch.waitForExistence(timeout: 90), "first page loaded")
+        let busy = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Please wait")).firstMatch
+        func order() -> (CGFloat, CGFloat)? {
+            let a = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", first)).firstMatch
+            let b = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", second)).firstMatch
+            for _ in 0..<8 where !(a.exists && b.exists) { app.swipeUp(velocity: .slow) }
+            guard a.exists && b.exists else { return nil }
+            return (a.frame.minY, b.frame.minY) // read together, same scroll position
+        }
+        // Pay while every response is slowed: the list is covered by the loading window, so a
+        // second choice cannot be made until this one has finished (no stale-response race).
+        sort.tap(); app.buttons["Pay Rate"].firstMatch.tap()
+        XCTAssertTrue(busy.waitForExistence(timeout: 5), "loading window while the new order loads")
+        XCTAssertFalse(sort.isHittable, "the sort control is blocked while loading")
+        XCTAssertTrue(busy.waitForNonExistence(timeout: 60))
+        XCTAssertTrue(sort.label.contains("Pay"))
+        let payOrder = try XCTUnwrap(order(), "both matches listed (Pay)")
+        XCTAssertGreaterThan(payOrder.0, payOrder.1, "\(second) above \(first) in the Pay order")
+        // Then Distance: the list ends in the last choice's order.
+        for _ in 0..<8 where !sort.isHittable { app.swipeDown(velocity: .slow) }
+        sort.tap(); app.buttons.matching(NSPredicate(format: "label ENDSWITH %@", "Distance")).firstMatch.tap()
+        XCTAssertTrue(busy.waitForNonExistence(timeout: 60))
+        XCTAssertTrue(sort.label.contains("Distance"), "the control shows the last choice")
+        let dist = try XCTUnwrap(order(), "both matches listed (Distance)")
+        XCTAssertLessThan(dist.0, dist.1, "\(first) above \(second): the Distance order")
+    }
+
+    /// P09-006 / P09-009 (simulator part): pull-to-refresh on My Matches while offline keeps the
+    /// list and shows the managed connection message; back online the next pull refreshes.
+    func testMatchesPullToRefreshOfflineKeepsListAndSaysSo() throws {
+        // A long, deliberate drag from the top of the list: XCTest's short swipe only bounces.
+        func pullToRefresh() {
+            let list = app.scrollViews.firstMatch
+            list.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.15))
+                .press(forDuration: 0.1, thenDragTo: list.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.85)), withVelocity: .slow, thenHoldForDuration: 0.6)
+        }
+        let first = try XCTUnwrap(try matchesFirstNames("distance").first, "account has matches")
+        let launchedAt = Date()
+        launch(["--qa-offline", "35", "70"]); clearBanner()
+        let card = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", first)).firstMatch
+        XCTAssertTrue(card.waitForExistence(timeout: 33), "matches loaded before the connection drops")
+        let wait = 38 - Date().timeIntervalSince(launchedAt); if wait > 0 { Thread.sleep(forTimeInterval: wait) }
+        pullToRefresh()
+        let message = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Cannot communicate")).firstMatch
+        XCTAssertTrue(message.waitForExistence(timeout: 25), "offline refresh says it could not refresh")
+        XCTAssertTrue(card.exists, "the existing matches stay on screen")
+        let back = 72 - Date().timeIntervalSince(launchedAt); if back > 0 { Thread.sleep(forTimeInterval: back) }
+        let before = counts().filter { $0.key.contains("/matches?") || $0.key.hasSuffix("/matches") }.values.reduce(0, +)
+        pullToRefresh(); sleep(6)
+        let after = counts().filter { $0.key.contains("/matches?") || $0.key.hasSuffix("/matches") }.values.reduce(0, +)
+        XCTAssertGreaterThan(after, before, "back online, the pull refreshes")
+        XCTAssertTrue(card.exists)
+        XCTAssertEqual(writes(), 0)
+    }
+
+    /// P09-003: the connection is down when Favourite is tapped. A useful message appears, and
+    /// on the next visit the heart matches what the server actually stored (unchanged).
+    func testFavoriteToggleWhileOfflineReconcilesActualBookmark() throws {
+        let token = try CarezaarAPI.login(try value("QA_EMAIL"), try value("QA_PASSWORD"))
+        let isClient = ((try CarezaarAPI.me(token))["role"] as? String) == "client"
+        let partner = try value(isClient ? "QA_CG_ID" : "QA_CLIENT_USER_ID")
+        let route = isClient ? "CaregiverDetails" : "ClientDetails"
+        func bookmarked() throws -> Bool {
+            // The stored favourites list (users/bookmarks); the partner counts as saved when
+            // its ID appears in any entry, whatever the entry's shape.
+            let list = try CarezaarAPI.call("GET", "users/bookmarks?page=1&perPage=50", token: token)["result"] ?? []
+            let text = String(data: try JSONSerialization.data(withJSONObject: list), encoding: .utf8) ?? ""
+            return text.contains("\"\(partner)\"")
+        }
+        let before = try bookmarked()
+        let launchedAt = Date()
+        launch(["--qa-push", "\(route)/\(partner)", "--qa-offline", "40", "90"]); clearBanner()
+        let heart = app.buttons.matching(NSPredicate(format: "label IN %@", ["Add to favorites", "Remove from favorites"])).firstMatch
+        XCTAssertTrue(heart.waitForExistence(timeout: 38), "profile loaded before the connection drops")
+        let labelBefore = heart.label
+        // The app counts its offline window from its own launch, a few seconds after this
+        // clock starts; tap well inside it (40–90 s) so the request cannot slip out first.
+        let wait = 52 - Date().timeIntervalSince(launchedAt)
+        if wait > 0 { Thread.sleep(forTimeInterval: wait) }
+        heart.tap()
+        let message = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Cannot communicate")).firstMatch
+        XCTAssertTrue(message.waitForExistence(timeout: 20), "offline toggle shows the connection message")
+        XCTAssertEqual(try bookmarked(), before, "the server bookmark did not change")
+        app.terminate()
+        launch(["--qa-push", "\(route)/\(partner)"]); clearBanner()
+        XCTAssertTrue(heart.waitForExistence(timeout: 60))
+        XCTAssertEqual(heart.label, labelBefore, "the revisited heart shows the real saved state")
+    }
+
+    /// P12-003: add the synthetic photo and save, reopen; remove it and save, reopen. The
+    /// account ends with no photo, as it started.
+    func testPhotoAddRemoveSaveAndReopen() throws {
+        XCTAssertNil(try me()["photo"] as? String, "start without a photo")
+        launch(["--qa-push", "ProfileEdit"]); clearBanner(); waitForm()
+        app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Upload Photo")).firstMatch.tap()
+        app.buttons["Gallery"].tap()
+        let cells = app.images.matching(identifier: "PXGGridLayout-Info")
+        XCTAssertTrue(cells.firstMatch.waitForExistence(timeout: 15))
+        if app.buttons["Close"].exists { app.buttons["Close"].tap() }
+        cells.firstMatch.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+        XCTAssertTrue(app.buttons["Confirm"].waitForExistence(timeout: 20)); app.buttons["Confirm"].tap()
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Remove Photo")).firstMatch.waitForExistence(timeout: 10))
+        app.buttons["Save"].firstMatch.tap(); XCTAssertTrue(app.buttons["Save"].firstMatch.waitForNonExistence(timeout: 60))
+        XCTAssertNotNil(try me()["photo"] as? String, "photo saved")
+        app.terminate(); launch(["--qa-push", "ProfileEdit"]); clearBanner(); waitForm()
+        let remove = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Remove Photo")).firstMatch
+        XCTAssertTrue(remove.exists, "reopened form shows the saved photo")
+        remove.tap()
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Upload Photo")).firstMatch.waitForExistence(timeout: 10))
+        app.buttons["Save"].firstMatch.tap(); XCTAssertTrue(app.buttons["Save"].firstMatch.waitForNonExistence(timeout: 60))
+        XCTAssertNil(try me()["photo"] as? String, "photo removed on the server")
+        app.terminate(); launch(["--qa-push", "ProfileEdit"]); clearBanner(); waitForm()
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Upload Photo")).firstMatch.exists, "the removed photo does not come back")
+    }
+
+    /// P10-009: the photo library is open when the user switches to the Home screen and back.
+    /// Cancelling then returns to the intact form; nothing is uploaded.
+    func testPhotoPickerInterruptedByAppSwitchCancelsSafely() throws {
+        let photoBefore = "\(try me()["photo"] ?? "nil")"
+        launch(["--qa-push", "ProfileEdit"]); clearBanner(); waitForm()
+        app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Photo")).firstMatch.tap()
+        app.buttons["Gallery"].tap()
+        XCTAssertTrue(app.images.matching(identifier: "PXGGridLayout-Info").firstMatch.waitForExistence(timeout: 15), "library open")
+        XCUIDevice.shared.press(.home); sleep(3); app.activate(); sleep(2)
+        let cancel = app.buttons["Cancel"].firstMatch
+        if cancel.waitForExistence(timeout: 10) { cancel.tap() }
+        XCTAssertTrue(app.buttons["Save"].firstMatch.waitForExistence(timeout: 15), "the form is intact")
+        XCTAssertEqual(writes(), 0, "nothing uploaded or saved")
+        app.terminate()
+        XCTAssertEqual("\(try me()["photo"] ?? "nil")", photoBefore)
+    }
+
+    /// P19-003: the caregiver edits the bio in the app; the client then opens that caregiver and
+    /// sees the new bio. The bio is removed again in the app afterwards.
+    func testBioEditedInOneSessionAppearsForPartner() throws {
+        let cgEmail = try value("QA_CG_EMAIL"), cgPassword = try value("QA_CG_PASSWORD"), cgID = try value("QA_CG_ID")
+        let marker = "QA sync \(Int(Date().timeIntervalSince1970) % 100000)"
+        func editBio(_ text: String) {
+            app.launchEnvironment["QA_EMAIL"] = cgEmail; app.launchEnvironment["QA_PASSWORD"] = cgPassword
+            app.launchArguments = ["--qa-signout", "--qa-login-env", "--qa-push", "ProfileEdit", "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
+            app.launch(); clearBanner(); waitForm()
+            // Found by its placeholder attribute: once the bio has text, the label query no longer matches.
+            let bio = app.textFields.matching(NSPredicate(format: "placeholderValue == %@", "Tell us a little about yourself.")).firstMatch
+            for _ in 0..<4 where !bio.isHittable { app.swipeUp() }
+            bio.tap()
+            let current = bio.value as? String ?? ""
+            if !current.isEmpty && current != "Tell us a little about yourself." { bio.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: current.count)) }
+            if !text.isEmpty { bio.typeText(text) }
+            dismissKeyboard()
+            app.buttons["Save"].firstMatch.tap()
+            // Opened through the QA route, the form stays on screen after saving; the server is
+            // the proof that the save happened.
+            let saved = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+                let bio = ((try? CarezaarAPI.me(try CarezaarAPI.login(cgEmail, cgPassword)))?["bio"] as? String) ?? ""
+                return text.isEmpty ? !bio.contains("QA sync") : bio.contains(text)
+            }, object: nil)
+            XCTAssertEqual(XCTWaiter.wait(for: [saved], timeout: 60), .completed, "bio saved on the server")
+            app.terminate()
+        }
+        editBio(marker)
+        launch(["--qa-push", "CaregiverDetails/\(cgID)"]); clearBanner()
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", marker)).firstMatch.waitForExistence(timeout: 60),
+                      "the partner sees the caregiver's new bio")
+        app.terminate()
+        editBio("")
+        let cgMe = try CarezaarAPI.me(try CarezaarAPI.login(cgEmail, cgPassword))
+        XCTAssertFalse(((cgMe["bio"] as? String) ?? "").contains(marker), "the QA bio was removed again")
+    }
+
+    /// P20-001: cold launch time, measured by XCTest, plus time from launch to the first match card.
+    func testLaunchAndFirstMatchTimings() throws {
+        measure(metrics: [XCTApplicationLaunchMetric()]) { app.launch(); app.terminate() }
+        let started = Date()
+        launch([])
+        let first = try XCTUnwrap(try matchesFirstNames("distance").first, "account has matches")
+        let card = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", first)).firstMatch
+        XCTAssertTrue(card.waitForExistence(timeout: 90), "first match card")
+        let seconds = Date().timeIntervalSince(started)
+        let note = XCTAttachment(string: "Sign-in (forced) to first match card: \(String(format: "%.1f", seconds)) s")
+        note.name = "first-card-timing"; note.lifetime = .keepAlways; add(note)
+        XCTAssertLessThan(seconds, 60, "first card within a minute on the production API")
+    }
+
+    /// P10-003: an unfinished account (registered, code verified, no profile) signs in, starts
+    /// the profile step, and the app is quit. The next launch is signed out and nothing was created.
+    func testQuitDuringOnboardingCreatesNoEntity() throws {
+        let email = try value("QA_UNFINISHED_EMAIL"), password = try value("QA_UNFINISHED_PASSWORD")
+        app.launchArguments = ["--qa-signout", "--qa-request-counts", "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
+        app.launch()
+        let signIn = app.buttons["Sign in"].firstMatch
+        XCTAssertTrue(signIn.waitForExistence(timeout: 60)); signIn.tap()
+        let field = app.textFields.firstMatch; XCTAssertTrue(field.waitForExistence(timeout: 10)); field.tap(); field.typeText(email)
+        let pw = app.secureTextFields.firstMatch; pw.tap(); pw.typeText(password)
+        app.buttons.matching(NSPredicate(format: "label == %@", "Sign In")).firstMatch.tap()
+        let first = app.textFields["Enter your first name"]
+        if app.buttons["Not Now"].waitForExistence(timeout: 6) { app.buttons["Not Now"].tap() }
+        XCTAssertTrue(first.waitForExistence(timeout: 40), "profile step opened")
+        if app.buttons["Not Now"].exists { app.buttons["Not Now"].tap() }
+        _ = XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate(format: "isHittable == true"), object: first)], timeout: 15)
+        first.tap(); first.typeText("Quit")
+        XCTAssertEqual(writes(), 0)
+        app.terminate()
+        app.launchArguments = ["--qa-request-counts", "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
+        app.launch()
+        XCTAssertTrue(app.buttons["Sign in"].firstMatch.waitForExistence(timeout: 60), "relaunch is signed out (sign-up state is not kept)")
+        let again = try CarezaarAPI.callWithHTTPStatus("POST", "auth/login", form: ["email": email, "password": password, "version_app": "1.0.0", "os": "iOS", "version_os": "26"])
+        let user = (again.body["result"] as? [String: Any])?["user"] as? [String: Any]
+        XCTAssertNil(user?["client"] ?? nil, "no client entity created")
+        XCTAssertNil(user?["caregiver"] ?? nil, "no caregiver entity created")
+    }
+}

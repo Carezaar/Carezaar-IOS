@@ -4,13 +4,15 @@ This file supersedes the status sections of earlier handoffs. Nothing here has b
 
 ## Build and tests
 
-- All 171 unit tests pass (`CarezaarTests`, iPhone 17 Pro Max simulator, iOS 26.5).
+- All 172 unit tests pass (`CarezaarTests`, iPhone 17 Pro Max simulator, iOS 26.5).
 - Debug build-for-testing and Release build succeed. Warnings: Xcode's App Intents metadata notice, and one unused local in a UI test.
 - QA launch arguments (`Navigation/QALaunch.swift`) are compiled only in Debug; the Release binary contains none of them.
 - The Release bundle's built-in images are the logo, rooms, a desk, abstract shapes and the hands-only Messages header. No people or faces (see `ARTWORK_POLICY.md`).
 
 ## Changes in this review
 
+- **No sign-out when a record change is refused.** The backend answers 403 both for an expired token and for "not allowed to touch this record" (for example cancelling a request that has just changed); the second names the field. iOS treated every 403 as a session problem, renewed, was refused again and signed the user out. A 403 with field errors is now a normal error with the managed message, as on the web (`Core/Networking/APIClient.swift`, unit test `testRecordForbidden403WithFieldErrorsKeepsSessionWithoutRenewal`). A 403 without field errors (expired token, or the other role's screen, which users cannot reach) still renews and, if refused again, ends the session — unchanged, by the earlier design; the web keeps the session in that last case.
+- **Offline pull-to-refresh on My Matches says so.** A failed refresh kept the list but gave no sign; it now shows the managed "Cannot communicate with server." message while keeping the list (`Features/Main/MainView.swift`). Checked on a physical iPhone with mobile data off and on.
 - **FAQ in right-to-left languages.** In Farsi the category strip is wider than the screen and opened at its far end, so the selected "All" chip was off-screen. The strip now scrolls "All" into view when the screen opens and when the language changes (`Features/Settings/SettingsScreens.swift`).
 - Earlier in this review: agreement feedback, date-of-birth serialization, pagination cancellation, managed request-cancellation wording, semantic Back labels, notification read state (kept unread when marking seen fails, with an explicit retry), and accessibility layout fixes. The Terms of Use and Privacy Policy viewer reads `CarezaarTermsOfUseURL` / `CarezaarPrivacyPolicyURL` from `Info.plist` (build settings `CAREZAAR_TERMS_OF_USE_URL`, `CAREZAAR_PRIVACY_POLICY_URL`) and shows the supplied PDFs until those URLs are set.
 
@@ -36,11 +38,16 @@ Devices: iPhone 17 Pro Max ("Pro Max") and iPhone SE 3rd generation ("SE"), both
 | Session: refresh, revoked session, offline restart, logout | Pass |
 | Languages: all 8 server languages including Farsi, French/Arabic tab captions at the largest text size | Pass |
 | Startup cache, help/settings, partner navigation, favourites, preferences, large HEIC photo | Pass |
-| Physical iPhone 15 (iOS 26.5.2), both roles: camera prompt, Don't Allow, Allow with capture/Retake/crop/Cancel, Camera off and on again in Settings, notification banner; FAQ, language and splash smoke | Pass (nothing uploaded; camera images not kept) |
+| Physical iPhone 15 (iOS 26.5.2), both roles: camera prompt, Don't Allow, Allow with capture/Retake/crop/Cancel, Camera off and on again in Settings, notification banner; Mail hand-off from Help Center; Siri and a real incoming phone call during an unsaved edit; FAQ, language and splash smoke | Pass (nothing uploaded; camera images not kept) |
+| Physical iPhone 15, owner at the phone: mobile data off and on during use | Pass (list kept, managed message, recovery) |
+| Owner-approved test data: QA support issue submitted once and listed once; a deleted partner shown as "Deleted Account" with the chat closed; another pair's chat refused with nothing shown or sent; quitting mid-sign-up creates nothing | Pass |
+| Slow start-up, failed save then retry, photo add/remove, interrupted photo picker, launch timings; favourite while offline (client) | Pass |
+| Still running at the time of writing: unfinished sign-up resume, favourite while offline (caregiver), sort under slow responses (caregiver, Pro Max), bio change seen by the partner, caregiver saved location, client with empty preferences | See `IOS_FINAL_QA_REPORT.md` in the delivery folder |
 
 ## Not yet accepted
 
 - **Terms of Use / Privacy Policy URLs** from the client.
 - **Apple's strict accessibility audit** still fails on every screen set. Measured on the audited screenshots, the grey text it flags is #595959 on white (about 7:1) and only white on the brand blue is 4.03:1 (bold ≥ 14 pt, WCAG large text; the brand colour is the owner's decision). The other findings are the intentional one-line message preview and notification rows marked "partly unsupported" for Dynamic Type although they scale. A spoken VoiceOver review by a person has not been done.
-- **Physical device**: switching Wi-Fi/cellular during use and a real incoming call still need a person at the iPhone. The app has no remote push (the backend has no iOS push channel); its foreground notification banner works on the device.
+- **Physical device**: a true Wi-Fi-to-mobile handover was not possible (the test iPhone was not on Wi-Fi). The app has no remote push (the backend has no iOS push channel); its foreground notification banner works on the device.
+- **Other role's screen**: reaching the other role's preferences screen (only possible through a QA hook) signs the user out after the server refuses it twice; see the 403 note above.
 - **Built-in artwork**: by the owner's instruction, the parity items asking to restore people images (A1, F1, F2, G1, M1, M2) are intentionally not implemented. User-uploaded photos are unaffected.

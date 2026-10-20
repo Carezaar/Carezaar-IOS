@@ -235,6 +235,181 @@ final class DeviceCameraTests: XCTestCase {
         XCTAssertTrue(try serverPhoto() == photoBefore, "the server photo changed")
     }
 
+    // MARK: Device network and interruptions (owner approved the test toggling his iPhone)
+
+    private func controlCenterToggle(_ labels: [String]) -> XCUIElement {
+        springboard.descendants(matching: .any).matching(NSPredicate(format: "label IN %@ OR identifier IN %@", labels, labels)).firstMatch
+    }
+    private func openControlCenter() {
+        let start = springboard.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.005))
+        start.press(forDuration: 0.1, thenDragTo: springboard.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.6)))
+    }
+    private func closeControlCenter() {
+        springboard.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.95)).tap()
+        app.activate()
+    }
+    private func set(_ labels: [String], on: Bool) {
+        openControlCenter()
+        let toggle = controlCenterToggle(labels)
+        XCTAssertTrue(toggle.waitForExistence(timeout: 8), "Control Center toggle \(labels[0])")
+        if ((toggle.value as? String) == "1") != on { toggle.tap() }
+        let settled = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == %@", on ? "1" : "0"), object: toggle)
+        _ = XCTWaiter.wait(for: [settled], timeout: 8)
+        closeControlCenter()
+    }
+    private func requestCount(_ key: String) -> Int {
+        let ledger = app.staticTexts["qa-request-counts"]
+        return ledger.label.split(separator: "\n").first { $0.hasPrefix(key + "=") }.flatMap { Int($0.dropFirst(key.count + 1)) } ?? 0
+    }
+
+    /// P09-009 (as available on this phone): the iPhone is on mobile data (Wi-Fi not joined),
+    /// so the real network change is mobile data off and on again mid-session. Offline, a list
+    /// reload shows the managed connection message; back online it recovers; nothing is written.
+    /// Mobile data is switched back on at the end whatever happens.
+    func testWiFiToCellularAndAirplaneDuringUseRecovers() throws {
+        guard env["QA_DEVICE_NETWORK_TOGGLE"] == "1" else { throw XCTSkip("Owner-approved device network toggling not enabled") }
+        func mobileData() -> XCUIElement {
+            springboard.descendants(matching: .any).matching(NSPredicate(format: "label BEGINSWITH %@ OR label BEGINSWITH %@", "Mobile Data", "Cellular Data")).firstMatch
+        }
+        func tapMobileData() {
+            openControlCenter()
+            let tile = mobileData()
+            XCTAssertTrue(tile.waitForExistence(timeout: 8), "Mobile Data control in Control Center")
+            tile.tap(); sleep(2)
+            closeControlCenter(); sleep(4)
+        }
+        var dataOff = false
+        defer {
+            if dataOff { tapMobileData() }
+        }
+        app.launchEnvironment["QA_EMAIL"] = env["QA_EMAIL"]; app.launchEnvironment["QA_PASSWORD"] = env["QA_PASSWORD"]
+        app.launchArguments = ["--qa-signout", "--qa-login-env", "--qa-request-counts", "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
+        app.launch()
+        if springboard.buttons["Allow"].waitForExistence(timeout: 6) { springboard.buttons["Allow"].tap() }
+        XCTAssertTrue(app.buttons["Messages"].waitForExistence(timeout: 60), "signed in over mobile data")
+        let banner = springboard.descendants(matching: .any).matching(identifier: "NotificationShortLookView").firstMatch
+        if banner.waitForExistence(timeout: 10) { _ = banner.waitForNonExistence(timeout: 20) }
+        tapMobileData(); dataOff = true
+        let list = app.scrollViews.firstMatch
+        list.swipeDown(velocity: .slow)
+        let failure = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Cannot communicate")).firstMatch
+        XCTAssertTrue(failure.waitForExistence(timeout: 40), "with no network a reload shows the managed connection message")
+        shot("net-1-offline-message")
+        tapMobileData(); dataOff = false
+        sleep(6)
+        list.swipeDown(velocity: .slow)
+        let card = app.buttons.matching(identifier: "MatchCard").firstMatch
+        XCTAssertTrue(card.waitForExistence(timeout: 60), "the list recovers once mobile data is back")
+        for write in ["POST /api/users/matches", "POST /api/users/chats", "PUT /api/clients/profile", "PUT /api/caregivers/profile", "POST /api/users/profile"] {
+            XCTAssertEqual(requestCount(write), 0, "no mutation while the network changed (\(write))")
+        }
+        shot("net-2-recovered")
+    }
+
+    /// Diagnostic only: saves Control Center's accessibility tree so the network test can
+    /// address its real controls on this iOS version. Changes nothing.
+    func testDumpControlCenterTree() throws {
+        guard env["QA_DEVICE_NETWORK_TOGGLE"] == "1" else { throw XCTSkip("diagnostic not enabled") }
+        app.launch(); sleep(2)
+        openControlCenter(); sleep(2)
+        let a = XCTAttachment(string: springboard.debugDescription); a.name = "control-center-tree"; a.lifetime = .keepAlways; add(a)
+        closeControlCenter()
+    }
+
+    /// P09-009, person-guided: iOS 26 does not expose Control Center's network tiles to XCTest,
+    /// so the owner switches Mobile Data off and on while this test watches the app. The app
+    /// must show the managed connection message while offline, recover afterwards, and write nothing.
+    func testGuidedMobileDataOffAndOnDuringUse() throws {
+        guard env["QA_DEVICE_GUIDED"] == "1" else { throw XCTSkip("person-guided network check not enabled") }
+        app.launchEnvironment["QA_EMAIL"] = env["QA_EMAIL"]; app.launchEnvironment["QA_PASSWORD"] = env["QA_PASSWORD"]
+        app.launchArguments = ["--qa-signout", "--qa-login-env", "--qa-request-counts", "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
+        app.launch()
+        if springboard.buttons["Allow"].waitForExistence(timeout: 6) { springboard.buttons["Allow"].tap() }
+        XCTAssertTrue(app.buttons["Messages"].waitForExistence(timeout: 90), "signed in")
+        sleep(5)
+        let failure = app.staticTexts.matching(NSPredicate(format: "label CONTAINS[c] %@ OR label CONTAINS[c] %@ OR label CONTAINS[c] %@", "communicate", "internet", "connection")).firstMatch
+        let list = app.scrollViews.firstMatch
+        var offline = false
+        for _ in 0..<36 where !offline { // up to 6 minutes for the owner to turn Mobile Data off
+            app.activate(); list.swipeDown(velocity: .slow); offline = failure.waitForExistence(timeout: 8)
+            if !offline { app.buttons["Messages"].tap(); sleep(2); app.buttons["Matches"].firstMatch.tap(); offline = failure.waitForExistence(timeout: 6) }
+        }
+        XCTAssertTrue(offline, "offline: the managed connection message appears")
+        shot("guided-net-offline")
+        var recovered = false
+        for _ in 0..<36 where !recovered { // up to 6 minutes for the owner to turn it back on
+            sleep(4); app.activate(); list.swipeDown(velocity: .slow); sleep(6)
+            recovered = !failure.exists && !app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Please wait")).firstMatch.exists
+        }
+        XCTAssertTrue(recovered, "back online: the list recovers")
+        for write in ["POST /api/users/matches", "POST /api/users/chats", "PUT /api/clients/profile", "PUT /api/caregivers/profile", "POST /api/users/profile"] {
+            XCTAssertEqual(requestCount(write), 0, "no mutation while the network changed (\(write))")
+        }
+    }
+
+    /// P10-010, person-guided: a real incoming phone call while a profile edit is unsaved. The
+    /// owner calls the iPhone, ends the call and returns to Carezaar; the edit must still be there.
+    func testGuidedIncomingCallKeepsUnsavedEdit() throws {
+        guard env["QA_DEVICE_GUIDED"] == "1" else { throw XCTSkip("person-guided call check not enabled") }
+        app.launchEnvironment["QA_EMAIL"] = env["QA_EMAIL"]; app.launchEnvironment["QA_PASSWORD"] = env["QA_PASSWORD"]
+        app.launchArguments = ["--qa-signout", "--qa-login-env", "--qa-request-counts", "--qa-push", "ProfileEdit", "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
+        app.launch()
+        if springboard.buttons["Allow"].waitForExistence(timeout: 6) { springboard.buttons["Allow"].tap() }
+        let bio = app.textFields["Tell us a little about yourself."]
+        XCTAssertTrue(bio.waitForExistence(timeout: 40), "profile form")
+        for _ in 0..<4 where !bio.isHittable { app.swipeUp() }
+        bio.tap(); bio.typeText(" call-check")
+        let edited = app.textFields.matching(NSPredicate(format: "value CONTAINS %@", "call-check")).firstMatch
+        XCTAssertTrue(edited.waitForExistence(timeout: 5))
+        let typed = edited.value as? String ?? ""
+        let interrupted = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in self.app.state != .runningForeground }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [interrupted], timeout: 360), .completed, "the incoming call interrupts the app")
+        let back = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in self.app.state == .runningForeground }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [back], timeout: 360), .completed, "the owner returned to Carezaar after the call")
+        XCTAssertTrue(edited.waitForExistence(timeout: 15), "the form is still open")
+        XCTAssertEqual(edited.value as? String, typed, "the unsaved edit survives the call")
+        assertNoPhotoWrites()
+    }
+
+    /// P10-010 (system interruption): Siri over an unsaved profile edit, then back to the app.
+    /// The typed value is kept, nothing is saved and the session stays. A real phone call cannot
+    /// be placed from XCTest; this is the system interruption it can trigger on a device.
+    func testSiriInterruptionKeepsUnsavedEditAndSession() throws {
+        guard env["QA_DEVICE_INTERRUPTION"] == "1" else { throw XCTSkip("Owner-approved device interruption not enabled") }
+        let photoBefore = try serverPhoto()
+        app.launchEnvironment["QA_EMAIL"] = env["QA_EMAIL"]; app.launchEnvironment["QA_PASSWORD"] = env["QA_PASSWORD"]
+        app.launchArguments = ["--qa-signout", "--qa-login-env", "--qa-request-counts", "--qa-push", "ProfileEdit",
+                               "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
+        app.launch()
+        if springboard.buttons["Allow"].waitForExistence(timeout: 6) { springboard.buttons["Allow"].tap() }
+        let banner = springboard.descendants(matching: .any).matching(identifier: "NotificationShortLookView").firstMatch
+        if banner.waitForExistence(timeout: 10) { _ = banner.waitForNonExistence(timeout: 20) }
+        let bio = app.textFields["Tell us a little about yourself."]
+        XCTAssertTrue(bio.waitForExistence(timeout: 40), "profile form")
+        let marker = " siri-check"
+        for _ in 0..<4 where !bio.isHittable { app.swipeUp() }
+        bio.tap(); bio.typeText(marker)
+        // Once text is typed the placeholder query no longer matches; follow the field by its text.
+        let edited = app.textFields.matching(NSPredicate(format: "value CONTAINS %@", marker.trimmingCharacters(in: .whitespaces))).firstMatch
+        XCTAssertTrue(edited.waitForExistence(timeout: 5), "typed text is in the bio field")
+        let typed = edited.value as? String ?? ""
+        XCUIDevice.shared.siriService.activate(voiceRecognitionText: "What time is it")
+        sleep(6)
+        // On iOS 26 Siri opens as an overlay, so the app can stay in the foreground under it.
+        // Follow it with a real trip to the Home screen, which does background the app.
+        // The first Home press closes the Siri overlay; the second goes to the Home screen.
+        XCUIDevice.shared.press(.home); sleep(2)
+        if app.state == .runningForeground { XCUIDevice.shared.press(.home) }
+        let backgrounded = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in self.app.state != .runningForeground }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [backgrounded], timeout: 10), .completed, "the app went to the background")
+        app.activate()
+        XCTAssertTrue(edited.waitForExistence(timeout: 15), "back on the same form with the edit")
+        XCTAssertEqual(edited.value as? String, typed, "the unsaved edit survives the interruption")
+        assertNoPhotoWrites()
+        app.terminate()
+        XCTAssertTrue(try serverPhoto() == photoBefore)
+    }
+
     /// Settings → Apps → Carezaar → Camera switch, set to the requested state and verified.
     private func setCameraAccess(_ allowed: Bool) throws {
         let settings = XCUIApplication(bundleIdentifier: "com.apple.Preferences")

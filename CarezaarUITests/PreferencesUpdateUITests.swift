@@ -75,6 +75,38 @@ final class PreferencesUpdateUITests: XCTestCase {
         try certificationRoundTrip([], fixture: fixture, firstLaunch: false)
     }
 
+    /// P03-030 / P09-002: the connection fails on the first save (the request never reaches
+    /// the server). The wizard stays on the review step with every input, shows the managed
+    /// connection message, and the explicit second Save stores the same values once.
+    func testConnectionFailureDuringSaveKeepsInputsAndRetrySavesOnce() throws {
+        let fixture = try ownedFixture()
+        restoreFixture = fixture
+        let wanted = fixture.certifications.prefix(1).map(\.id)
+        launchPreferences(fixture: fixture, extra: ["--qa-signout", "--qa-login-env", "--qa-request-counts", "--qa-fail-once", "PUT", "clients/profile"])
+        advance(to: .skills, fixture: fixture)
+        for certificate in fixture.certifications { setCertificate(certificate, selected: wanted.contains(certificate.id)) }
+        advance(to: .schedule, fixture: fixture)
+        advance(to: .review, fixture: fixture)
+        let save = app.buttons[fixture.text("general_save")].firstMatch
+        XCTAssertTrue(save.waitForExistence(timeout: 10)); save.tap()
+        let failure = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", fixture.text("general_network_title"))).firstMatch
+        XCTAssertTrue(failure.waitForExistence(timeout: 30), "a failed save shows the managed connection message")
+        XCTAssertTrue(save.exists, "the wizard stays on the review step after a failed save")
+        XCTAssertTrue(app.staticTexts[fixture.text("signup_form_client_review")].exists, "still on review with the entered values")
+        let unchanged = try profile(fixture.token)
+        XCTAssertEqual(Set(ids(unchanged["certification_ids"])), Set(ids(fixture.original["certification_ids"])), "nothing was saved by the failed attempt")
+        sleep(4) // let the error toast clear the Save button
+        save.tap()
+        XCTAssertTrue(save.waitForNonExistence(timeout: 60), "the explicit retry saves and returns")
+        let saved = try profile(fixture.token)
+        XCTAssertEqual(Set(ids(saved["certification_ids"])), Set(wanted), "the retry stored the entered values")
+        let ledger = app.staticTexts["qa-request-counts"].label
+        let puts = ledger.split(separator: "\n").first { $0.hasPrefix("PUT /api/clients/profile=") }.flatMap { Int($0.split(separator: "=").last ?? "") } ?? 0
+        // The refused first Save never reached the server; the transport retries only such
+        // pre-connection failures (1 + 3, APIClient.transfer), then the explicit retry is one more.
+        XCTAssertEqual(puts, 5, "four refused pre-connection attempts plus one explicit retry, nothing else")
+    }
+
     func testSavedLocationPickerCancelAndConfirmContinueWithoutSaving() throws {
         try savedLocationNavigation()
     }
@@ -205,11 +237,11 @@ final class PreferencesUpdateUITests: XCTestCase {
         return Fixture(token: token, original: original, labels: labels, certifications: certificates, careTypeLabel: typeLabel)
     }
 
-    private func launchPreferences(fixture: Fixture, retainSession: Bool = false) {
+    private func launchPreferences(fixture: Fixture, retainSession: Bool = false, extra: [String] = []) {
         app.terminate()
         app.launchEnvironment["QA_EMAIL"] = env["QA_EMAIL"]
         app.launchEnvironment["QA_PASSWORD"] = env["QA_PASSWORD"]
-        app.launchArguments = ["-carezaar.languageId", "1", "-carezaar.languageCode", "en", "--qa-push", "ClientPreferences"]
+        app.launchArguments = ["-carezaar.languageId", "1", "-carezaar.languageCode", "en", "--qa-push", "ClientPreferences"] + extra
         if !retainSession { app.launchArguments += ["--qa-signout", "--qa-login-env"] }
         app.launch()
         let continueControl = continueButton(fixture)

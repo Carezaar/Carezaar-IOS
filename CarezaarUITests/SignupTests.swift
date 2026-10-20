@@ -510,7 +510,8 @@ final class SignupTests: XCTestCase {
               let role = environment["PV3_B1_ROLE"], environment["QA_SIMULATOR_LOCATION_READY"] == "1" else {
             throw XCTSkip("Requires a staged unfinished account and simulator location permission/GPS.")
         }
-        app.launchArguments = ["--qa-signout", "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
+        // The shared completion helper reads the request ledger after the wizard is saved.
+        app.launchArguments = ["--qa-signout", "--qa-request-counts", "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
         app.launch()
         let signIn = app.buttons["Sign in"].firstMatch
         XCTAssertTrue(signIn.waitForExistence(timeout: 40))
@@ -991,6 +992,9 @@ final class SignupTests: XCTestCase {
         // Tell us about yourself.
         let first = app.textFields["Enter your first name"]
         XCTAssertTrue(first.waitForExistence(timeout: 30), "profile step")
+        // iOS's "Save Password?" sheet or the server's message toast can cover the form briefly.
+        if app.buttons["Not Now"].exists { app.buttons["Not Now"].tap() }
+        _ = XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate(format: "isHittable == true"), object: first)], timeout: 15)
         if first.value as? String != "Ios" { first.tap(); first.typeText("Ios") }
         let last = app.textFields["Enter your last name"]
         let lastName = caregiver ? "Caregiver" : "Client"
