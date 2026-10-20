@@ -36,10 +36,11 @@ Devices: iPhone 17 Pro Max ("Pro Max") and iPhone SE 3rd generation ("SE"), both
 | Session: refresh, revoked session, offline restart, logout | Pass |
 | Languages: all 8 server languages including Farsi, French/Arabic tab captions at the largest text size | Pass |
 | Startup cache, help/settings, partner navigation, favourites, preferences, large HEIC photo | Pass |
+| Physical iPhone 15 (iOS 26.5.2), both roles: camera prompt, Don't Allow, Allow with capture/Retake/crop/Cancel, Camera off and on again in Settings, notification banner; FAQ, language and splash smoke | Pass (nothing uploaded; camera images not kept) |
 
 ## Not yet accepted
 
 - **Terms of Use / Privacy Policy URLs** from the client.
 - **Apple's strict accessibility audit** still fails on every screen set. Measured on the audited screenshots, the grey text it flags is #595959 on white (about 7:1) and only white on the brand blue is 4.03:1 (bold ≥ 14 pt, WCAG large text; the brand colour is the owner's decision). The other findings are the intentional one-line message preview and notification rows marked "partly unsupported" for Dynamic Type although they scale. A spoken VoiceOver review by a person has not been done.
-- **Physical device**: camera, push notifications, cellular and phone-call interruptions need an iPhone.
+- **Physical device**: switching Wi-Fi/cellular during use and a real incoming call still need a person at the iPhone. The app has no remote push (the backend has no iOS push channel); its foreground notification banner works on the device.
 - **Built-in artwork**: by the owner's instruction, the parity items asking to restore people images (A1, F1, F2, G1, M1, M2) are intentionally not implemented. User-uploaded photos are unaffected.
