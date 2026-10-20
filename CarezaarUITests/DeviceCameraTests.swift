@@ -163,7 +163,8 @@ final class DeviceCameraTests: XCTestCase {
 
     // MARK: Helpers
 
-    private func openCameraChoice() {
+    /// `expectPermissionPrompt` is documentation only: the caller asserts the prompt itself.
+    private func openCameraChoice(expectPermissionPrompt: Bool = true) {
         app.launchEnvironment["QA_EMAIL"] = env["QA_EMAIL"]
         app.launchEnvironment["QA_PASSWORD"] = env["QA_PASSWORD"]
         app.launchArguments = ["--qa-signout", "--qa-login-env", "--qa-request-counts", "--qa-push", "ProfileEdit",
@@ -171,6 +172,11 @@ final class DeviceCameraTests: XCTestCase {
         app.launch()
         let notifications = springboard.buttons["Allow"]
         if notifications.waitForExistence(timeout: 6) { notifications.tap() }
+        // With notifications allowed, the app's "New Notification(s)" banner follows the first
+        // poll; XCTest's interruption handling tapped it on the iPhone and opened Notifications.
+        // Let it finish before using the form.
+        let banner = springboard.descendants(matching: .any).matching(identifier: "NotificationShortLookView").firstMatch
+        if banner.waitForExistence(timeout: 15) { _ = banner.waitForNonExistence(timeout: 20) }
         let upload = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Photo")).firstMatch
         XCTAssertTrue(upload.waitForExistence(timeout: 40), "profile form")
         // A tap while the form is still loading its profile is ignored; retry.
@@ -200,6 +206,57 @@ final class DeviceCameraTests: XCTestCase {
             throw URLError(.userAuthenticationRequired)
         }
         return "\(user["photo"] ?? "nil")"
+    }
+
+    /// Run after `testCameraAllowedCaptureThenCancel` on the same install (camera already
+    /// allowed). Turns Camera off in Settings, checks the app explains instead of opening it,
+    /// turns Camera back on and checks the camera opens again. Nothing is captured or saved.
+    func testCameraRevokeInSettingsThenReenable() throws {
+        let photoBefore = try serverPhoto()
+        try setCameraAccess(false)
+        openCameraChoice(expectPermissionPrompt: false)
+        let explanation = app.alerts.firstMatch
+        XCTAssertTrue(explanation.waitForExistence(timeout: 10), "revoked: no explanation shown")
+        XCTAssertTrue(explanation.buttons["Settings"].exists && explanation.buttons["Gallery"].exists, "revoked: Settings and Gallery offered")
+        shot("cam-5-revoked-explained")
+        explanation.buttons["Cancel"].tap()
+        XCTAssertTrue(app.buttons["Save"].firstMatch.waitForExistence(timeout: 10), "revoked: the form was lost")
+        assertNoPhotoWrites()
+        app.terminate()
+        try setCameraAccess(true)
+        openCameraChoice(expectPermissionPrompt: false)
+        XCTAssertFalse(springboard.alerts.firstMatch.waitForExistence(timeout: 3), "re-enabled: no new permission prompt")
+        let shutter = app.buttons["PhotoCapture"].exists ? app.buttons["PhotoCapture"] : app.buttons["Take Picture"]
+        XCTAssertTrue(shutter.waitForExistence(timeout: 20), "re-enabled: the camera did not open")
+        shot("cam-6-reenabled-camera-open")
+        // Nothing was captured; close the app from the live camera (the system camera's own
+        // close control is not exposed as "Cancel" on this device) and check the server photo.
+        app.terminate()
+        XCTAssertTrue(try serverPhoto() == photoBefore, "the server photo changed")
+    }
+
+    /// Settings → Apps → Carezaar → Camera switch, set to the requested state and verified.
+    private func setCameraAccess(_ allowed: Bool) throws {
+        let settings = XCUIApplication(bundleIdentifier: "com.apple.Preferences")
+        settings.terminate(); settings.launch()
+        func open(_ label: String) throws {
+            let row = settings.cells.matching(NSPredicate(format: "label == %@ OR label BEGINSWITH %@", label, label + ",")).firstMatch
+            let any = settings.buttons.matching(NSPredicate(format: "label == %@ OR label BEGINSWITH %@", label, label + ",")).firstMatch
+            for _ in 0..<12 where !(row.exists && row.isHittable) && !(any.exists && any.isHittable) { settings.swipeUp() }
+            if row.exists && row.isHittable { row.tap() } else if any.exists && any.isHittable { any.tap() }
+            else { XCTFail("Settings row \(label) not reachable"); throw URLError(.cannotParseResponse) }
+        }
+        try open("Apps"); try open("Carezaar")
+        let camera = settings.switches["Camera"]
+        for _ in 0..<6 where !(camera.exists && camera.isHittable) { settings.swipeUp() }
+        XCTAssertTrue(camera.exists && camera.isHittable, "Camera switch in Carezaar's Settings")
+        if (camera.value as? String == "1") != allowed {
+            // The row is exposed as the switch; its control sits at the trailing edge.
+            camera.coordinate(withNormalizedOffset: CGVector(dx: 0.93, dy: 0.5)).tap()
+        }
+        let settled = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == %@", allowed ? "1" : "0"), object: camera)
+        XCTAssertEqual(XCTWaiter.wait(for: [settled], timeout: 5), .completed, "Camera switch must reach the requested state")
+        settings.terminate()
     }
 
     private func assertNoPhotoWrites() {
