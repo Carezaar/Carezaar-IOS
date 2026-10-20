@@ -906,7 +906,8 @@ final class OwnerApprovedFixtureUITests: XCTestCase {
                        "Preferred Caregiver Role": empty(["role_ids", "roles"])]
         guard missing.values.contains(true) else { throw XCTSkip("Fixture client has all three preferences set") }
         launch(["--qa-push", "ClientDetails/\(clientID)"], email: email, password: password)
-        let name = app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", (client["first_name"] as? String) ?? "\u{0}")).firstMatch
+        let firstName = (client["first_name"] as? String) ?? ((client["user"] as? [String: Any])?["first_name"] as? String) ?? "\u{0}"
+        let name = app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", firstName)).firstMatch
         XCTAssertTrue(name.waitForExistence(timeout: 40), "client profile loaded")
         for (heading, isMissing) in missing where isMissing {
             XCTAssertFalse(app.staticTexts[heading].exists, "\(heading) shown although the client has none")
@@ -1001,7 +1002,7 @@ final class TakeoverHarnessUITests: XCTestCase {
         outer: for (i, x) in distance.enumerated() { for y in distance[(i + 1)...] where x != y {
             if let px = pay.firstIndex(of: x), let py = pay.firstIndex(of: y), py < px { pair = (x, y); break outer }
         } }
-        guard let (first, second) = pair else { throw XCTSkip("Distance and Pay give the same order on the first page; the last choice cannot be told apart") }
+        guard let (first, second) = pair else { throw XCTSkip("Distance and Pay give the same order on the first page; the last choice cannot be told apart (distance \(distance), pay \(pay))") }
         launch(["--qa-latency", "3"]); clearBanner()
         let sort = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Sort")).firstMatch
         XCTAssertTrue(sort.waitForExistence(timeout: 90))
@@ -1019,7 +1020,11 @@ final class TakeoverHarnessUITests: XCTestCase {
         // second choice cannot be made until this one has finished (no stale-response race).
         sort.tap(); app.buttons["Pay Rate"].firstMatch.tap()
         XCTAssertTrue(busy.waitForExistence(timeout: 5), "loading window while the new order loads")
-        XCTAssertFalse(sort.isHittable, "the sort control is blocked while loading")
+        // isHittable only sees accessibility elements, and the dim layer is not one; so tap the
+        // control's position and check that the menu does not open.
+        XCTAssertTrue(busy.exists, "still loading when the second tap lands")
+        sort.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+        XCTAssertFalse(app.buttons["Pay Rate"].firstMatch.waitForExistence(timeout: 2), "the sort control is blocked while loading")
         XCTAssertTrue(busy.waitForNonExistence(timeout: 60))
         XCTAssertTrue(sort.label.contains("Pay"))
         let payOrder = try XCTUnwrap(order(), "both matches listed (Pay)")
@@ -1147,10 +1152,15 @@ final class TakeoverHarnessUITests: XCTestCase {
             app.launchEnvironment["QA_EMAIL"] = cgEmail; app.launchEnvironment["QA_PASSWORD"] = cgPassword
             app.launchArguments = ["--qa-signout", "--qa-login-env", "--qa-push", "ProfileEdit", "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
             app.launch(); clearBanner(); waitForm()
-            // Found by its placeholder attribute: once the bio has text, the label query no longer matches.
-            let bio = app.textFields.matching(NSPredicate(format: "placeholderValue == %@", "Tell us a little about yourself.")).firstMatch
+            // The bio is the form's only text input besides first and last name; its identifier and
+            // placeholder change once it holds text, so it is picked by exclusion.
+            let inputs = app.descendants(matching: .any).matching(NSPredicate(format: "(elementType == %d OR elementType == %d) AND NOT (identifier BEGINSWITH %@)",
+                                                                              XCUIElement.ElementType.textField.rawValue, XCUIElement.ElementType.textView.rawValue, "Enter your"))
+            let bio = inputs.firstMatch
             for _ in 0..<4 where !bio.isHittable { app.swipeUp() }
-            bio.tap()
+            // Tapping the lower-right corner puts the cursor after the existing text, so the
+            // deletes below remove it instead of doing nothing at the start.
+            bio.coordinate(withNormalizedOffset: CGVector(dx: 0.97, dy: 0.92)).tap()
             let current = bio.value as? String ?? ""
             if !current.isEmpty && current != "Tell us a little about yourself." { bio.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: current.count)) }
             if !text.isEmpty { bio.typeText(text) }
