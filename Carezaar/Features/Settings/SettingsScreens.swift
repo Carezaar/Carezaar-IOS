@@ -107,7 +107,7 @@ struct FAQView: View {
         Button(action: action) {
             Text(title).font(Theme.Typography.control(14)).foregroundStyle(on ? .white : Theme.Palette.primaryDark)
                 .padding(.horizontal, 14).padding(.vertical, 8)
-                .background(on ? Theme.Palette.primary : Theme.Palette.clientPanel, in: Capsule())
+                .background(on ? Theme.Palette.primaryFill : Theme.Palette.clientPanel, in: Capsule())
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(on ? [.isSelected] : [])
@@ -164,7 +164,7 @@ struct ReportAnIssueView: View {
         .overlay(alignment: .bottomTrailing) {
             Button { composing = true } label: {
                 AppIcon(name: "ic_add_circle", size: 34, tint: .white)
-                    .frame(width: 62, height: 62).background(Theme.Palette.primary, in: Circle()).shadow(radius: 4, y: 2)
+                    .frame(width: 62, height: 62).background(Theme.Palette.primaryFill, in: Circle()).shadow(radius: 4, y: 2)
             }
             .padding(24)
             .accessibilityLabel(loc.t("report_an_issue_title", "Report An Issue"))

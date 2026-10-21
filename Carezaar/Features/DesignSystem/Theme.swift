@@ -9,6 +9,10 @@ enum Theme {
         /// on white, below WCAG AA's 4.5:1; this shade is 5.4:1. Fills, icons and borders
         /// keep the brand blue (Aariz's decision, 2026-10-10).
         static let primaryText = Color(hex: 0x0066D6)
+        /// The brand blue behind white text and icons (buttons, selected chips, the user's own chat
+        /// bubble): #0071EC is the nearest shade to #007AFE that meets 4.5:1 with white (4.59:1).
+        /// Adjusted only where needed, at the client's request (21 Oct 2026); everything else keeps #007AFE.
+        static let primaryFill = Color(hex: 0x0071EC)
         static let textPrimary = Color.black
         // Stronger small-text contrast: #595959 is 7.0:1 on white and
         // 6.3:1 or better on both role panels, including thin custom-font glyphs.
@@ -58,8 +62,8 @@ enum Theme {
         static func heading(_ size: CGFloat = 28) -> Font { font(size, weight: .bold, relativeTo: .largeTitle) }
         static func title(_ size: CGFloat = 20) -> Font { font(size, weight: .semibold, relativeTo: .title2) }
         static func control(_ size: CGFloat = 16) -> Font { font(size, weight: .medium, relativeTo: .body) }
-        /// Labels on brand-blue fills: bold at 14 pt or more is WCAG "large text" (3:1),
-        /// which white on #007AFE (4.03:1) meets.
+        /// Labels on brand-blue fills (`primaryFill`, #0071EC): white is 4.59:1, which meets
+        /// WCAG AA for text of any size.
         static func filledLabel(_ size: CGFloat = 16) -> Font { font(max(size, 14), weight: .bold, relativeTo: .body) }
         static func body(_ size: CGFloat = 14) -> Font { font(size, weight: .regular, relativeTo: .body) }
         static func caption(_ size: CGFloat = 12) -> Font { font(max(size, 12), weight: .regular, relativeTo: .caption) }

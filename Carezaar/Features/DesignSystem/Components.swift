@@ -17,7 +17,7 @@ struct PrimaryButton: View {
             .font(Theme.Typography.filledLabel())
             .foregroundStyle(isEnabled ? Color.white : Theme.Palette.disabledForeground)
             .frame(maxWidth: .infinity, minHeight: 52)
-            .background(isEnabled ? Theme.Palette.primary : Theme.Palette.disabledBackground)
+            .background(isEnabled ? Theme.Palette.primaryFill : Theme.Palette.disabledBackground)
             .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.field, style: .continuous))
         }
         .disabled(!isEnabled || isLoading)

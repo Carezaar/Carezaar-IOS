@@ -155,7 +155,7 @@ struct ChatView: View {
             // small server-time and quoted-message text.
             .foregroundStyle(.black)
             .padding(.horizontal, 14).padding(.vertical, 10)
-            .background(mine ? Theme.Palette.primary : Color(hex: 0xF1F3F6),
+            .background(mine ? Theme.Palette.primaryFill : Color(hex: 0xF1F3F6),
                         in: UnevenRoundedRectangle(topLeadingRadius: 16, bottomLeadingRadius: mine ? 16 : 4,
                                                    bottomTrailingRadius: mine ? 4 : 16, topTrailingRadius: 16))
             .contextMenu { menuItems(m) }
@@ -345,7 +345,7 @@ private struct ChatComposer: View {
                         .flipsForRightToLeftLayoutDirection(true)
                         // K2/K3: grey on a closed conversation, as on Android.
                         .frame(width: 46, height: 46)
-                        .background(closedNote != nil ? Theme.Palette.textSecondary : Theme.Palette.primary, in: Circle())
+                        .background(closedNote != nil ? Theme.Palette.textSecondary : Theme.Palette.primaryFill, in: Circle())
                 }
                 .disabled(!isEnabled || closedNote != nil)
                 .opacity(!isEnabled ? 0.45 : closedNote != nil ? 0.6 : 1)
@@ -413,7 +413,7 @@ struct ManageMatchesView: View {
                         .fixedSize(horizontal: false, vertical: true)
                         .padding(.vertical, 6)
                         .frame(maxWidth: .infinity, minHeight: 44)
-                        .background(on ? Theme.Palette.primary : .clear, in: RoundedRectangle(cornerRadius: 10))
+                        .background(on ? Theme.Palette.primaryFill : .clear, in: RoundedRectangle(cornerRadius: 10))
                 }
                 .buttonStyle(.plain)
                 .accessibilityAddTraits(on ? [.isSelected] : [])

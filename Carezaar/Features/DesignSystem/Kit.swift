@@ -322,7 +322,7 @@ struct MiniButton: View {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 12).padding(.vertical, 6)
                 .foregroundStyle(danger ? Theme.Palette.dangerText : .white)
-                .background(danger ? Theme.Palette.dangerSoft : Theme.Palette.primary, in: Capsule())
+                .background(danger ? Theme.Palette.dangerSoft : Theme.Palette.primaryFill, in: Capsule())
                 .overlay(Capsule().stroke(danger ? Theme.Palette.danger : .clear))
                 .frame(minHeight: 44)
                 .contentShape(Rectangle())

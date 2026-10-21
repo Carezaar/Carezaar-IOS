@@ -245,7 +245,7 @@ struct MatchesTab: View {
                     .fixedSize(horizontal: false, vertical: true)
                     .multilineTextAlignment(.center).frame(maxWidth: 140)
                     .padding(.horizontal, 14).padding(.vertical, 10)
-                    .background(Theme.Palette.primary, in: RoundedRectangle(cornerRadius: 10))
+                    .background(Theme.Palette.primaryFill, in: RoundedRectangle(cornerRadius: 10))
             }
         }
         .padding(.horizontal, 20).padding(.vertical, 18)

@@ -32,7 +32,7 @@ struct MultiSelectField: View {
                                 .foregroundStyle(isOn ? .white : Theme.Palette.textPrimary)
                                 .padding(.horizontal, Theme.Spacing.s)
                                 .padding(.vertical, Theme.Spacing.xs)
-                                .background(isOn ? Theme.Palette.primary : Theme.Palette.clientPanel)
+                                .background(isOn ? Theme.Palette.primaryFill : Theme.Palette.clientPanel)
                                 .clipShape(Capsule())
                         }
                         .accessibilityAddTraits(isOn ? [.isSelected] : [])
