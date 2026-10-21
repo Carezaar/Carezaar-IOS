@@ -1490,3 +1490,104 @@ final class SimultaneousCrossRoleUITests: XCTestCase {
         let note = XCTAttachment(string: log.joined(separator: "\n")); note.name = "simultaneous-timeline-\(role)"; note.lifetime = .keepAlways; add(note)
     }
 }
+
+/// P17-002 (simulator part): what VoiceOver reads is the accessibility tree. On the main screens
+/// every button, link, field, switch and tab must carry a spoken label that is not empty and not an
+/// internal name, the selected tab must report its selected state, and the notification popup must
+/// offer a labelled way to close it. Each screen's reading order is saved. A spoken VoiceOver pass
+/// on a device is a separate check.
+final class AccessibilityTreeTraversalUITests: XCTestCase {
+    private var app: XCUIApplication!
+    private var env: [String: String] { ProcessInfo.processInfo.environment }
+    override func setUp() { continueAfterFailure = true; app = XCUIApplication() }
+    override func tearDown() { app?.terminate() }
+
+    private func launch(_ route: String?, signedIn: Bool = true) {
+        app.terminate()
+        if signedIn { app.launchEnvironment["QA_EMAIL"] = env["QA_EMAIL"]; app.launchEnvironment["QA_PASSWORD"] = env["QA_PASSWORD"] }
+        app.launchArguments = (signedIn ? ["--qa-signout", "--qa-login-env"] : ["--qa-signout"]) + ["-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
+            + (route.map { ["--qa-push", $0] } ?? [])
+        app.launch()
+        let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+        if springboard.buttons["Allow"].waitForExistence(timeout: 5) { springboard.buttons["Allow"].tap() }
+        let busy = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Please wait")).firstMatch
+        sleep(3); _ = busy.waitForNonExistence(timeout: 60); sleep(1)
+    }
+
+    /// Walks the visible interactive elements in reading order and checks each one's label.
+    @discardableResult
+    private func walk(_ screen: String) -> [XCUIElement] {
+        let types: [XCUIElement.ElementType] = [.button, .link, .textField, .secureTextField, .switch, .textView]
+        var items: [(XCUIElement, CGRect)] = []
+        for type in types {
+            for e in app.descendants(matching: type).allElementsBoundByIndex where e.exists && e.isHittable && app.frame.intersects(e.frame) {
+                items.append((e, e.frame))
+            }
+        }
+        items.sort { abs($0.1.minY - $1.1.minY) > 4 ? $0.1.minY < $1.1.minY : $0.1.minX < $1.1.minX }
+        var order: [String] = []
+        for (e, _) in items {
+            let label = e.label.trimmingCharacters(in: .whitespacesAndNewlines)
+            let placeholder = (e.placeholderValue ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+            let spoken = label.isEmpty ? placeholder : label
+            order.append("\(e.elementType.rawValue)\t\(spoken)\t\(e.isSelected ? "selected" : "")")
+            XCTAssertFalse(spoken.isEmpty, "\(screen): an interactive element has no spoken label (\(e.identifier))")
+            XCTAssertFalse(spoken.hasPrefix("ic_") || spoken.range(of: #"^[a-z]+(_[a-z]+)+$"#, options: .regularExpression) != nil,
+                           "\(screen): '\(spoken)' is an internal name, not a spoken label")
+        }
+        let note = XCTAttachment(string: order.joined(separator: "\n")); note.name = "voiceover-order-\(screen)"; note.lifetime = .keepAlways; add(note)
+        XCTAssertGreaterThan(order.count, 0, "\(screen): nothing to read")
+        return items.map(\.0)
+    }
+
+    func testMainScreensSpeakMeaningfulLabelsSelectedTabsAndClosableModals() throws {
+        guard env["QA_EMAIL"] != nil else { throw XCTSkip("QA account required") }
+        launch(nil, signedIn: false)
+        walk("welcome")
+        launch("SignIn", signedIn: false)
+        walk("sign-in")
+
+        launch(nil)
+        let tabs = ["Matches", "Messages", "Profile"]
+        // The tab bar's buttons, not the header's "Profile" avatar button of the same name.
+        func tabButton(_ name: String) -> XCUIElement {
+            app.buttons.matching(identifier: name).allElementsBoundByIndex.first { $0.exists && $0.frame.minY > app.frame.midY } ?? app.buttons[name].firstMatch
+        }
+        for tab in tabs {
+            let button = tabButton(tab)
+            XCTAssertTrue(button.waitForExistence(timeout: 30), "tab \(tab)")
+            button.tap(); sleep(3)
+            XCTAssertTrue(button.isSelected, "the \(tab) tab reports its selected state")
+            for other in tabs where other != tab {
+                let o = tabButton(other)
+                XCTAssertFalse(o.isSelected, "only the current tab is selected (\(other) while on \(tab))")
+            }
+            walk("tab-\(tab.lowercased())")
+        }
+
+        launch("Notifications")
+        walk("notifications")
+        let row = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "notification-row-")).firstMatch
+        if row.waitForExistence(timeout: 30) {
+            row.tap()
+            let detail = app.scrollViews["notification-detail"]
+            XCTAssertTrue(detail.waitForExistence(timeout: 10), "notification popup")
+            let close = app.buttons["notification-dismiss-backdrop"], show = app.buttons["notification-show"]
+            XCTAssertTrue(close.exists, "the popup can be closed")
+            XCTAssertFalse(close.label.trimmingCharacters(in: .whitespaces).isEmpty, "the popup's close control has a spoken label")
+            XCTAssertTrue(show.exists && !show.label.trimmingCharacters(in: .whitespaces).isEmpty, "the popup's Show action has a spoken label")
+            let note = XCTAttachment(string: "close\t\(close.label)\nshow\t\(show.label)\ncontent\t\(detail.staticTexts.allElementsBoundByIndex.map(\.label).joined(separator: " | "))")
+            note.name = "voiceover-order-notification-popup"; note.lifetime = .keepAlways; add(note)
+            close.tap()
+        }
+        launch(nil)
+        for (row, screen) in [("Help Center", "help-center"), ("Change Language", "change-language")] {
+            tabButton("Profile").tap(); sleep(2)
+            let entry = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", row)).firstMatch
+            XCTAssertTrue(entry.waitForExistence(timeout: 20), "\(row) row")
+            entry.tap(); sleep(3)
+            walk(screen)
+            app.buttons["Back"].firstMatch.tap(); sleep(2)
+        }
+    }
+}
