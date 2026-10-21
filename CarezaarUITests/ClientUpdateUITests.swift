@@ -378,7 +378,12 @@ final class ParityV3UITests: XCTestCase {
             let viewer = app.webViews["legal-document"]
             XCTAssertTrue(viewer.waitForExistence(timeout: 10), "C2: document viewer opens")
             if english { XCTAssertTrue(app.navigationBars[index == 0 ? "Terms of Use" : "Privacy Policy"].exists, "C2: title bar names the document") }
-            XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "legal-document-loading").firstMatch.waitForNonExistence(timeout: 30), "C2: the server PDF finishes loading")
+            // The server's PDFs take 5–20 s on this connection; wait up to the app's own
+            // 120 s request timeout (Android's), and record how long the document took.
+            let loadStart = Date()
+            XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "legal-document-loading").firstMatch.waitForNonExistence(timeout: 130), "C2: the server PDF finishes loading")
+            let took = XCTAttachment(string: String(format: "%@ loaded in %.1f s", index == 0 ? "Terms of Use" : "Privacy Policy", Date().timeIntervalSince(loadStart)))
+            took.name = "legal-load-time-\(index)"; took.lifetime = .keepAlways; add(took)
             XCTAssertFalse(app.staticTexts["legal-document-unavailable"].exists, "C2: the server document is available")
             sleep(2)
             shot("C2-viewer-\(index == 0 ? "terms" : "privacy")")
