@@ -47,12 +47,14 @@ final class MatchActionBoundaryUITests: XCTestCase {
         XCTAssertTrue(cancel.waitForExistence(timeout: 10))
         XCTAssertEqual(cancel.label, "Cancel")
         XCTAssertFalse(app.alerts.buttons["Close"].exists)
-        // Since REG-MATCH-CANCEL-001 the destructive action uses the managed general_cancel
-        // label, as Android does, so both buttons read "Cancel"; tell them apart by identifier.
+        // Parity review v5.0/v6.0 H1 (server texts since 13 Oct): the window is titled "Withdraw",
+        // asks whether to withdraw the request and has Withdraw and Cancel, all managed texts.
         let actions = app.alerts.firstMatch.buttons.allElementsBoundByIndex.filter { !$0.identifier.isEmpty }
         XCTAssertEqual(Set(actions.map(\.identifier)), ["match-confirm-dismiss", "match-action-confirm"],
                        "Exactly the dismiss and confirm actions, ignoring nested AX wrappers")
-        XCTAssertTrue(actions.allSatisfy { $0.label == "Cancel" }, "Both actions use the managed Cancel label")
+        XCTAssertEqual(app.alerts.buttons["match-action-confirm"].firstMatch.label, "Withdraw", "the confirming button reads Withdraw")
+        XCTAssertTrue(app.alerts.staticTexts["Withdraw"].exists, "the window is titled Withdraw")
+        XCTAssertTrue(app.alerts.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "withdraw your match request")).firstMatch.exists, "the managed question")
         let proof = XCTAttachment(screenshot: app.alerts.firstMatch.screenshot())
         proof.name = "owned-withdraw-two-button-cancel-confirmation"; proof.lifetime = .keepAlways; add(proof)
         cancel.tap()

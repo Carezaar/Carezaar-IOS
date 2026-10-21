@@ -178,7 +178,7 @@ struct PartnerDetailsView: View {
                 }
                 .accessibilityIdentifier("match-request")
             case .sent:
-                WideButton(title: loc.t("general_cancel", "Cancel"), icon: "ic_match_off", style: .outline) { ask(.withdraw) }
+                WideButton(title: loc.t("match_withdraw_title", "Withdraw"), icon: "ic_match_off", style: .outline) { ask(.withdraw) }
                     .accessibilityIdentifier("match-withdraw")
             case .received:
                 WideButton(title: loc.t("match_reject_title", loc.t("match_reject", "Reject")), style: .danger) { ask(.reject) }
@@ -199,7 +199,7 @@ struct PartnerDetailsView: View {
         case .request: return loc.t("match_match_button", "Request a Match")
         case .accept: return loc.t("match_accept_title", "Accept")
         case .reject: return loc.t("match_reject_title", loc.t("match_reject", "Reject"))
-        case .withdraw: return loc.t("general_cancel", "Cancel")
+        case .withdraw: return loc.t("match_withdraw_title", "Withdraw")
         case .unmatch: return loc.t("match_unmatch_title", "Unmatch")
         }
     }
@@ -207,7 +207,7 @@ struct PartnerDetailsView: View {
     private func confirmLabel(_ which: MatchMutation) -> String {
         switch which {
         case .request: return loc.t("match_match_title", "Match")
-        case .withdraw: return loc.t("general_cancel", "Cancel")
+        case .withdraw: return loc.t("match_withdraw_title", "Withdraw")
         case .accept: return loc.t("match_accept_title", "Accept")
         case .reject: return loc.t("match_reject_title", loc.t("match_reject", "Reject"))
         case .unmatch: return loc.t("match_unmatch_title", "Unmatch")
@@ -220,7 +220,7 @@ struct PartnerDetailsView: View {
         case .request: question = loc.t("match_match_message", "Are you sure you want to match with this user? They should accept your request.")
         case .accept: question = loc.t("match_accept_message", "Are you sure you want to accept this match request?")
         case .reject: question = loc.t("match_reject_message", "Are you sure you want to reject this match request?")
-        case .withdraw: question = loc.t("match_withdraw_message", "Are you sure you want to cancel this match request?")
+        case .withdraw: question = loc.t("match_withdraw_message", "Are you sure you want to withdraw your match request with this user?")
         case .unmatch: question = loc.t("match_unmatch_message", "Are you sure you want to end your match with this user?")
         }
         if (which == .accept || which == .reject), let introduction = matchIntroduction,
@@ -634,7 +634,7 @@ enum MatchMutation: Hashable {
         switch self { case .request: "loading_match_submit"; case .withdraw: "loading_match_withdraw"; case .accept: "loading_match_accept"; case .reject: "loading_match_reject"; case .unmatch: "loading_unmatch_submit" }
     }
     var loadingFallback: String {
-        switch self { case .request: "Submitting match request"; case .withdraw: "Cancelling match request"; case .accept: "Accepting match request"; case .reject: "Rejecting match request"; case .unmatch: "Submitting unmatch request" }
+        switch self { case .request: "Submitting match request"; case .withdraw: "Withdrawing match request"; case .accept: "Accepting match request"; case .reject: "Rejecting match request"; case .unmatch: "Submitting unmatch request" }
     }
 }
 

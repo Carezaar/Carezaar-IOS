@@ -699,7 +699,7 @@ final class NativeOwnedGraphJourneyUITests: XCTestCase {
         try profileState("sent", j: j)
         let outgoing = app.buttons["match-withdraw"]
         try ready(outgoing)
-        try Guard.require(outgoing.label == text("general_cancel", "Cancel") && outgoing.label != "Withdraw", "outgoing-label-must-be-managed-Cancel")
+        try Guard.require(outgoing.label == text("match_withdraw_title", "Withdraw"), "outgoing-label-must-be-managed-Withdraw")
         let withdrawal = "DELETE /api/users/matches/\(edge)/withdraw"
         for confirm in [false, true] {
             try ready(outgoing); outgoing.tap()
@@ -776,7 +776,7 @@ final class NativeOwnedGraphJourneyUITests: XCTestCase {
         try profileState("sent", j: j)
         let outgoing = app.buttons["match-withdraw"]
         try ready(outgoing)
-        try Guard.require(outgoing.label == text("general_cancel", "Cancel") && outgoing.label != "Withdraw", "outgoing-label-must-be-managed-Cancel")
+        try Guard.require(outgoing.label == text("match_withdraw_title", "Withdraw"), "outgoing-label-must-be-managed-Withdraw")
         let withdrawal = "DELETE /api/users/matches/\(edge)/withdraw"
         for confirm in [false, true] {
             try ready(outgoing); outgoing.tap()
@@ -854,7 +854,7 @@ final class NativeOwnedGraphJourneyUITests: XCTestCase {
         try profileState("sent", j: j)
         let outgoing = app.buttons["match-withdraw"]
         try ready(outgoing)
-        try Guard.require(outgoing.label == text("general_cancel", "Cancel") && outgoing.label != "Withdraw", "outgoing-label-must-be-managed-Cancel")
+        try Guard.require(outgoing.label == text("match_withdraw_title", "Withdraw"), "outgoing-label-must-be-managed-Withdraw")
         let withdrawal = "DELETE /api/users/matches/\(edge)/withdraw"
         for confirm in [false, true] {
             try ready(outgoing); outgoing.tap()

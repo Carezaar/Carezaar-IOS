@@ -929,12 +929,12 @@ final class NativeOwnedGraphPhasesUITests: XCTestCase {
             try Guard.require(!app.staticTexts.matching(NSPredicate(format: "label == %@", j.introduction)).firstMatch.exists, "profile-top-must-not-show-introduction")
         }
         let actionLabels = ["match-request": text("match_match_button", "Request a Match"),
-            "match-withdraw": text("general_cancel", "Cancel"),
+            "match-withdraw": text("match_withdraw_title", "Withdraw"),
             "match-reject": text("match_reject_title", text("match_reject", "Reject")),
             "match-accept": text("match_accept_title", "Accept"), "match-unmatch": text("match_unmatch_title", "Unmatch")]
         for id in expected { try Guard.require(app.buttons[id].label == actionLabels[id], "exact-managed-profile-action-label") }
         if state == "sent" {
-            try Guard.require(app.buttons["match-withdraw"].label == text("general_cancel", "Cancel"), "outgoing-Cancel-never-Withdraw")
+            try Guard.require(app.buttons["match-withdraw"].label == text("match_withdraw_title", "Withdraw"), "outgoing-managed-Withdraw")
         }
         if state == "received" {
             let reject = app.buttons["match-reject"].frame, accept = app.buttons["match-accept"].frame
@@ -1009,9 +1009,9 @@ final class NativeOwnedGraphPhasesUITests: XCTestCase {
     private func confirmMutation(_ action: String, j: Guard) throws {
         guard let edge = j.edgeID else { throw Guard.Stopped.invariant("bound-edge-before-dialog") }
         let key = action == "withdraw" ? "match-withdraw" : "match-" + action
-        let label = action == "withdraw" ? text("general_cancel", "Cancel") : action == "reject"
+        let label = action == "withdraw" ? text("match_withdraw_title", "Withdraw") : action == "reject"
             ? text("match_reject_title", text("match_reject", "Reject")) : text("match_\(action)_title", action == "accept" ? "Accept" : "Unmatch")
-        let fallback = action == "withdraw" ? "Are you sure you want to cancel this match request?" : action == "reject"
+        let fallback = action == "withdraw" ? "Are you sure you want to withdraw your match request with this user?" : action == "reject"
             ? "Are you sure you want to reject this match request?" : action == "accept"
             ? "Are you sure you want to accept this match request?" : "Are you sure you want to end your match with this user?"
         let question = text("match_\(action)_message", fallback)

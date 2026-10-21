@@ -323,9 +323,10 @@ final class MatchStateMatrixUITests: XCTestCase {
             throw XCTSkip("Outgoing Cancel requires exact retained pair NONE; preserving existing relationship")
         }
         let cancel = try XCTUnwrap(f.labels["general_cancel"], "Managed Cancel must exist")
-        let obsolete = try XCTUnwrap(f.labels["match_withdraw_title"], "Current managed withdrawal label must exist for the regression guard")
-        XCTAssertEqual(cancel, "Cancel", "This English allocation must retain the governing Cancel contract")
-        XCTAssertNotEqual(cancel, obsolete, "Live CMS fixture must expose the distinct Withdraw regression trigger")
+        // Parity review v5.0/v6.0 H1: my own request is withdrawn with the managed "Withdraw"
+        // texts (button, window title, confirming button); the window's other button is Cancel.
+        let withdraw = try XCTUnwrap(f.labels["match_withdraw_title"], "Managed Withdraw must exist")
+        XCTAssertEqual(cancel, "Cancel"); XCTAssertEqual(withdraw, "Withdraw")
         cleanupFixture = f
         let edge = try createRequest(f, fromPrimary: true)
         XCTAssertEqual(try pairStatus(f), "sent") // also asserts the peer is RECEIVED
@@ -337,16 +338,15 @@ final class MatchStateMatrixUITests: XCTestCase {
             outgoing.isHittable && !self.app.staticTexts["Please wait..."].exists
         }, object: nil)
         XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 20), .completed)
-        XCTAssertEqual(outgoing.label, cancel)
-        XCTAssertNotEqual(outgoing.label, obsolete)
+        XCTAssertEqual(outgoing.label, withdraw)
         let endpoint = "DELETE /api/users/matches/\(edge)/withdraw"
         XCTAssertEqual(count(endpoint), 0)
         for shouldConfirm in [false, true] {
             XCTAssertTrue(outgoing.isHittable)
             outgoing.tap()
-            let dialog = app.alerts[cancel]
-            XCTAssertTrue(dialog.waitForExistence(timeout: 10), "Outgoing confirmation title must be managed Cancel")
-            XCTAssertTrue(dialog.staticTexts[cancel].exists)
+            let dialog = app.alerts[withdraw]
+            XCTAssertTrue(dialog.waitForExistence(timeout: 10), "Outgoing confirmation title must be managed Withdraw")
+            XCTAssertTrue(dialog.staticTexts[withdraw].exists)
             let dismiss = dialog.buttons.matching(identifier: "match-confirm-dismiss").firstMatch
             let confirm = dialog.buttons.matching(identifier: "match-action-confirm").firstMatch
             let hierarchy = XCTAttachment(string: dialog.debugDescription)
@@ -358,16 +358,15 @@ final class MatchStateMatrixUITests: XCTestCase {
             XCTAssertTrue(dismiss.exists && dismiss.isHittable)
             XCTAssertTrue(confirm.exists && confirm.isHittable)
             XCTAssertEqual(dismiss.label, cancel)
-            XCTAssertEqual(confirm.label, cancel)
+            XCTAssertEqual(confirm.label, withdraw)
             // UIKit exposes each SwiftUI alert action as nested Button nodes
             // with identical identifier/label/frame. Count distinct hit targets,
             // retaining strict exact-label/identifier assertions on every node.
             let actionNodes = dialog.buttons.allElementsBoundByIndex
             XCTAssertEqual(Set(actionNodes.map(\.identifier)), Set(["match-confirm-dismiss", "match-action-confirm"]))
-            XCTAssertTrue(actionNodes.allSatisfy { $0.label == cancel })
+            XCTAssertTrue(actionNodes.allSatisfy { $0.label == ($0.identifier == "match-action-confirm" ? withdraw : cancel) })
             let distinctTargets = Set(actionNodes.map { "\($0.identifier):\(NSCoder.string(for: $0.frame))" })
             XCTAssertEqual(distinctTargets.count, 2)
-            XCTAssertFalse(dialog.staticTexts[obsolete].exists)
             let proof = XCTAttachment(screenshot: dialog.screenshot())
             proof.name = "owned-outgoing-cancel-\(shouldConfirm ? "confirm" : "dismiss")-\(f.role)"
             proof.lifetime = .keepAlways; add(proof)
@@ -881,7 +880,7 @@ final class MatchStateMatrixUITests: XCTestCase {
             XCTAssertEqual(app.buttons[id].exists, expectedIDs.contains(id), "Profile action set must match exact public state")
         }
         let expectedLabels = ["match-request": f.label("match_match_button", "Request a Match"),
-            "match-withdraw": f.label("general_cancel", "Cancel"),
+            "match-withdraw": f.label("match_withdraw_title", "Withdraw"),
             "match-reject": f.label("match_reject_title", f.label("match_reject", "Reject")),
             "match-accept": f.label("match_accept_title", "Accept"), "match-unmatch": f.label("match_unmatch_title", "Unmatch")]
         for id in expectedIDs {
