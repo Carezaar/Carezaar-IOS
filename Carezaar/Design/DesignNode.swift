@@ -66,8 +66,14 @@ enum SourceStore {
         }
         return try JSONDecoder().decode(T.self, from: Data(contentsOf: url))
     }
-    /// Scene images shown with a different picture.
-    static let replacements = ["92bf103484e337567f379617f79c6c37ba10484d.jpg": "intro-room.jpg"]
+    /// Scene images shown with a people-free picture that carries the same meaning
+    /// (see ARTWORK_POLICY.md).
+    static let replacements = [
+        "92bf103484e337567f379617f79c6c37ba10484d.jpg": "welcome-hands.jpg",
+        "2c0c41de4775bed358fedceb4f03ba6bd2b76913.png": "care-type-senior.png",
+        "80e754df1acd580e680f27c317c16f17a8ffb0eb.png": "care-type-child.png",
+        "b8a5332565873bf014bb9feaf8faef4b797407fe.png": "care-type-pregnancy.png",
+    ]
     static func assetURL(_ name: String) -> URL? {
         Bundle.main.url(forResource: replacements[name] ?? name, withExtension: nil, subdirectory: "Assets")
     }

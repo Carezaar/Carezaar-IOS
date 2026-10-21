@@ -106,6 +106,13 @@ struct PreferencesWizard: View {
             },
             // The caregiver frame (715:11684) shows its own skills illustration.
             isHidden: { node in !isClient && ["101:11970", "101:11969", "101:11971"].contains(node.id) }),
+            overlays: isClient ? [] : [
+                SceneOverlay(x: 94, y: 110, width: 224, height: 238) {
+                    if let url = SourceStore.assetURL("skills-illustration.png"), let image = UIImage(contentsOfFile: url.path) {
+                        Image(uiImage: image).resizable().scaledToFit()
+                    }
+                },
+            ],
             fitHeight: true)
         .navigationBarBackButtonHidden()
         .toolbar(.hidden, for: .navigationBar)

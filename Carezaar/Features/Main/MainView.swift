@@ -363,10 +363,15 @@ struct MatchesTab: View {
     }
 
     private func loadHeader() async {
-        // The banner shows the room photo for every care type.
-        headerImages = []
+        let ids: [Int]
+        if isClient { ids = (try? await ClientService().profile().clienttypeId).map { [$0] } ?? [] }
+        else { ids = (try? await CaregiverService().profile().clienttypeIds) ?? [] }
+        headerImages = ids.compactMap { id in
+            baseData.items(.clienttypes).first(where: { $0.id == id })?.icon?
+                .replacingOccurrences(of: "client_", with: "header_")
+        }
         headerIndex = 0
-        headerImage = "bg_matches"
+        headerImage = headerImages.first ?? "bg_matches"
     }
 
     private func toggleFavorite(_ card: Card) async {
@@ -576,7 +581,7 @@ struct ProfileTab: View {
                     description: loc.t("profile_matches_description", "Review your match history"), tint: Theme.Palette.success,
                     // The icon keeps the brand green; text uses the darker green (5.3:1).
                     titleColor: Color(hex: 0x047A5A)) { router.push(.manageMatches) },
-            MenuRow(icon: "ic_message", title: loc.t("profile_help_center_title", "Help Center"),
+            MenuRow(icon: "ic_support", title: loc.t("profile_help_center_title", "Help Center"),
                     description: loc.t("profile_help_center_description", "Get help and support")) { router.push(.helpCenter) },
             MenuRow(icon: "ic_issue", title: loc.t("profile_report_an_issue_title", "Report an Issue"),
                     description: loc.t("profile_report_an_issue_description", "")) { router.push(.reportAnIssue) },
