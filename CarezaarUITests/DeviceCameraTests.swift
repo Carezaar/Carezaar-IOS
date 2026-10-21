@@ -453,3 +453,52 @@ final class DeviceCameraTests: XCTestCase {
         let a = XCTAttachment(screenshot: XCUIScreen.main.screenshot()); a.name = name; a.lifetime = .keepAlways; add(a)
     }
 }
+
+/// P17-002 on the physical iPhone, performed by a person. The test turns on VoiceOver's caption
+/// panel in Settings, opens Carezaar signed in, turns VoiceOver on through Siri, then only records a
+/// screenshot every 2 s while the owner swipes (it sends no input, so VoiceOver gets only the
+/// person's gestures). Afterwards it turns VoiceOver off through Siri and restores the caption panel.
+final class DeviceVoiceOverRecordingTests: XCTestCase {
+    private let settings = XCUIApplication(bundleIdentifier: "com.apple.Preferences")
+    private func openVoiceOverSettings() -> Bool {
+        settings.terminate(); settings.launch()
+        let accessibility = settings.cells.staticTexts["Accessibility"].firstMatch
+        for _ in 0..<6 where !accessibility.isHittable { settings.swipeUp() }
+        guard accessibility.waitForExistence(timeout: 10) else { return false }
+        accessibility.tap()
+        let vo = settings.cells.staticTexts["VoiceOver"].firstMatch
+        guard vo.waitForExistence(timeout: 10) else { return false }
+        vo.tap(); return settings.switches.firstMatch.waitForExistence(timeout: 10)
+    }
+    private func captionSwitch() -> XCUIElement {
+        let s = settings.switches.matching(NSPredicate(format: "identifier CONTAINS[c] %@ OR label CONTAINS[c] %@", "Caption", "Caption")).firstMatch
+        for _ in 0..<8 where !s.exists || !s.isHittable { settings.swipeUp() }
+        return s
+    }
+    func testRecordPersonsVoiceOverWalk() throws {
+        let env = ProcessInfo.processInfo.environment
+        guard env["QA_DEVICE_VOICEOVER"] == "1" else { throw XCTSkip("Physical iPhone run only (QA_DEVICE_VOICEOVER=1)") }
+        var captionWasOn = true
+        if openVoiceOverSettings() {
+            let caption = captionSwitch()
+            if caption.exists { captionWasOn = caption.value as? String == "1"; if !captionWasOn { caption.tap() } }
+        }
+        addTeardownBlock { [self] in
+            XCUIDevice.shared.siriService.activate(voiceRecognitionText: "Turn off VoiceOver"); sleep(6)
+            if !captionWasOn, openVoiceOverSettings() { let c = captionSwitch(); if c.exists, c.value as? String == "1" { c.tap() } }
+            settings.terminate()
+        }
+        let app = XCUIApplication()
+        app.launchEnvironment["QA_EMAIL"] = env["QA_EMAIL"]; app.launchEnvironment["QA_PASSWORD"] = env["QA_PASSWORD"]
+        app.launchArguments = ["--qa-signout", "--qa-login-env", "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
+        app.launch()
+        _ = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Sort")).firstMatch.waitForExistence(timeout: 90)
+        XCUIDevice.shared.siriService.activate(voiceRecognitionText: "Turn on VoiceOver"); sleep(6)
+        app.activate()
+        let seconds = Int(env["QA_VO_SECONDS"] ?? "240") ?? 240
+        for i in 0..<(seconds / 2) {
+            sleep(2)
+            let a = XCTAttachment(screenshot: XCUIScreen.main.screenshot()); a.name = String(format: "vo-person-%03d", i); a.lifetime = .keepAlways; add(a)
+        }
+    }
+}
