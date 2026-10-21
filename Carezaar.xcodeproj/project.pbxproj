@@ -832,8 +832,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				CAREZAAR_TERMS_OF_USE_URL = "";
-				CAREZAAR_PRIVACY_POLICY_URL = "";
+				CAREZAAR_TERMS_OF_USE_URL = "https://new.carezaar.com/terms_of_use.pdf";
+				CAREZAAR_PRIVACY_POLICY_URL = "https://new.carezaar.com/privacy_policy.pdf";
 				INFOPLIST_FILE = Carezaar/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Carezaar needs camera access so you can take a profile picture.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Carezaar uses your location to find care matches near you.";
@@ -893,8 +893,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
-				CAREZAAR_TERMS_OF_USE_URL = "";
-				CAREZAAR_PRIVACY_POLICY_URL = "";
+				CAREZAAR_TERMS_OF_USE_URL = "https://new.carezaar.com/terms_of_use.pdf";
+				CAREZAAR_PRIVACY_POLICY_URL = "https://new.carezaar.com/privacy_policy.pdf";
 				INFOPLIST_FILE = Carezaar/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Carezaar needs camera access so you can take a profile picture.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Carezaar uses your location to find care matches near you.";

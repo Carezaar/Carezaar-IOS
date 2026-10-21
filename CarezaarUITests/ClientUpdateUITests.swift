@@ -356,7 +356,8 @@ final class ParityV3UITests: XCTestCase {
         XCTAssertFalse(app.staticTexts["signup-error-agreement"].exists)
         shot("C1-invalid-email-rule-mismatch")
 
-        // C2: the two names open the in-app viewer; no document is configured yet.
+        // C2: the two names open the client's server PDFs (new.carezaar.com, set in Info.plist)
+        // in the in-app viewer with a title bar, scrolling and zoom.
         let consent = app.descendants(matching: .any).matching(identifier: "signup-consent-text").firstMatch
         if english {
             let sentence = "I agree to the Terms of Use and acknowledge that I have read the Privacy Policy."
@@ -374,10 +375,11 @@ final class ParityV3UITests: XCTestCase {
             if link.frame.width > 1 { link.tap() }
             else if english { consent.coordinate(withNormalizedOffset: CGVector(dx: 0.42, dy: 0.75)).tap() }
             else { continue }
-            // C2: the client's bundled PDF opens in the in-app viewer (scroll + pinch zoom).
             let viewer = app.webViews["legal-document"]
             XCTAssertTrue(viewer.waitForExistence(timeout: 10), "C2: document viewer opens")
-            XCTAssertFalse(app.staticTexts["legal-document-unavailable"].exists, "C2: the document is bundled")
+            if english { XCTAssertTrue(app.navigationBars[index == 0 ? "Terms of Use" : "Privacy Policy"].exists, "C2: title bar names the document") }
+            XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "legal-document-loading").firstMatch.waitForNonExistence(timeout: 30), "C2: the server PDF finishes loading")
+            XCTAssertFalse(app.staticTexts["legal-document-unavailable"].exists, "C2: the server document is available")
             sleep(2)
             shot("C2-viewer-\(index == 0 ? "terms" : "privacy")")
             viewer.swipeUp(); viewer.pinch(withScale: 2, velocity: 1)

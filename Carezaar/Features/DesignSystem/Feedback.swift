@@ -131,7 +131,7 @@ final class Feedback: ObservableObject {
             return serverTrouble
         case .timeout:
             return serverTrouble
-        case .unauthenticated:
+        case .unauthenticated, .forbidden:
             return translate("general_error_forbidden", "You can't do this right now.")
         case .decoding:
             return translate("general_error_general", "Something went wrong. Please try again.")

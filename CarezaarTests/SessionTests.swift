@@ -741,7 +741,10 @@ final class SessionTests: XCTestCase {
         XCTAssertEqual(writes, 1)
     }
 
-    func testRejectedReplayAfterSuccessfulRefreshExpiresCapturedSession() async {
+    /// P16-015 (owner decision, 21 Oct 2026): after a successful renewal a refused replay means
+    /// "not allowed here" (e.g. the other role's screen), not an invalid session: report it as
+    /// forbidden and keep the user signed in, as the web does. Still exactly one replay.
+    func testRejectedReplayAfterSuccessfulRefreshKeepsSessionAndReportsForbidden() async {
         for status in [401, 403] {
             let tokens = FixtureTokens()
             tokens.save(Session(accessToken: "old-access", refreshToken: "old-refresh"))
@@ -755,15 +758,39 @@ final class SessionTests: XCTestCase {
                 if reads == 2 { XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer renewed-access") }
                 return (status, Data(#"{"message":"Refused"}"#.utf8))
             }
-            _ = try? await APIClient(tokens: tokens, session: StubHTTP.session()).sendIgnoringResult(
-                Endpoint(method: .get, path: "users/notifications/count"))
+            do {
+                try await APIClient(tokens: tokens, session: StubHTTP.session()).sendIgnoringResult(
+                    Endpoint(method: .get, path: "users/notifications/count"))
+                XCTFail("A refused replay must fail")
+            } catch let error as APIError {
+                guard case .forbidden = error else { XCTFail("HTTP \(status) refused replay must be forbidden, not \(error)"); continue }
+            } catch { XCTFail("Unexpected \(error)") }
             XCTAssertEqual(reads, 2, "Retry once after renewal, never loop on refusal")
             XCTAssertEqual(refreshes, 1)
-            XCTAssertFalse(tokens.hasSession, "A rejected renewed credential cannot remain signed in")
+            XCTAssertTrue(tokens.hasSession, "A refused request on a renewed session keeps the user signed in")
+            XCTAssertEqual(tokens.accessToken, "renewed-access")
         }
     }
 
-    func testRejectedReplayUsingConcurrentRenewalExpiresCapturedSession() async {
+    /// The identity check refused with a freshly renewed token means the account itself is
+    /// not usable: that captured session still ends.
+    func testRejectedIdentityReplayAfterSuccessfulRefreshExpiresCapturedSession() async {
+        let tokens = FixtureTokens()
+        tokens.save(Session(accessToken: "old-access", refreshToken: "old-refresh"))
+        var reads = 0
+        StubHTTP.handler = { request in
+            if request.url!.lastPathComponent == "refresh" {
+                return (200, Data(#"{"result":{"access_token":"renewed-access","refresh_token":"renewed-refresh"}}"#.utf8))
+            }
+            reads += 1
+            return (403, Data(#"{"message":"Refused"}"#.utf8))
+        }
+        _ = try? await APIClient(tokens: tokens, session: StubHTTP.session()).sendIgnoringResult(Endpoint(method: .get, path: "auth/info"))
+        XCTAssertEqual(reads, 2)
+        XCTAssertFalse(tokens.hasSession, "A refused identity check on a renewed credential cannot remain signed in")
+    }
+
+    func testRejectedReplayUsingConcurrentRenewalKeepsCapturedSession() async {
         let tokens = FixtureTokens()
         tokens.save(Session(accessToken: "old-access", refreshToken: "old-refresh"))
         let generation = tokens.generation
@@ -784,7 +811,8 @@ final class SessionTests: XCTestCase {
         _ = try? await APIClient(tokens: tokens, session: StubHTTP.session()).sendIgnoringResult(
             Endpoint(method: .get, path: "users/notifications/count"))
         XCTAssertEqual(reads, 2)
-        XCTAssertFalse(tokens.hasSession)
+        XCTAssertTrue(tokens.hasSession, "P16-015: a refused replay on the renewed session keeps it")
+        XCTAssertEqual(tokens.accessToken, "renewed-access")
     }
 
     func testRejectedReplayNeverExpiresUnrelatedNewLogin() async {

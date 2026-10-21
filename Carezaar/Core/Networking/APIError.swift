@@ -6,6 +6,9 @@ enum APIError: Error, Equatable {
     /// 403 — "Valid JWT token is required!". The backend uses 403, *not* 401, for a
     /// missing or expired token, so this is the case that must drive token refresh.
     case unauthenticated(String)
+    /// 403 on a freshly renewed, valid session: this request is not allowed (for example the
+    /// other role's screen). Not a session problem — the user stays signed in, as on the web.
+    case forbidden(String)
     /// 422 — field validation failures keyed by field name.
     case validation(message: String, fields: [String: [String]])
     case notFound(String)
@@ -25,7 +28,7 @@ enum APIError: Error, Equatable {
     /// The server's own text, when it has one.
     var serverMessage: String {
         switch self {
-        case .unauthenticated(let m), .notFound(let m), .server(let m), .unknown(let m), .decoding(let m): return m
+        case .unauthenticated(let m), .forbidden(let m), .notFound(let m), .server(let m), .unknown(let m), .decoding(let m): return m
         case .validation(let m, _): return m
         case .connectionUnavailable, .network, .timeout: return ""
         }
@@ -83,7 +86,7 @@ enum MutationOutcome {
         if error is CancellationError || error is AuthorizationRejectedMutationError { return false }
         guard let api = error as? APIError else { return true }
         switch api {
-        case .validation, .notFound, .unauthenticated, .connectionUnavailable: return false
+        case .validation, .notFound, .unauthenticated, .forbidden, .connectionUnavailable: return false
         case .network, .timeout, .decoding, .server, .unknown: return true
         }
     }

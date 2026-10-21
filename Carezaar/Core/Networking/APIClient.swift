@@ -142,13 +142,16 @@ actor APIClient {
         }
     }
 
-    /// A valid-looking refresh pair is not enough when its authenticated replay
-    /// is explicitly refused. End only the captured session, never a newer login.
+    /// The session was just renewed, so a refused replay means this request is not allowed
+    /// (for example the other role's screen): report it and keep the session, as the web does.
+    /// Only the identity check (`auth/info`) refused with a renewed token ends the captured
+    /// session, never a newer login.
     private func replayAfterRenewal<T: Decodable>(_ endpoint: Endpoint, generation: UUID) async throws -> APIEnvelope<T> {
         guard tokens.generation == generation else { throw CancellationError() }
         do {
             return try await performChecked(endpoint, generation: generation, accessToken: tokens.accessToken)
         } catch APIError.unauthenticated(let message) {
+            guard endpoint.path == "auth/info" else { throw APIError.forbidden(message) }
             await expireSession(ifGeneration: generation)
             throw APIError.unauthenticated(message)
         }
