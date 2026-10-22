@@ -375,6 +375,9 @@ final class AuthBoundaryUITests: XCTestCase {
     /// (closed again with Edit, never confirmed); an invalid one shows its problems
     /// under the fields and opens nothing.
     private func assertGate(caseID: String, expected: Bool, manifest: String, agreementOnly: Bool = false, extra: [String: Any] = [:]) {
+        // On the iPhone SE the previous case's agreement toast (shown 4.5 s) sits over Continue;
+        // a tap while it is up lands on the toast. Wait for it to clear first.
+        XCTAssertTrue(app.staticTexts["Please accept the license agreement to continue."].waitForNonExistence(timeout: 10))
         scrollTo(next)
         XCTAssertTrue(next.exists && next.isHittable && next.isEnabled, "Continue must always be active")
         next.tap()
