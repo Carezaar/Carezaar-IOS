@@ -112,6 +112,7 @@
 		24F3284569C64285B47502C7 /* ChatNetworkBoundaryUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54CB6EB5FDD6404F87D0D8B3 /* ChatNetworkBoundaryUITests.swift */; };
 		33B4F300AD81497F934F95E8 /* RequestIntroductionBoundaryUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D36B853A88545219D811F8D /* RequestIntroductionBoundaryUITests.swift */; };
 		9A75E348538A4E4A8DF3FAC0 /* ManagedLanguageMatrixUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9137E9FE110447994A3B2B0 /* ManagedLanguageMatrixUITests.swift */; };
+		C8D1B2F3E4A5B6C7D8E9F0A1 /* BrandColorUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7C0A1E2D3F4A5B6C7D8E9F0 /* BrandColorUITests.swift */; };
 		DFF086AFFC394F25B48EF989 /* MatchStateMatrixUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFCDD0EB34F64C0CA8D51857 /* MatchStateMatrixUITests.swift */; };
 		01096EA9753543DBBE04FCB2 /* ChromeDynamicTypeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4AD527B520748B7B164060A /* ChromeDynamicTypeUITests.swift */; };
 		F23C6B1E1B1443269A50D4E7 /* LocationBoundaryUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9ED3B4E5D2F402996EFD287 /* LocationBoundaryUITests.swift */; };
@@ -250,6 +251,7 @@
 		54CB6EB5FDD6404F87D0D8B3 /* ChatNetworkBoundaryUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ChatNetworkBoundaryUITests.swift; sourceTree = "<group>"; };
 		6D36B853A88545219D811F8D /* RequestIntroductionBoundaryUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RequestIntroductionBoundaryUITests.swift; sourceTree = "<group>"; };
 		C9137E9FE110447994A3B2B0 /* ManagedLanguageMatrixUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ManagedLanguageMatrixUITests.swift; sourceTree = "<group>"; };
+		B7C0A1E2D3F4A5B6C7D8E9F0 /* BrandColorUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BrandColorUITests.swift; sourceTree = "<group>"; };
 		BFCDD0EB34F64C0CA8D51857 /* MatchStateMatrixUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MatchStateMatrixUITests.swift; sourceTree = "<group>"; };
 		C4AD527B520748B7B164060A /* ChromeDynamicTypeUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ChromeDynamicTypeUITests.swift; sourceTree = "<group>"; };
 		A9ED3B4E5D2F402996EFD287 /* LocationBoundaryUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LocationBoundaryUITests.swift; sourceTree = "<group>"; };
@@ -446,6 +448,7 @@
 				8524A30E672ED446BB0E6B6C /* NativeLoginRoleUITests.swift */,
 				E199C99305C84DE79BF50FF6 /* FavoritePersistenceUITests.swift */,
 				E797FD6799264E409FA79B52 /* UnsentChatDraftUITests.swift */,
+				B7C0A1E2D3F4A5B6C7D8E9F0 /* BrandColorUITests.swift */,
 				BFCDD0EB34F64C0CA8D51857 /* MatchStateMatrixUITests.swift */,
 				26B864C075D34BD78704BFD2 /* LanguagePersistenceUITests.swift */,
 				54CB6EB5FDD6404F87D0D8B3 /* ChatNetworkBoundaryUITests.swift */,
@@ -719,6 +722,7 @@
 				964FB8B160D732DCC5A8C70F /* NativeLoginRoleUITests.swift in Sources */,
 				7BD3CBD52C83437D9D5B9F76 /* FavoritePersistenceUITests.swift in Sources */,
 				7B6F044E03964DC391F060D4 /* UnsentChatDraftUITests.swift in Sources */,
+				C8D1B2F3E4A5B6C7D8E9F0A1 /* BrandColorUITests.swift in Sources */,
 				DFF086AFFC394F25B48EF989 /* MatchStateMatrixUITests.swift in Sources */,
 				687DCB81CEFD428D92C095AF /* LanguagePersistenceUITests.swift in Sources */,
 				24F3284569C64285B47502C7 /* ChatNetworkBoundaryUITests.swift in Sources */,
