@@ -4,14 +4,14 @@ This file supersedes the status sections of earlier handoffs. Nothing here has b
 
 ## Build and tests
 
-- All 172 unit tests in this commit pass (`CarezaarTests`, iOS 26.5 simulator).
+- All 176 unit tests in this commit pass (`CarezaarTests`, iOS 26.5 simulator).
 - Debug build-for-testing and Release build succeed. Warnings: Xcode's App Intents metadata notice, and one unused local in a UI test.
 - QA launch arguments (`Navigation/QALaunch.swift`) are compiled only in Debug; the Release binary contains none of them.
 - The Release bundle's built-in images are the logo, rooms, a desk, abstract shapes and the hands-only Messages header. No people or faces (see `ARTWORK_POLICY.md`).
 
 ## Changes in this review
 
-- **No sign-out when a request is refused on a valid session.** The backend answers 403 both for an expired token and for "not allowed here". A 403 that names a field is a normal error straight away. Otherwise the app renews the token once; if the renewed request is refused again, it is reported as "You can't do this right now." and the user stays signed in, as on the web (owner decision for the other role's screen, P16-015). Only a refused identity check (`auth/info`) after a renewal still ends the session (`Core/Networking/APIClient.swift`, `APIError.forbidden`, unit tests in `NetworkTests` and `SessionTests`).
+- **Every refused request renews once and is sent once more (client review, 22 Oct).** The backend answers 403 both for an expired sign-in and for an action that is no longer allowed, with or without a field name. Every 403 on a signed-in request now renews the sign-in once (one shared renewal for concurrent requests) and sends the original request once more. If that is refused again, the app shows the managed "You can't do this right now." and the user stays signed in. Until 22 Oct a 403 that named a field was shown as a field error without renewing. Sign-in and sign-up, which have no session, still show their field errors. Only a refused identity check (`auth/info`) after a renewal, or a refused renewal, ends the session (`Core/Networking/APIClient.swift`; unit tests in `NetworkTests`; UI tests `MatchActionBoundaryUITests/testRefusedWithdraw…` and `testExpiredSignInDuringWithdraw…` with the Debug-only `--qa-refuse` hook).
 - **An unreadable photo says so.** A photo chosen in the gallery that could not be loaded or decoded did nothing; the app now shows the managed general error and keeps the form (`Features/Auth/ProfileFormView.swift`). On the simulator the system itself refuses the corrupt test file and the picker keeps the truncated one, so this branch is a safeguard that no test reached.
 - **Offline pull-to-refresh on My Matches says so.** A failed refresh kept the list but gave no sign; it now shows the managed "Cannot communicate with server." message while keeping the list (`Features/Main/MainView.swift`). Checked on a physical iPhone with mobile data off and on.
 - **FAQ in right-to-left languages.** In Farsi the category strip is wider than the screen and opened at its far end, so the selected "All" chip was off-screen. The strip now scrolls "All" into view when the screen opens and when the language changes (`Features/Settings/SettingsScreens.swift`).
