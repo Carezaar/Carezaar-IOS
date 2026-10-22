@@ -376,8 +376,13 @@ final class AuthBoundaryUITests: XCTestCase {
     /// under the fields and opens nothing.
     private func assertGate(caseID: String, expected: Bool, manifest: String, agreementOnly: Bool = false, extra: [String: Any] = [:]) {
         // On the iPhone SE the previous case's agreement toast (shown 4.5 s) sits over Continue;
-        // a tap while it is up lands on the toast. Wait for it to clear first.
-        XCTAssertTrue(app.staticTexts["Please accept the license agreement to continue."].waitForNonExistence(timeout: 10))
+        // a tap while it is up lands on the toast. Close it (its Dismiss button) and make sure no
+        // element still carries its text: once the checkbox changes, the exact static-text query
+        // no longer matches the combined toast element.
+        let dismiss = app.buttons["Dismiss"].firstMatch
+        if dismiss.exists && dismiss.isHittable { dismiss.tap() }
+        let toastText = app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", "accept the license agreement")).firstMatch
+        XCTAssertTrue(toastText.waitForNonExistence(timeout: 10), "the agreement toast must be gone before Continue")
         scrollTo(next)
         XCTAssertTrue(next.exists && next.isHittable && next.isEnabled, "Continue must always be active")
         next.tap()
