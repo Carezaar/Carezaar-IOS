@@ -971,12 +971,17 @@ final class ChatNetworkBoundaryUITests: XCTestCase {
         let busy = app.staticTexts[f.label("loading_please_wait", "Please wait...")]
         XCTAssertTrue(send.isEnabled && send.isHittable && refresh.isEnabled)
         let beforeGET = count("GET /api/users/chats/\(chatID)")
+        let beforeGETAt = Date()
         XCTAssertEqual(messagePOSTs(chatID), 0)
         send.tap()
         XCTAssertTrue(busy.waitForExistence(timeout: 10), "Direct POST delivery must present progress")
         XCTAssertFalse(send.isEnabled)
         XCTAssertFalse(refresh.isEnabled, "Manual refresh stays disabled during delivery")
-        XCTAssertEqual(count("GET /api/users/chats/\(chatID)"), beforeGET)
+        // Sending adds no conversation read. An open chat still re-checks every 10 s (parity review
+        // v4.0 / 16 Oct list item 10), so only those scheduled reads may fall in this window.
+        let scheduledReads = Int((Date().timeIntervalSince(beforeGETAt) / 10).rounded(.up))
+        XCTAssertLessThanOrEqual(count("GET /api/users/chats/\(chatID)"), beforeGET + scheduledReads,
+                                 "Sending must not add a conversation read beyond the 10 s re-check")
         XCTAssertFalse(refresh.isHittable, "Progress modal blocks the disabled refresh target")
         // The deliberate transport latency runs before the request counter.
         // Require actual dispatch after that delay, without inventing a GET
