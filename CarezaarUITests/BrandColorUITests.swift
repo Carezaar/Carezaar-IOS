@@ -31,8 +31,11 @@ final class BrandColorUITests: XCTestCase {
         XCTAssertTrue(field.waitForExistence(timeout: 60))
         settle()
         // The message text sits 14 pt inside its bubble: the bubble is sampled just left of the text.
-        let own = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Brand colour check'")).firstMatch
-        XCTAssertTrue(own.waitForExistence(timeout: 30), "the client's own message must be on screen")
+        let ownMessages = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Brand colour check'"))
+        XCTAssertTrue(ownMessages.firstMatch.waitForExistence(timeout: 30), "the client's own message must be on screen")
+        // Earlier check messages may be scrolled out of view: sample the newest one that is on screen.
+        let window = app.windows.firstMatch.frame
+        let own = ownMessages.allElementsBoundByIndex.last { window.contains($0.frame) } ?? ownMessages.firstMatch
         let send = app.buttons["Send"].firstMatch
         XCTAssertTrue(send.waitForExistence(timeout: 10))
         check("chat-own-bubble", own, at: .leftOfText, target: target, folder: folder)
