@@ -67,6 +67,119 @@ final class MatchActionBoundaryUITests: XCTestCase {
         lostAckCleanup = nil
     }
 
+    // MARK: Client review 22 Oct 2026, IOS-22-02: a refused request (403, with or without a field
+    // name) renews the sign-in once and is sent once more; refused again, it shows the managed
+    // "You can't do this right now." and the person stays signed in.
+
+    /// Stages an owned sent request and opens it with the given extra launch arguments.
+    private func launchOwnedSentRequest(_ extra: (_ edge: Int) -> [String]) throws -> (LostAckFixture, Int, Date) {
+        let f = try lostAckFixture()
+        guard try lostAckProfile(f)["match_status"] as? String == "none",
+              try lostAckProfile(f, peer: true)["match_status"] as? String == "none" else {
+            throw XCTSkip("Refusal checks need the owned pair at NONE; no existing edge is cleared")
+        }
+        lostAckCleanup = f
+        let staged = try CarezaarAPI.callWithHTTPStatus("POST", "users/matches",
+            form: ["partner_id": f.partnerID, "introduction": f.marker], token: f.token)
+        XCTAssertEqual(staged.status, 200)
+        let edge = try XCTUnwrap((staged.body["result"] as? [String: Any])?["id"] as? Int)
+        app.launchEnvironment = ["QA_EMAIL": env["QA_EMAIL"]!, "QA_PASSWORD": env["QA_PASSWORD"]!]
+        app.launchArguments = ["--qa-signout", "--qa-login-env", "--qa-request-counts", "--qa-push", f.route]
+            + extra(edge) + ["-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
+        let launched = Date()
+        app.launch()
+        return (f, edge, launched)
+    }
+    private func confirmWithdraw() throws {
+        let withdraw = app.buttons["match-withdraw"]
+        try revealOwnedRequest(withdraw, timeout: 45)
+        withdraw.tap()
+        let confirm = app.alerts.buttons["match-action-confirm"].firstMatch
+        XCTAssertTrue(confirm.waitForExistence(timeout: 10))
+        confirm.tap()
+    }
+    private func managedText(_ slug: String, fallback: String, token: String) throws -> String {
+        let contents = try CarezaarAPI.callWithHTTPStatus("GET", "base/contents?ts_cache=0", token: token)
+        let rows = contents.body["result"] as? [[String: Any]] ?? []
+        guard let row = rows.first(where: { $0["slug"] as? String == slug }),
+              let item = (row["translations"] as? [[String: Any]])?.first(where: { ($0["language_id"] as? Int) == 1 }),
+              let value = item["name"] as? String, !value.isEmpty else { return fallback }
+        return value
+    }
+    private func attachEvidence(_ name: String, _ facts: [String: Any]) throws {
+        let shot = XCTAttachment(screenshot: app.screenshot())
+        shot.name = name + "-screen"; shot.lifetime = .keepAlways; add(shot)
+        let data = XCTAttachment(data: try JSONSerialization.data(withJSONObject: facts, options: [.sortedKeys]),
+                                 uniformTypeIdentifier: "public.json")
+        data.name = name; data.lifetime = .keepAlways; add(data)
+    }
+
+    func testRefusedWithdrawNamingAFieldRenewsOnceReplaysOnceThenShowsManagedRefusal() throws {
+        let (f, edge, _) = try launchOwnedSentRequest { ["--qa-refuse", "DELETE", "users/matches/\($0)/withdraw", "2"] }
+        let refusal = try managedText("general_error_forbidden", fallback: "You can't do this right now.", token: f.token)
+        try confirmWithdraw()
+        let toast = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", refusal)).firstMatch
+        XCTAssertTrue(toast.waitForExistence(timeout: 20), "The managed refusal is shown")
+        let delete = "DELETE /api/users/matches/\(edge)/withdraw"
+        XCTAssertEqual(try count(delete), 2, "The original request and one replay")
+        XCTAssertEqual(try count("PUT /api/auth/refresh"), 1, "One renewal")
+        XCTAssertEqual(app.staticTexts["qa-token-presence"].label, "accessPresent=true;refreshPresent=true", "Still signed in")
+        XCTAssertTrue(app.buttons["match-withdraw"].exists, "Still on the request, not signed out")
+        XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "The selected id is invalid")).firstMatch.exists,
+                       "The server's own text is not shown")
+        let sent = try lostAckProfile(f)
+        XCTAssertEqual(sent["match_status"] as? String, "sent")
+        XCTAssertEqual(sent["match_id"] as? Int, edge, "Server unchanged")
+        try attachEvidence("IOS-22-02-refused-twice", ["deleteRequests": try count(delete), "renewals": try count("PUT /api/auth/refresh"),
+            "message": toast.label, "signedIn": true, "serverAfter": "sent \(edge)"])
+        try restoreLostAckNone(f)
+        lostAckCleanup = nil
+    }
+
+    func testRefusedWithdrawNamingAFieldIsCarriedOutOnceAfterRenewal() throws {
+        let (f, edge, _) = try launchOwnedSentRequest { ["--qa-refuse", "DELETE", "users/matches/\($0)/withdraw", "1"] }
+        let refusal = try managedText("general_error_forbidden", fallback: "You can't do this right now.", token: f.token)
+        try confirmWithdraw()
+        let request = app.buttons["match-request"]
+        XCTAssertTrue(request.waitForExistence(timeout: 30), "Withdrawn: the request button is back")
+        let delete = "DELETE /api/users/matches/\(edge)/withdraw"
+        XCTAssertEqual(try count(delete), 2, "Refused once (not sent), then sent once")
+        XCTAssertEqual(try count("PUT /api/auth/refresh"), 1)
+        XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", refusal)).firstMatch.exists)
+        XCTAssertEqual(app.staticTexts["qa-token-presence"].label, "accessPresent=true;refreshPresent=true")
+        XCTAssertEqual(try lostAckProfile(f)["match_status"] as? String, "none")
+        XCTAssertEqual(try lostAckProfile(f, peer: true)["match_status"] as? String, "none")
+        try attachEvidence("IOS-22-02-refused-once", ["deleteRequests": try count(delete), "renewals": try count("PUT /api/auth/refresh"),
+            "signedIn": true, "serverAfter": "none"])
+        lostAckCleanup = nil
+    }
+
+    func testExpiredSignInDuringWithdrawRenewsAgainstTheLiveServerAndWithdrawsOnce() throws {
+        let (f, edge, _) = try launchOwnedSentRequest { _ in ["--qa-break-access-later"] }
+        try revealOwnedRequest(app.buttons["match-withdraw"], timeout: 45)
+        // The hook breaks the token 8 s after the screen is pushed (after sign-in). Tap only once
+        // it has, or the break replaces the session mid-action.
+        let broken = XCTNSPredicateExpectation(predicate: NSPredicate { [unowned self] _, _ in
+            ((try? self.count("QA access-broken")) ?? 0) == 1 }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [broken], timeout: 30), .completed, "The access token is now one the live server refuses (403)")
+        XCTAssertEqual(try count("PUT /api/auth/refresh"), 0, "Nothing has renewed yet")
+        try confirmWithdraw()
+        let withdrawn = app.buttons["match-request"].waitForExistence(timeout: 30)
+        let diagnosis = XCTAttachment(string: (try? ledger().map { "\($0.key)=\($0.value)" }.sorted().joined(separator: "\n")) ?? "no ledger")
+        diagnosis.name = "IOS-22-02-live-ledger"; diagnosis.lifetime = .keepAlways; add(diagnosis)
+        let screen = XCTAttachment(screenshot: app.screenshot()); screen.name = "IOS-22-02-live-after-withdraw"; screen.lifetime = .keepAlways; add(screen)
+        XCTAssertTrue(withdrawn, "Withdrawn: the request button is back")
+        let delete = "DELETE /api/users/matches/\(edge)/withdraw"
+        XCTAssertEqual(try count("PUT /api/auth/refresh"), 1, "One real renewal for the session (whichever request met the 403 first)")
+        XCTAssertEqual(try count(delete), 1, "The withdraw was sent once, with the renewed sign-in")
+        XCTAssertEqual(app.staticTexts["qa-token-presence"].label, "accessPresent=true;refreshPresent=true")
+        XCTAssertEqual(try lostAckProfile(f)["match_status"] as? String, "none")
+        try attachEvidence("IOS-22-02-live-expired-sign-in", ["deleteRequests": try count(delete),
+            "profileReads": try count("GET /api/" + f.endpoint),
+            "renewals": try count("PUT /api/auth/refresh"), "signedIn": true, "serverAfter": "none"])
+        lostAckCleanup = nil
+    }
+
     func testOwnedRequestCommittedLostAcknowledgementReconcilesSentWithoutReplay() throws {
         let f = try lostAckFixture()
         let before = try lostAckProfile(f)

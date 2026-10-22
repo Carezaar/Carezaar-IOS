@@ -239,11 +239,13 @@ actor APIClient {
                 throw APIError.decoding("Could not decode \(T.self) from \(endpoint.path).")
             }
             return envelope
-        case 403 where !(envelope?.errors ?? Self.rawErrors(from: data) ?? [:]).isEmpty:
-            // 403 also means "not allowed to touch this record" (e.g. withdrawing a request
-            // that has just changed), and then the backend names the field. That is not a
-            // session problem: no renewal, no sign-out — as the web app does.
+        case 403 where !endpoint.requiresAuth && !(envelope?.errors ?? Self.rawErrors(from: data) ?? [:]).isEmpty:
+            // Sign-in and sign-up carry no session to renew: their field errors are shown.
             throw APIError.validation(message: message, fields: envelope?.errors ?? Self.rawErrors(from: data) ?? [:])
+        // The server answers an expired sign-in and an action that is no longer allowed with
+        // the same 403, with or without a field name (client review 22 Oct 2026). Either way:
+        // renew once, replay once, and a second refusal shows "You can't do this right now."
+        // with the session kept (sendEnvelope / replayAfterRenewal), as the web app does.
         case 401, 403:
             throw APIError.unauthenticated(message)
         case 404:
@@ -296,6 +298,7 @@ actor APIClient {
             do {
                 #if DEBUG
                 await QARequestLedger.shared.record(request)
+                if let refused = QANetworkFault.refusal(request) { return refused }
                 #endif
                 if let generation, tokens.generation != generation { throw CancellationError() }
                 return try await session.data(for: request)

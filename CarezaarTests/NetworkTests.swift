@@ -383,26 +383,91 @@ final class NetworkPolicyTests: XCTestCase {
         catch {}
         XCTAssertEqual(attempts, 1)
     }
-    func testRecordForbidden403WithFieldErrorsKeepsSessionWithoutRenewal() async {
+    /// Client review 22 Oct 2026: a 403 that names a field is renewed and sent once more like
+    /// any other refusal; refused again, it shows the managed text and the session is kept.
+    func testRecordForbidden403WithFieldErrorsRenewsOnceReplaysOnceThenManagedRefusal() async {
         let tokens = FixtureTokens()
         tokens.save(Session(accessToken: "valid-access", refreshToken: "valid-refresh"))
-        var refreshes = 0, writes = 0
+        var refreshes = 0, writes: [String?] = []
         StubHTTP.handler = { request in
-            if request.url!.lastPathComponent == "refresh" { refreshes += 1; return (200, Data(#"{"result":{"access_token":"a","refresh_token":"b"}}"#.utf8)) }
-            writes += 1
+            if request.url!.lastPathComponent == "refresh" { refreshes += 1; return (200, Data(#"{"result":{"access_token":"renewed-access","refresh_token":"renewed-refresh"}}"#.utf8)) }
+            writes.append(request.value(forHTTPHeaderField: "Authorization"))
             return (403, Data(#"{"result":null,"message":"The selected id is invalid.","errors":{"id":["The selected id is invalid."]}}"#.utf8))
         }
+        var failure: APIError?
         do {
             try await APIClient(tokens: tokens, session: StubHTTP.session()).sendIgnoringResult(
                 Endpoint(method: .delete, path: "users/matches/1/withdraw"))
             XCTFail("A refused record change must fail")
-        } catch let error as APIError {
-            guard case .validation(_, let fields) = error else { return XCTFail("Expected a field error, got \(error)") }
-            XCTAssertEqual(fields["id"], ["The selected id is invalid."])
-        } catch { XCTFail("Unexpected \(error)") }
-        XCTAssertEqual(refreshes, 0, "A record-level 403 is not a session problem")
-        XCTAssertEqual(writes, 1, "Never replayed")
+        } catch let error as APIError { failure = error } catch { XCTFail("Unexpected \(error)") }
+        guard case .forbidden = failure else { return XCTFail("Expected the managed refusal, got \(String(describing: failure))") }
+        let shown = await MainActor.run { () -> String in
+            let original = Feedback.translate
+            defer { Feedback.translate = original }
+            Feedback.translate = { _, fallback in fallback }
+            return Feedback.message(failure!)
+        }
+        XCTAssertEqual(shown, "You can't do this right now.")
+        XCTAssertEqual(refreshes, 1, "One renewal")
+        XCTAssertEqual(writes, ["Bearer valid-access", "Bearer renewed-access"], "The original request, then one replay with the renewed sign-in")
         XCTAssertTrue(tokens.hasSession, "The user stays signed in")
+        XCTAssertEqual(tokens.accessToken, "renewed-access")
+    }
+
+    func testRecordForbidden403WithFieldErrorsSucceedsAfterRenewal() async throws {
+        let tokens = FixtureTokens()
+        tokens.save(Session(accessToken: "expired-access", refreshToken: "valid-refresh"))
+        var refreshes = 0, writes = 0
+        StubHTTP.handler = { request in
+            if request.url!.lastPathComponent == "refresh" { refreshes += 1; return (200, Data(#"{"result":{"access_token":"renewed-access","refresh_token":"renewed-refresh"}}"#.utf8)) }
+            writes += 1
+            if request.value(forHTTPHeaderField: "Authorization") == "Bearer expired-access" {
+                return (403, Data(#"{"result":null,"message":"Token is invalid!","errors":{"token":["Token is invalid!"]}}"#.utf8))
+            }
+            return (204, Data())
+        }
+        try await APIClient(tokens: tokens, session: StubHTTP.session()).sendIgnoringResult(
+            Endpoint(method: .delete, path: "users/matches/1/withdraw"))
+        XCTAssertEqual(refreshes, 1)
+        XCTAssertEqual(writes, 2, "Refused once, carried out once")
+    }
+
+    func testConcurrent403sShareOneRenewalAndReplayEachRequestOnce() async {
+        let tokens = FixtureTokens()
+        tokens.save(Session(accessToken: "valid-access", refreshToken: "valid-refresh"))
+        let counts = LockedCounts()
+        StubHTTP.handler = { request in
+            if request.url!.lastPathComponent == "refresh" {
+                counts.add("refresh")
+                return (200, Data(#"{"result":{"access_token":"renewed-access","refresh_token":"renewed-refresh"}}"#.utf8))
+            }
+            counts.add(String(request.url!.path.split(separator: "/").suffix(4).joined(separator: "/")))
+            return (403, Data(#"{"result":null,"message":"Not allowed","errors":{"id":["Not allowed"]}}"#.utf8))
+        }
+        let client = APIClient(tokens: tokens, session: StubHTTP.session())
+        await withTaskGroup(of: Void.self) { group in
+            for id in 1...3 {
+                group.addTask { _ = try? await client.sendIgnoringResult(Endpoint(method: .delete, path: "users/matches/\(id)/withdraw")) }
+            }
+        }
+        XCTAssertEqual(counts.value("refresh"), 1, "Concurrent refusals share one renewal")
+        for id in 1...3 { XCTAssertEqual(counts.value("users/matches/\(id)/withdraw"), 2, "Request \(id): original + one replay") }
+        XCTAssertTrue(tokens.hasSession)
+    }
+
+    func testSignInFieldErrorOn403IsShownWithoutRenewal() async {
+        var refreshes = 0
+        StubHTTP.handler = { request in
+            if request.url!.lastPathComponent == "refresh" { refreshes += 1 }
+            return (403, Data(#"{"result":null,"message":"Invalid","errors":{"email":["Not verified"]}}"#.utf8))
+        }
+        do {
+            try await APIClient(session: StubHTTP.session()).sendIgnoringResult(Endpoint(method: .post, path: "auth/login", requiresAuth: false))
+            XCTFail("Must fail")
+        } catch let error as APIError {
+            XCTAssertEqual(error.fieldError("email"), "Not verified")
+        } catch { XCTFail("Unexpected \(error)") }
+        XCTAssertEqual(refreshes, 0)
     }
 
     func testPermanentValidationIsNotRetried() async {
@@ -442,6 +507,13 @@ final class NetworkPolicyTests: XCTestCase {
         XCTAssertEqual(infoCalls, 2)
         XCTAssertEqual(tokens.accessToken, "new-fixture-access")
     }
+}
+
+final class LockedCounts: @unchecked Sendable {
+    private let lock = NSLock()
+    private var counts: [String: Int] = [:]
+    func add(_ key: String) { lock.lock(); defer { lock.unlock() }; counts[key, default: 0] += 1 }
+    func value(_ key: String) -> Int { lock.lock(); defer { lock.unlock() }; return counts[key] ?? 0 }
 }
 
 final class FixtureTokens: SessionTokenStorage, @unchecked Sendable {

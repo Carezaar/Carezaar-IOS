@@ -70,6 +70,7 @@ enum QALaunch {
         if args.contains("--qa-break-access-later") {
             try? await Task.sleep(for: .seconds(8))
             breakTokens(refreshToo: false)
+            QARequestLedger.shared.recordAccessBroken()
         }
     }
 
@@ -293,6 +294,18 @@ enum QANetworkFault {
     /// local port (a connection failure); later ones reach the server normally.
     private static let failOnce = QAFailOnce()
 
+    /// `--qa-refuse <METHOD> <path> <times>`: the first <times> matching requests are not
+    /// sent; each gets the server's 403 refusal naming a field, as for an action that is no
+    /// longer allowed. The live server can't be made to refuse a valid sign-in on demand.
+    private static let refuse = QARefuse()
+
+    static func refusal(_ request: URLRequest) -> (Data, URLResponse)? {
+        guard refuse.consume(request), let url = request.url,
+              let response = HTTPURLResponse(url: url, statusCode: 403, httpVersion: "HTTP/1.1",
+                                             headerFields: ["Content-Type": "application/json"]) else { return nil }
+        return (Data(#"{"result":null,"message":"The selected id is invalid.","errors":{"id":["The selected id is invalid."]}}"#.utf8), response)
+    }
+
     static func apply(_ request: URLRequest) -> URLRequest {
         if failOnce.consume(request), var parts = request.url.flatMap({ URLComponents(url: $0, resolvingAgainstBaseURL: false) }) {
             parts.host = "127.0.0.1"; parts.port = 9
@@ -430,6 +443,10 @@ final class QARequestLedger: ObservableObject {
         guard ProcessInfo.processInfo.arguments.contains("--qa-request-counts") else { return }
         notificationFallback = attestation
     }
+    func recordAccessBroken() {
+        guard ProcessInfo.processInfo.arguments.contains("--qa-request-counts") else { return }
+        counts["QA access-broken", default: 0] += 1
+    }
     func recordLostOwnedMatchAcknowledgement() {
         guard ProcessInfo.processInfo.arguments.contains("--qa-request-counts") else { return }
         counts["QA lost-owned-match-ack", default: 0] += 1
@@ -503,6 +520,22 @@ private final class QAFailOnce: @unchecked Sendable {
         guard let target, request.httpMethod == target.method,
               request.url?.path == APIConfiguration.baseURL.appendingPathComponent(target.path).path else { return false }
         self.target = nil
+        return true
+    }
+}
+
+private final class QARefuse: @unchecked Sendable {
+    private let lock = NSLock()
+    private var target: (method: String, path: String, remaining: Int)? = {
+        let args = ProcessInfo.processInfo.arguments
+        guard let i = args.firstIndex(of: "--qa-refuse"), i + 3 < args.count, let times = Int(args[i + 3]) else { return nil }
+        return (args[i + 1], args[i + 2], times)
+    }()
+    func consume(_ request: URLRequest) -> Bool {
+        lock.lock(); defer { lock.unlock() }
+        guard let current = target, current.remaining > 0, request.httpMethod == current.method,
+              request.url?.path == APIConfiguration.baseURL.appendingPathComponent(current.path).path else { return false }
+        target?.remaining -= 1
         return true
     }
 }
