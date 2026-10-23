@@ -24,7 +24,10 @@ final class Pager<Item: Identifiable>: ObservableObject where Item.ID: Hashable 
     @Published private(set) var isLoading = false
     @Published private(set) var error: Error?
     @Published private(set) var loadedOnce = false
-    private var page = 0
+    /// A quiet refresh of the loaded pages is running (`refreshLoaded`): nothing is shown for
+    /// it, and further pages wait until it is done.
+    @Published private(set) var isRevalidating = false
+    private(set) var page = 0
     /// Server totals are informational: rows may be added after the first response.
     /// Only an empty page or a repeated page with no new ids ends the traversal.
     private var exhausted = false
@@ -57,8 +60,45 @@ final class Pager<Item: Identifiable>: ObservableObject where Item.ID: Hashable 
         error = nil
     }
 
+    /// Quiet refresh of every page already loaded (My Matches on return, client request
+    /// 23 Oct 2026): pages 1…N are asked for again while the list stays on screen, with no
+    /// loading or error state, and replace it only once all have answered. They are rebuilt in
+    /// order with the usual rules (no id twice; an empty page, or one adding nothing, ends the
+    /// list). A failure keeps the list; a reload started meanwhile (a new sort) wins.
+    @discardableResult
+    func refreshLoaded(_ fetch: @escaping Fetch) async -> Bool {
+        guard loadedOnce, page > 0, !isLoading, !isRevalidating else { return false }
+        let g = generation, count = page
+        isRevalidating = true
+        defer { isRevalidating = false }
+        do {
+            let answers = try await withThrowingTaskGroup(of: (Int, [Item], APIMeta?).self) { group in
+                for p in 1...count { group.addTask { let (result, meta) = try await fetch(p); return (p, result, meta) } }
+                var out: [(Int, [Item], APIMeta?)] = []
+                for try await answer in group { out.append(answer) }
+                return out.sorted { $0.0 < $1.0 }
+            }
+            guard g == generation, !isLoading, !Task.isCancelled else { return false }
+            var seen = Set<Item.ID>(), merged: [Item] = [], pages = 0, ended = false
+            for (_, result, _) in answers {
+                pages += 1
+                let fresh = result.filter { seen.insert($0.id).inserted }
+                if result.isEmpty || fresh.isEmpty { ended = true; break }
+                merged += fresh
+            }
+            items = merged
+            page = pages
+            exhausted = ended
+            total = answers.first?.2?.total ?? total
+            error = nil
+            return true
+        } catch {
+            return false
+        }
+    }
+
     func loadMore(_ fetch: Fetch) async {
-        guard hasMore, !isLoading else { return }
+        guard hasMore, !isLoading, !isRevalidating else { return }
         await next(fetch, replacing: page == 0, generation: generation)
     }
 
@@ -101,6 +141,9 @@ struct PagedContent<Item: Identifiable, Row: View>: View {
     var emptyIcon: String?
     let retry: () -> Void
     let more: () -> Void
+    /// The rows are scroll targets, so the enclosing ScrollView can report and restore which
+    /// row is at the top (`scrollPosition(id:)`; My Matches keeps its place).
+    var scrollTargets = false
     @ViewBuilder let row: (Item) -> Row
     @EnvironmentObject private var loc: Localization
 
@@ -122,20 +165,26 @@ struct PagedContent<Item: Identifiable, Row: View>: View {
                 }
             }
             .padding(40).frame(maxWidth: .infinity)
+        } else if scrollTargets {
+            rows.scrollTargetLayout()
         } else {
-            LazyVStack(spacing: 0) {
-                ForEach(pager.items) { item in
-                    row(item).onAppear { if item.id == pager.items.last?.id { more() } }
+            rows
+        }
+    }
+
+    private var rows: some View {
+        LazyVStack(spacing: 0) {
+            ForEach(pager.items) { item in
+                row(item).onAppear { if item.id == pager.items.last?.id { more() } }
+            }
+            if pager.isLoading && !pager.items.isEmpty { ProgressView().padding() }
+            if let error = pager.error {
+                VStack(spacing: 10) {
+                    ErrorBanner(message: Feedback.message(error))
+                    OutlineButton(title: loc.t("general_try_again", "Try Again")) { more() }
+                        .accessibilityIdentifier("pagination-retry")
                 }
-                if pager.isLoading && !pager.items.isEmpty { ProgressView().padding() }
-                if let error = pager.error {
-                    VStack(spacing: 10) {
-                        ErrorBanner(message: Feedback.message(error))
-                        OutlineButton(title: loc.t("general_try_again", "Try Again")) { more() }
-                            .accessibilityIdentifier("pagination-retry")
-                    }
-                    .padding(20)
-                }
+                .padding(20)
             }
         }
     }

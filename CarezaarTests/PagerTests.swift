@@ -273,4 +273,94 @@ final class PagerTests: XCTestCase {
         XCTAssertTrue(pager.items.isEmpty)
     }
 
+    // MARK: Quiet refresh of the loaded pages (My Matches on return, client request 23 Oct 2026)
+
+    /// Records calls from the refresh's concurrent page requests.
+    private final class Calls: @unchecked Sendable {
+        private let lock = NSLock()
+        private var pages: [Int] = []
+        func add(_ page: Int) { lock.lock(); pages.append(page); lock.unlock() }
+        var sorted: [Int] { lock.lock(); defer { lock.unlock() }; return pages.sorted() }
+    }
+
+    func testRefreshLoadedAsksForEveryLoadedPageOnceAndRebuildsTheListInOrder() async {
+        let pager = Pager<Row>()
+        let first: Pager<Row>.Fetch = { page in (Array((page - 1) * 3 + 1...page * 3).map(Row.init), self.staleMeta) }
+        await pager.reload(first)
+        await pager.loadMore(first)
+        await pager.loadMore(first)
+        XCTAssertEqual(pager.items.map(\.id), Array(1...9))
+        // Since then id 2 went away and id 4 moved up into page 1, so page 2 repeats it.
+        let calls = Calls()
+        let fresh: Pager<Row>.Fetch = { page in
+            calls.add(page)
+            switch page {
+            case 1: return ([1, 3, 4].map(Row.init), self.staleMeta)
+            case 2: return ([4, 5, 6].map(Row.init), self.staleMeta)
+            default: return ([7, 8, 9].map(Row.init), self.staleMeta)
+            }
+        }
+        let refreshed = await pager.refreshLoaded(fresh)
+        XCTAssertTrue(refreshed)
+        XCTAssertEqual(calls.sorted, [1, 2, 3], "every loaded page, once; not only page 1")
+        XCTAssertEqual(pager.items.map(\.id), [1, 3, 4, 5, 6, 7, 8, 9], "in order, no duplicates, the removed record dropped")
+        XCTAssertNil(pager.error)
+        XCTAssertFalse(pager.isLoading, "no loading state")
+        XCTAssertFalse(pager.isRevalidating)
+        XCTAssertEqual(pager.page, 3, "the next page continues after the refreshed ones")
+    }
+
+    func testFailedRefreshKeepsTheListAndShowsNoError() async {
+        let pager = Pager<Row>()
+        let first: Pager<Row>.Fetch = { page in (page < 3 ? [Row(id: page * 10), Row(id: page * 10 + 1)] : [], self.staleMeta) }
+        await pager.reload(first)
+        await pager.loadMore(first)
+        let before = pager.items.map(\.id)
+        let failing: Pager<Row>.Fetch = { page in
+            if page == 2 { throw URLError(.notConnectedToInternet) }
+            return ([Row(id: 99)], self.staleMeta)
+        }
+        let refreshed = await pager.refreshLoaded(failing)
+        XCTAssertFalse(refreshed)
+        XCTAssertEqual(pager.items.map(\.id), before, "the last good list stays")
+        XCTAssertNil(pager.error)
+    }
+
+    func testReloadStartedDuringARefreshWinsOverItsLateAnswers() async {
+        let pager = Pager<Row>()
+        await pager.reload { _ in ([Row(id: 1), Row(id: 2)], self.staleMeta) }
+        let slow: Pager<Row>.Fetch = { _ in
+            try await Task.sleep(for: .milliseconds(300))
+            return ([Row(id: 500)], self.staleMeta)
+        }
+        let refresh = Task { await pager.refreshLoaded(slow) }
+        try? await Task.sleep(for: .milliseconds(50))
+        await pager.reload { _ in ([Row(id: 7)], self.staleMeta) } // a new sort
+        let refreshed = await refresh.value
+        XCTAssertFalse(refreshed)
+        XCTAssertEqual(pager.items.map(\.id), [7], "the late refresh answers do not replace the new sort's list")
+    }
+
+    func testMatchesStoreKeepsStateForTheSameSignInOnlyAndForgetsOnSignOut() async {
+        let store = MatchesStore.shared
+        store.forget()
+        store.prepare(for: "sign-in-1|user-a|client")
+        store.sort = .pay
+        store.loadedSort = .pay
+        store.topCard = "card-15"
+        await store.pager.reload { _ in ([MatchesTab.Card(id: "c1", user: User(id: "u1", countryId: 1, genderId: nil, role: .caregiver, email: "fixture@example.invalid", firstName: nil, lastName: nil, photo: nil, bio: nil, dateOfBirth: nil, status: .verified, isFavorite: false), min: nil, max: nil, distance: nil, clienttypeId: nil, isMatch: false)], self.staleMeta) }
+        store.prepare(for: "sign-in-1|user-a|client") // back on the tab
+        XCTAssertEqual(store.sort, .pay)
+        XCTAssertEqual(store.topCard, "card-15")
+        XCTAssertEqual(store.pager.items.count, 1)
+        store.prepare(for: "sign-in-2|user-a|client") // signed in again
+        XCTAssertEqual(store.sort, .distance)
+        XCTAssertNil(store.loadedSort)
+        XCTAssertNil(store.topCard)
+        XCTAssertTrue(store.pager.items.isEmpty, "nothing of the earlier sign-in is shown")
+        store.sort = .pay
+        store.forget() // sign-out
+        XCTAssertEqual(store.sort, .distance)
+        XCTAssertTrue(store.pager.items.isEmpty)
+    }
 }

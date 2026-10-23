@@ -220,6 +220,7 @@ actor APIClient {
             await QARequestLedger.shared.recordNotificationFallback(attestation)
         }
         data = QANetworkFault.corruptMatchState(data, path: endpoint.path)
+        data = QANetworkFault.emptyMatches(data, path: endpoint.path)
         data = QANetworkFault.profileResponseScenario(data, path: endpoint.path,
                                                     method: endpoint.method, statusCode: http.statusCode)
         #endif

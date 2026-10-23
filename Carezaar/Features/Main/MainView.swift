@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 
 /// `Main` — the three-tab shell of the Android app: a top bar (logo, notifications
 /// bell with badge, avatar), the tab content, and a bottom bar
@@ -121,6 +122,60 @@ struct MainView: View {
 
 // MARK: - Matches tab
 
+/// My Matches state for the signed-in session (client request, 23 Oct 2026): the chosen sort is
+/// remembered while the person stays signed in and forgotten when they sign out; the list they
+/// had loaded (every page, and the card at the top) is kept while they open a profile, Messages
+/// or another tab, and quietly refreshed when they come back. It lives outside the tab, which is
+/// rebuilt on every tab switch. Keyed by the sign-in (`TokenStore.generation`, new at every
+/// login and sign-out, kept by renewal), the account and the role.
+@MainActor
+final class MatchesStore: ObservableObject {
+    static let shared = MatchesStore()
+
+    @Published var sort: MatchSort = .distance
+    private(set) var pager = Pager<MatchesTab.Card>()
+    /// The sort the loaded pages were fetched in (nil until the first load of this sign-in).
+    var loadedSort: MatchSort?
+    /// The card at the top of the list when the person left it.
+    var topCard: String?
+    var headerImages: [String] = []
+    #if DEBUG
+    /// Outcome of the last quiet refresh, for the UI tests' readout.
+    var lastRefresh = ""
+    var appears = 0
+    var trace = ""
+    #endif
+    private var key: String?
+    private var forwarding: AnyCancellable?
+
+    private init() { forward() }
+
+    /// Called as the tab appears: another sign-in, account or role starts from the defaults.
+    func prepare(for key: String) {
+        guard self.key != key else { return }
+        reset()
+        self.key = key
+    }
+
+    /// Sign-out: forget the sort and the list.
+    func forget() { reset(); key = nil }
+
+    private func reset() {
+        sort = .distance
+        loadedSort = nil
+        topCard = nil
+        headerImages = []
+        pager = Pager()
+        forward()
+        objectWillChange.send()
+    }
+
+    /// The screen observes the store; the pager's changes are passed on.
+    private func forward() {
+        forwarding = pager.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }
+    }
+}
+
 /// A client sees caregivers (`clients/matches`); a caregiver sees clients
 /// (`caregivers/matches`). Hero art follows the user's care type (`header_*`).
 struct MatchesTab: View {
@@ -140,9 +195,14 @@ struct MatchesTab: View {
     @EnvironmentObject private var loc: Localization
     @EnvironmentObject private var feedback: Feedback
 
-    @StateObject private var pager = Pager<Card>()
+    @ObservedObject private var store = MatchesStore.shared
+    private var pager: Pager<Card> { store.pager }
+    private var sort: MatchSort { store.sort }
     @StateObject private var favorites = FavoriteMutationCoordinator.shared
-    @State private var sort: MatchSort = .distance
+    /// The card at the top, restored when the tab is rebuilt (a tab switch).
+    @State private var topCard: String? = MatchesStore.shared.topCard
+    /// Until the list is back in place the scroll view's own reports are not the person's place.
+    @State private var restoring = true
     @State private var choosingSort = false
     @State private var headerImage = "bg_matches"
     @State private var headerImages: [String] = []
@@ -153,6 +213,10 @@ struct MatchesTab: View {
 
     private var isClient: Bool { session.role != .caregiver }
     private var prefix: String { isClient ? "client" : "caregiver" }
+
+    private var sessionKey: String {
+        "\(TokenStore.shared.generation)|\(session.state.user?.id ?? "")|\(session.role?.rawValue ?? "")"
+    }
 
     var body: some View {
         ScrollView {
@@ -177,11 +241,14 @@ struct MatchesTab: View {
                 .padding(.horizontal, 20).padding(.top, 22).padding(.bottom, 10)
                 PagedContent(pager: pager, emptyTitle: "\(loc.t("\(prefix)_matches_all_matches", "All Matches")) (0)",
                              emptyIllustration: "illus_chat",
-                             retry: { Task { await reload() } }, more: { Task { await pager.loadMore(fetch) } }) { card in
+                             retry: { Task { await reload() } }, more: { Task { await pager.loadMore(fetch) } },
+                             scrollTargets: true) { card in
                     cardView(card).padding(.horizontal, 20).padding(.vertical, 7)
                 }
             }
         }
+        .scrollPosition(id: $topCard, anchor: .top)
+        .onChange(of: topCard) { _, card in if headerVisible, !restoring, let card { store.topCard = card } }
         #if DEBUG
         .overlay(alignment: .topLeading) {
             if ProcessInfo.processInfo.arguments.contains("--qa-request-counts") {
@@ -189,18 +256,27 @@ struct MatchesTab: View {
                     .accessibilityLabel(headerImages.joined(separator: ",") + ";current=" + headerImage)
                     .accessibilityIdentifier("qa-matches-header")
                     .allowsHitTesting(false)
+                // The list's own state in one element (UI tests read this instead of every card).
+                Text("·").frame(width: 1, height: 1).clipped()
+                    .accessibilityLabel("sort=\(sort.rawValue);pages=\(pager.page);items=\(pager.items.count);top=\(topCard ?? "");topName=\(pager.items.first { $0.id == topCard }?.user.displayName(loc) ?? "");firstName=\(pager.items.first?.user.displayName(loc) ?? "");revalidating=\(pager.isRevalidating);loading=\(pager.isLoading);lastRefresh=\(store.lastRefresh);appears=\(store.appears);trace=\(store.trace)")
+                    .accessibilityIdentifier("qa-matches-state")
+                    .allowsHitTesting(false)
             }
         }
         #endif
         .refreshable { await reload(quiet: true) }
-        .task(id: sort) { await reload() }
+        .task(id: sort) { await appear() }
         .onReceive(NotificationCenter.default.publisher(for: FavoriteSync.changed)) { note in
             guard let change = FavoriteSync.decode(note) else { return }
             for i in pager.items.indices where pager.items[i].user.id == change.id {
                 pager.items[i].user = pager.items[i].user.with(isFavorite: change.on)
             }
         }
-        .onAppear { headerVisible = true }
+        .onAppear {
+            store.prepare(for: sessionKey)
+            if !store.headerImages.isEmpty, headerImages.isEmpty { headerImages = store.headerImages; headerImage = store.headerImages[0] }
+            headerVisible = true
+        }
         .onDisappear { headerVisible = false }
         .task { await loadHeader() }
         // A new task exists only while this screen and scene are active. SwiftUI
@@ -218,7 +294,7 @@ struct MatchesTab: View {
 
         .confirmationDialog(loc.t("\(prefix)_matches_sort", "Sort"), isPresented: $choosingSort, titleVisibility: .visible) {
             ForEach(MatchSort.allCases, id: \.self) { s in
-                Button((s == sort ? "✓ " : "") + loc.t("\(prefix)_matches_sort_\(s.rawValue)", s.title)) { sort = s }
+                Button((s == sort ? "✓ " : "") + loc.t("\(prefix)_matches_sort_\(s.rawValue)", s.title)) { store.sort = s }
             }
         }
     }
@@ -351,6 +427,46 @@ struct MatchesTab: View {
         }
     }
 
+    /// First visit of this sign-in, or a new sort: page 1 with the loading window, as before.
+    /// Back on the tab (from a profile, Messages or Profile) in the same sort: the list stays as
+    /// it was and every loaded page is refreshed quietly; no loading window, no jump to page 1.
+    private func appear() async {
+        #if DEBUG
+        store.appears += 1
+        store.trace += "a\(store.appears):\(topCard?.suffix(4) ?? "-")/\(store.topCard?.suffix(4) ?? "-") "
+        #endif
+        store.prepare(for: sessionKey)
+        restoring = true
+        Task { try? await Task.sleep(for: .milliseconds(800)); restoring = false }
+        if store.loadedSort == sort, pager.loadedOnce {
+            // A page that started loading as the list came back (its end in view) finishes first;
+            // the refresh then covers it too.
+            while pager.isLoading, !Task.isCancelled { try? await Task.sleep(for: .milliseconds(100)) }
+            guard !Task.isCancelled else { return }
+            let refreshed = await pager.refreshLoaded(fetch)
+            #if DEBUG
+            store.lastRefresh = refreshed ? "refreshed" : "kept"
+            #endif
+        } else {
+            topCard = nil
+            store.topCard = nil
+            await reload()
+            if pager.loadedOnce { store.loadedSort = sort }
+            #if DEBUG
+            // `--qa-matches-pages <n>`: load n pages and put a card of the last one at the top, as a
+            // person scrolling would; UI tests then leave and return (long swipes through a big
+            // list make XCTest's snapshots of the screen too slow to use).
+            let args = ProcessInfo.processInfo.arguments
+            if let i = args.firstIndex(of: "--qa-matches-pages"), i + 1 < args.count, let n = Int(args[i + 1]), n > 1 {
+                for _ in 1..<n { await pager.loadMore(fetch) }
+                try? await Task.sleep(for: .seconds(1))
+                let index = min(pager.items.count - 1, (n - 1) * 10 + 5)
+                if index > 0 { topCard = pager.items[index].id; store.topCard = topCard }
+            }
+            #endif
+        }
+    }
+
     private func reload(quiet: Bool = false) async {
         let label = "\(loc.t("loading_matches", "Getting list of matches - Page")) 1"
         if quiet {
@@ -372,6 +488,7 @@ struct MatchesTab: View {
         }
         headerIndex = 0
         headerImage = headerImages.first ?? "bg_matches"
+        store.headerImages = headerImages
     }
 
     private func toggleFavorite(_ card: Card) async {

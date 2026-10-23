@@ -24,6 +24,8 @@ final class SessionManager: ObservableObject {
             // Signing in or out swaps the navigation graph; the router must be cleared
             // first so the new stack doesn't inherit the old one's path.
             if (state.user == nil) != (newValue.user == nil), newValue != .loading { willSwitchGraph?() }
+            // Signing out (or a sign-in ending) forgets the My Matches sort and list (23 Oct 2026).
+            if newValue == .signedOut { MatchesStore.shared.forget() }
         }
     }
     var willSwitchGraph: (() -> Void)?

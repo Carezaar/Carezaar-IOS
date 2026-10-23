@@ -214,6 +214,17 @@ enum QANetworkFault {
 
     /// `--qa-corrupt-match-state`: profile responses arrive with a `match_status` but no
     /// `match_id`, a contradiction the app must refuse to act on.
+    /// `--qa-empty-matches`: the My Matches list (`clients/matches`, `caregivers/matches`) answers
+    /// with an empty page, for the empty-list case no QA account has (the server is still asked).
+    static func emptyMatches(_ data: Data, path: String) -> Data {
+        guard ProcessInfo.processInfo.arguments.contains("--qa-empty-matches"),
+              path == "clients/matches" || path == "caregivers/matches",
+              var root = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else { return data }
+        root["result"] = [Any]()
+        root["meta"] = ["current_page": 1, "last_page": 1, "per_page": 10, "total": 0]
+        return (try? JSONSerialization.data(withJSONObject: root)) ?? data
+    }
+
     static func corruptMatchState(_ data: Data, path: String) -> Data {
         guard ProcessInfo.processInfo.arguments.contains("--qa-corrupt-match-state"),
               path.hasPrefix("clients/caregivers/") || path.hasPrefix("caregivers/clients/"),
