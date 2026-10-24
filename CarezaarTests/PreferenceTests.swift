@@ -4,8 +4,27 @@ import CryptoKit
 @testable import Carezaar
 
 final class PreferenceTests: XCTestCase {
+    private static let approvedAndroidImages: [String: String] = [
+        "bg_intro.webp": "926509b8b68d0fdfe0c22fd4ac1ec69726646ba1c39a7aa6ef0e527b136f9c54",
+        "bg_messages.webp": "e7cebc002ede449f8ad42c90540a483dc5ea4f064523eba3d0b05ae16b032096",
+        "bg_profile.webp": "af535d5dd6f5fb46f231e26ec39d76f330aee5275d8c813ab8dd5eb68c97a588",
+        "care-type-child.png": "fe923375cb3ea656b75d47eaec08914018396eccdfd681bf19a78b2d112b974a",
+        "care-type-pregnancy.png": "619b2804d43a3a72da24277b1cf1e12b0683c3c8da2d58ad0cbcf956eb2bb30c",
+        "care-type-senior.png": "ec906f73c509aa2b1133424e6366acebb9ff9bf4d38dcf54c1fc6d01cc65a278",
+        "client_adult.webp": "31df4e2fd4a95b477f197052e9c104e20227c2fe6fc316970b98c287729e8a14",
+        "client_child.webp": "0003ff47d50f969de5f9c65fa92624d5a165461c1e62482bbb42f857a0a01e23",
+        "client_pregnancy.webp": "eac2aaae8a6bd47cd67f0c25e0c99be2a5c391ee944f366c7a8c6aab63a9c623",
+        "client_senior.webp": "82b442cb341bd923e70eadf50e9461fe7ab0fb3ad914ae6c7382b12e551dc00a",
+        "header_adult.webp": "a4974815e0964777961284016f67871d9f8c4b261999a3e06d135ca7a158b583",
+        "header_child.webp": "c5f9556caea46f2bb007d7416026791d535cc57a786be121489491c5a2868b37",
+        "header_messages.webp": "e7cebc002ede449f8ad42c90540a483dc5ea4f064523eba3d0b05ae16b032096",
+        "header_pregnancy.webp": "120a8df43ce88b9ef660ae2a1c2c5ab9c07bf73621a016fc8f43a3ea067e434f",
+        "header_senior.webp": "62f6436f20558099bff5e1b1b5a116b6d980db81f7e4ef34f9d56afcb7199c14",
+        "welcome-hands.jpg": "714e647f538d3fd418d1d4e828bd4d6e8f8a83d31c82f08fe6184ac2e81bca93",
+    ]
+
     /// SHA-256 of every people image removed in 94d0f7c ("Update app artwork"). None of
-    /// these bytes may ship again, under any name.
+    /// these bytes may ship again except the approved Android images below.
     private static let removedPeopleArtwork: Set<String> = [
         "0003ff47d50f969de5f9c65fa92624d5a165461c1e62482bbb42f857a0a01e23",
         "018594c9f64b28d4d085840f75bceaa9cff0e20e2b5521ad8071ca70d867345b",
@@ -163,23 +182,27 @@ final class PreferenceTests: XCTestCase {
         SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
     }
 
-    func testRemovedPeopleArtworkDoesNotShipUnderAnyName() throws {
+    func testApprovedAndroidImagesAndExcludedArtwork() throws {
         let assets = try XCTUnwrap(Bundle.main.resourceURL?.appendingPathComponent("Assets"))
         let files = try XCTUnwrap(FileManager.default.enumerator(at: assets, includingPropertiesForKeys: [.isRegularFileKey]))
         var checked = 0
         for case let url as URL in files where (try? url.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile) == true {
-            XCTAssertFalse(Self.removedPeopleArtwork.contains(sha256(try Data(contentsOf: url))),
-                           "Removed people artwork shipped again: \(url.lastPathComponent)")
+            let hash = sha256(try Data(contentsOf: url))
+            if let expected = Self.approvedAndroidImages[url.lastPathComponent] {
+                XCTAssertEqual(hash, expected, "Android image differs: \(url.lastPathComponent)")
+            } else {
+                XCTAssertFalse(Self.removedPeopleArtwork.contains(hash), "Removed artwork shipped again: \(url.lastPathComponent)")
+            }
             checked += 1
         }
         XCTAssertGreaterThan(checked, 20)
     }
 
-    func testPeopleFreeReplacementsCarryTheSameMeaning() {
+    func testProductImageReplacementsExist() {
         // Care types, rotating My Matches headers, welcome background and Profile header.
         for name in ["bg_intro", "bg_profile", "client_pregnancy", "client_senior", "client_adult", "client_child",
                      "header_pregnancy", "header_senior", "header_adult", "header_child", "header_messages"] {
-            XCTAssertNotNil(AppImage.load(name), "People-free picture missing: \(name)")
+            XCTAssertNotNil(AppImage.load(name), "Product image missing: \(name)")
         }
         // Care services, qualities, shifts and Help Center support, redrawn without people.
         for name in ["ic_caregiver", "ic_client", "ic_condition_assessment", "ic_condition_babysitting_nanny",
