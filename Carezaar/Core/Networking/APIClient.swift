@@ -203,6 +203,10 @@ actor APIClient {
             throw APIError.unknown("Malformed response.")
         }
         #if DEBUG
+        if QANetworkFault.loseAnswer(request, statusCode: http.statusCode) {
+            await QARequestLedger.shared.recordLostAnswer()
+            throw APIError.network("The network connection was lost.")
+        }
         if QANetworkFault.loseOwnedMatchAcknowledgement(request, statusCode: http.statusCode) {
             await QARequestLedger.shared.recordLostOwnedMatchAcknowledgement()
             throw APIError.network("The network connection was lost.")
@@ -251,6 +255,10 @@ actor APIClient {
             throw APIError.unauthenticated(message)
         case 404:
             throw APIError.notFound(message)
+        case 409 where endpoint.idempotencyKey != nil:
+            // The key was used for other data (`idempotency_conflict`) or has expired
+            // (`idempotency_expired`): IdempotencyStore decides what happens next.
+            throw IdempotencyServerError(code: Self.rawMetaCode(from: data) ?? "unknown")
         case 409 where endpoint.path == "auth/login":
             // B1: email verified but the profile/role entity was never finished.
             throw RegistrationIncompleteError(message: message, role: Self.rawMetaRole(from: data))
@@ -393,6 +401,7 @@ actor APIClient {
         if endpoint.requiresAuth, let accessToken {
             request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         }
+        if let key = endpoint.idempotencyKey { request.setValue(key, forHTTPHeaderField: "Idempotency-Key") }
 
         switch endpoint.body {
         case .none:
@@ -452,6 +461,11 @@ actor APIClient {
     private static func rawMetaRole(from data: Data) -> UserRole? {
         let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
         return ((object?["meta"] as? [String: Any])?["role"] as? String).flatMap { UserRole(rawValue: $0.lowercased()) }
+    }
+
+    private static func rawMetaCode(from data: Data) -> String? {
+        let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+        return (json?["meta"] as? [String: Any])?["code"] as? String
     }
 
     private static func rawErrors(from data: Data) -> [String: [String]]? {

@@ -467,15 +467,12 @@ struct MatchesTab: View {
         }
     }
 
+    /// Page 1 again. The first load shows skeleton cards (PagedContent); pull-to-refresh keeps
+    /// the current matches when it fails, but says so: offline the user otherwise saw an
+    /// unchanged list and no sign the refresh did not happen.
     private func reload(quiet: Bool = false) async {
-        let label = "\(loc.t("loading_matches", "Getting list of matches - Page")) 1"
-        if quiet {
-            await pager.reload(fetch)
-            // Pull-to-refresh keeps the current matches when it fails, but says so: offline the
-            // user otherwise saw an unchanged list and no sign the refresh did not happen.
-            if let error = pager.error, !pager.items.isEmpty { feedback.toast(Feedback.message(error)) }
-        }
-        else { try? await feedback.run(label) { await pager.reload(fetch) } }
+        if quiet { await pager.refresh(fetch) } else { await pager.reload(fetch) }
+        if quiet, let error = pager.error, !pager.items.isEmpty { feedback.toast(Feedback.message(error)) }
     }
 
     private func loadHeader() async {
@@ -499,10 +496,8 @@ struct MatchesTab: View {
         let on = card.user.isFavorite
         pager.items[index].user = card.user.with(isFavorite: !on)
         do {
-            let saved = try await feedback.run(on ? loc.t("loading_favorite_delete", "Removing from favorite list")
-                                      : loc.t("loading_favorite_create", "Adding to favorite list")) {
-                try await favorites.change(partner: card.user, to: !on, profileId: card.id, accountId: accountId, generation: generation)
-            }
+            // FavoriteMutationCoordinator is the shared guard for one person's favourite.
+            let saved = try await favorites.change(partner: card.user, to: !on, profileId: card.id, accountId: accountId, generation: generation)
             guard session.state.user?.id == accountId, TokenStore.shared.generation == generation else { return }
             if let i = pager.items.firstIndex(where: { $0.id == card.id }) { pager.items[i].user = saved }
             FavoriteSync.post(userId: card.user.id, isFavorite: saved.isFavorite)
@@ -560,12 +555,12 @@ struct MessagesTab: View {
                            subtitle: loc.t("messages_description", "All your conversations in one place"))
                 PagedContent(pager: pager, emptyTitle: loc.t("chat_screen_no_messages_yet", "No Messages Yet"),
                              emptyMessage: loc.t("chat_screen_empty_description", "Your chats about jobs will appear here."),
-                             retry: { Task { await reload() } }, more: { Task { await pager.loadMore(fetch) } }) { chat in
+                             retry: { Task { await reload() } }, more: { Task { await pager.loadMore(fetch) } }, skeleton: .row) { chat in
                     row(chat)
                 }
             }
         }
-        .refreshable { await pager.reload(fetch) }
+        .refreshable { await pager.refresh(fetch) }
         .task { await reload() }
         // Back from a chat, or back in the app: previews and unread dots may have changed.
         .onChange(of: router.path.isEmpty) { _, atRoot in if atRoot { Task { await pager.reload(fetch) } } }
@@ -616,8 +611,9 @@ struct MessagesTab: View {
 
     private let fetch: Pager<ChatBrief>.Fetch = { page in try await UserService().chats(page: page) }
 
+    /// Page 1; the first load shows skeleton rows (PagedContent).
     private func reload() async {
-        try? await feedback.run("\(loc.t("loading_chat_get_all", "Getting list of chats - Page")) 1") { await pager.reload(fetch) }
+        await pager.reload(fetch)
     }
 }
 
@@ -652,7 +648,7 @@ struct ProfileTab: View {
         .alert(loc.t("navigation_drawer_log_out_dialog_title", "Are you sure?"), isPresented: $confirmingLogout) {
             Button(loc.t("navigation_drawer_log_out_dialog_deny", "Cancel"), role: .cancel) {}
             Button(loc.t("navigation_drawer_log_out_dialog_confirm", "Confirm"), role: .destructive) {
-                Task { try? await feedback.run(loc.t("loading_auth_logout", "Signing out")) { await session.signOut() } }
+                Task { try? await ActionGuard.shared.run("auth:logout") { await session.signOut() } }
             }
         } message: {
             Text(loc.t("navigation_drawer_log_out_dialog_message", "You have selected to sign out from your account."))

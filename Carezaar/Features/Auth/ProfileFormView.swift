@@ -8,6 +8,7 @@ import AVFoundation
 /// to the role's preference wizard. Edit (from Profile): same endpoint, signed in,
 /// prefilled from `auth/info`. The photo is optional, as in the Android app.
 struct ProfileFormView: View {
+    @ObservedObject private var guards = ActionGuard.shared
     enum Mode { case signup, edit }
     let mode: Mode
 
@@ -105,7 +106,7 @@ struct ProfileFormView: View {
         }
         .bottomAction {
             PrimaryButton(title: mode == .signup ? loc.t("general_continue", "Continue") : loc.t("profile_save", "Save"),
-                          isEnabled: valid) { submit() }
+                          isLoading: guards.isBusy("profile:save"), isEnabled: valid && !guards.isBusy("profile:save")) { submit() }
                 .padding(.horizontal, Theme.Spacing.m).padding(.vertical, 10).background(.white)
         }
         .navigationBarTitleDisplayMode(.inline)
@@ -229,14 +230,19 @@ struct ProfileFormView: View {
     private func prefill() async {
         guard mode == .edit, !loaded else { return }
         loaded = true
-        _ = try? await feedback.run(loc.t("loading_auth_info", "Getting user information")) { await session.refreshUser() }
-        guard let user = session.state.user else { return }
-        firstName = user.firstName ?? ""; lastName = user.lastName ?? ""; bio = user.bio ?? ""
-        genderId = user.genderId; remotePhoto = user.photo
-        if let raw = user.dateOfBirth {
-            let f = DateFormatter(); f.dateFormat = "MM/dd/yyyy"; f.locale = Locale(identifier: "en_US_POSIX")
-            dateOfBirth = f.date(from: raw)
+        // The form opens with the account as it is known (no loading window), then is brought
+        // up to date when the refreshed account arrives.
+        let apply = { (user: User) in
+            firstName = user.firstName ?? ""; lastName = user.lastName ?? ""; bio = user.bio ?? ""
+            genderId = user.genderId; remotePhoto = user.photo
+            if let raw = user.dateOfBirth {
+                let f = DateFormatter(); f.dateFormat = "MM/dd/yyyy"; f.locale = Locale(identifier: "en_US_POSIX")
+                dateOfBirth = f.date(from: raw)
+            }
         }
+        if let known = session.state.user { apply(known) }
+        await session.refreshUser()
+        if let user = session.state.user { apply(user) }
     }
 
     private func submit() {
@@ -251,8 +257,7 @@ struct ProfileFormView: View {
         let email = mode == .signup ? signUp.email : (session.state.user?.email ?? "")
         Task {
             do {
-                let label = mode == .signup ? loc.t("loading_auth_register", "Registering") : loc.t("loading_profile_set", "Updating profile")
-                let saved = try await feedback.run(label) {
+                let saved = try await ActionGuard.shared.run("profile:save") {
                     try await userService.setProfile(
                         email: email, genderId: genderId,
                         firstName: firstName.trimmingCharacters(in: .whitespaces),

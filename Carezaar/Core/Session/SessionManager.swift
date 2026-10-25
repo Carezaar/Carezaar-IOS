@@ -26,6 +26,9 @@ final class SessionManager: ObservableObject {
             if (state.user == nil) != (newValue.user == nil), newValue != .loading { willSwitchGraph?() }
             // Signing out (or a sign-in ending) forgets the My Matches sort and list (23 Oct 2026).
             if newValue == .signedOut { MatchesStore.shared.forget() }
+            // Action guards and unfinished submissions belong to the signed-in account (25 Oct 2026).
+            ActionGuard.shared.account = newValue.user?.id ?? "signed-out"
+            IdempotencyStore.shared.account = newValue.user?.id
         }
     }
     var willSwitchGraph: (() -> Void)?

@@ -17,11 +17,11 @@ struct NotificationsView: View {
         ScrollView {
             PagedContent(pager: pager, emptyTitle: loc.t("general_notifications", "Notifications"),
                          emptyIcon: "ic_notification_off",
-                         retry: { Task { await reload() } }, more: { Task { await pager.loadMore(fetch) } }) { n in
+                         retry: { Task { await reload() } }, more: { Task { await pager.loadMore(fetch) } }, skeleton: .row) { n in
                 row(n)
             }
         }
-        .refreshable { await pager.reload(fetch) }
+        .refreshable { await pager.refresh(fetch) }
         .backHeader(loc.t("general_notifications", "Notifications"))
         .task { await reload() }
         .onDisappear { poller.markChecked() }
@@ -108,10 +108,7 @@ struct NotificationsView: View {
             Task {
                 defer { markingSeen.remove(n.id) }
                 do {
-                    _ = try await feedback.run(
-                        loc.t("loading_user_notifications_see", "Marking notification as seen"),
-                        key: "notification-seen-\(n.id)"
-                    ) { try await UserService().markNotificationSeen(id: n.id) }
+                    _ = try await ActionGuard.shared.run("notification:\(n.id)") { try await UserService().markNotificationSeen(id: n.id) }
                     seen.insert(n.id)
                 } catch is CancellationError {
                     return
@@ -160,6 +157,6 @@ struct NotificationsView: View {
     private let fetch: Pager<AppNotification>.Fetch = { page in try await UserService().notifications(page: page) }
 
     private func reload() async {
-        try? await feedback.run("\(loc.t("loading_user_notifications_get", "Getting notifications - Page")) 1") { await pager.reload(fetch) }
+        await pager.reload(fetch) // the first load shows skeleton rows (PagedContent)
     }
 }

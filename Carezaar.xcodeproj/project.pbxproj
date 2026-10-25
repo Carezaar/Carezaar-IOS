@@ -40,6 +40,7 @@
 		53961150F206C2C326C5ABAB /* SourceText.swift in Sources */ = {isa = PBXBuildFile; fileRef = B57379D4C7CD6E9D297FCAB7 /* SourceText.swift */; };
 		56E349FB672D7318383E2FBE /* BaseMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = C327C6699B654E0CD3717FF3 /* BaseMetadata.swift */; };
 		5F0BE87ABE22FF2F2138E6CB /* PagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B688BAD5394A69E032C3614 /* PagerTests.swift */; };
+		A7C1E2D3F4A5B6C7D8E9F0A1 /* LoadingIdempotencyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8D2F3E4A5B6C7D8E9F0A1B2 /* LoadingIdempotencyTests.swift */; };
 		607898B4ECD1FD04E3F9D295 /* CarezaarApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFF95E860415DFAD8FEF3AAF /* CarezaarApp.swift */; };
 		62ADE25F4ADB2B742C409A1F /* StartupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4835509DB337574FE07905DA /* StartupTests.swift */; };
 		62B1F0C58969FDC9A1929D9A /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 190FA2754B6F41733A78729D /* APIError.swift */; };
@@ -114,6 +115,7 @@
 		9A75E348538A4E4A8DF3FAC0 /* ManagedLanguageMatrixUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9137E9FE110447994A3B2B0 /* ManagedLanguageMatrixUITests.swift */; };
 		C8D1B2F3E4A5B6C7D8E9F0A1 /* BrandColorUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7C0A1E2D3F4A5B6C7D8E9F0 /* BrandColorUITests.swift */; };
 		D9E2C3F4A5B6C7D8E9F0A1B2 /* MyMatchesStateUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1F2A3B4C5D6E7F8A9B0C1D2 /* MyMatchesStateUITests.swift */; };
+		C9E3F4A5B6C7D8E9F0A1B2C3 /* LoadingIdempotencyUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF4A5B6C7D8E9F0A1B2C3D4 /* LoadingIdempotencyUITests.swift */; };
 		DFF086AFFC394F25B48EF989 /* MatchStateMatrixUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFCDD0EB34F64C0CA8D51857 /* MatchStateMatrixUITests.swift */; };
 		01096EA9753543DBBE04FCB2 /* ChromeDynamicTypeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4AD527B520748B7B164060A /* ChromeDynamicTypeUITests.swift */; };
 		F23C6B1E1B1443269A50D4E7 /* LocationBoundaryUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9ED3B4E5D2F402996EFD287 /* LocationBoundaryUITests.swift */; };
@@ -198,6 +200,7 @@
 		97919258ECC327CB8AAAAFAD /* ValidationTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ValidationTests.swift; sourceTree = "<group>"; };
 		9891614A8DF84300623FE258 /* Scenes */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = Scenes; path = Resources/Scenes; sourceTree = "<group>"; };
 		9B688BAD5394A69E032C3614 /* PagerTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PagerTests.swift; sourceTree = "<group>"; };
+		B8D2F3E4A5B6C7D8E9F0A1B2 /* LoadingIdempotencyTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LoadingIdempotencyTests.swift; sourceTree = "<group>"; };
 		A2AFE40A366F4D2A3BCC0FFF /* Feedback.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Feedback.swift; path = Features/DesignSystem/Feedback.swift; sourceTree = "<group>"; };
 		A535DA54B74E813EF6FA8B91 /* Profiles.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Profiles.swift; path = Models/Profiles.swift; sourceTree = "<group>"; };
 		A7D3B668C3EC06070539AB16 /* NetworkTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NetworkTests.swift; sourceTree = "<group>"; };
@@ -254,6 +257,7 @@
 		C9137E9FE110447994A3B2B0 /* ManagedLanguageMatrixUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ManagedLanguageMatrixUITests.swift; sourceTree = "<group>"; };
 		B7C0A1E2D3F4A5B6C7D8E9F0 /* BrandColorUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BrandColorUITests.swift; sourceTree = "<group>"; };
 		E1F2A3B4C5D6E7F8A9B0C1D2 /* MyMatchesStateUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MyMatchesStateUITests.swift; sourceTree = "<group>"; };
+		DAF4A5B6C7D8E9F0A1B2C3D4 /* LoadingIdempotencyUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LoadingIdempotencyUITests.swift; sourceTree = "<group>"; };
 		BFCDD0EB34F64C0CA8D51857 /* MatchStateMatrixUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MatchStateMatrixUITests.swift; sourceTree = "<group>"; };
 		C4AD527B520748B7B164060A /* ChromeDynamicTypeUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ChromeDynamicTypeUITests.swift; sourceTree = "<group>"; };
 		A9ED3B4E5D2F402996EFD287 /* LocationBoundaryUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LocationBoundaryUITests.swift; sourceTree = "<group>"; };
@@ -410,6 +414,7 @@
 				8561D7687FECB39862406C42 /* BaseCacheTests.swift */,
 				0ADAEEB350119F49FFD81836 /* PreferenceTests.swift */,
 				9B688BAD5394A69E032C3614 /* PagerTests.swift */,
+				B8D2F3E4A5B6C7D8E9F0A1B2 /* LoadingIdempotencyTests.swift */,
 				6584707E37D0DE7CF455A33C /* SessionTests.swift */,
 				0B2535A33840137CC9A72C66 /* PollerTests.swift */,
 				94E56FD9F86220B7E9F42AB0 /* FeedbackTests.swift */,
@@ -452,6 +457,7 @@
 				E797FD6799264E409FA79B52 /* UnsentChatDraftUITests.swift */,
 				B7C0A1E2D3F4A5B6C7D8E9F0 /* BrandColorUITests.swift */,
 				E1F2A3B4C5D6E7F8A9B0C1D2 /* MyMatchesStateUITests.swift */,
+				DAF4A5B6C7D8E9F0A1B2C3D4 /* LoadingIdempotencyUITests.swift */,
 				BFCDD0EB34F64C0CA8D51857 /* MatchStateMatrixUITests.swift */,
 				26B864C075D34BD78704BFD2 /* LanguagePersistenceUITests.swift */,
 				54CB6EB5FDD6404F87D0D8B3 /* ChatNetworkBoundaryUITests.swift */,
@@ -622,6 +628,7 @@
 				0CD993F63DAFC018F1960693 /* BaseCacheTests.swift in Sources */,
 				E727C069772F73B830FF9DEE /* PreferenceTests.swift in Sources */,
 				5F0BE87ABE22FF2F2138E6CB /* PagerTests.swift in Sources */,
+				A7C1E2D3F4A5B6C7D8E9F0A1 /* LoadingIdempotencyTests.swift in Sources */,
 				1776191B51E8FFAD5C9E74D8 /* SessionTests.swift in Sources */,
 				3EE8815A9CFFE2DDC1E12034 /* PollerTests.swift in Sources */,
 				11404B0AD72B18D4277DBCD6 /* FeedbackTests.swift in Sources */,
@@ -727,6 +734,7 @@
 				7B6F044E03964DC391F060D4 /* UnsentChatDraftUITests.swift in Sources */,
 				C8D1B2F3E4A5B6C7D8E9F0A1 /* BrandColorUITests.swift in Sources */,
 				D9E2C3F4A5B6C7D8E9F0A1B2 /* MyMatchesStateUITests.swift in Sources */,
+				C9E3F4A5B6C7D8E9F0A1B2C3 /* LoadingIdempotencyUITests.swift in Sources */,
 				DFF086AFFC394F25B48EF989 /* MatchStateMatrixUITests.swift in Sources */,
 				687DCB81CEFD428D92C095AF /* LanguagePersistenceUITests.swift in Sources */,
 				24F3284569C64285B47502C7 /* ChatNetworkBoundaryUITests.swift in Sources */,

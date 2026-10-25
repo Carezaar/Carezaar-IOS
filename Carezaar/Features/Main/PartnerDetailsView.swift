@@ -19,7 +19,13 @@ struct PartnerDetailsView: View {
     @State private var confirming: MatchMutation?
     @State private var requesting = false
     @State private var introduction = ""
-    @State private var busy = false
+    /// Every action on this person's match shares one guard (ActionGuard, `match:<partner id>`):
+    /// accept and reject, a double tap, or the same action from a reopened screen never run at once.
+    @ObservedObject private var guards = ActionGuard.shared
+    private var busy: Bool { guards.isBusy(matchResource) }
+    private var matchResource: String { "match:\(partnerId)" }
+    /// Which action is running, for the progress indicator on its own button.
+    @State private var working: MatchMutation?
     @State private var didLoad = false
     @State private var visible = false
     @State private var delayedBack: Task<Void, Never>?
@@ -43,7 +49,7 @@ struct PartnerDetailsView: View {
             } else if let partner {
                 content(partner)
             } else {
-                ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
+                ScrollView { SkeletonDetail() }
             }
         }
         .navigationBarTitleDisplayMode(.inline)
@@ -157,7 +163,8 @@ struct PartnerDetailsView: View {
                 }
                 AdaptiveStack(alignment: .center, spacing: 12, stackedSpacing: 8) {
                     if matchState?.status == .active {
-                        WideButton(title: loc.t("\(prefix)_message", "Message"), icon: "ic_message", style: .outline) { Task { await message() } }
+                        WideButton(title: loc.t("\(prefix)_message", "Message"), icon: "ic_message", style: .outline,
+                                   loading: guards.isBusy("chat:create:\(partnerId)")) { Task { await message() } }
                     }
                     matchButtons
                 }
@@ -171,22 +178,22 @@ struct PartnerDetailsView: View {
         if let state = matchState {
             switch state.status {
             case .none:
-                WideButton(title: loc.t("match_match_button", "Request a Match"), icon: "ic_match_on") {
+                WideButton(title: loc.t("match_match_button", "Request a Match"), icon: "ic_match_on", enabled: !busy, loading: working == .request) {
                     guard !busy else { return }
                     introduction = ""
                     requesting = true
                 }
                 .accessibilityIdentifier("match-request")
             case .sent:
-                WideButton(title: loc.t("match_withdraw_title", "Withdraw"), icon: "ic_match_off", style: .outline) { ask(.withdraw) }
+                WideButton(title: loc.t("match_withdraw_title", "Withdraw"), icon: "ic_match_off", style: .outline, enabled: !busy, loading: working == .withdraw) { ask(.withdraw) }
                     .accessibilityIdentifier("match-withdraw")
             case .received:
-                WideButton(title: loc.t("match_reject_title", loc.t("match_reject", "Reject")), style: .danger) { ask(.reject) }
+                WideButton(title: loc.t("match_reject_title", loc.t("match_reject", "Reject")), style: .danger, enabled: !busy, loading: working == .reject) { ask(.reject) }
                     .accessibilityIdentifier("match-reject")
-                WideButton(title: loc.t("match_accept_title", "Accept"), icon: "ic_match_on") { ask(.accept) }
+                WideButton(title: loc.t("match_accept_title", "Accept"), icon: "ic_match_on", enabled: !busy, loading: working == .accept) { ask(.accept) }
                     .accessibilityIdentifier("match-accept")
             case .active:
-                WideButton(title: loc.t("match_unmatch_title", "Unmatch"), icon: "ic_match_off", style: .danger) { ask(.unmatch) }
+                WideButton(title: loc.t("match_unmatch_title", "Unmatch"), icon: "ic_match_off", style: .danger, enabled: !busy, loading: working == .unmatch) { ask(.unmatch) }
                     .accessibilityIdentifier("match-unmatch")
             }
         }
@@ -287,7 +294,7 @@ struct PartnerDetailsView: View {
         didLoad = true
         error = nil
         do {
-            try await feedback.run(loc.t("loading_profile_get", "Getting profile")) { try await fetch() }
+            try await fetch() // a skeleton stands in for the profile until it arrives
             if matchState == nil { checkUnavailable = true }
         } catch is CancellationError { return }
         catch { failAndReturn(error) }
@@ -312,14 +319,14 @@ struct PartnerDetailsView: View {
             return
         }
         guard !busy else { return }
-        busy = true
-        defer { busy = false }
-        do {
-            try await fetch()
-            guard visible, !Task.isCancelled else { return }
-            if matchState == nil { checkUnavailable = true }
-        } catch is CancellationError { return }
-        catch { if visible { checkUnavailable = true } }
+        _ = try? await ActionGuard.shared.run(matchResource) {
+            do {
+                try await fetch()
+                guard visible, !Task.isCancelled else { return }
+                if matchState == nil { checkUnavailable = true }
+            } catch is CancellationError { return }
+            catch { if visible { checkUnavailable = true } }
+        }
     }
 
     private func fetch(generation: UUID? = nil) async throws {
@@ -339,7 +346,7 @@ struct PartnerDetailsView: View {
             feedback.toast(loc.t("chat_screen_match_check", "You can only send messages to your current matches.")); return
         }
         do {
-            let chat = try await feedback.run(loc.t("loading_chat_create", "Creating a new chat")) {
+            let chat = try await ActionGuard.shared.run("chat:create:\(partnerId)") {
                 try await UserService().createChat(partnerId: partnerId)
             }
             guard visible, !Task.isCancelled else { return }
@@ -362,8 +369,12 @@ struct PartnerDetailsView: View {
 
     private func continueIntent(_ intent: MatchActionIntent) async {
         guard !busy, visible, !Task.isCancelled, TokenStore.shared.generation == intent.generation else { return }
-        busy = true
-        defer { busy = false }
+        working = intent.action
+        defer { working = nil }
+        _ = try? await ActionGuard.shared.run(matchResource) { await guardedIntent(intent) }
+    }
+
+    private func guardedIntent(_ intent: MatchActionIntent) async {
         let checked: ProfileMatchState?
         do { checked = try await freshState(generation: intent.generation) }
         catch is CancellationError { return }
@@ -373,7 +384,10 @@ struct PartnerDetailsView: View {
         }
         guard visible, !Task.isCancelled, TokenStore.shared.generation == intent.generation else { return }
         guard let checked else { pendingIntent = intent; checkUnavailable = true; return }
-        guard intent.canSubmit, checked == intent.before,
+        // A match request carries an Idempotency-Key: after a lost answer, while the profile still
+        // shows no request, it may be sent again with the same key (the server keeps one).
+        let resendable = intent.action == .request && checked.status == .none
+        guard intent.canSubmit || resendable, checked == intent.before,
               checked.status == intent.action.expectedStatus else {
             resolve(intent, checked: checked)
             return
@@ -382,7 +396,7 @@ struct PartnerDetailsView: View {
         submitted.phase = .uncertain(APIError.unknown(""))
         pendingIntent = submitted // Set before suspension: no tap can replay this write.
         do {
-            let result: Match? = try await feedback.run(loc.t(intent.action.loadingKey, intent.action.loadingFallback)) {
+            let result: Match? = try await {
                 let service = UserService()
                 switch intent.action {
                 case .request: return try await service.requestMatch(partnerId: partnerId, introduction: intent.introduction, ifGeneration: intent.generation)
@@ -391,7 +405,7 @@ struct PartnerDetailsView: View {
                 case .withdraw: try await service.withdrawMatch(id: checked.id!, ifGeneration: intent.generation); return nil
                 case .unmatch: return try await service.breakMatch(id: checked.id!, ifGeneration: intent.generation)
                 }
-            }
+            }()
             submitted.phase = .acknowledged
             pendingIntent = submitted
             guard visible, !Task.isCancelled, TokenStore.shared.generation == intent.generation else { return }
@@ -441,6 +455,8 @@ struct PartnerDetailsView: View {
 
     private func complete(_ intent: MatchActionIntent, matched: Bool) {
         pendingIntent = nil
+        // The profile shows how the request ended: its key is done with.
+        if intent.action == .request { IdempotencyStore.shared.retireAll(.matchRequest, target: partnerId) }
         if intent.action == .request, introduction == intent.introduction { introduction = "" }
         if matched { router.push(.matched(partner: matchedPartner)) }
     }
@@ -461,10 +477,8 @@ struct PartnerDetailsView: View {
         let on = partner.isFavorite
         setPartner(partner.with(isFavorite: !on))
         do {
-            let saved = try await feedback.run(on ? loc.t("loading_favorite_delete", "Removing from favorite list")
-                                      : loc.t("loading_favorite_create", "Adding to favorite list")) {
-                try await favorites.change(partner: partner, to: !on, profileId: partnerId, accountId: accountId, generation: generation)
-            }
+            // FavoriteMutationCoordinator is the shared guard for one person's favourite.
+            let saved = try await favorites.change(partner: partner, to: !on, profileId: partnerId, accountId: accountId, generation: generation)
             guard session.state.user?.id == accountId, TokenStore.shared.generation == generation else { return }
             setPartner(saved)
             FavoriteSync.post(userId: partner.id, isFavorite: saved.isFavorite)
@@ -735,7 +749,7 @@ struct MatchedView: View {
             } else if let partner {
                 content(partner)
             } else {
-                ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
+                ScrollView { SkeletonDetail() }
             }
         }
         .backHeader(loc.t("match_matched_title", "It's a Match!"))
@@ -861,12 +875,11 @@ struct MatchedView: View {
         didLoad = true
         error = nil
         do {
-            try await feedback.run(loc.t("loading_match_get", "Getting match details")) {
-                let profile = try await activeProfile()
-                guard visible, !Task.isCancelled else { return }
-                guard let (_, user) = profile else { openProfile(); return }
-                partner = user
-            }
+            // A skeleton stands in for the profile until it arrives.
+            let profile = try await activeProfile()
+            guard visible, !Task.isCancelled else { return }
+            guard let (_, user) = profile else { openProfile(); return }
+            partner = user
             if partner != nil, visible {
                 try? await Task.sleep(for: .milliseconds(600))
                 if !Task.isCancelled, visible { headingFocused = true }
@@ -888,7 +901,7 @@ struct MatchedView: View {
     private func chat() async {
         guard partner != nil else { return }
         do {
-            try await feedback.run(loc.t("loading_chat_create", "Creating a new chat")) {
+            try await ActionGuard.shared.run("chat:create:\(partnerRef.id)") {
                 // A single profile read already confirmed active on this opening.
                 // The create-chat endpoint remains the authority for authorization.
                 let conversation = try await UserService().createChat(partnerId: partnerRef.id)

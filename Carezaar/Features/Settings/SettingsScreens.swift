@@ -147,8 +147,11 @@ struct ReportAnIssueView: View {
 
     var body: some View {
         ScrollView {
-            if let error {
+            if let error, issues == nil {
                 ErrorState(message: Feedback.message(error)) { Task { await load() } }
+            } else if issues == nil {
+                // Support history loading: placeholders in the shape of the issue cards.
+                SkeletonList(style: .issue, count: 3)
             } else if let issues, issues.isEmpty {
                 VStack(spacing: 10) {
                     AppIcon(name: "illus_report", size: 160)
@@ -172,8 +175,11 @@ struct ReportAnIssueView: View {
         .backHeader(loc.t("report_an_issue_title", "Report An Issue"))
         .task { await load() }
         .sheet(isPresented: $composing) {
-            IssueComposer(submission: issueSubmission, existingIssues: issues) {
-                composing = false; Task { await load() }
+            IssueComposer(submission: issueSubmission, existingIssues: issues) { created in
+                // The server's answer is the issue as filed: shown at once, not after another
+                // load, so a later failed refresh can't make it look unsent.
+                composing = false
+                issues = [created] + (issues ?? []).filter { $0.id != created.id }
             }
                 .presentationDetents([.large])
         }
@@ -212,7 +218,7 @@ struct ReportAnIssueView: View {
     private func load() async {
         error = nil
         do {
-            issues = try await feedback.run(loc.t("loading_user_issues_get", "Getting reported issues")) { try await UserService().issues() }
+            issues = try await UserService().issues()
         } catch { self.error = error }
     }
 }
@@ -222,7 +228,8 @@ struct ReportAnIssueView: View {
 private struct IssueComposer: View {
     @ObservedObject var submission: IssueSubmissionCoordinator
     let existingIssues: [Issue]?
-    let onDone: () -> Void
+    let onDone: (Issue) -> Void
+    @ObservedObject private var guards = ActionGuard.shared
     @EnvironmentObject private var session: SessionManager
     @EnvironmentObject private var baseData: BaseDataStore
     @EnvironmentObject private var loc: Localization
@@ -258,8 +265,10 @@ private struct IssueComposer: View {
                 Text(loc.t("report_an_issue_description_label", "Description")).font(Theme.Typography.control(15))
                 TextField(loc.t("report_an_issue_description_placeholder", "Write your issue here..."), text: $description, axis: .vertical)
                     .lineLimit(4...8).padding(14).overlay(RoundedRectangle(cornerRadius: 12).stroke(Theme.Palette.line))
-                PrimaryButton(title: loc.t("report_an_issue_submit_button", "Submit")) { Task { await submit() } }
-                    .disabled(submission.submitting)
+                PrimaryButton(title: loc.t("report_an_issue_submit_button", "Submit"),
+                              isLoading: guards.isBusy(IssueSubmissionCoordinator.resource)) { Task { await submit() } }
+                    .disabled(guards.isBusy(IssueSubmissionCoordinator.resource))
+                    .accessibilityIdentifier("issue-submit")
             }
             .padding(20)
         }
@@ -277,14 +286,13 @@ private struct IssueComposer: View {
         let owner = session.state.user?.id, generation = TokenStore.shared.generation
         guard owner != nil else { return }
         do {
-            _ = try await feedback.run(loc.t("loading_user_issues_create", "Reporting a new issue")) {
-                try await submission.submit(IssueSubmissionDraft(issuetypeId: typeId,
-                    title: typeId == nil ? subject.trimmingCharacters(in: .whitespaces) : nil,
-                    description: description.trimmingCharacters(in: .whitespacesAndNewlines)), baseline: existingIssues, generation: generation)
-            }
+            let created = try await submission.submit(IssueSubmissionDraft(issuetypeId: typeId,
+                title: typeId == nil ? subject.trimmingCharacters(in: .whitespaces) : nil,
+                description: description.trimmingCharacters(in: .whitespacesAndNewlines)), baseline: existingIssues, generation: generation)
             guard owner == session.state.user?.id, generation == TokenStore.shared.generation else { return }
-            onDone()
+            onDone(created)
         } catch is CancellationError { }
+        catch is DuplicateActionError { }
         catch let error as APIError where error.isServiceFault {
             feedback.toast(Feedback.unavailable(loc.t("report_an_issue_title", "Report An Issue")))
         } catch { feedback.toast(Feedback.message(error)) }
@@ -298,54 +306,25 @@ struct IssueSubmissionDraft: Hashable, Sendable {
     let description: String
 }
 
-/// Public workflow seam wired to the real native issue composer.
+/// Public workflow seam wired to the real native issue composer. Each issue is one submission
+/// with its own Idempotency-Key (IdempotencyStore): when the answer is lost the form stays as
+/// it is and Submit repeats the same submission, which the server files at most once. One
+/// issue at a time (ActionGuard). No list read guesses the outcome (client request, 25 Oct 2026).
 @MainActor
 final class IssueSubmissionCoordinator: ObservableObject {
+    static let resource = "issue:create"
     private let service: UserService
     init(service: UserService = UserService()) { self.service = service }
 
-    @Published private(set) var submitting = false
-    private struct Pending {
-        let existingIDs: Set<Int>
-        let error: Error
-    }
-    private struct Key: Hashable { let generation: UUID; let draft: IssueSubmissionDraft }
-    private var pending: [Key: Pending] = [:]
+    var submitting: Bool { ActionGuard.shared.isBusy(Self.resource) }
 
     func submit(_ draft: IssueSubmissionDraft, baseline: [Issue]?, generation: UUID? = nil) async throws -> Issue {
-        guard !submitting else { throw APIError.unknown("") }
-        submitting = true
-        defer { submitting = false }
         let owner = await service.client.credentialGeneration()
         guard generation == nil || generation == owner else { throw CancellationError() }
-        let key = Key(generation: owner, draft: draft)
-        if let unresolved = pending[key] { return try await reconcile(key, pending: unresolved) }
-        let existing: [Issue]
-        if let baseline { existing = baseline } else { existing = try await service.issues(ifGeneration: owner) }
-        do {
-            return try await service.createIssue(issuetypeId: draft.issuetypeId,
-                                                  title: draft.title, description: draft.description, ifGeneration: owner)
-        } catch is CancellationError { throw CancellationError() }
-        catch {
-            guard MutationOutcome.mayHaveCommitted(error) else { throw error }
-            let unresolved = Pending(existingIDs: Set(existing.map(\.id)), error: error)
-            pending[key] = unresolved
-            return try await reconcile(key, pending: unresolved)
+        return try await ActionGuard.shared.run(Self.resource) {
+            try await service.createIssue(issuetypeId: draft.issuetypeId, title: draft.title, description: draft.description,
+                                          ifGeneration: owner, after: baseline?.map(\.id).max())
         }
-    }
-
-    private func reconcile(_ key: Key, pending unresolved: Pending) async throws -> Issue {
-        let draft = key.draft
-        let issues: [Issue]
-        do { issues = try await service.issues(ifGeneration: key.generation) }
-        catch is CancellationError { throw CancellationError() }
-        catch { throw unresolved.error }
-        guard let saved = issues.first(where: {
-            !unresolved.existingIDs.contains($0.id) && $0.issuetypeId == draft.issuetypeId
-                && (draft.issuetypeId != nil || $0.title == draft.title) && $0.description == draft.description
-        }) else { throw unresolved.error }
-        pending.removeValue(forKey: key)
-        return saved
     }
 }
 
@@ -417,7 +396,8 @@ struct ChangePasswordView: View {
     @State private var updated = ""
     @State private var confirmation = ""
     @State private var confirming = false
-    @State private var submitting = false
+    @ObservedObject private var guards = ActionGuard.shared
+    private var submitting: Bool { guards.isBusy("auth:password") }
 
     private var valid: Bool { !current.isEmpty && PasswordValidator.isValid(updated) && updated == confirmation }
 
@@ -442,7 +422,7 @@ struct ChangePasswordView: View {
         // puts the keyboard away.
         .scrollDismissesKeyboard(.interactively)
         .bottomAction {
-            PrimaryButton(title: loc.t("settings_change_password_change_password", "Change Password"), isEnabled: valid && !submitting) { confirming = true }
+            PrimaryButton(title: loc.t("settings_change_password_change_password", "Change Password"), isLoading: submitting, isEnabled: valid && !submitting) { confirming = true }
                 .padding(.horizontal, 20).padding(.vertical, 10).background(.white)
         }
         .backHeader(loc.t("settings_change_password_title", "Change Password"))
@@ -456,15 +436,14 @@ struct ChangePasswordView: View {
 
     private func submit() async {
         guard valid, !submitting else { return }
-        submitting = true
-        defer { submitting = false }
         do {
-            try await feedback.run(loc.t("loading_user_password_change", "Changing password")) {
+            try await ActionGuard.shared.run("auth:password") {
                 try await session.changePassword(current: current, new: updated)
             }
             current = ""
             updated = ""
             confirmation = ""
+        } catch is DuplicateActionError {
         } catch let error as APIError where error.isServiceFault {
             feedback.toast(Feedback.unavailable(loc.t("settings_change_password_title", "Change Password")))
         } catch { feedback.toast(Feedback.message(error)) }
@@ -481,6 +460,7 @@ struct DeleteAccountView: View {
     @EnvironmentObject private var feedback: Feedback
     @State private var reasonId: Int?
     @State private var aware = false
+    @ObservedObject private var guards = ActionGuard.shared
 
     /// Reason codes are role-prefixed (`client_…`, `caregiver_…`); show the user's own.
     private var reasons: [BaseItem] {
@@ -554,7 +534,7 @@ struct DeleteAccountView: View {
             AdaptiveStack(alignment: .center, spacing: 12, stackedSpacing: 8) {
                 WideButton(title: loc.t("delete_account_action_cancel", "Cancel"), style: .outline) { router.pop() }
                 WideButton(title: loc.t("delete_account_action_delete", "Delete Account"), style: .danger,
-                           enabled: aware && reasonId != nil) { Task { await submit() } }
+                           enabled: aware && reasonId != nil, loading: guards.isBusy("account:delete")) { Task { await submit() } }
             }
             .padding(.horizontal, 20).padding(.vertical, 10).background(.white)
         }
@@ -564,7 +544,7 @@ struct DeleteAccountView: View {
     private func submit() async {
         guard let reasonId else { return }
         do {
-            try await feedback.run(loc.t("loading_deleting_user_account", "Deleting user account")) {
+            try await ActionGuard.shared.run("account:delete") {
                 try await session.deleteAccount(reasonId: reasonId)
             }
         } catch let error as APIError where error.isServiceFault {

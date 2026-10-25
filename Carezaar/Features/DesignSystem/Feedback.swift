@@ -1,50 +1,51 @@
 import SwiftUI
 
-/// Android shows one modal "Please wait…" card listing every in-flight operation
-/// ("- Signing in", "- Getting list of chats - Page 1"), and errors as a red toast.
-/// `run` reproduces that for every network call a screen makes.
+/// A second attempt at an action that is still unresolved (see ActionGuard).
+struct DuplicateActionError: Error, Equatable { let key: String }
+
+/// Duplicate-action protection (client request, 25 Oct 2026): one shared guard for every
+/// action that changes data. It is taken before the request starts (on the main actor, so the
+/// check and the claim can't interleave), and a second attempt while the first is unresolved
+/// (a double tap, a rebuilt view, the same screen opened again, another view) is rejected at
+/// once, not queued. It is released when the action ends: success, failure or cancellation.
+///
+/// Keys are the signed-in account plus the resource, e.g. `match:<partner id>`: every action
+/// on one match (request, accept, reject, withdraw, end) shares a guard, while other matches
+/// and other operations stay usable. Views observe it to disable their control and show
+/// progress on it.
 @MainActor
-final class Feedback: ObservableObject {
-    struct Operation: Identifiable { let id = UUID(); let label: String }
-    struct Toast: Identifiable, Equatable { let id = UUID(); let message: String }
+final class ActionGuard: ObservableObject {
+    static let shared = ActionGuard()
+    @Published private(set) var running: Set<String> = []
+    /// The signed-in account guards are scoped to (set by the session).
+    var account = "signed-out" { didSet { objectWillChange.send() } }
 
-    @Published private(set) var operations: [Operation] = []
-    @Published private(set) var toasts: [Toast] = []
+    func key(_ resource: String) -> String { "\(account)|\(resource)" }
+    func isBusy(_ resource: String) -> Bool { running.contains(key(resource)) }
 
-    private var running: Set<String> = []
-    private var waiters: [String: [CheckedContinuation<Any, Error>]] = [:]
-
-    /// A second call from the same call site (or with the same explicit `key`) while
-    /// the first is in flight waits for the first one's result instead of running
-    /// again: a double tap sends one request. Different screens never share a key,
-    /// even when their labels match. The first caller runs `work` itself, so
-    /// cancellation still flows from the view's task as before.
-    func run<T>(_ label: String, key: String? = nil, file: String = #fileID, line: Int = #line,
-                _ work: () async throws -> T) async throws -> T {
-        let key = key ?? "\(file):\(line)"
-        if running.contains(key) {
-            let shared = try await withCheckedThrowingContinuation { waiters[key, default: []].append($0) }
-            if let value = shared as? T { return value }
-            throw APIError.decoding("Unexpected result type.")
-        }
+    func run<T>(_ resource: String, _ work: () async throws -> T) async throws -> T {
+        let key = key(resource)
+        guard !running.contains(key) else { throw DuplicateActionError(key: key) }
         running.insert(key)
-        let op = Operation(label: label)
-        operations.append(op)
-        defer {
-            running.remove(key)
-            operations.removeAll { $0.id == op.id }
-        }
-        do {
-            let value = try await work()
-            waiters.removeValue(forKey: key)?.forEach { $0.resume(returning: value) }
-            return value
-        } catch {
-            waiters.removeValue(forKey: key)?.forEach { $0.resume(throwing: error) }
-            throw error
-        }
+        defer { running.remove(key) }
+        return try await work()
     }
 
+    /// Test hook.
+    func reset() { running = [] }
+}
+
+/// Errors as the red toast Android uses. There is no blocking "Please wait…" window any more
+/// (client request, 25 Oct 2026): a first load shows a skeleton where its content goes, and an
+/// action shows progress on its own control.
+@MainActor
+final class Feedback: ObservableObject {
+    struct Toast: Identifiable, Equatable { let id = UUID(); let message: String }
+
+    @Published private(set) var toasts: [Toast] = []
+
     func toast(_ message: String) {
+        guard !message.isEmpty else { return }
         let toast = Toast(message: message)
         toasts.append(toast)
         Task { [weak self] in
@@ -109,6 +110,7 @@ final class Feedback: ObservableObject {
     /// Common/global failures use managed general copy. Useful field-specific
     /// validation remains server authored; technical field text is suppressed.
     static func message(_ error: Error) -> String {
+        if error is DuplicateActionError || error is CancellationError { return "" }
         if let rejected = error as? AuthorizationRejectedMutationError { return message(rejected.cause) }
         let serverTrouble = translate("general_network_title", "Cannot communicate with server.")
         guard let api = error as? APIError else {
@@ -150,36 +152,12 @@ final class Feedback: ObservableObject {
 
 }
 
-/// Overlays the busy card and toasts above the whole app.
+/// Overlays the toasts above the whole app.
 struct FeedbackOverlay: ViewModifier {
     @EnvironmentObject private var feedback: Feedback
-    @EnvironmentObject private var loc: Localization
 
     func body(content: Content) -> some View {
         content
-            .overlay {
-                if !feedback.operations.isEmpty {
-                    ZStack {
-                        Color.black.opacity(0.22).ignoresSafeArea()
-                        VStack(alignment: .leading, spacing: 10) {
-                            HStack(spacing: 12) {
-                                ProgressView()
-                                Text(loc.t("loading_please_wait", "Please wait..."))
-                                    .font(Theme.Typography.title(17))
-                            }
-                            ForEach(feedback.operations) { op in
-                                Text("- \(op.label)").font(Theme.Typography.body())
-                            }
-                        }
-                        .padding(18)
-                        .frame(minWidth: 260, alignment: .leading)
-                        .background(.white, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-                        .shadow(color: .black.opacity(0.18), radius: 20, y: 8)
-                    }
-                    .accessibilityElement(children: .combine)
-                    .transition(.opacity)
-                }
-            }
             .overlay(alignment: .bottom) {
                 VStack(spacing: 8) {
                     ForEach(feedback.toasts) { toast in

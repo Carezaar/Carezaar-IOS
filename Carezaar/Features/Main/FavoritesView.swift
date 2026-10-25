@@ -16,12 +16,12 @@ struct FavoritesView: View {
                     .frame(width: 88, height: 88).background(Theme.Palette.clientPanel, in: Circle())
                     .padding(.vertical, 16)
                 PagedContent(pager: pager, emptyTitle: loc.t("profile_favorites_title", "Favorites"),
-                             retry: { Task { await reload() } }, more: { Task { await pager.loadMore(fetch) } }) { u in
+                             retry: { Task { await reload() } }, more: { Task { await pager.loadMore(fetch) } }, skeleton: .row) { u in
                     row(u).padding(.horizontal, 20).padding(.vertical, 7)
                 }
             }
         }
-        .refreshable { await pager.reload(fetch) }
+        .refreshable { await pager.refresh(fetch) }
         .backHeader(loc.t("profile_favorites_title", "Favorites"))
         .task { await reload() }
         // Un-bookmarked from the partner's profile: drop the row; bookmarked again: reload.
@@ -60,7 +60,7 @@ struct FavoritesView: View {
     private let fetch: Pager<User>.Fetch = { page in try await UserService().bookmarks(page: page) }
 
     private func reload() async {
-        try? await feedback.run("\(loc.t("loading_favorite_get", "Getting favorites - Page")) 1") { await pager.reload(fetch) }
+        await pager.reload(fetch) // the first load shows skeleton rows (PagedContent)
     }
 
     private func remove(_ u: User) async {
@@ -68,9 +68,8 @@ struct FavoritesView: View {
         let generation = TokenStore.shared.generation
         guard !favorites.isBusy(partner: u, accountId: accountId) else { return }
         do {
-            let saved = try await feedback.run(loc.t("loading_favorite_delete", "Removing from favorite list")) {
-                try await favorites.change(partner: u, to: false, accountId: accountId, generation: generation)
-            }
+            // FavoriteMutationCoordinator is the shared guard for one person's favourite.
+            let saved = try await favorites.change(partner: u, to: false, accountId: accountId, generation: generation)
             guard session.state.user?.id == accountId, TokenStore.shared.generation == generation else { return }
             if !saved.isFavorite { pager.items.removeAll { $0.id == u.id } }
             FavoriteSync.post(userId: u.id, isFavorite: saved.isFavorite)

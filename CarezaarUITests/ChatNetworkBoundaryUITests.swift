@@ -899,10 +899,11 @@ final class ChatNetworkBoundaryUITests: XCTestCase {
         field.typeText(second)
         XCTAssertTrue((field.value as? String) == first + second,
                       "Continued typing must actually occur before acknowledgement and append to the unchanged submitted baseline")
-        let busy = app.staticTexts["Please wait..."]
-        XCTAssertTrue(busy.waitForExistence(timeout: 20), "Native delivery POST must show real progress")
+        // 25 Oct 2026: no loading window; the progress is on the Send button itself.
+        XCTAssertTrue(sendShowsProgress(send, timeout: 20), "Native delivery POST must show real progress on Send")
+        XCTAssertFalse(app.staticTexts["Please wait..."].exists, "No blocking loading window")
         XCTAssertFalse(send.isEnabled)
-        XCTAssertTrue(busy.waitForNonExistence(timeout: 40), "Slow acknowledged delivery must finish")
+        XCTAssertTrue(sendShowsProgress(send, false, timeout: 40), "Slow acknowledged delivery must finish")
         let retained = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in (field.value as? String) == second }, object: nil)
         XCTAssertEqual(XCTWaiter.wait(for: [retained], timeout: 15), .completed,
                        "Acknowledgement must remove only submitted prefix, preserving exact new typing")
@@ -968,13 +969,13 @@ final class ChatNetworkBoundaryUITests: XCTestCase {
         // migration does not certify changing reply selection during delivery.
         let send = app.buttons["Send"]
         let refresh = app.buttons[f.label("chat_screen_refresh", "Refresh")].firstMatch
-        let busy = app.staticTexts[f.label("loading_please_wait", "Please wait...")]
         XCTAssertTrue(send.isEnabled && send.isHittable && refresh.isEnabled)
         let beforeGET = count("GET /api/users/chats/\(chatID)")
         let beforeGETAt = Date()
         XCTAssertEqual(messagePOSTs(chatID), 0)
         send.tap()
-        XCTAssertTrue(busy.waitForExistence(timeout: 10), "Direct POST delivery must present progress")
+        XCTAssertTrue(sendShowsProgress(send, timeout: 10), "Direct POST delivery must present progress on Send")
+        XCTAssertFalse(app.staticTexts[f.label("loading_please_wait", "Please wait...")].exists, "No blocking loading window")
         XCTAssertFalse(send.isEnabled)
         XCTAssertFalse(refresh.isEnabled, "Manual refresh stays disabled during delivery")
         // Sending adds no conversation read. An open chat still re-checks every 10 s (parity review
@@ -982,7 +983,7 @@ final class ChatNetworkBoundaryUITests: XCTestCase {
         let scheduledReads = Int((Date().timeIntervalSince(beforeGETAt) / 10).rounded(.up))
         XCTAssertLessThanOrEqual(count("GET /api/users/chats/\(chatID)"), beforeGET + scheduledReads,
                                  "Sending must not add a conversation read beyond the 10 s re-check")
-        XCTAssertFalse(refresh.isHittable, "Progress modal blocks the disabled refresh target")
+        XCTAssertFalse(refresh.isEnabled, "Refresh stays disabled during delivery (no modal blocks the screen any more)")
         // The deliberate transport latency runs before the request counter.
         // Require actual dispatch after that delay, without inventing a GET
         // preflight or equating the progress UI with an already-sent request.
@@ -995,7 +996,7 @@ final class ChatNetworkBoundaryUITests: XCTestCase {
         // delivery. Its counter is not evidence of a new per-send preflight.
         // Dedicated direct-send tests retain the controlled no-extra-GET proof.
         let readsAtDispatch = count("GET /api/users/chats/\(chatID)")
-        XCTAssertTrue(busy.waitForNonExistence(timeout: 45))
+        XCTAssertTrue(sendShowsProgress(send, false, timeout: 45))
         waitForExactEmptyDraft(field, fixture: f, timeout: 15)
         XCTAssertFalse(app.buttons["Cancel"].exists, "Acknowledgement clears the submitted reply selection")
         let bubble = app.staticTexts.matching(NSPredicate(format: "label == %@", sentText)).firstMatch
@@ -1445,5 +1446,11 @@ final class ChatNetworkBoundaryUITests: XCTestCase {
         }.resume()
         done.wait()
         return try result.get()
+    }
+
+    /// Whether Send shows its own progress (accessibility value "Sending…"), within `timeout`.
+    private func sendShowsProgress(_ send: XCUIElement, _ expected: Bool = true, timeout: TimeInterval) -> Bool {
+        let sending = NSPredicate { _, _ in ((send.value as? String) ?? "").isEmpty != expected }
+        return XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: sending, object: nil)], timeout: timeout) == .completed
     }
 }

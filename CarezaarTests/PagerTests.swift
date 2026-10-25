@@ -276,6 +276,27 @@ final class PagerTests: XCTestCase {
     // MARK: Quiet refresh of the loaded pages (My Matches on return, client request 23 Oct 2026)
 
     /// Records calls from the refresh's concurrent page requests.
+    /// 25 Oct 2026: the refresh control cancels its task when the content changes; the
+    /// pull-to-refresh load must still land, or a superseded first load leaves nothing.
+    @MainActor
+    func testPullToRefreshLoadSurvivesTheRefreshControlCancellingItsTask() async throws {
+        let pager = Pager<Row>()
+        let slow: Pager<Row>.Fetch = { _ in
+            try await Task.sleep(for: .milliseconds(300))
+            return ([Row(id: 1), Row(id: 2)], nil)
+        }
+        let first = Task { await pager.reload(slow) }          // the screen's own first load
+        try await Task.sleep(for: .milliseconds(50))
+        let pull = Task { await pager.refresh(slow) }          // pull-to-refresh supersedes it…
+        try await Task.sleep(for: .milliseconds(50))
+        pull.cancel()                                           // …and its task is cancelled
+        await first.value; await pull.value
+        try await Task.sleep(for: .milliseconds(400))
+        XCTAssertEqual(pager.items.map(\.id), [1, 2], "The list still loads")
+        XCTAssertTrue(pager.loadedOnce)
+        XCTAssertFalse(pager.isLoading)
+    }
+
     private final class Calls: @unchecked Sendable {
         private let lock = NSLock()
         private var pages: [Int] = []

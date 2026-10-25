@@ -288,6 +288,14 @@ final class MyMatchesStateUITests: XCTestCase {
         // The QA hook puts a card of page 2 at the top a moment after the pages arrive.
         let placed = NSPredicate { _, _ in !(self.state()["top"] ?? "").isEmpty }
         XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: placed, object: nil)], timeout: 20), .completed)
+        // On a tall screen the last card of page 2 is in view, so page 3 follows: wait until the
+        // list has settled (nothing loading, the same number of cards twice in a row).
+        var previous = ""
+        let settled = NSPredicate { _, _ in
+            let s = self.state(); defer { previous = s["items"] ?? "" }
+            return s["loading"] == "false" && s["revalidating"] == "false" && s["items"] == previous
+        }
+        XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: settled, object: nil)], timeout: 30), .completed)
         Thread.sleep(forTimeInterval: 1)
         let before = state()
         // A refresh while offline: the list stays, no error replaces it.

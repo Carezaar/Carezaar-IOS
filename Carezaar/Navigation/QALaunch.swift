@@ -175,6 +175,18 @@ enum QANetworkFault {
         ownedMatchAcknowledgementLoss?.shouldDrop(request, statusCode: statusCode) ?? false
     }
 
+    /// `--qa-lose-answer <METHOD> <path prefix> <times>`: the first <times> matching requests reach
+    /// the server and are carried out, but their answer is lost (a dropped connection), so the
+    /// app can't know the outcome. For the Idempotency-Key retry tests (25 Oct 2026).
+    private static let answerLoss: QAAnswerLoss? = {
+        let args = ProcessInfo.processInfo.arguments
+        guard let i = args.firstIndex(of: "--qa-lose-answer"), i + 3 < args.count, let times = Int(args[i + 3]) else { return nil }
+        return QAAnswerLoss(method: args[i + 1], prefix: args[i + 2], times: times)
+    }()
+    static func loseAnswer(_ request: URLRequest, statusCode: Int) -> Bool {
+        answerLoss?.shouldDrop(request, statusCode: statusCode) ?? false
+    }
+
     private static let missingNotificationTarget: QANotificationMissingTarget? = {
         let args = ProcessInfo.processInfo.arguments
         guard let i = args.firstIndex(of: "--qa-notification-missing-target"), i + 2 < args.count,
@@ -411,8 +423,23 @@ struct QAOwnedProfileWithoutLocation {
     }
 }
 
+final class QAAnswerLoss: @unchecked Sendable {
+    private let lock = NSLock()
+    private let method: String, prefix: String
+    private var left: Int
+    init(method: String, prefix: String, times: Int) { self.method = method; self.prefix = prefix; left = times }
+    func shouldDrop(_ request: URLRequest, statusCode: Int) -> Bool {
+        lock.lock(); defer { lock.unlock() }
+        guard left > 0, (200..<300).contains(statusCode), request.httpMethod == method,
+              request.url?.path.hasPrefix(prefix) == true else { return false }
+        left -= 1
+        return true
+    }
+}
+
 /// Opt-in Debug request counts expose no headers, bodies, credentials or response
-/// data. UI regression tests use the actual transport rather than view appearances.
+/// data (for an Idempotency-Key only how many different keys a path has seen).
+/// UI regression tests use the actual transport rather than view appearances.
 @MainActor
 final class QARequestLedger: ObservableObject {
     static let shared = QARequestLedger()
@@ -432,10 +459,19 @@ final class QARequestLedger: ObservableObject {
               ProcessInfo.processInfo.arguments.contains("--qa-request-counts") else { return }
         ownedRevocation = witness
     }
+    private var idempotencyKeys: [String: Set<String>] = [:]
     func record(_ request: URLRequest) {
         guard ProcessInfo.processInfo.arguments.contains("--qa-request-counts") else { return }
         let key = "\(request.httpMethod ?? "GET") \(request.url?.path ?? "")"
         counts[key, default: 0] += 1
+        if let idempotency = request.value(forHTTPHeaderField: "Idempotency-Key") {
+            idempotencyKeys[key, default: []].insert(idempotency)
+            counts["KEYS \(key)"] = idempotencyKeys[key]?.count
+        }
+    }
+    func recordLostAnswer() {
+        guard ProcessInfo.processInfo.arguments.contains("--qa-request-counts") else { return }
+        counts["QA lost-answer", default: 0] += 1
     }
     func recordLocationFixture(_ attestation: String) {
         guard ProcessInfo.processInfo.arguments.contains("--qa-request-counts") else { return }

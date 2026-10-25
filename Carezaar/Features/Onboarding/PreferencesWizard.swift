@@ -65,11 +65,16 @@ struct PreferencesWizard: View {
 
     private var isClient: Bool { role == .client }
     private let totalSteps = 4
+    /// The editor shows a skeleton until the saved choices arrive, not an empty form.
+    @State private var prefilled = false
+    @ObservedObject private var guards = ActionGuard.shared
 
     var body: some View {
         Group {
             if !started && mode == .signup {
                 intro
+            } else if mode == .edit && !prefilled {
+                ScrollView { SkeletonDetail() }
             } else {
                 wizard
                     .fullScreenCover(isPresented: $picking, onDismiss: { locationPickerGuidance = nil }) {
@@ -139,7 +144,8 @@ struct PreferencesWizard: View {
         .scrollDismissesKeyboard(.interactively)
         .bottomAction {
             VStack(spacing: 8) {
-                PrimaryButton(title: step == totalSteps - 1 ? loc.t("general_save", "Save") : loc.t("signup_form_client_continue", "Continue")) { advance() }
+                PrimaryButton(title: step == totalSteps - 1 ? loc.t("general_save", "Save") : loc.t("signup_form_client_continue", "Continue"),
+                              isLoading: guards.isBusy("preferences:save"), isEnabled: !guards.isBusy("preferences:save")) { advance() }
                 HStack(spacing: 6) {
                     AppIcon(name: "ic_info_circle", size: 18, tint: Theme.Palette.primary)
                     Text(loc.t("signup_form_client_create_account_description", "You can change all of this later."))
@@ -316,10 +322,11 @@ struct PreferencesWizard: View {
     // MARK: data
 
     private func prefill() async {
-        guard mode == .edit, careTypes.isEmpty else { return }
+        guard mode == .edit, careTypes.isEmpty else { prefilled = true; return }
+        defer { prefilled = true }
         do {
             if isClient {
-                let p = try await feedback.run(loc.t("loading_profile_get", "Getting profile")) { try await ClientService().profile() }
+                let p = try await ClientService().profile()
                 careTypes = p.clienttypeId.map { [$0] } ?? []; conditions = p.careconditionIds; specials = p.carespecialIds
                 experiences = p.experienceIds; roles = p.roleIds; certifications = p.certificationIds; languages = p.languageskillIds
                 commutes = p.commuteIds; shifts = p.shiftIds; days = p.caredayIds; worktypes = p.worktypeIds; genders = p.genderIds
@@ -329,7 +336,7 @@ struct PreferencesWizard: View {
                     coordinate = saved
                 }
             } else {
-                let p = try await feedback.run(loc.t("loading_profile_get", "Getting profile")) { try await CaregiverService().profile() }
+                let p = try await CaregiverService().profile()
                 careTypes = p.clienttypeIds; conditions = p.careconditionIds; specials = p.carespecialIds
                 experiences = p.experienceId.map { [$0] } ?? []; roles = p.roleId.map { [$0] } ?? []
                 certifications = p.certificationIds; languages = p.languageskillIds
@@ -350,7 +357,8 @@ struct PreferencesWizard: View {
             return
         }
         Task {
-            do {
+            // One guarded save, start to finish: Save shows progress and can't run twice.
+            do { try await ActionGuard.shared.run("preferences:save") {
                 if isClient {
                     let prefs = ClientPreferences(
                         clienttypeId: careTypes.first ?? 0, lat: coordinate.latitude, lng: coordinate.longitude,
@@ -359,12 +367,10 @@ struct PreferencesWizard: View {
                         experienceIds: experiences, genderIds: genders, languageskillIds: languages,
                         roleIds: roles, shiftIds: shifts, worktypeIds: worktypes)
                     if mode == .signup, !signUp.entityCreated {
-                        _ = try await feedback.run(loc.t("loading_client_signup", "Signing up care needer")) {
-                            try await ClientService().create(userId: signUp.userId ?? "", preferences: prefs)
-                        }
+                        _ = try await ClientService().create(userId: signUp.userId ?? "", preferences: prefs)
                         signUp.entityCreated = true
                     } else if mode == .edit {
-                        _ = try await feedback.run(loc.t("loading_profile_set", "Updating profile")) { try await ClientService().updateProfile(prefs) }
+                        _ = try await ClientService().updateProfile(prefs)
                     }
                 } else {
                     let skills = CaregiverSkills(
@@ -374,24 +380,20 @@ struct PreferencesWizard: View {
                         caredayIds: days, carespecialIds: specials, certificationIds: certifications,
                         clienttypeIds: careTypes, languageskillIds: languages, shiftIds: shifts)
                     if mode == .signup, !signUp.entityCreated {
-                        _ = try await feedback.run(loc.t("loading_caregiver_signup", "Signing up caregiver")) {
-                            try await CaregiverService().create(userId: signUp.userId ?? "", skills: skills)
-                        }
+                        _ = try await CaregiverService().create(userId: signUp.userId ?? "", skills: skills)
                         signUp.entityCreated = true
                     } else if mode == .edit {
-                        _ = try await feedback.run(loc.t("loading_profile_set", "Updating profile")) { try await CaregiverService().updateProfile(skills) }
+                        _ = try await CaregiverService().updateProfile(skills)
                     }
                 }
                 if mode == .signup {
                     // Only now can the account sign in.
-                    try await feedback.run(loc.t("loading_auth_login", "Signing in")) {
-                        try await session.signIn(email: signUp.email, password: signUp.password)
-                    }
+                    try await session.signIn(email: signUp.email, password: signUp.password)
                     signUp.reset()
                 } else {
                     router.pop()
                 }
-            } catch { feedback.toast(Feedback.message(error)) }
+            } } catch { feedback.toast(Feedback.message(error)) }
         }
     }
 }

@@ -45,6 +45,13 @@ final class Pager<Item: Identifiable>: ObservableObject where Item.ID: Hashable 
         await next(fetch, replacing: true, generation: generation)
     }
 
+    /// Pull-to-refresh. The load runs in its own task: the refresh control cancels its task when
+    /// the scroll content changes, and a cancelled newest load would otherwise leave the list
+    /// with neither the earlier load's answer nor its own (25 Oct 2026).
+    func refresh(_ fetch: @escaping Fetch) async {
+        await Task { await self.reload(fetch) }.value
+    }
+
     /// Periodic background refresh (Messages list, K1): replaces the list with the
     /// first page only when it loads, never shows loading or error state, and yields
     /// to any explicit load or reload in flight.
@@ -144,6 +151,8 @@ struct PagedContent<Item: Identifiable, Row: View>: View {
     /// The rows are scroll targets, so the enclosing ScrollView can report and restore which
     /// row is at the top (`scrollPosition(id:)`; My Matches keeps its place).
     var scrollTargets = false
+    /// The shape of the skeleton rows shown until the first page arrives.
+    var skeleton: SkeletonList.Style = .card
     @ViewBuilder let row: (Item) -> Row
     @EnvironmentObject private var loc: Localization
 
@@ -151,6 +160,18 @@ struct PagedContent<Item: Identifiable, Row: View>: View {
         if let error = pager.error, pager.items.isEmpty {
             ErrorState(message: Feedback.message(error)) { retry() }
                 .padding(.top, 40)
+        } else if pager.items.isEmpty && (pager.isLoading || !pager.loadedOnce) {
+            // The first page: placeholders in the shape of the rows (client request, 25 Oct 2026).
+            SkeletonList(style: skeleton)
+                // A first load that was cancelled leaves nothing loading and nothing loaded:
+                // load once more rather than show placeholders for ever. It fires only from that
+                // idle state (never while a load runs), so it can't repeat itself.
+                .task(id: pager.isLoading) {
+                    guard !pager.isLoading, !pager.loadedOnce, pager.error == nil else { return }
+                    try? await Task.sleep(for: .milliseconds(400))
+                    guard !Task.isCancelled, !pager.isLoading, !pager.loadedOnce, pager.error == nil else { return }
+                    retry()
+                }
         } else if pager.loadedOnce && !pager.isLoading && pager.items.isEmpty {
             VStack(spacing: 12) {
                 if let emptyIllustration { EmptyArt(name: emptyIllustration) }
@@ -187,6 +208,116 @@ struct PagedContent<Item: Identifiable, Row: View>: View {
                 .padding(20)
             }
         }
+    }
+}
+
+// MARK: - Skeletons
+
+/// The shimmer of a placeholder. It exists only while the placeholder is on screen, so it stops
+/// the moment the content, an empty state or an error replaces it; it requests nothing itself.
+/// Still under Reduce Motion.
+struct Shimmer: ViewModifier {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var phase: CGFloat = -1
+    func body(content: Content) -> some View {
+        content
+            .overlay {
+                if !reduceMotion {
+                    GeometryReader { geo in
+                        LinearGradient(colors: [.clear, .white.opacity(0.55), .clear], startPoint: .leading, endPoint: .trailing)
+                            .frame(width: geo.size.width * 0.6)
+                            .offset(x: phase * geo.size.width)
+                    }
+                    .mask(content)
+                }
+            }
+            .onAppear {
+                guard !reduceMotion else { return }
+                withAnimation(.easeInOut(duration: 1.3).repeatForever(autoreverses: false)) { phase = 1.4 }
+            }
+    }
+}
+
+private struct Bone: View {
+    var width: CGFloat? = nil
+    var height: CGFloat = 14
+    var radius: CGFloat = 7
+    var body: some View {
+        RoundedRectangle(cornerRadius: radius, style: .continuous)
+            .fill(Color(red: 0.91, green: 0.93, blue: 0.96))
+            .frame(width: width, height: height)
+            .frame(maxWidth: width == nil ? .infinity : nil, alignment: .leading)
+    }
+}
+
+/// Rows loading: card (photo and three lines), row (avatar and two lines) or issue (three lines).
+struct SkeletonList: View {
+    enum Style { case card, row, issue }
+    var style: Style = .card
+    var count = 4
+    var body: some View {
+        VStack(spacing: 12) {
+            ForEach(0..<count, id: \.self) { _ in
+                HStack(spacing: 14) {
+                    if style == .card { Bone(width: 88, height: 88, radius: 12) }
+                    if style == .row { Bone(width: 48, height: 48, radius: 24) }
+                    VStack(alignment: .leading, spacing: 10) {
+                        Bone(width: 150)
+                        Bone(width: 220)
+                        if style != .row { Bone(width: 110) }
+                    }
+                    Spacer(minLength: 0)
+                }
+                .padding(14)
+                .background(.white, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .shadow(color: .black.opacity(0.05), radius: 3, y: 1)
+            }
+        }
+        .padding(.horizontal, 20).padding(.top, 12)
+        .modifier(Shimmer())
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Loading")
+        .accessibilityIdentifier("skeleton")
+    }
+}
+
+/// A profile or details page loading: photo, name and a few sections.
+struct SkeletonDetail: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Bone(height: 220, radius: 20)
+            Bone(width: 180, height: 22)
+            Bone(width: 120)
+            ForEach(0..<3, id: \.self) { _ in
+                Bone(width: 140).padding(.top, 10)
+                HStack(spacing: 8) { Bone(width: 96, height: 32, radius: 16); Bone(width: 96, height: 32, radius: 16); Bone(width: 96, height: 32, radius: 16) }
+            }
+        }
+        .padding(20)
+        .modifier(Shimmer())
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Loading")
+        .accessibilityIdentifier("skeleton")
+    }
+}
+
+/// A conversation loading: message bubbles on both sides.
+struct SkeletonChat: View {
+    var body: some View {
+        VStack(spacing: 12) {
+            ForEach(Array([(false, 190.0), (false, 140.0), (true, 220.0), (false, 160.0), (true, 130.0), (true, 200.0)].enumerated()), id: \.offset) { _, bubble in
+                HStack {
+                    if bubble.0 { Spacer(minLength: 0) }
+                    Bone(width: bubble.1, height: 44, radius: 16)
+                    if !bubble.0 { Spacer(minLength: 0) }
+                }
+            }
+        }
+        .padding(16)
+        .modifier(Shimmer())
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Loading")
+        .accessibilityIdentifier("skeleton")
     }
 }
 
@@ -387,6 +518,8 @@ struct WideButton: View {
     var icon: String?
     var style: Style = .primary
     var enabled = true
+    /// The action is running: progress in place of the icon, and the button is disabled.
+    var loading = false
     /// Forward arrows ("Keep Exploring →") follow the label, as on Android.
     var iconTrailing = false
     let action: () -> Void
@@ -394,7 +527,8 @@ struct WideButton: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 8) {
-                if let icon, !iconTrailing { AppIcon(name: icon, size: 20, tint: foreground) }
+                if loading { ProgressView().tint(foreground) }
+                else if let icon, !iconTrailing { AppIcon(name: icon, size: 20, tint: foreground) }
                 // Long translations ("Demander une mise en relation") wrap to a second line.
                 Text(title).font(style == .primary ? Theme.Typography.filledLabel(16) : Theme.Typography.control(16))
                     .lineLimit(2).minimumScaleFactor(0.8)
@@ -409,7 +543,8 @@ struct WideButton: View {
             .overlay(RoundedRectangle(cornerRadius: 12).stroke(border, lineWidth: 1.5))
         }
         .buttonStyle(ReadableInactiveStyle())
-        .disabled(!enabled)
+        .disabled(!enabled || loading)
+        .accessibilityValue(loading ? "In progress" : "")
     }
 
     /// PlainButtonStyle fades disabled labels even when their colors are opaque.

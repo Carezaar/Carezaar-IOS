@@ -113,11 +113,17 @@ struct SignInView: View {
 
     @State private var email = ""
     @State private var password = ""
+    @ObservedObject private var guards = ActionGuard.shared
+    private var signingIn: Bool { guards.isBusy("auth:login") }
 
-    private var canSubmit: Bool { !email.trimmingCharacters(in: .whitespaces).isEmpty && !password.isEmpty }
+    private var canSubmit: Bool { !email.trimmingCharacters(in: .whitespaces).isEmpty && !password.isEmpty && !signingIn }
 
     var body: some View {
         FigmaScreen(key: "v2-51-5170", binder: binder, overlays: [
+            // Progress on the frame's own Sign In button (node 51:5272) while signing in.
+            SceneOverlay(x: 344, y: 455, width: 24, height: 24) {
+                if signingIn { ProgressView().tint(.white).accessibilityLabel(loc.t("loading_auth_login", "Signing in")) }
+            },
             SceneOverlay(x: 20, y: 409, width: 372, height: 30) {
                 HStack {
                     Spacer()
@@ -170,7 +176,7 @@ struct SignInView: View {
         guard canSubmit else { return }
         Task {
             do {
-                try await feedback.run(loc.t("loading_auth_login", "Signing in")) {
+                try await ActionGuard.shared.run("auth:login") {
                     try await session.signIn(email: email, password: password)
                 }
             } catch let incomplete as RegistrationIncompleteError {
@@ -206,6 +212,7 @@ struct SignUpCredentialsView: View {
     @EnvironmentObject private var loc: Localization
     @EnvironmentObject private var feedback: Feedback
 
+    @ObservedObject private var guards = ActionGuard.shared
     @State private var email = ""
     @State private var password = ""
     @State private var confirmation = ""
@@ -385,6 +392,8 @@ struct SignUpCredentialsView: View {
                 if node.isPrimaryButton { proceed(); return true }
                 return false
             },
+            // While the account is being created the dialog stays open with its buttons dimmed.
+            isEnabled: { node in node.isPrimaryButton ? !registering : true },
             isHidden: { node in
                 ((node.name == "Dialog" || node.name == "Rectangle 2931") && !confirming)
                     || node.id == Self.ruleChipRow
@@ -398,11 +407,14 @@ struct SignUpCredentialsView: View {
                     // No translation exists for this hint; the rule chips carry the same rules.
                     || (loc.languageId != 1 && node.text?.hasPrefix("Use 8 or more characters") == true)
             },
+            opacity: { node in node.isPrimaryButton && registering ? 0.45 : nil },
             yOffset: { node in
                 node.id == Self.continueButton ? Double(buttonY - Self.continueButtonY) : nil
             }
         )
     }
+
+    private var registering: Bool { guards.isBusy("auth:register") || guards.isBusy("auth:otp-send") }
 
     private func proceed() {
         let problems = SignUpCredentialsValidation.problems(
@@ -425,13 +437,15 @@ struct SignUpCredentialsView: View {
     }
 
     private func confirm() {
-        confirming = false
         let address = email.trimmingCharacters(in: .whitespaces)
         Task {
+            defer { confirming = false }
             do {
-                try await feedback.run(loc.t("loading_auth_register", "Registering")) {
+                try await ActionGuard.shared.run("auth:register") {
                     _ = try await authService.register(role: role, email: address, password: password)
                 }
+            } catch is DuplicateActionError {
+                return
             } catch {
                 if case .validation(_, let fields) = error as? APIError,
                    fields["email"] != nil || fields["password"] != nil {
@@ -448,7 +462,7 @@ struct SignUpCredentialsView: View {
             signUp.isPasswordRecovery = false
             signUp.otpSendFailed = false
             do {
-                try await feedback.run(loc.t("loading_user_otp_send", "Sending OTP code")) {
+                try await ActionGuard.shared.run("auth:otp-send") {
                     try await userService.sendOTP(email: address)
                 }
             } catch {
@@ -677,6 +691,7 @@ struct OTPView: View {
     @FocusState private var focused: Bool
 
     private let userService = UserService()
+    @ObservedObject private var guards = ActionGuard.shared
     private let ticker = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
@@ -684,7 +699,8 @@ struct OTPView: View {
             Text(loc.t("signup_otp_message", "Kindly enter the 5-digit OTP that we sent to your email."))
                 .font(Theme.Typography.title(17)).multilineTextAlignment(.center).padding(.top, Theme.Spacing.xl)
             OTPBoxes(code: $code, focused: $focused)
-            PrimaryButton(title: loc.t("signup_otp_continue", "Continue"), isEnabled: code.count == FieldValidator.otpLength) { submit() }
+            PrimaryButton(title: loc.t("signup_otp_continue", "Continue"), isLoading: guards.isBusy("auth:otp-verify"),
+                          isEnabled: code.count == FieldValidator.otpLength && !guards.isBusy("auth:otp-verify")) { submit() }
             Text(loc.t("signup_otp_didnot_receive_otp", "Didn't receive the OTP?")).font(Theme.Typography.body(15))
             if secondsLeft > 0 {
                 Text(loc.t("signup_otp_wait_to_resend", "Wait for mm:ss to re-send")
@@ -710,7 +726,7 @@ struct OTPView: View {
     private func submit() {
         Task {
             do {
-                try await feedback.run(loc.t("loading_user_otp_verify", "Verifying OTP code")) {
+                try await ActionGuard.shared.run("auth:otp-verify") {
                     try await userService.verifyOTP(email: signUp.email, otp: code)
                 }
                 router.push(.signUpProfile)
@@ -721,7 +737,7 @@ struct OTPView: View {
     private func resend() {
         Task {
             do {
-                try await feedback.run(loc.t("loading_user_otp_send", "Sending OTP code")) {
+                try await ActionGuard.shared.run("auth:otp-send") {
                     try await userService.sendOTP(email: signUp.email)
                 }
                 signUp.otpSendFailed = false
@@ -779,6 +795,7 @@ struct ForgotPasswordView: View {
     @State private var email = ""
     @State private var confirming = false
     private let userService = UserService()
+    @ObservedObject private var guards = ActionGuard.shared
 
     var body: some View {
         ScrollView {
@@ -788,7 +805,7 @@ struct ForgotPasswordView: View {
                 LabeledField(label: loc.t("signup_forgot_password_email", "Email Address"),
                              placeholder: loc.t("signup_forgot_password_email_placeholder", "Enter your email address..."),
                              text: $email, keyboard: .emailAddress, contentType: .emailAddress)
-                PrimaryButton(title: loc.t("signup_forgot_password_reset_password", "Reset Password"),
+                PrimaryButton(title: loc.t("signup_forgot_password_reset_password", "Reset Password"), isLoading: guards.isBusy("auth:otp-send"),
                               isEnabled: FieldValidator.email(email) == nil) { confirming = true }
             }
             .padding(.horizontal, Theme.Spacing.m)
@@ -806,7 +823,7 @@ struct ForgotPasswordView: View {
     private func send() {
         Task {
             do {
-                try await feedback.run(loc.t("loading_user_otp_send", "Sending OTP code")) {
+                try await ActionGuard.shared.run("auth:otp-send") {
                     try await userService.sendOTP(email: email.trimmingCharacters(in: .whitespaces))
                 }
                 signUp.email = email.trimmingCharacters(in: .whitespaces)
@@ -835,6 +852,7 @@ struct SetupPasswordView: View {
     @State private var secondsLeft = 120
     @FocusState private var codeFocused: Bool
     private let userService = UserService()
+    @ObservedObject private var guards = ActionGuard.shared
     private let ticker = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     private var valid: Bool {
@@ -862,7 +880,8 @@ struct SetupPasswordView: View {
                              placeholder: loc.t("signup_setup_password_confirm_password_placeholder", "Confirm your password..."),
                              text: $confirmation, contentType: .newPassword, isSecure: true,
                              error: !confirmation.isEmpty && confirmation != password ? loc.t("signup_credentials_password_match", "Passwords do not match.") : nil)
-                PrimaryButton(title: loc.t("signup_setup_password_continue", "Continue"), isEnabled: valid) { submit() }
+                PrimaryButton(title: loc.t("signup_setup_password_continue", "Continue"), isLoading: guards.isBusy("auth:password-reset"),
+                              isEnabled: valid && !guards.isBusy("auth:password-reset")) { submit() }
                     .padding(.top, Theme.Spacing.xs)
                 VStack(spacing: 6) {
                     Text(loc.t("signup_setup_password_didnot_receive_otp", "Didn't receive the OTP?")).font(Theme.Typography.body(15))
@@ -896,7 +915,7 @@ struct SetupPasswordView: View {
     private func submit() {
         Task {
             do {
-                try await feedback.run(loc.t("loading_user_password_reset", "Resetting password")) {
+                try await ActionGuard.shared.run("auth:password-reset") {
                     try await userService.resetPassword(email: signUp.email, otp: code, newPassword: password)
                 }
                 signUp.reset()
@@ -915,7 +934,7 @@ struct SetupPasswordView: View {
     private func resend() {
         Task {
             do {
-                try await feedback.run(loc.t("loading_user_otp_send", "Sending OTP code")) {
+                try await ActionGuard.shared.run("auth:otp-send") {
                     try await userService.sendOTP(email: signUp.email)
                 }
                 secondsLeft = 120
