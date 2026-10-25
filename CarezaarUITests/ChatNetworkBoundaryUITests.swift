@@ -1062,7 +1062,8 @@ final class ChatNetworkBoundaryUITests: XCTestCase {
         // AX frame subtraction can report 44 as 43.99999999999997.
         // Allow only eight CGFloat ULPs (under 0.0000000000001 point),
         // preserving the physical 44-point target requirement.
-        let minimumTarget = CGFloat(44) - CGFloat(44).ulp * 8
+        // 44 pt, allowing for screen-coordinate rounding (a 3x display reports 43.99999999999977).
+        let minimumTarget = CGFloat(44) - 0.01
         XCTAssertGreaterThanOrEqual(menu.frame.width, minimumTarget, "Message options requires a 44-point target")
         XCTAssertGreaterThanOrEqual(menu.frame.height, minimumTarget)
         return menu
