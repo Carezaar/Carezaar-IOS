@@ -206,6 +206,7 @@ struct ChatView: View {
             let full = try await UserService().chat(id: chatId)
             guard visible, !sending, !Task.isCancelled, operations.canCommit(owner) else { return }
             apply(full)
+            retireCarriedOut(in: full)
             restorePending(in: full)
         } catch is CancellationError { return }
         catch {
@@ -222,6 +223,18 @@ struct ChatView: View {
         guard let full = try? await UserService().chat(id: chatId),
               visible, !Task.isCancelled, !sending, operations.canCommit(owner) else { return }
         if full != chat { apply(full) }
+    }
+
+    /// A message whose answer was lost but which the conversation shows went through: its pending
+    /// key is retired, so a later message with the same words gets a key of its own. Not while a
+    /// draft is in the box as "may not have been sent" (Send settles that one with its own key).
+    private func retireCarriedOut(in full: ChatFull) {
+        guard !sending, !delivery.uncertain, restoredDraft == nil else { return }
+        let settled = Date().addingTimeInterval(-IdempotencyStore.settledAfter)
+        IdempotencyStore.shared.retireCarriedOut(.chatMessage, target: String(chatId)) { record in
+            record.created < settled && full.messages.contains { $0.id > (record.after ?? 0) && $0.message == record.draft && $0.isMine(role: role)
+                && $0.parent?.value.id == record.parent }
+        }
     }
 
     /// After a restart or another visit: a message whose send got no answer comes back into

@@ -318,8 +318,9 @@ final class NetworkPolicyTests: XCTestCase {
         XCTAssertEqual(starts.count, drops + 1)
         let intervals = zip(starts, starts.dropFirst()).map { $1 - $0 }
         for (index, interval) in intervals.enumerated() {
-            let scheduled = 0.25 * Double(1 << index)
-            XCTAssertGreaterThanOrEqual(interval, scheduled - 0.01, "Retries must respect the shared backoff")
+            // Android's safeCall: (attempt + 1) × 500 ms (Technical Alignment, 26 Oct 2026).
+            let scheduled = 0.5 * Double(index + 1)
+            XCTAssertGreaterThanOrEqual(interval, scheduled - 0.01, "Retries must wait Android's 500, 1,000 and 1,500 ms")
             XCTAssertLessThan(interval, 10, "An immediate fixture response must not stall retry recovery")
         }
         let attachment = XCTAttachment(data: try! JSONSerialization.data(withJSONObject: [
@@ -362,7 +363,7 @@ final class NetworkPolicyTests: XCTestCase {
         XCTAssertEqual(mapped.1, "managed:general_network_title")
         let intervals = zip(starts, starts.dropFirst()).map { $1 - $0 }
         for (index, interval) in intervals.enumerated() {
-            XCTAssertGreaterThanOrEqual(interval, 0.25 * Double(1 << index) - 0.01)
+            XCTAssertGreaterThanOrEqual(interval, 0.5 * Double(index + 1) - 0.01)
             XCTAssertLessThan(interval, 10)
         }
         let proof: [String: Any] = ["attemptCount": starts.count,

@@ -196,3 +196,173 @@ private actor AsyncGate {
     func wait() async { if opened { return }; await withCheckedContinuation { waiters.append($0) } }
     func open() { opened = true; waiters.forEach { $0.resume() }; waiters = [] }
 }
+
+/// Records the waits APIClient asks for between read retries, without waiting.
+private final class RecordedWaits: @unchecked Sendable {
+    private let lock = NSLock()
+    private var waits: [Duration] = []
+    var values: [Duration] { lock.withLock { waits } }
+    func pause(_ duration: Duration) async throws { lock.withLock { waits.append(duration) } }
+}
+
+/// "Carezaar — Technical Alignment Tasks" (26 Oct 2026), iOS 4-6, against the Android 1.0.0
+/// APK (`je.safeCall`: up to 3 retries, (n + 1) × 500 ms, any IOException but a SocketException;
+/// `ms3.v()`: an unusable renewal clears the saved sign-in). Real APIClient on StubHTTP.
+@MainActor
+final class TechnicalAlignmentNetworkTests: XCTestCase {
+    private let androidDelays: [Duration] = [.milliseconds(500), .milliseconds(1_000), .milliseconds(1_500)]
+
+    private func client(_ tokens: FixtureTokens = FixtureTokens(), waits: RecordedWaits) -> APIClient {
+        if !tokens.hasSession { tokens.save(Session(accessToken: "access", refreshToken: "refresh")) }
+        return APIClient(tokens: tokens, session: StubHTTP.session(), pause: { try await waits.pause($0) })
+    }
+
+    func testTransientReadFailuresAreRetriedThreeTimesWithAndroidDelays() async {
+        for code: URLError.Code in [.cannotFindHost, .dnsLookupFailed, .notConnectedToInternet, .timedOut, .networkConnectionLost, .secureConnectionFailed] {
+            let waits = RecordedWaits()
+            var attempts = 0
+            StubHTTP.handler = { _ in attempts += 1; throw URLError(code) }
+            do { _ = try await client(waits: waits).sendIgnoringResult(Endpoint(method: .get, path: "users/notifications/count")); XCTFail("\(code)") }
+            catch {}
+            XCTAssertEqual(attempts, 4, "One request and three retries (\(code.rawValue))")
+            XCTAssertEqual(waits.values, androidDelays, "\(code.rawValue)")
+        }
+    }
+
+    func testARefusedConnectionAndHTTPErrorsAreNotRetried() async {
+        let waits = RecordedWaits()
+        var attempts = 0
+        StubHTTP.handler = { _ in attempts += 1; throw URLError(.cannotConnectToHost) }
+        do { _ = try await client(waits: waits).sendIgnoringResult(Endpoint(method: .get, path: "users/notifications/count")); XCTFail() } catch {}
+        XCTAssertEqual(attempts, 1, "Android's ConnectException is a SocketException: not retried")
+        attempts = 0
+        StubHTTP.handler = { _ in attempts += 1; return (500, Data(#"{"message":"Server Error"}"#.utf8)) }
+        do { _ = try await client(waits: waits).sendIgnoringResult(Endpoint(method: .get, path: "users/notifications/count")); XCTFail() } catch {}
+        XCTAssertEqual(attempts, 1)
+        XCTAssertEqual(waits.values, [])
+    }
+
+    func testAReadThatRecoversReturnsItsAnswer() async throws {
+        let waits = RecordedWaits()
+        var attempts = 0
+        StubHTTP.handler = { _ in
+            attempts += 1
+            if attempts < 3 { throw URLError(.notConnectedToInternet) }
+            return (200, Data(#"{"result":{"count":3},"meta":null,"message":"ok","errors":null}"#.utf8))
+        }
+        _ = try await client(waits: waits).sendIgnoringResult(Endpoint(method: .get, path: "users/notifications/count"))
+        XCTAssertEqual(attempts, 3)
+        XCTAssertEqual(waits.values, Array(androidDelays.prefix(2)))
+    }
+
+    func testWritesAreNeverRetriedAutomatically() async {
+        for code: URLError.Code in [.cannotFindHost, .notConnectedToInternet, .cannotConnectToHost, .timedOut, .networkConnectionLost] {
+            for method: HTTPMethod in [.post, .patch, .put, .delete] {
+                let waits = RecordedWaits()
+                var attempts = 0
+                StubHTTP.handler = { _ in attempts += 1; throw URLError(code) }
+                do { _ = try await client(waits: waits).sendIgnoringResult(Endpoint(method: method, path: "users/bookmarks")); XCTFail() } catch {}
+                XCTAssertEqual(attempts, 1, "\(method.rawValue) after \(code.rawValue)")
+                XCTAssertEqual(waits.values, [])
+            }
+        }
+    }
+
+    func testTheRenewalRequestIsNotRetried() async {
+        let waits = RecordedWaits()
+        var refreshes = 0
+        StubHTTP.handler = { request in
+            if request.url!.lastPathComponent == "refresh" { refreshes += 1; throw URLError(.cannotFindHost) }
+            return (403, Data(#"{"message":"Valid JWT token is required!"}"#.utf8))
+        }
+        do { _ = try await client(waits: waits).sendIgnoringResult(Endpoint(method: .post, path: "users/bookmarks")); XCTFail() } catch {}
+        XCTAssertEqual(refreshes, 1, "Android's refresh call isn't wrapped in safeCall")
+    }
+
+    func testCancellingDuringAWaitStopsRetrying() async {
+        var attempts = 0
+        StubHTTP.handler = { _ in attempts += 1; throw URLError(.notConnectedToInternet) }
+        let tokens = FixtureTokens(); tokens.save(Session(accessToken: "access", refreshToken: "refresh"))
+        let api = APIClient(tokens: tokens, session: StubHTTP.session(), pause: { _ in throw CancellationError() })
+        do { _ = try await api.sendIgnoringResult(Endpoint(method: .get, path: "users/notifications/count")); XCTFail() }
+        catch { XCTAssertTrue(error is CancellationError, "\(error)") }
+        XCTAssertEqual(attempts, 1)
+    }
+
+    // MARK: pending submissions past 24 hours
+
+    private func seededStore(account: String, created: Date, form: [String: FormValue?], key: String) -> IdempotencyStore {
+        let defaults = UserDefaults(suiteName: "TechnicalAlignment-\(UUID().uuidString)")!
+        let scope = "\(account)|issue|issues|\(IdempotencyStore.payloadHash(form))"
+        let record = PendingSubmission(key: key, created: created, account: account, operation: .issue, target: "issues", after: 4)
+        defaults.set(try! JSONEncoder().encode([scope: record]), forKey: IdempotencyStore.storageKey)
+        let store = IdempotencyStore(defaults: defaults)
+        store.account = "account-a"
+        return store
+    }
+
+    func testAnUnresolvedKeyFrom25HoursAgoIsReused() async throws {
+        let form: [String: FormValue?] = ["title": .string("Login"), "description": .string("Can't sign in")]
+        let old = "6d7c2b1e-0d1f-4a5b-9c8d-7e6f5a4b3c2d"
+        let store = seededStore(account: "account-a", created: Date().addingTimeInterval(-25 * 3600), form: form, key: old)
+        XCTAssertEqual(store.pending(.issue, target: "issues").first?.key, old, "Still pending after 25 hours")
+        var sent: [String] = []
+        let result = try await store.submit(.issue, target: "issues", form: form, after: 4) { (key: String) -> String in sent.append(key); return "filed" }
+        XCTAssertEqual(result, "filed")
+        XCTAssertEqual(sent, [old], "The original key, not a new one")
+        XCTAssertTrue(store.pending(.issue, target: "issues").isEmpty, "Retired once confirmed")
+    }
+
+    func testAfter25HoursAForgottenKeyIsReconciledBeforeAnythingNewIsSent() async throws {
+        let form: [String: FormValue?] = ["title": .string("Login"), "description": .string("Can't sign in")]
+        let old = "6d7c2b1e-0d1f-4a5b-9c8d-7e6f5a4b3c2d"
+        var sends = 0
+        var store = seededStore(account: "account-a", created: Date().addingTimeInterval(-25 * 3600), form: form, key: old)
+        let found = try await store.submit(.issue, target: "issues", form: form, after: 4) { (_: String) -> String in
+            sends += 1; throw IdempotencyServerError(code: "idempotency_expired")
+        } reconcile: { record in record.after == 4 ? "issue 5, filed earlier" : nil }
+        XCTAssertEqual(found, "issue 5, filed earlier")
+        XCTAssertEqual(sends, 1, "No second mutation")
+        store = seededStore(account: "account-a", created: Date().addingTimeInterval(-25 * 3600), form: form, key: old)
+        do {
+            _ = try await store.submit(.issue, target: "issues", form: form, after: 4) { (_: String) -> String in
+                throw IdempotencyServerError(code: "idempotency_expired")
+            } reconcile: { _ in nil }
+            XCTFail("Not found: not carried out")
+        } catch { XCTAssertTrue(error is SubmissionNotCarriedOutError) }
+    }
+
+    func testARecordTheServerShowsAsCarriedOutIsRetiredAndOthersAreKept() async throws {
+        let form: [String: FormValue?] = ["title": .string("Login"), "description": .string("Can't sign in")]
+        let store = seededStore(account: "account-a", created: Date().addingTimeInterval(-40 * 3600), form: form, key: "6d7c2b1e-0d1f-4a5b-9c8d-7e6f5a4b3c2d")
+        XCTAssertEqual(store.retireCarriedOut(.issue, target: "issues") { _ in false }, 0)
+        XCTAssertEqual(store.pending(.issue, target: "issues").count, 1, "Not shown as carried out: kept")
+        XCTAssertEqual(store.retireCarriedOut(.issue, target: "issues") { $0.after == 4 }, 1)
+        XCTAssertTrue(store.pending(.issue, target: "issues").isEmpty, "Shown as carried out: retired")
+        // The next identical issue is a new submission with a new key.
+        var sent: [String] = []
+        _ = try await store.submit(.issue, target: "issues", form: form, after: 9) { (key: String) -> String in sent.append(key); return "filed" }
+        XCTAssertNotEqual(sent.first, "6d7c2b1e-0d1f-4a5b-9c8d-7e6f5a4b3c2d")
+    }
+
+    func testCertificateAndMalformedAnswerFailuresAreRetriedLikeAndroidIOExceptions() async {
+        for code: URLError.Code in [.serverCertificateUntrusted, .cannotParseResponse, .zeroByteResource] {
+            let waits = RecordedWaits()
+            var attempts = 0
+            StubHTTP.handler = { _ in attempts += 1; throw URLError(code) }
+            do { _ = try await client(waits: waits).sendIgnoringResult(Endpoint(method: .get, path: "users/notifications/count")); XCTFail() } catch {}
+            XCTAssertEqual(attempts, 4, "\(code.rawValue)")
+        }
+    }
+
+    func testAnotherAccountsPendingRecordIsNeverUsed() async throws {
+        let form: [String: FormValue?] = ["title": .string("Login"), "description": .string("Can't sign in")]
+        let theirs = "11111111-1111-4111-8111-111111111111"
+        let store = seededStore(account: "account-b", created: Date().addingTimeInterval(-30 * 3600), form: form, key: theirs)
+        var sent: [String] = []
+        _ = try await store.submit(.issue, target: "issues", form: form, after: 4) { (key: String) -> String in sent.append(key); return "filed" }
+        XCTAssertNotEqual(sent.first, theirs)
+        store.account = "account-b"
+        XCTAssertEqual(store.pending(.issue, target: "issues").first?.key, theirs, "Still kept for its own account")
+    }
+}

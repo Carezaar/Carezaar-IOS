@@ -23,17 +23,21 @@ final class SessionTests: XCTestCase {
     }
 
     /// Parity v3 Q1: any HTTP error answer to renewal signs the person out without the
-    /// Connection Problem window; a malformed 2xx answer keeps the session.
-    func testRenewalHTTPErrorSignsOutButMalformedSuccessKeepsSessionWithoutDialog() async {
-        for status in [400, 404, 500, 503, 200] {
+    /// Connection Problem window. Technical Alignment (26 Oct 2026), iOS 5: so does a 2xx
+    /// answer that can't provide a usable session (malformed JSON, no result, empty or
+    /// missing tokens), as Android clears its saved sign-in then.
+    func testRenewalHTTPErrorOrUnusableSuccessSignsOutWithoutDialog() async {
+        let answers: [(Int, String)] = [(400, #"{"message":"Renewal refused"}"#), (404, #"{"message":"Renewal refused"}"#),
+            (500, #"{"message":"Renewal refused"}"#), (503, #"{"message":"Renewal refused"}"#),
+            (200, #"{"result":{}}"#), (200, "{"), (200, #"{"result":null}"#),
+            (200, #"{"result":{"access_token":"","refresh_token":""}}"#),
+            (200, #"{"result":{"access_token":"only-access"}}"#)]
+        for (status, body) in answers {
             let tokens = FixtureTokens()
             tokens.save(Session(accessToken: "original-access", refreshToken: "original-refresh"))
             var dialogRequests = 0
             StubHTTP.handler = { request in
-                if request.url!.lastPathComponent == "refresh" {
-                    return status == 200 ? (200, Data(#"{"result":{}}"#.utf8))
-                        : (status, Data(#"{"message":"Renewal refused"}"#.utf8))
-                }
+                if request.url!.lastPathComponent == "refresh" { return (status, Data(body.utf8)) }
                 return (403, Data(#"{"message":"Expired access"}"#.utf8))
             }
             let client = APIClient(tokens: tokens, session: StubHTTP.session(), reportRenewalUnreachable: { _ in
@@ -43,14 +47,12 @@ final class SessionTests: XCTestCase {
                 _ = try await client.sendIgnoringResult(Endpoint(method: .get, path: "auth/info"))
                 XCTFail("Unsuccessful renewal must report an error")
             } catch let error as APIError {
-                if status == 200 {
-                    guard case .decoding = error else { XCTFail("Expected malformed-response error"); continue }
-                } else {
-                    guard case .unauthenticated = error else { XCTFail("HTTP \(status) renewal must end the session"); continue }
-                }
+                guard case .unauthenticated = error else { XCTFail("HTTP \(status) \(body) renewal must end the session"); continue }
             } catch { XCTFail("Unexpected renewal error") }
             XCTAssertEqual(dialogRequests, 0, "A received answer is not a connectivity failure (HTTP \(status))")
-            XCTAssertEqual(tokens.hasSession, status == 200, "HTTP \(status)")
+            XCTAssertFalse(tokens.hasSession, "HTTP \(status) \(body)")
+            XCTAssertNil(tokens.accessToken)
+            XCTAssertNil(tokens.refreshToken)
         }
     }
 
@@ -873,7 +875,9 @@ final class SessionTests: XCTestCase {
             XCTAssertEqual(tokens.accessToken, "new-login", "Old session responses cannot alter a new login")
         }
     }
-    func testEmptyRefreshPairPreservesSavedCredentialsUntilExplicitRefusal() async {
+    /// Technical Alignment (26 Oct 2026), iOS 5: an empty pair is not a usable session, so the
+    /// saved sign-in is cleared, as Android does when renewal brings no tokens.
+    func testEmptyRefreshPairIsUnusableAndClearsSavedCredentials() async {
         let tokens = FixtureTokens()
         tokens.save(Session(accessToken: "old-access", refreshToken: "old-refresh"))
         StubHTTP.handler = { request in
@@ -883,9 +887,9 @@ final class SessionTests: XCTestCase {
             return (403, Data(#"{"message":"Expired"}"#.utf8))
         }
         _ = try? await APIClient(tokens: tokens, session: StubHTTP.session()).sendIgnoringResult(Endpoint(method: .get, path: "auth/info"))
-        XCTAssertTrue(tokens.hasSession)
-        XCTAssertEqual(tokens.accessToken, "old-access")
-        XCTAssertEqual(tokens.refreshToken, "old-refresh")
+        XCTAssertFalse(tokens.hasSession)
+        XCTAssertNil(tokens.accessToken)
+        XCTAssertNil(tokens.refreshToken)
     }
     func testPasswordVerificationRefusalEndsSessionButOfflineDoesNot() async {
         for status in [403, 200] {
@@ -1021,18 +1025,24 @@ final class SessionTests: XCTestCase {
         XCTAssertEqual(manager.state.user?.id, "fixture-user")
         XCTAssertTrue(tokens.hasSession)
     }
-    func testMalformedRefreshPreservesCredentialsAndStartupRetry() async {
-        let tokens = FixtureTokens()
-        tokens.save(Session(accessToken: "fixture", refreshToken: "fixture-refresh"))
-        StubHTTP.handler = { request in
-            request.url!.lastPathComponent == "refresh" ? (200, Data(#"{"result":{}}"#.utf8)) : (403, Data(#"{"message":"Expired"}"#.utf8))
+    /// Technical Alignment (26 Oct 2026), iOS 5: an unusable 2xx renewal at startup clears the
+    /// saved sign-in and lands signed out, as Android does; protected requests then carry no token.
+    func testUnusableRefreshSuccessAtStartupSignsOut() async {
+        for body in [#"{"result":{}}"#, "{", #"{"result":null}"#] {
+            let tokens = FixtureTokens()
+            tokens.save(Session(accessToken: "fixture", refreshToken: "fixture-refresh"))
+            StubHTTP.handler = { request in
+                request.url!.lastPathComponent == "refresh" ? (200, Data(body.utf8)) : (403, Data(#"{"message":"Expired"}"#.utf8))
+            }
+            let manager = SessionManager(auth: AuthService(client: APIClient(tokens: tokens, session: StubHTTP.session())), tokens: tokens)
+            await manager.restore()
+            XCTAssertEqual(manager.state, .signedOut, body)
+            XCTAssertFalse(tokens.hasSession, body)
+            var authorization: String?? = .none
+            StubHTTP.handler = { request in authorization = .some(request.value(forHTTPHeaderField: "Authorization")); return (403, Data(#"{"message":"Valid JWT token is required!"}"#.utf8)) }
+            _ = try? await APIClient(tokens: tokens, session: StubHTTP.session()).sendIgnoringResult(Endpoint(method: .get, path: "users/notifications/count"))
+            XCTAssertEqual(authorization, .some(nil), "A protected request after sign-out carries no saved token (\(body))")
         }
-        let manager = SessionManager(auth: AuthService(client: APIClient(tokens: tokens, session: StubHTTP.session())), tokens: tokens)
-        await manager.restore()
-        XCTAssertEqual(manager.state, .loading)
-        XCTAssertTrue(tokens.hasSession)
-        XCTAssertNotNil(manager.errorMessage)
-        XCTAssertFalse(manager.savedSessionRejected)
     }
 }
 

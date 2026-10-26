@@ -218,7 +218,18 @@ struct ReportAnIssueView: View {
     private func load() async {
         error = nil
         do {
-            issues = try await UserService().issues()
+            let all = try await UserService().issues()
+            // An issue whose answer was lost but which the list shows went through: its pending key
+            // is retired, so a later issue with the same words gets its own. Not while one is filed.
+            if !ActionGuard.shared.isBusy(IssueSubmissionCoordinator.resource) {
+                let settled = Date().addingTimeInterval(-IdempotencyStore.settledAfter)
+                IdempotencyStore.shared.retireCarriedOut(.issue, target: "issues") { record in
+                    record.created < settled && all.contains { $0.id > (record.after ?? 0) && $0.description == record.draft
+                        && (record.issuetypeId != nil ? $0.issuetypeId == record.issuetypeId
+                            : record.title != nil && $0.title == record.title) }
+                }
+            }
+            issues = all
         } catch { self.error = error }
     }
 }
@@ -399,7 +410,9 @@ struct ChangePasswordView: View {
     @ObservedObject private var guards = ActionGuard.shared
     private var submitting: Bool { guards.isBusy("auth:password") }
 
-    private var valid: Bool { !current.isEmpty && PasswordValidator.isValid(updated) && updated == confirmation }
+    /// As on Android: all three fields nonblank and the new passwords identical. Strength is the
+    /// API's to judge, and its answer is shown.
+    private var valid: Bool { PasswordValidator.canSubmitChange(current: current, new: updated, confirmation: confirmation) }
 
     var body: some View {
         ScrollView {
@@ -410,7 +423,8 @@ struct ChangePasswordView: View {
                 LabeledField(label: loc.t("settings_change_password_new_password", "New Password"),
                              placeholder: loc.t("settings_change_password_new_password_placeholder", "Enter your new password..."),
                              text: $updated, contentType: .newPassword, isSecure: true)
-                PasswordRulesView(password: updated, prefix: "settings_change_password")
+                PasswordRulesView(password: updated, prefix: "settings_change_password",
+                                  special: PasswordValidator.changePasswordSpecialCharacters)
                 LabeledField(label: loc.t("settings_change_password_confirm_password", "Confirm Password"),
                              placeholder: loc.t("settings_change_password_confirm_password_placeholder", "Confirm your new password..."),
                              text: $confirmation, contentType: .newPassword, isSecure: true,

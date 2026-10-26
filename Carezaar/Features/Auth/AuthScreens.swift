@@ -760,7 +760,8 @@ struct OTPBoxes: View {
                 .keyboardType(.numberPad).textContentType(.oneTimeCode).focused(focused)
                 .frame(width: 1, height: 1).opacity(0.01)
                 .onChange(of: code) { _, new in
-                    let digits = String(new.filter(\.isNumber).prefix(FieldValidator.otpLength))
+                    // ASCII 0-9 only: the code is five plain digits.
+                    let digits = String(new.filter { $0.isASCII && $0.isNumber }.prefix(FieldValidator.otpLength))
                     if digits != new { code = digits }
                 }
             HStack(spacing: 12) {
@@ -855,8 +856,10 @@ struct SetupPasswordView: View {
     @ObservedObject private var guards = ActionGuard.shared
     private let ticker = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
+    /// As on Android: a five-digit code and two nonblank, identical passwords. Strength is the
+    /// API's to judge, and its answer is shown.
     private var valid: Bool {
-        code.count == FieldValidator.otpLength && PasswordValidator.isValid(password) && password == confirmation
+        PasswordValidator.canSubmitReset(code: code, password: password, confirmation: confirmation)
     }
 
     // Figma v2 frame 714:11663.

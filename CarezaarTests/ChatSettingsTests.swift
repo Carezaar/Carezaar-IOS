@@ -190,7 +190,9 @@ final class ChatSettingsTests: XCTestCase {
         let full = try await coordinator.submit(chatId: 42, text: "Retry my draft", parentId: nil)
         XCTAssertEqual(full.messages.first?.message, "Retry my draft")
         XCTAssertEqual(acknowledgements, 1, "The later explicit user Send delivers once")
-        XCTAssertEqual(attempts, 5, "Four safe closed-connection attempts then one acknowledged intentional Send")
+        // Technical Alignment (26 Oct 2026), iOS 4: a write is never retried automatically,
+        // even after a refused connection; the user's own Send is the only second attempt.
+        XCTAssertEqual(attempts, 2, "One failed attempt, then one acknowledged intentional Send")
         XCTAssertEqual(reads, 0, "Proven preconnection failure needs no outcome reconciliation or pre-send read")
     }
 

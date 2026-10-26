@@ -126,11 +126,13 @@ struct PasswordRulesView: View {
     /// Content slug prefix, e.g. `settings_change_password` →
     /// `settings_change_password_password_validation_8_letters`.
     var prefix = "signup_credentials"
+    /// Change Password's chips test Android's smaller special set there.
+    var special = PasswordValidator.specialCharacters
     @EnvironmentObject private var loc: Localization
 
     var body: some View {
         FlowLayout(spacing: 8) {
-            ForEach(PasswordValidator.rules(for: password)) { rule in
+            ForEach(PasswordValidator.rules(for: password, special: special)) { rule in
                 HStack(spacing: 6) {
                     AppIcon(name: rule.isSatisfied ? "ic_check_circle" : "ic_clear_circle", size: 16,
                             tint: rule.isSatisfied ? Theme.Palette.success : Theme.Palette.textSecondary)

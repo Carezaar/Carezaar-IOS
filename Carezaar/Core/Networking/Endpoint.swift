@@ -93,6 +93,9 @@ struct PendingSubmission: Codable, Equatable, Sendable {
     var after: Int?
     /// The message replied to, for a chat message.
     var parent: Int?
+    /// An issue's free title or predefined type, to recognise it once filed.
+    var title: String?
+    var issuetypeId: Int?
 }
 
 /// The server's 409 for a key: `idempotency_conflict` or `idempotency_expired`.
@@ -106,9 +109,14 @@ struct SubmissionNotCarriedOutError: Error, Equatable {}
 final class IdempotencyStore {
     static let shared = IdempotencyStore()
     static let storageKey = "carezaar.pendingSubmissions.v1"
-    /// Kept for a day. How long the server keeps a key is undocumented; a key it has forgotten
-    /// is reported as expired and reconciled.
-    static let maxAge: TimeInterval = 24 * 60 * 60
+    /// Longer than any write can take: a refused write is sent, its sign-in renewed and the write
+    /// replayed, each with a 120 s deadline (up to 6 minutes). A record older than this has had its
+    /// answer, or lost it, so screens may retire it once they see it carried out.
+    static let settledAfter: TimeInterval = 10 * 60
+
+    // Unresolved records are kept until their outcome is known, with no age limit. The server
+    // may forget a key sooner; it then answers `idempotency_expired` and the record is
+    // reconciled with the server before anything new is sent.
 
     /// The signed-in account submissions are scoped to (set by the session).
     var account: String?
@@ -120,8 +128,7 @@ final class IdempotencyStore {
     private func readAll() -> [String: PendingSubmission] {
         guard let data = defaults.data(forKey: Self.storageKey),
               let all = try? JSONDecoder().decode([String: PendingSubmission].self, from: data) else { return [:] }
-        let now = Date()
-        return all.filter { now.timeIntervalSince($0.value.created) < Self.maxAge }
+        return all
     }
 
     private func writeAll(_ all: [String: PendingSubmission]) {
@@ -147,7 +154,18 @@ final class IdempotencyStore {
     /// Retires every unresolved submission for an operation and target, once the resource
     /// shows how it ended (e.g. the profile shows the request as sent).
     func retireAll(_ operation: IdempotentOperation, target: String) {
-        writeAll(readAll().filter { !($0.value.account == accountKey && $0.value.operation == operation && $0.value.target == target) })
+        retireCarriedOut(operation, target: target) { _ in true }
+    }
+
+    /// Retires the signed-in account's unresolved submissions for an operation and target that
+    /// the server already shows as carried out (e.g. the message is in the loaded conversation),
+    /// so a later submission with the same words isn't taken for them. Returns how many.
+    @discardableResult
+    func retireCarriedOut(_ operation: IdempotentOperation, target: String, where carriedOut: (PendingSubmission) -> Bool) -> Int {
+        let all = readAll()
+        let kept = all.filter { !($0.value.account == accountKey && $0.value.operation == operation && $0.value.target == target && carriedOut($0.value)) }
+        if kept.count != all.count { writeAll(kept) }
+        return all.count - kept.count
     }
 
     func clearAll() { defaults.removeObject(forKey: Self.storageKey) }
@@ -168,13 +186,14 @@ final class IdempotencyStore {
     /// Sends one logical submission with its key: a new one, or the same one again while its
     /// earlier attempt is unresolved.
     func submit<T>(_ operation: IdempotentOperation, target: String, form: [String: FormValue?],
-                   draft: String? = nil, after: Int? = nil, parent: Int? = nil,
+                   draft: String? = nil, after: Int? = nil, parent: Int? = nil, title: String? = nil, issuetypeId: Int? = nil,
                    send: (String) async throws -> T,
                    reconcile: ((PendingSubmission) async throws -> T?)? = nil) async throws -> T {
         let scope = scope(operation, target, form)
         var all = readAll()
         let record = all[scope] ?? PendingSubmission(key: UUID().uuidString.lowercased(), created: Date(), account: accountKey,
-                                                     operation: operation, target: target, draft: draft, after: after, parent: parent)
+                                                     operation: operation, target: target, draft: draft, after: after, parent: parent,
+                                                     title: title, issuetypeId: issuetypeId)
         all[scope] = record
         writeAll(all)
         func retire() { var now = readAll(); now.removeValue(forKey: scope); writeAll(now) }

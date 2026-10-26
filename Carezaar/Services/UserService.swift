@@ -275,7 +275,8 @@ struct UserService: Sendable {
         let client = self.client
         let baseline: Int
         if let after { baseline = after } else { baseline = try await issues(ifGeneration: ifGeneration).map(\.id).max() ?? 0 }
-        return try await IdempotencyStore.shared.submit(.issue, target: "issues", form: fields, draft: description, after: baseline) { key in
+        return try await IdempotencyStore.shared.submit(.issue, target: "issues", form: fields, draft: description, after: baseline,
+                                                         title: title, issuetypeId: issuetypeId) { key in
             try await client.send(Endpoint(method: .post, path: "users/issues", body: .form(fields), idempotencyKey: key), ifGeneration: ifGeneration)
         } reconcile: { record in
             let all: [Issue] = try await client.send(Endpoint(method: .get, path: "users/issues"))

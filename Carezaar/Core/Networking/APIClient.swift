@@ -20,7 +20,7 @@ actor APIClient {
         case rejected
         /// The server still cannot be reached; the window stays.
         case unreachable
-        /// A received but unusable answer (malformed, local storage); credentials kept.
+        /// The new credentials couldn't be stored locally; the saved ones are kept.
         case failed
     }
 
@@ -33,9 +33,13 @@ actor APIClient {
     private let reportRenewalUnreachable: (@Sendable (UUID) async -> Void)?
     /// Single-flight refresh: concurrent 403s must not fire parallel refresh calls.
     private var refreshTask: (generation: UUID, id: UUID, task: Task<Result<Bool, APIError>, Never>)?
+    /// Waits between read retries (replaceable in tests).
+    private let pause: @Sendable (Duration) async throws -> Void
 
     init(tokens: any SessionTokenStorage = TokenStore.shared, session: URLSession? = nil,
-         reportRenewalUnreachable: (@Sendable (UUID) async -> Void)? = nil) {
+         reportRenewalUnreachable: (@Sendable (UUID) async -> Void)? = nil,
+         pause: (@Sendable (Duration) async throws -> Void)? = nil) {
+        self.pause = pause ?? { try await Task.sleep(for: $0) }
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = APIConfiguration.requestTimeout
         config.timeoutIntervalForResource = APIConfiguration.requestTimeout
@@ -289,8 +293,22 @@ actor APIClient {
         }
     }
 
-    /// A lost response to a mutation is ambiguous: it may already have committed.
-    /// Retry reads, or failures that establish no connection was made, only.
+    /// Android's `safeCall` waits (attempt + 1) × 500 ms before each of up to three retries.
+    static let readRetryDelays: [Duration] = [.milliseconds(500), .milliseconds(1_000), .milliseconds(1_500)]
+
+    /// Failures Android's `safeCall` retries: any `IOException` except a `SocketException`,
+    /// so DNS failures, being offline (no DNS), timeouts, TLS and certificate failures and a
+    /// malformed or cut-off answer are retried, and a refused connection (`ConnectException`)
+    /// is not. iOS reports a dropped connection as one code, whether Android would have seen
+    /// an end of stream (retried) or a reset socket (not retried); it is retried here.
+    static func isTransientReadFailure(_ code: URLError.Code) -> Bool {
+        [.cannotFindHost, .dnsLookupFailed, .notConnectedToInternet, .dataNotAllowed, .internationalRoamingOff,
+         .timedOut, .networkConnectionLost, .badServerResponse, .cannotParseResponse, .zeroByteResource,
+         .secureConnectionFailed, .serverCertificateUntrusted, .serverCertificateHasBadDate,
+         .serverCertificateHasUnknownRoot, .serverCertificateNotYetValid,
+         .clientCertificateRejected, .clientCertificateRequired].contains(code)
+    }
+
     private static func transportError(_ error: URLError) -> APIError {
         switch error.code {
         case .cannotFindHost, .dnsLookupFailed, .cannotConnectToHost, .notConnectedToInternet:
@@ -313,19 +331,20 @@ actor APIClient {
                 return try await session.data(for: request)
             }
             catch let error as URLError {
-                let beforeConnection: Set<URLError.Code> = [.cannotFindHost, .dnsLookupFailed, .cannotConnectToHost, .notConnectedToInternet]
-                let retryable = beforeConnection.contains(error.code)
-                    || (safeToReplay && error.code == .networkConnectionLost)
-                guard retryable, retries < 3 else { throw error }
-                try await Task.sleep(for: .milliseconds(250 * (1 << retries)))
+                // Only reads are repeated (as Android's `safeCall` does for them); a write, the
+                // renewal itself and logout are never sent again automatically.
+                guard safeToReplay, Self.isTransientReadFailure(error.code), retries < Self.readRetryDelays.count else { throw error }
+                try await pause(Self.readRetryDelays[retries])
                 retries += 1
             }
         }
     }
 
     /// Any HTTP error answer to renewal (4xx or 5xx) rejects the session, as on
-    /// Android (parity review v3, Q1). Transport failures (server unreachable),
-    /// malformed success bodies and local storage failures preserve the saved pair.
+    /// Android (parity review v3, Q1), and so does a success that doesn't carry a usable
+    /// session (malformed JSON, no result, empty tokens): Android clears its saved sign-in
+    /// then too. Transport failures (server unreachable) and local storage failures
+    /// preserve the saved pair.
     private func refreshSession(ifGeneration expected: UUID) async -> Result<Bool, APIError> {
         if let existing = refreshTask, existing.generation == expected { return await existing.task.value }
         let id = UUID()
@@ -349,7 +368,7 @@ actor APIClient {
                 guard (200..<300).contains(http.statusCode) else { return .success(false) }
                 guard let envelope = try? self.decoder.decode(APIEnvelope<Session>.self, from: data),
                       let session = envelope.result, !session.accessToken.isEmpty, !session.refreshToken.isEmpty else {
-                    return .failure(.decoding(""))
+                    return .success(false)
                 }
                 guard tokens.replace(session, ifGeneration: expected, refreshToken: refresh) else {
                     // Persistence can fail without the server rejecting renewal.
