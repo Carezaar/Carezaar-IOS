@@ -148,6 +148,8 @@ final class LoadingIdempotencyTests: XCTestCase {
         StubHTTP.handler = { request in
             let path = request.url!.path
             if path.hasSuffix("auth/refresh") { return (200, Data(#"{"result":{"access_token":"new","refresh_token":"refresh-2"}}"#.utf8)) }
+            // The issue list read for the baseline when the screen's list isn't known.
+            if refused, request.httpMethod == "GET", path.hasSuffix("users/issues") { return (200, Data(#"{"result":[]}"#.utf8)) }
             posts.append((path, request.value(forHTTPHeaderField: "Idempotency-Key"), request.value(forHTTPHeaderField: "Authorization")))
             if !refused { refused = true; return (403, Data(#"{"message":"Token is invalid!"}"#.utf8)) }
             if path.hasSuffix("users/chats/7") { return (200, Data(#"{"result":{"id":7,"messages":[]}}"#.utf8)) }

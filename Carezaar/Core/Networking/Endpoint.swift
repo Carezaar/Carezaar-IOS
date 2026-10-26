@@ -67,7 +67,9 @@ struct Endpoint {
 /// the key must be a UUID (otherwise 422 `idempotency_invalid`); the same key with the same
 /// request replays the first answer (`Idempotency-Replayed: true`) and creates nothing, also
 /// for two at once; the same key with different data is 409 `idempotency_conflict`; keys are
-/// per account; an expired key is 409 `idempotency_expired`.
+/// per account. Not verified on the server: how long a key is kept (undocumented; still
+/// replayed after more than 5 hours on 26 Oct 2026) and the expired answer, taken from the
+/// client's description as 409 `idempotency_expired`.
 ///
 /// One key per logical submission, kept in UserDefaults (scoped by account, operation, target
 /// and a hash of the data) until the outcome is known, so a retry after a timeout, a lost
@@ -104,7 +106,8 @@ struct SubmissionNotCarriedOutError: Error, Equatable {}
 final class IdempotencyStore {
     static let shared = IdempotencyStore()
     static let storageKey = "carezaar.pendingSubmissions.v1"
-    /// Kept for a day; the server forgets keys sooner, which it reports as expired.
+    /// Kept for a day. How long the server keeps a key is undocumented; a key it has forgotten
+    /// is reported as expired and reconciled.
     static let maxAge: TimeInterval = 24 * 60 * 60
 
     /// The signed-in account submissions are scoped to (set by the session).

@@ -264,14 +264,18 @@ struct UserService: Sendable {
 
     /// A predefined issue type and a free-text title are mutually exclusive — the
     /// backend rejects both together. "Other" sends a title; any type sends the id.
-    /// Sent with an Idempotency-Key; `after` is the newest issue id the person had.
+    /// Sent with an Idempotency-Key; `after` is the newest issue id the person had. It is nil
+    /// when the screen's list hasn't loaded, and then read here before anything is sent, so an
+    /// older issue with the same words is never taken for this one after an expired key.
     @MainActor
     func createIssue(issuetypeId: Int?, title: String?, description: String, ifGeneration: UUID? = nil, after: Int? = nil) async throws -> Issue {
         let fields: [String: FormValue?] = issuetypeId.map {
             ["issuetype_id": .int($0), "description": .string(description)]
         } ?? ["title": .string(title ?? ""), "description": .string(description)]
         let client = self.client
-        return try await IdempotencyStore.shared.submit(.issue, target: "issues", form: fields, draft: description, after: after) { key in
+        let baseline: Int
+        if let after { baseline = after } else { baseline = try await issues(ifGeneration: ifGeneration).map(\.id).max() ?? 0 }
+        return try await IdempotencyStore.shared.submit(.issue, target: "issues", form: fields, draft: description, after: baseline) { key in
             try await client.send(Endpoint(method: .post, path: "users/issues", body: .form(fields), idempotencyKey: key), ifGeneration: ifGeneration)
         } reconcile: { record in
             let all: [Issue] = try await client.send(Endpoint(method: .get, path: "users/issues"))

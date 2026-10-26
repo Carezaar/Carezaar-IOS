@@ -483,6 +483,34 @@ final class SettingsMutationReconciliationTests: XCTestCase {
         XCTAssertEqual(posts, 1, "Reconciled, not sent again")
     }
 
+    func testIssueFiledBeforeTheListLoadedReadsItFirstSoAnExpiredKeyIsNotMatchedToAnOlderIdenticalIssue() async throws {
+        IdempotencyStore.shared.clearAll(); ActionGuard.shared.reset()
+        let tokens = FixtureTokens()
+        tokens.save(Session(accessToken: "fixture", refreshToken: "fixture-refresh"))
+        var methods: [String] = []
+        StubHTTP.handler = { request in
+            methods.append(request.httpMethod ?? "")
+            if request.httpMethod == "POST" {
+                return (409, Data(#"{"result":null,"meta":{"code":"idempotency_expired"},"message":"Expired"}"#.utf8))
+            }
+            // An older issue with the same words; nothing newer was filed.
+            return (200, Data(#"{"result":[{"id":7,"title":"Login","description":"Same words","is_replied":false}]}"#.utf8))
+        }
+        let coordinator = IssueSubmissionCoordinator(service: UserService(client: APIClient(tokens: tokens, session: StubHTTP.session())))
+        let draft = IssueSubmissionDraft(issuetypeId: nil, title: "Login", description: "Same words")
+        do {
+            _ = try await coordinator.submit(draft, baseline: nil)
+            XCTFail("The older identical issue must not be taken for this one")
+        } catch is SubmissionNotCarriedOutError {}
+        XCTAssertEqual(methods, ["GET", "POST", "GET"], "List read before anything was sent; then the expired key was reconciled")
+
+        // The list can't be read: nothing is sent.
+        IdempotencyStore.shared.clearAll(); methods = []
+        StubHTTP.handler = { request in methods.append(request.httpMethod ?? ""); throw URLError(.notConnectedToInternet) }
+        do { _ = try await coordinator.submit(IssueSubmissionDraft(issuetypeId: nil, title: "Login", description: "Other words"), baseline: nil); XCTFail("No baseline") } catch {}
+        XCTAssertFalse(methods.contains("POST"), "No issue sent without a baseline")
+    }
+
     func testLostDeletionAcknowledgementAndRejectedSessionClearsLocalStateWithoutAnotherDelete() async throws {
         let tokens = FixtureTokens()
         tokens.save(Session(accessToken: "fixture", refreshToken: "fixture-refresh"))

@@ -323,7 +323,7 @@ final class IssueSubmissionCoordinator: ObservableObject {
         guard generation == nil || generation == owner else { throw CancellationError() }
         return try await ActionGuard.shared.run(Self.resource) {
             try await service.createIssue(issuetypeId: draft.issuetypeId, title: draft.title, description: draft.description,
-                                          ifGeneration: owner, after: baseline?.map(\.id).max())
+                                          ifGeneration: owner, after: baseline.map { $0.map(\.id).max() ?? 0 })
         }
     }
 }
