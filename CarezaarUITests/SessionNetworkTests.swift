@@ -534,8 +534,8 @@ final class SessionNetworkTests: XCTestCase {
         app.buttons["Send"].tap()
         XCTAssertTrue(text("Cannot communicate").waitForExistence(timeout: 30), "no connection message")
         XCTAssertEqual(field.value as? String, message, "draft lost after a failed send")
-        XCTAssertEqual(requestCount("POST /api/users/chats/\(chatId)"), 4,
-                       "One logical direct Send has one initial closed-port attempt plus three safe preconnection retries")
+        XCTAssertEqual(requestCount("POST /api/users/chats/\(chatId)"), 1,
+                       "One direct Send is one attempt; writes are never retried automatically")
         XCTAssertFalse(text("Couldn't confirm whether your message was sent").exists,
                        "The superseded English-only blocking notice must be absent")
         shot("chat-offline-draft-kept")
@@ -550,8 +550,8 @@ final class SessionNetworkTests: XCTestCase {
         sleep(3)
         let stored = try messages(chatId: chatId, token: clientToken).filter { $0 == message }
         XCTAssertEqual(stored.count, 1, "sent \(stored.count) times")
-        XCTAssertEqual(requestCount("POST /api/users/chats/\(chatId)"), 5,
-                       "Four safe preconnection attempts plus one successful intentional recovery Send; empty-draft taps never repeat it")
+        XCTAssertEqual(requestCount("POST /api/users/chats/\(chatId)"), 2,
+                       "One refused attempt plus one successful intentional recovery Send; empty-draft taps never repeat it")
     }
 
     /// Slow network: the busy card shows; text typed while a message is sending is kept.

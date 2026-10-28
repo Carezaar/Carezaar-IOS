@@ -60,13 +60,13 @@ final class ChatNetworkBoundaryUITests: XCTestCase {
         }
         send.tap()
         let failed = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
-            self.messagePOSTs(chatID) == 4 && send.isEnabled
+            self.messagePOSTs(chatID) == 1 && send.isEnabled
                 && !self.app.staticTexts["Please wait..."].exists
         }, object: nil)
         XCTAssertEqual(XCTWaiter.wait(for: [failed], timeout: 35), .completed,
-                       "One direct Send must exhaust its safe preconnection attempts and restore its composer")
+                       "One direct Send is one attempt (no automatic write retry) and restores its composer")
         let failedAttempts = messagePOSTs(chatID)
-        XCTAssertEqual(failedAttempts, 4)
+        XCTAssertEqual(failedAttempts, 1)
         XCTAssertEqual(field.value as? String, draft)
         XCTAssertFalse(app.descendants(matching: .any).matching(identifier: "chat-send-uncertain").firstMatch.exists)
         XCTAssertFalse(app.buttons["Allow retry"].exists)
@@ -87,10 +87,10 @@ final class ChatNetworkBoundaryUITests: XCTestCase {
         }, object: nil)
         XCTAssertEqual(XCTWaiter.wait(for: [acknowledged], timeout: 35), .completed,
                        "A later intentional Send after proven preconnection failure must deliver and clear its draft")
-        XCTAssertEqual(messagePOSTs(chatID), 5, "Four failed preconnection attempts plus one acknowledged Send")
+        XCTAssertEqual(messagePOSTs(chatID), 2, "One refused attempt plus one acknowledged Send")
         XCTAssertEqual(try chatTexts(ownedChat(chatID, fixture: f, active: true)).filter { $0 == draft }.count, 1)
         send.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
-        XCTAssertEqual(messagePOSTs(chatID), 5, "Empty-draft tap must not replay")
+        XCTAssertEqual(messagePOSTs(chatID), 2, "Empty-draft tap must not replay")
         try record("owned-native-direct-send-offline-recovered-\(f.role)", [
             "role": f.role, "elapsedBeforeNativeSend": elapsedBeforeSend,
             "configuredGlobalLatencySeconds": 8, "configuredOfflineWindowSeconds": [100, 125],
@@ -847,11 +847,11 @@ final class ChatNetworkBoundaryUITests: XCTestCase {
         // No read-count check here: an open chat re-reads itself every 10 s (ChatView
         // pollInterval), so chat GETs around a send are not attributable to it. The send
         // itself makes no pre-send read (ChatView.send); the outcome checks follow.
-        // There is no pre-send check: the POST itself is refused before any connection, and
-        // APIClient.transfer retries only such pre-connection failures (1 + 3 attempts), as
-        // the direct-send test asserts. None reached the server (checked just below).
+        // There is no pre-send check: the POST itself is refused before any connection. Writes
+        // are never retried automatically (Technical Alignment, 26 Oct; APIClient retries reads
+        // only), so this is exactly one attempt. It didn't reach the server (checked just below).
         let failedAttempts = messagePOSTs(chatID)
-        XCTAssertEqual(failedAttempts, 4, "One refused send plus three pre-connection retries, never more")
+        XCTAssertEqual(failedAttempts, 1, "One refused send, no automatic write retry")
         XCTAssertTrue((field.value as? String) == message, "Offline send must preserve exact draft")
         XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "Couldn't confirm whether your message was sent")).firstMatch.exists,
                        "A send refused before connecting must not be mislabeled as uncertain delivery")

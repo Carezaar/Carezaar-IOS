@@ -102,9 +102,9 @@ final class PreferencesUpdateUITests: XCTestCase {
         XCTAssertEqual(Set(ids(saved["certification_ids"])), Set(wanted), "the retry stored the entered values")
         let ledger = app.staticTexts["qa-request-counts"].label
         let puts = ledger.split(separator: "\n").first { $0.hasPrefix("PUT /api/clients/profile=") }.flatMap { Int($0.split(separator: "=").last ?? "") } ?? 0
-        // The refused first Save never reached the server; the transport retries only such
-        // pre-connection failures (1 + 3, APIClient.transfer), then the explicit retry is one more.
-        XCTAssertEqual(puts, 5, "four refused pre-connection attempts plus one explicit retry, nothing else")
+        // The refused first Save never reached the server. Writes are never retried
+        // automatically (Technical Alignment, 26 Oct), so the explicit retry is the second PUT.
+        XCTAssertEqual(puts, 2, "one refused attempt plus one explicit retry, nothing else")
     }
 
     func testSavedLocationPickerCancelAndConfirmContinueWithoutSaving() throws {
