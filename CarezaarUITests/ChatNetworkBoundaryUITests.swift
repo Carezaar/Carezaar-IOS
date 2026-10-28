@@ -255,8 +255,9 @@ final class ChatNetworkBoundaryUITests: XCTestCase {
     func testOwnedIncomingDuringInitialChatLoadAppliesLatestAndTimestamp() throws {
         let (f, chatID) = try stageOwnedActiveChat()
         launchChat(chatID, faults: ["--qa-latency", "30"])
-        let operationText = f.label("loading_chat_get_one", "Getting chat details")
-        let operation = app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", operationText)).firstMatch
+        // Since 25 Oct the initial load shows ChatView's skeleton instead of the managed
+        // "Getting chat details" window; the skeleton is shown only while chat is nil.
+        let operation = app.descendants(matching: .any).matching(identifier: "skeleton").firstMatch
         let header = app.navigationBars[f.label("chat_screen_messages_title", "Chat Messages")]
         let rows = app.otherElements.matching(NSPredicate(format: "identifier BEGINSWITH %@", "chat-message-"))
         func initialDetailPending() -> Bool {
@@ -289,6 +290,9 @@ final class ChatNetworkBoundaryUITests: XCTestCase {
             "exactNativeDetailGETDispatchesBeforeAndAfterPeerPOST": 0,
             "controlledPreTransportLatencySeconds": 30, "ownedPeerSyntheticPOSTs": 1,
             "dispatchedHeldHTTPResponseCovered": false, "metadataPreflightUsedAsInitialLoadProof": false])
+        // iOS may ask for notification permission once the sign-in lands; it covers the chat.
+        let systemAllow = XCUIApplication(bundleIdentifier: "com.apple.springboard").buttons["Allow"]
+        if systemAllow.waitForExistence(timeout: 2) { systemAllow.tap() }
         let field = try loadedComposer(chatID, fixture: f, timeout: 100, readyTimeout: 60)
         let transcript = try ownedIncomingTranscript(above: field)
         let incoming = app.staticTexts.matching(NSPredicate(format: "label == %@", incomingText)).firstMatch
@@ -959,7 +963,8 @@ final class ChatNetworkBoundaryUITests: XCTestCase {
         let aText = try XCTUnwrap(a["message"] as? String), bText = try XCTUnwrap(b["message"] as? String)
         XCTAssertNotEqual(aID, bID)
         launchChat(chatID, faults: ["--qa-latency", "20"])
-        let field = try loadedComposer(chatID, fixture: f, timeout: 150)
+        // Every startup request waits 20 s here, so startup alone can pass 150 s.
+        let field = try loadedComposer(chatID, fixture: f, timeout: 240, readyTimeout: 60)
         _ = try ownedChat(chatID, fixture: f, active: true)
         try selectSyntheticReply(aText, messageID: aID)
         XCTAssertTrue(replyBannerContains(aText, near: field))
@@ -1209,9 +1214,12 @@ final class ChatNetworkBoundaryUITests: XCTestCase {
     private func loadedComposer(_ id: Int, fixture f: Fixture, timeout: TimeInterval, readyTimeout: TimeInterval = 30) throws -> XCUIElement {
         let field = app.textFields.firstMatch
         XCTAssertTrue(field.waitForExistence(timeout: timeout))
+        // The composer is on screen while the chat skeleton (25 Oct) still stands in for the
+        // transcript, so the chat counts as loaded only once that skeleton is gone.
+        let skeleton = app.descendants(matching: .any).matching(identifier: "skeleton").firstMatch
         let ready = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
             field.isHittable && !self.app.staticTexts["Please wait..."].exists
-                && self.count("GET /api/users/chats/\(id)") >= 1
+                && self.count("GET /api/users/chats/\(id)") >= 1 && !skeleton.exists
         }, object: nil)
         XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: readyTimeout), .completed)
         XCTAssertEqual(app.textFields.count, 1)
