@@ -59,6 +59,12 @@ final class ChatNetworkBoundaryUITests: XCTestCase {
             throw XCTSkip("Native initialization/input missed the bounded offline-send window; no Send attempted")
         }
         send.tap()
+        // The connection error is a toast that leaves after 4.5 s (Feedback.swift), so it is
+        // looked for while waiting and captured first, before the slower checks below.
+        let connectionError = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@",
+            f.label("general_network_title", "Cannot communicate with server."))).firstMatch
+        XCTAssertTrue(connectionError.waitForExistence(timeout: 35), "Failed Send must present the standard managed connection error")
+        controlProof(connectionError, "owned-direct-send-managed-connection-error-only-\(f.role)")
         let failed = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
             self.messagePOSTs(chatID) == 1 && send.isEnabled
                 && !self.app.staticTexts["Please wait..."].exists
@@ -71,10 +77,6 @@ final class ChatNetworkBoundaryUITests: XCTestCase {
         XCTAssertFalse(app.descendants(matching: .any).matching(identifier: "chat-send-uncertain").firstMatch.exists)
         XCTAssertFalse(app.buttons["Allow retry"].exists)
         XCTAssertFalse(app.alerts["Allow another send attempt?"].exists)
-        let connectionError = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@",
-            f.label("general_network_title", "Cannot communicate with server."))).firstMatch
-        XCTAssertTrue(connectionError.exists, "Failed Send must present the standard managed connection error")
-        controlProof(connectionError, "owned-direct-send-managed-connection-error-only-\(f.role)")
         try assertOwnedUncertainDraftAbsent(draft, chatID: chatID, fixture: f)
 
         waitUntilLaunchPlus(137)
