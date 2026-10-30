@@ -81,16 +81,25 @@ struct SingleSelectField: View {
 struct SalaryRangeField: View {
     @Binding var minimum: Int?
     @Binding var maximum: Int?
+    var title: String? = nil
+    var unit: String? = nil
+    var hint: String? = nil
     var error: String?
     @EnvironmentObject private var loc: Localization
     @FocusState private var focused: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(loc.t("signup_form_client_pay_rate", "Pay Rate")).font(Theme.Typography.title(16))
+            HStack(alignment: .firstTextBaseline) {
+                Text(title ?? loc.t("signup_form_client_pay_rate", "Pay Rate")).font(Theme.Typography.title(16))
+                if let unit { Text("(\(unit))").font(Theme.Typography.caption()).foregroundStyle(Theme.Palette.textSecondary) }
+            }
             HStack(spacing: Theme.Spacing.s) {
                 numberField(loc.t("signup_form_client_minimum", "Minimum"), value: $minimum)
                 numberField(loc.t("signup_form_client_maximum", "Maximum"), value: $maximum)
+            }
+            if let hint {
+                Text(hint).font(Theme.Typography.caption()).foregroundStyle(Theme.Palette.textSecondary)
             }
             if let error {
                 Text(error).font(Theme.Typography.caption()).foregroundStyle(Theme.Palette.error)

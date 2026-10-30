@@ -132,16 +132,8 @@ struct UserService: Sendable {
         let text = introduction?.trimmingCharacters(in: .whitespacesAndNewlines)
         if let text, !text.isEmpty { form["introduction"] = .string(text) }
         let client = self.client
-        return try await IdempotencyStore.shared.submit(.matchRequest, target: partnerId, form: form, draft: text) { key in
+        return try await IdempotencyStore.shared.submit(.matchRequest, target: partnerId, form: form) { key in
             try await client.send(Endpoint(method: .post, path: "users/matches", body: .form(form), idempotencyKey: key), ifGeneration: ifGeneration)
-        } reconcile: { _ in
-            // After an expired key: a request (or match) with this partner means it went through.
-            for type in [MatchListType.requests, .matches] {
-                let (list, _): ([Match], APIMeta?) = try await client.sendPaged(Endpoint(method: .get, path: "users/matches",
-                    query: ["type": type.rawValue, "page": "1", "perPage": "50"]))
-                if let found = list.first(where: { $0.client?.id == partnerId || $0.caregiver?.id == partnerId }) { return found }
-            }
-            return nil
         }
     }
 
@@ -192,22 +184,14 @@ struct UserService: Sendable {
     }
 
     /// `parentId` threads the message as a reply. Sent with an Idempotency-Key: one message per
-    /// submission however often it is retried. `fromCaregiver` (the sender's side) and `after`
-    /// (the newest message on screen) let an expired key be reconciled.
+    /// submission however often it is retried.
     @MainActor
-    func sendMessage(chatId: Int, message: String, parentId: Int? = nil, ifGeneration: UUID? = nil,
-                     fromCaregiver: Bool? = nil, after: Int? = nil) async throws -> ChatFull {
+    func sendMessage(chatId: Int, message: String, parentId: Int? = nil, ifGeneration: UUID? = nil) async throws -> ChatFull {
         let form: [String: FormValue?] = ["message": .string(message), "parent_id": parentId.map { .int($0) } ?? nil]
         let client = self.client
-        return try await IdempotencyStore.shared.submit(.chatMessage, target: String(chatId), form: form,
-                                                         draft: message, after: after, parent: parentId) { key in
+        return try await IdempotencyStore.shared.submit(.chatMessage, target: String(chatId), form: form) { key in
             try await client.send(Endpoint(method: .post, path: "users/chats/\(chatId)", body: .form(form), idempotencyKey: key),
                                   ifGeneration: ifGeneration)
-        } reconcile: { record in
-            let chat: ChatFull = try await client.send(Endpoint(method: .get, path: "users/chats/\(chatId)"))
-            let sent = chat.messages.contains { $0.id > (record.after ?? 0) && $0.message == message
-                && (fromCaregiver == nil || $0.isFromCaregiver == fromCaregiver) && $0.parent?.value.id == parentId }
-            return sent ? chat : nil
         }
     }
 
@@ -264,24 +248,15 @@ struct UserService: Sendable {
 
     /// A predefined issue type and a free-text title are mutually exclusive — the
     /// backend rejects both together. "Other" sends a title; any type sends the id.
-    /// Sent with an Idempotency-Key; `after` is the newest issue id the person had. It is nil
-    /// when the screen's list hasn't loaded, and then read here before anything is sent, so an
-    /// older issue with the same words is never taken for this one after an expired key.
+    /// Sent with an Idempotency-Key: one issue per submission however often it is retried.
     @MainActor
-    func createIssue(issuetypeId: Int?, title: String?, description: String, ifGeneration: UUID? = nil, after: Int? = nil) async throws -> Issue {
+    func createIssue(issuetypeId: Int?, title: String?, description: String, ifGeneration: UUID? = nil) async throws -> Issue {
         let fields: [String: FormValue?] = issuetypeId.map {
             ["issuetype_id": .int($0), "description": .string(description)]
         } ?? ["title": .string(title ?? ""), "description": .string(description)]
         let client = self.client
-        let baseline: Int
-        if let after { baseline = after } else { baseline = try await issues(ifGeneration: ifGeneration).map(\.id).max() ?? 0 }
-        return try await IdempotencyStore.shared.submit(.issue, target: "issues", form: fields, draft: description, after: baseline,
-                                                         title: title, issuetypeId: issuetypeId) { key in
+        return try await IdempotencyStore.shared.submit(.issue, target: "issues", form: fields) { key in
             try await client.send(Endpoint(method: .post, path: "users/issues", body: .form(fields), idempotencyKey: key), ifGeneration: ifGeneration)
-        } reconcile: { record in
-            let all: [Issue] = try await client.send(Endpoint(method: .get, path: "users/issues"))
-            return all.first { $0.id > (record.after ?? 0) && $0.description == description
-                && (issuetypeId != nil ? $0.issuetypeId == issuetypeId : $0.title == title) }
         }
     }
 }

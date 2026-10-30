@@ -613,12 +613,6 @@ enum NotificationsBadge {
 struct EmptyArt: View {
     let name: String
     var body: some View {
-        if name == "illus_chat", let url = SourceStore.assetURL("desktop-empty-message-illustration.jpg"),
-           let image = UIImage(contentsOfFile: url.path) {
-            Image(uiImage: image).resizable().scaledToFit().frame(width: 150, height: 157)
-                .clipShape(RoundedRectangle(cornerRadius: 16)).accessibilityHidden(true)
-        } else {
-            AppIcon(name: name, size: 150)
-        }
+        AppIcon(name: name, size: 150)
     }
 }

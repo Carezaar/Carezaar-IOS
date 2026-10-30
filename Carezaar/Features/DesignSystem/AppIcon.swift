@@ -7,6 +7,9 @@ final class AndroidVectors: @unchecked Sendable {
     static let shared = AndroidVectors()
 
     struct Paint: Decodable { let hex: String; let a: Double }
+    struct GradientStop: Decodable { let hex: String; let a: Double; let offset: Double }
+    struct LinearGradient: Decodable { let x1: Double; let y1: Double; let x2: Double; let y2: Double; let stops: [GradientStop] }
+    struct Clip: Decodable { let d: String; let matrix: [Double] }
     struct PathSpec: Decodable {
         let d: String
         let fill: Paint?
@@ -16,6 +19,38 @@ final class AndroidVectors: @unchecked Sendable {
         let strokeWidth: Double
         let evenOdd: Bool
         let matrix: [Double]
+        let fillGradient: LinearGradient?
+        let strokeGradient: LinearGradient?
+        let cap: String?
+        let join: String?
+        let clips: [Clip]?
+
+        var transform: CGAffineTransform {
+            CGAffineTransform(a: matrix[0], b: matrix[1], c: matrix[2], d: matrix[3], tx: matrix[4], ty: matrix[5])
+        }
+
+        var strokeStyle: StrokeStyle {
+            let lineCap: CGLineCap = cap == "round" ? .round : cap == "square" ? .square : .butt
+            let lineJoin: CGLineJoin = join == "round" ? .round : join == "bevel" ? .bevel : .miter
+            return StrokeStyle(lineWidth: strokeWidth, lineCap: lineCap, lineJoin: lineJoin)
+        }
+
+        var clipPaths: [Path] {
+            (clips ?? []).map { clip in
+                let m = clip.matrix
+                return AndroidPathParser.parse(clip.d)
+                    .applying(CGAffineTransform(a: m[0], b: m[1], c: m[2], d: m[3], tx: m[4], ty: m[5]))
+            }
+        }
+
+        func shading(_ gradient: LinearGradient, alpha: Double) -> GraphicsContext.Shading {
+            let stops = gradient.stops.map {
+                Gradient.Stop(color: Color(hexString: $0.hex).opacity($0.a * alpha), location: $0.offset)
+            }
+            return .linearGradient(Gradient(stops: stops),
+                                   startPoint: CGPoint(x: gradient.x1, y: gradient.y1).applying(transform),
+                                   endPoint: CGPoint(x: gradient.x2, y: gradient.y2).applying(transform))
+        }
     }
     struct Vector: Decodable { let name: String; let viewport: [Double]; let paths: [PathSpec] }
 
@@ -40,9 +75,7 @@ final class AndroidVectors: @unchecked Sendable {
         if let cached = cache[name] { return cached }
         guard let vector = vectors[name] else { return [] }
         let built = vector.paths.map { spec -> (Path, PathSpec) in
-            let m = spec.matrix
-            let transform = CGAffineTransform(a: m[0], b: m[1], c: m[2], d: m[3], tx: m[4], ty: m[5])
-            return (AndroidPathParser.parse(spec.d).applying(transform), spec)
+            (AndroidPathParser.parse(spec.d).applying(spec.transform), spec)
         }
         cache[name] = built
         return built
@@ -211,13 +244,14 @@ struct AppIcon: View {
                 context.translateBy(x: dx, y: dy)
                 context.scaleBy(x: scale, y: scale)
                 for (path, spec) in AndroidVectors.shared.paths(name) {
-                    if let fill = spec.fill {
-                        let colour = tint ?? Color(hexString: fill.hex).opacity(fill.a * spec.fillAlpha)
-                        context.fill(path, with: .color(colour), style: FillStyle(eoFill: spec.evenOdd))
-                    }
-                    if let stroke = spec.stroke, spec.strokeWidth > 0 {
-                        let colour = tint ?? Color(hexString: stroke.hex).opacity(stroke.a * spec.strokeAlpha)
-                        context.stroke(path, with: .color(colour), lineWidth: spec.strokeWidth)
+                    let clips = spec.clipPaths
+                    if clips.isEmpty {
+                        Self.draw(path, spec, tint: tint, in: &context)
+                    } else {
+                        context.drawLayer { layer in
+                            for clip in clips { layer.clip(to: clip) }
+                            Self.draw(path, spec, tint: tint, in: &layer)
+                        }
                     }
                 }
             }
@@ -227,6 +261,23 @@ struct AppIcon: View {
             Image(uiImage: image).resizable().scaledToFit().frame(width: size, height: size).accessibilityHidden(true)
         } else {
             Color.clear.frame(width: size, height: size)
+        }
+    }
+
+    private static func draw(_ path: Path, _ spec: AndroidVectors.PathSpec, tint: Color?, in context: inout GraphicsContext) {
+        let fillStyle = FillStyle(eoFill: spec.evenOdd)
+        if let fill = spec.fill {
+            let colour = tint ?? Color(hexString: fill.hex).opacity(fill.a * spec.fillAlpha)
+            context.fill(path, with: .color(colour), style: fillStyle)
+        } else if let gradient = spec.fillGradient {
+            context.fill(path, with: tint.map { GraphicsContext.Shading.color($0) } ?? spec.shading(gradient, alpha: spec.fillAlpha), style: fillStyle)
+        }
+        guard spec.strokeWidth > 0 else { return }
+        if let stroke = spec.stroke {
+            let colour = tint ?? Color(hexString: stroke.hex).opacity(stroke.a * spec.strokeAlpha)
+            context.stroke(path, with: .color(colour), style: spec.strokeStyle)
+        } else if let gradient = spec.strokeGradient {
+            context.stroke(path, with: tint.map { GraphicsContext.Shading.color($0) } ?? spec.shading(gradient, alpha: spec.strokeAlpha), style: spec.strokeStyle)
         }
     }
 }

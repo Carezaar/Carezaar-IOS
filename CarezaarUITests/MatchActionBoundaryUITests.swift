@@ -180,7 +180,7 @@ final class MatchActionBoundaryUITests: XCTestCase {
         lostAckCleanup = nil
     }
 
-    func testOwnedRequestCommittedLostAcknowledgementReconcilesSentWithoutReplay() throws {
+    func testOwnedRequestLostAcknowledgementIsSentAgainWithItsKeyAndKeptOnce() throws {
         let f = try lostAckFixture()
         let before = try lostAckProfile(f)
         let peerBefore = try lostAckProfile(f, peer: true)
@@ -227,15 +227,24 @@ final class MatchActionBoundaryUITests: XCTestCase {
         lostAckCleanup = f
         confirm.tap()
         let toast = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", changed)).firstMatch
-        let withdraw = app.buttons["match-withdraw"]
-        XCTAssertTrue(withdraw.waitForExistence(timeout: 10) && withdraw.isHittable)
-        XCTAssertTrue(app.staticTexts[pending].exists)
-        XCTAssertFalse(toast.exists, "An own successfully reconciled request must not report an external match change")
-        XCTAssertFalse(request.exists)
-        XCTAssertEqual(try count("POST /api/users/matches"), 1)
-        XCTAssertEqual(try relationshipWrites(), 1)
+        // As on Android: a lost answer to a request is reported, nothing is read to guess it.
+        let shownAgain = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            request.exists && request.isEnabled && request.isHittable
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [shownAgain], timeout: 45), .completed)
         XCTAssertEqual(try count("QA lost-owned-match-ack"), 1, "Hook must prove one actual successful response was dropped")
-        XCTAssertEqual(try count("GET /api/" + f.endpoint), 3, "Initial load, action preflight and post-loss reconciliation are actual native reads")
+        XCTAssertEqual(try count("GET /api/" + f.endpoint), 2, "Initial load and action preflight only")
+        request.tap()
+        XCTAssertTrue(field.waitForExistence(timeout: 10))
+        XCTAssertEqual(field.value as? String, f.marker, "The introduction is kept for the next attempt")
+        confirm.tap()
+        let withdraw = app.buttons["match-withdraw"]
+        XCTAssertTrue(withdraw.waitForExistence(timeout: 30) && withdraw.isHittable)
+        XCTAssertTrue(app.staticTexts[pending].exists)
+        XCTAssertFalse(toast.exists, "An own request must not report an external match change")
+        XCTAssertFalse(request.exists)
+        XCTAssertEqual(try count("POST /api/users/matches"), 2, "Sent again with the same Idempotency-Key")
+        XCTAssertEqual(try count("GET /api/" + f.endpoint), 3, "Initial load and one preflight per attempt")
         let sent = try lostAckProfile(f), received = try lostAckProfile(f, peer: true)
         XCTAssertEqual(sent["match_status"] as? String, "sent")
         XCTAssertEqual(received["match_status"] as? String, "received")
@@ -262,14 +271,14 @@ final class MatchActionBoundaryUITests: XCTestCase {
         XCTAssertEqual(after["match_id"] as? Int, edgeID)
         _ = try lostAckOwnedEdge(edgeID, fixture: f)
         let record: [String: Any] = ["caseID": "P23-017", "ownedPairStartedNone": true,
-            "realRequestPOSTsBeforeRevisit": 1, "actualSuccessfulAcknowledgementsDropped": 1,
+            "realRequestPOSTsBeforeRevisit": 2, "actualSuccessfulAcknowledgementsDropped": 1,
             "nativeProfileReadsBeforeRevisit": 3, "ownActionChangedErrorAbsent": true,
             "backendSentReceivedSameOwnedEdge": true, "nativeSentActionObserved": true,
             "revisitMutationRequests": try relationshipWrites(), "requestBodyCaptured": false,
             "faultScope": "one-actual-2xx-owned-request-acknowledgement",
             "scenarioOtherSessionRelationshipChange": false, "scenarioLostAcknowledgement": true]
         let attachment = XCTAttachment(data: try JSONSerialization.data(withJSONObject: record, options: [.sortedKeys]), uniformTypeIdentifier: "public.json")
-        attachment.name = "P23-017-real-owned-request-lost-ack-reconciliation"; attachment.lifetime = .keepAlways; add(attachment)
+        attachment.name = "P23-017-real-owned-request-lost-ack-same-key"; attachment.lifetime = .keepAlways; add(attachment)
         app.terminate()
         try restoreLostAckNone(f)
         lostAckCleanup = nil

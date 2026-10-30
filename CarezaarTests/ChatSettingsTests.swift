@@ -18,7 +18,6 @@ final class ChatSettingsTests: XCTestCase {
         // Parity v3 Q1: an HTTP error answer to renewal ends the session.
         catch { XCTAssertEqual(Feedback.message(error), Feedback.message(APIError.unauthenticated(""))) }
         XCTAssertEqual(methods, ["POST", "PUT"], "An explicitly rejected Send needs no delivery reconciliation read")
-        XCTAssertFalse(coordinator.uncertain)
         XCTAssertFalse(tokens.hasSession)
     }
 
@@ -42,7 +41,6 @@ final class ChatSettingsTests: XCTestCase {
         } catch is CancellationError { }
         catch { XCTFail("Superseded Send must cancel") }
         XCTAssertEqual(methods, ["POST"])
-        XCTAssertFalse(coordinator.uncertain)
         XCTAssertEqual(tokens.accessToken, "new-account")
     }
 
@@ -156,17 +154,14 @@ final class ChatSettingsTests: XCTestCase {
         }
         let coordinator = ChatSendCoordinator(service: UserService(client: APIClient(tokens: FixtureTokens(), session: StubHTTP.session())))
         do { _ = try await coordinator.submit(chatId: 42, text: "Keep my draft", parentId: nil); XCTFail("The answer was lost") } catch {}
-        XCTAssertTrue(coordinator.uncertain)
-        XCTAssertEqual(IdempotencyStore.shared.pending(.chatMessage, target: "42").first?.draft, "Keep my draft", "Kept to offer again")
+        XCTAssertEqual(IdempotencyStore.shared.pending(.chatMessage, target: "42").count, 1, "Kept for the next Send")
         let reconciled = try await coordinator.submit(chatId: 42, text: "Keep my draft", parentId: nil)
         XCTAssertEqual(reconciled.messages.map(\.id), [101])
         XCTAssertEqual(requests, ["POST", "POST"], "No conversation read guesses the outcome")
         XCTAssertEqual(keys.count, 2)
         XCTAssertEqual(keys[0], keys[1], "The retry sends the same Idempotency-Key")
         XCTAssertNotNil(UUID(uuidString: keys[0]))
-        XCTAssertFalse(coordinator.uncertain)
         XCTAssertTrue(IdempotencyStore.shared.pending(.chatMessage, target: "42").isEmpty, "Retired after the confirmed success")
-        XCTAssertEqual(ChatDraftReconciliation.afterAcknowledgedSend(current: "Keep my draft", submitted: "Keep my draft"), "")
     }
 
     @MainActor
@@ -270,8 +265,7 @@ final class ChatSettingsTests: XCTestCase {
             catch { XCTAssertFalse(Feedback.message(error).isEmpty) }
         }
         XCTAssertEqual(reads, 0)
-        XCTAssertEqual(Set(keys).count, 1, "A server error is uncertain: the same key every time")
-        XCTAssertTrue(coordinator.uncertain)
+        XCTAssertEqual(Set(keys).count, 1, "A server error keeps the key: the same key every time")
     }
 
     @MainActor
@@ -295,20 +289,13 @@ final class ChatSettingsTests: XCTestCase {
     }
 
     @MainActor
-    func testConfirmedValidationRejectionDoesNotBecomeUncertainDelivery() async {
+    func testValidationRejectionKeepsTheKeyAsOnAndroid() async {
+        IdempotencyStore.shared.clearAll(); ActionGuard.shared.reset()
         StubHTTP.handler = { _ in (422, Data(#"{"errors":{"message":["Required"]},"message":"Invalid message"}"#.utf8)) }
         let coordinator = ChatSendCoordinator(service: UserService(client: APIClient(tokens: FixtureTokens(), session: StubHTTP.session())))
         do { _ = try await coordinator.submit(chatId: 42, text: "", parentId: nil) }
         catch {}
-        XCTAssertFalse(coordinator.uncertain)
-    }
-
-    func testAcknowledgedSendClearsOnlyItsOwnDraftContent() {
-        XCTAssertEqual(ChatDraftReconciliation.afterAcknowledgedSend(current: "Original", submitted: "Original"), "")
-        XCTAssertEqual(ChatDraftReconciliation.afterAcknowledgedSend(current: "Original next message", submitted: "Original"), "next message")
-        XCTAssertEqual(ChatDraftReconciliation.afterAcknowledgedSend(current: "Replacement message", submitted: "Original"), "Replacement message")
-        XCTAssertEqual(ChatDraftReconciliation.afterAcknowledgedSend(current: "Edited original", submitted: "Original"), "Edited original")
-        XCTAssertEqual(ChatDraftReconciliation.afterAcknowledgedSend(current: "مرحبا جديد", submitted: "مرحبا"), "جديد")
+        XCTAssertEqual(IdempotencyStore.shared.pending(.chatMessage, target: "42").count, 1)
     }
 
     @MainActor
@@ -456,8 +443,8 @@ final class SettingsMutationReconciliationTests: XCTestCase {
             return (200, Data(#"{"result":{"id":102,"title":"Synthetic issue","description":"Synthetic description","is_replied":false}}"#.utf8))
         }
         let coordinator = IssueSubmissionCoordinator(service: UserService(client: APIClient(tokens: tokens, session: StubHTTP.session())))
-        do { _ = try await coordinator.submit(draft, baseline: []); XCTFail("Lost answer") } catch {}
-        let created = try await coordinator.submit(draft, baseline: [])
+        do { _ = try await coordinator.submit(draft); XCTFail("Lost answer") } catch {}
+        let created = try await coordinator.submit(draft)
         XCTAssertEqual(created.id, 102)
         XCTAssertEqual(reads, 0, "No list read guesses the outcome")
         XCTAssertEqual(keys.count, 2)
@@ -465,52 +452,21 @@ final class SettingsMutationReconciliationTests: XCTestCase {
         XCTAssertTrue(tokens.hasSession)
     }
 
-    func testExpiredIssueKeyIsReconciledByTypeAndDescriptionBeforeAnythingIsResent() async throws {
-        IdempotencyStore.shared.clearAll(); ActionGuard.shared.reset()
-        let tokens = FixtureTokens()
-        tokens.save(Session(accessToken: "fixture", refreshToken: "fixture-refresh"))
-        var posts = 0
-        StubHTTP.handler = { request in
-            if request.httpMethod == "POST" {
-                posts += 1
-                return (409, Data(#"{"result":null,"meta":{"code":"idempotency_expired"},"message":"Expired"}"#.utf8))
-            }
-            return (200, Data(#"{"result":[{"id":102,"issuetype_id":7,"title":"Server category caption","description":"Synthetic description","is_replied":false}]}"#.utf8))
-        }
-        let coordinator = IssueSubmissionCoordinator(service: UserService(client: APIClient(tokens: tokens, session: StubHTTP.session())))
-        let draft = IssueSubmissionDraft(issuetypeId: 7, title: nil, description: "Synthetic description")
-        let saved = try await coordinator.submit(draft, baseline: [])
-        XCTAssertEqual(saved.id, 102)
-        XCTAssertEqual(saved.issuetypeId, 7)
-        XCTAssertEqual(posts, 1, "Reconciled, not sent again")
-    }
-
-    func testIssueFiledBeforeTheListLoadedReadsItFirstSoAnExpiredKeyIsNotMatchedToAnOlderIdenticalIssue() async throws {
+    func testExpiredIssueKeyIsShownAndKeptWithoutReadingTheList() async throws {
         IdempotencyStore.shared.clearAll(); ActionGuard.shared.reset()
         let tokens = FixtureTokens()
         tokens.save(Session(accessToken: "fixture", refreshToken: "fixture-refresh"))
         var methods: [String] = []
         StubHTTP.handler = { request in
             methods.append(request.httpMethod ?? "")
-            if request.httpMethod == "POST" {
-                return (409, Data(#"{"result":null,"meta":{"code":"idempotency_expired"},"message":"Expired"}"#.utf8))
-            }
-            // An older issue with the same words; nothing newer was filed.
-            return (200, Data(#"{"result":[{"id":7,"title":"Login","description":"Same words","is_replied":false}]}"#.utf8))
+            return (409, Data(#"{"result":null,"meta":{"code":"idempotency_expired"},"message":"Expired"}"#.utf8))
         }
         let coordinator = IssueSubmissionCoordinator(service: UserService(client: APIClient(tokens: tokens, session: StubHTTP.session())))
-        let draft = IssueSubmissionDraft(issuetypeId: nil, title: "Login", description: "Same words")
-        do {
-            _ = try await coordinator.submit(draft, baseline: nil)
-            XCTFail("The older identical issue must not be taken for this one")
-        } catch is SubmissionNotCarriedOutError {}
-        XCTAssertEqual(methods, ["GET", "POST", "GET"], "List read before anything was sent; then the expired key was reconciled")
-
-        // The list can't be read: nothing is sent.
-        IdempotencyStore.shared.clearAll(); methods = []
-        StubHTTP.handler = { request in methods.append(request.httpMethod ?? ""); throw URLError(.notConnectedToInternet) }
-        do { _ = try await coordinator.submit(IssueSubmissionDraft(issuetypeId: nil, title: "Login", description: "Other words"), baseline: nil); XCTFail("No baseline") } catch {}
-        XCTAssertFalse(methods.contains("POST"), "No issue sent without a baseline")
+        let draft = IssueSubmissionDraft(issuetypeId: 7, title: nil, description: "Synthetic description")
+        do { _ = try await coordinator.submit(draft); XCTFail("Expired") }
+        catch { XCTAssertEqual(error as? APIError, .unknown("Expired")) }
+        XCTAssertEqual(methods, ["POST"], "Sent straight away; no list read")
+        XCTAssertEqual(IdempotencyStore.shared.pending(.issue, target: "issues").count, 1)
     }
 
     func testLostDeletionAcknowledgementAndRejectedSessionClearsLocalStateWithoutAnotherDelete() async throws {

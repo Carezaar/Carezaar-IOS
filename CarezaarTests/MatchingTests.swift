@@ -118,31 +118,15 @@ final class MatchingTests: XCTestCase {
         XCTAssertEqual(MatchMutation.reject.expectedStatus, .received)
         XCTAssertEqual(MatchMutation.unmatch.expectedStatus, .active)
     }
-    /// The October 13 client explicitly rejects the old changed-error presentation
-    /// when this user's accept became an active match. Historical results remain.
-    func testOwnAcceptConfirmedBySameRelationshipNeverReportsExternalMatchChange() {
-        let before = ProfileMatchState(status: "received", id: 41)!
-        let accepted = ProfileMatchState(status: "active", id: 41)!
-        XCTAssertEqual(MatchFailureResolution.resolve(before: before, after: accepted, action: .accept), .matched,
-                       "Confirmed same-relationship acceptance must open It's a match rather than report an external change")
-    }
-
-    func testOwnAcceptanceSucceedsButReplacementRelationshipStillReportsChanged() {
-        let before = ProfileMatchState(status: "received", id: 41)!
-        let accepted = ProfileMatchState(status: "active", id: 41)!
-        let replacement = ProfileMatchState(status: "received", id: 42)!
-        XCTAssertEqual(MatchFailureResolution.resolve(before: before, after: accepted, action: .accept), .matched)
-        XCTAssertEqual(MatchFailureResolution.resolve(before: before, after: replacement), .changed)
-    }
-
-    func testFailedWriteWithoutVerifiableProfileUsesCheckWindow() {
-        let before = ProfileMatchState(status: "sent", id: 41)!
-        XCTAssertEqual(MatchFailureResolution.resolve(before: before, after: nil), .checkUnavailable)
-    }
-
-    func testFailedWriteWithUnchangedProfileRetainsOperationError() {
-        let state = ProfileMatchState(status: "received", id: 41)!
-        XCTAssertEqual(MatchFailureResolution.resolve(before: state, after: state), .originalError)
+    func testClearingAMatchLeavesNoRelationshipOnTheProfile() throws {
+        let json = #"{"id":"g1","user":{"id":"c1","role":"caregiver","is_favorite":false},"is_match":true,"match_status":"active","match_id":41}"#
+        let profile = try JSONDecoder().decode(CaregiverFull.self, from: Data(json.utf8))
+        XCTAssertEqual(profile.matchState?.status, .active)
+        let cleared = profile.with(matchStatus: "none", matchId: nil)
+        XCTAssertEqual(cleared.matchState?.status, ProfileMatchStatus.none)
+        XCTAssertNil(cleared.matchState?.id)
+        XCTAssertFalse(cleared.isMatch)
+        XCTAssertEqual(profile.with(matchStatus: "sent", matchId: 42).matchState?.id, 42)
     }
 
 }

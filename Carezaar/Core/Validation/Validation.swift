@@ -14,9 +14,6 @@ enum PasswordValidator {
     /// Android's special set on sign-up and Set Up Password (`.*[!@#$%^&*()_+\[\]{}|\-;:,.<>?].*`);
     /// other symbols do not satisfy this rule.
     static let specialCharacters = "!@#$%^&*()_+[]{}|-;:,.<>?"
-    /// Android's Change Password checklist tests a smaller set (`.*[!@#%^&*()?].*`); that
-    /// screen's chips use it. Its button doesn't depend on the chips: the API decides.
-    static let changePasswordSpecialCharacters = "!@#%^&*()?"
 
     /// Android tests each rule with Java's `Pattern.matches(".*[class].*")`. Java's `.` stops at
     /// line terminators, so a password containing one fails every character rule there.

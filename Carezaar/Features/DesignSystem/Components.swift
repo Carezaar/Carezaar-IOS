@@ -126,7 +126,6 @@ struct PasswordRulesView: View {
     /// Content slug prefix, e.g. `settings_change_password` →
     /// `settings_change_password_password_validation_8_letters`.
     var prefix = "signup_credentials"
-    /// Change Password's chips test Android's smaller special set there.
     var special = PasswordValidator.specialCharacters
     @EnvironmentObject private var loc: Localization
 

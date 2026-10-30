@@ -68,10 +68,7 @@ struct PartnerDetailsView: View {
         .onDisappear { visible = false; delayedBack?.cancel(); delayedBack = nil }
         .task { await load() }
         .alert(loc.t("match_check_failed_title", "Couldn't check this match"), isPresented: $checkUnavailable) {
-            Button(loc.t("general_cancel", "Cancel"), role: .cancel) {
-                // Cancelling the window cannot erase an uncertain write outcome.
-                if pendingIntent?.canSubmit == true { pendingIntent = nil }
-            }
+            Button(loc.t("general_cancel", "Cancel"), role: .cancel) { pendingIntent = nil }
             Button(loc.t("general_try_again", "Try Again")) {
                 Task { await retryCheck() }
             }
@@ -180,7 +177,6 @@ struct PartnerDetailsView: View {
             case .none:
                 WideButton(title: loc.t("match_match_button", "Request a Match"), icon: "ic_match_on", enabled: !busy, loading: working == .request) {
                     guard !busy else { return }
-                    introduction = ""
                     requesting = true
                 }
                 .accessibilityIdentifier("match-request")
@@ -315,6 +311,7 @@ struct PartnerDetailsView: View {
 
     private func retryCheck() async {
         if let intent = pendingIntent {
+            pendingIntent = nil
             await continueIntent(intent)
             return
         }
@@ -354,17 +351,11 @@ struct PartnerDetailsView: View {
         } catch { feedback.toast(Feedback.message(error)) }
     }
 
-    /// Preserve the exact confirmed action, original relationship and introduction.
-    /// A failed preflight can resume it; an uncertain write can only be reconciled.
+    /// As on Android: the confirmed action first re-reads the profile. A changed match sends
+    /// nothing; a check that fails offers Try Again.
     private func perform(_ which: MatchMutation) async {
         guard !busy, let shown = matchState else { return }
-        if let unresolved = pendingIntent, !unresolved.canSubmit {
-            await continueIntent(unresolved)
-            return
-        }
-        let intent = MatchActionIntent(action: which, before: shown, introduction: introduction, generation: TokenStore.shared.generation)
-        pendingIntent = intent
-        await continueIntent(intent)
+        await continueIntent(MatchActionIntent(action: which, before: shown, introduction: introduction, generation: TokenStore.shared.generation))
     }
 
     private func continueIntent(_ intent: MatchActionIntent) async {
@@ -384,86 +375,59 @@ struct PartnerDetailsView: View {
         }
         guard visible, !Task.isCancelled, TokenStore.shared.generation == intent.generation else { return }
         guard let checked else { pendingIntent = intent; checkUnavailable = true; return }
-        // A match request carries an Idempotency-Key: after a lost answer, while the profile still
-        // shows no request, it may be sent again with the same key (the server keeps one).
-        let resendable = intent.action == .request && checked.status == .none
-        guard intent.canSubmit || resendable, checked == intent.before,
-              checked.status == intent.action.expectedStatus else {
-            resolve(intent, checked: checked)
+        guard checked == intent.before else {
+            feedback.toast(loc.t("match_changed_message", "This match has changed"))
             return
         }
-        var submitted = intent
-        submitted.phase = .uncertain(APIError.unknown(""))
-        pendingIntent = submitted // Set before suspension: no tap can replay this write.
         do {
-            let result: Match? = try await {
-                let service = UserService()
+            let service = UserService()
+            switch intent.action {
+            case .request:
+                let match = try await service.requestMatch(partnerId: partnerId, introduction: intent.introduction, ifGeneration: intent.generation)
+                guard visible, !Task.isCancelled, TokenStore.shared.generation == intent.generation else { return }
+                setMatch(match.stage == .active ? "active" : "sent", id: match.id)
+                if introduction == intent.introduction { introduction = "" }
+                if match.stage == .active { router.push(.matched(partner: matchedPartner)) }
+            case .accept:
+                let match = try await service.acceptMatch(id: checked.id!, ifGeneration: intent.generation)
+                guard visible, !Task.isCancelled, TokenStore.shared.generation == intent.generation else { return }
+                setMatch("active", id: match.id)
+                router.push(.matched(partner: matchedPartner))
+            case .reject, .withdraw, .unmatch:
                 switch intent.action {
-                case .request: return try await service.requestMatch(partnerId: partnerId, introduction: intent.introduction, ifGeneration: intent.generation)
-                case .accept: return try await service.acceptMatch(id: checked.id!, ifGeneration: intent.generation)
-                case .reject: try await service.rejectMatch(id: checked.id!, ifGeneration: intent.generation); return nil
-                case .withdraw: try await service.withdrawMatch(id: checked.id!, ifGeneration: intent.generation); return nil
-                case .unmatch: return try await service.breakMatch(id: checked.id!, ifGeneration: intent.generation)
+                case .reject: try await service.rejectMatch(id: checked.id!, ifGeneration: intent.generation)
+                case .withdraw: try await service.withdrawMatch(id: checked.id!, ifGeneration: intent.generation)
+                default: _ = try await service.breakMatch(id: checked.id!, ifGeneration: intent.generation)
                 }
-            }()
-            submitted.phase = .acknowledged
-            pendingIntent = submitted
-            guard visible, !Task.isCancelled, TokenStore.shared.generation == intent.generation else { return }
-            if (intent.action == .request || intent.action == .accept),
-               let result, result.isActive(with: partnerId, for: session.role ?? .client),
-               intent.action == .request || result.id == checked.id {
-                applyMatchResult(result)
-                complete(intent, matched: true)
-                return
+                guard visible, !Task.isCancelled, TokenStore.shared.generation == intent.generation else { return }
+                setMatch("none", id: nil)
             }
         } catch is CancellationError { return }
         catch {
-            guard MutationOutcome.mayHaveCommitted(error) else {
-                pendingIntent = nil
-                if visible, !Task.isCancelled { feedback.toast(Feedback.message(error)) }
-                return
+            guard visible, !Task.isCancelled, TokenStore.shared.generation == intent.generation else { return }
+            // A lost answer: the profile shows whether the action went through anyway.
+            if intent.action != .request, (error as? APIError)?.isUnreachable ?? false {
+                await checkAfterNoAnswer(intent, error: error)
+            } else {
+                feedback.toast(Feedback.message(error))
             }
-            submitted.phase = .uncertain(error)
-            pendingIntent = submitted
-            guard visible, !Task.isCancelled, TokenStore.shared.generation == intent.generation else { return }
         }
-        // Acknowledged and ambiguous writes both use a read, never another mutation.
+    }
+
+    private func checkAfterNoAnswer(_ intent: MatchActionIntent, error: Error) async {
+        let done: ProfileMatchStatus = intent.action == .accept ? .active : .none
         do {
-            let actual = try await freshState(generation: intent.generation)
+            let fresh = try await freshState(generation: intent.generation)
             guard visible, !Task.isCancelled, TokenStore.shared.generation == intent.generation else { return }
-            resolve(submitted, checked: actual)
+            guard fresh?.status == done else { feedback.toast(Feedback.message(error)); return }
+            if done == .active { router.push(.matched(partner: matchedPartner)) }
         } catch is CancellationError { return }
-        catch { if visible, TokenStore.shared.generation == intent.generation { checkUnavailable = true } }
+        catch { if visible { feedback.toast(Feedback.message(error)) } }
     }
 
-    private func resolve(_ intent: MatchActionIntent, checked: ProfileMatchState?) {
-        switch MatchFailureResolution.resolve(before: intent.before, after: checked, action: intent.action) {
-        case .matched: complete(intent, matched: true)
-        case .completed: complete(intent, matched: false)
-        case .changed:
-            pendingIntent = nil
-            feedback.toast(loc.t("match_changed_message", "This match has changed"))
-        case .checkUnavailable:
-            pendingIntent = intent
-            checkUnavailable = true
-        case .originalError:
-            if intent.canSubmit { pendingIntent = nil }
-            else { pendingIntent = intent }
-            feedback.toast(Feedback.message(intent.failure ?? APIError.unknown("")))
-        }
-    }
-
-    private func complete(_ intent: MatchActionIntent, matched: Bool) {
-        pendingIntent = nil
-        // The profile shows how the request ended: its key is done with.
-        if intent.action == .request { IdempotencyStore.shared.retireAll(.matchRequest, target: partnerId) }
-        if intent.action == .request, introduction == intent.introduction { introduction = "" }
-        if matched { router.push(.matched(partner: matchedPartner)) }
-    }
-
-    private func applyMatchResult(_ match: Match) {
-        if let value = caregiver { caregiver = value.with(matchStatus: "active", matchId: match.id) }
-        if let value = client { client = value.with(matchStatus: "active", matchId: match.id) }
+    private func setMatch(_ status: String, id: Int?) {
+        if let value = caregiver { caregiver = value.with(matchStatus: status, matchId: id) }
+        if let value = client { client = value.with(matchStatus: status, matchId: id) }
     }
 
     private var matchedPartner: MatchedPartner {
@@ -598,43 +562,12 @@ private struct FavoriteProfileSnapshot: Decodable {
     }
 }
 
-/// Confirmed intent and delivery phase survive connection windows and later taps.
+/// The confirmed action with the relationship it was confirmed against.
 struct MatchActionIntent {
-    enum Phase { case preflight, uncertain(Error), acknowledged }
     let action: MatchMutation
     let before: ProfileMatchState
     let introduction: String
     let generation: UUID
-    var phase: Phase = .preflight
-    var canSubmit: Bool { if case .preflight = phase { return true }; return false }
-    var failure: Error? { if case .uncertain(let error) = phase { return error }; return nil }
-}
-
-/// An own action reaching its requested outcome is success, not an external change.
-/// Same-status replacement relationship IDs cannot authorize or acknowledge an action.
-enum MatchFailureResolution: Equatable {
-    case matched, completed, changed, checkUnavailable, originalError
-
-    static func resolve(before: ProfileMatchState, after: ProfileMatchState?, action: MatchMutation? = nil) -> Self {
-        guard let after else { return .checkUnavailable }
-        guard after != before else { return .originalError }
-        let intent = action ?? inferredAction(before.status)
-        guard before.status == intent.expectedStatus else { return .changed }
-        switch intent {
-        case .request:
-            if after.status == .active { return .matched }
-            if after.status == .sent { return .completed }
-        case .accept:
-            if after.id == before.id, after.status == .active { return .matched }
-        case .withdraw, .reject, .unmatch:
-            if after.status == .none { return .completed }
-        }
-        return .changed
-    }
-
-    private static func inferredAction(_ status: ProfileMatchStatus) -> MatchMutation {
-        switch status { case .none: .request; case .sent: .withdraw; case .received: .accept; case .active: .unmatch }
-    }
 }
 
 // MARK: - Match request

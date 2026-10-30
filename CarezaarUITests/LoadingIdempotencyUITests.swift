@@ -152,38 +152,34 @@ final class LoadingIdempotencyUITests: XCTestCase {
         XCTAssertTrue(waitFor(30) { self.count("QA lost-answer") == 1 })
         XCTAssertTrue(waitFor(15) { self.send.isEnabled })
         let kept = composer.value as? String
-        let note = app.descendants(matching: .any).matching(identifier: "chat-unconfirmed-note").firstMatch.waitForExistence(timeout: 5)
         send.tap()
         XCTAssertTrue(waitFor(30) { ((self.composer.value as? String) ?? "") != text })
         sleep(2)
         let posts = count("POST /api/users/chats/\(chat)"), keys = count("KEYS POST /api/users/chats/\(chat)")
         let stored = try serverMessages(chat, text)
         let shown = app.staticTexts.matching(NSPredicate(format: "label == %@", text)).count
-        attach("lost-answer", ["posts": posts, "keys": keys, "stored": stored, "keptText": kept == text, "note": note, "shown": shown])
+        attach("lost-answer", ["posts": posts, "keys": keys, "stored": stored, "keptText": kept == text, "shown": shown])
         XCTAssertEqual(kept, text, "The text stays after the lost answer")
-        XCTAssertTrue(note, "Says the message may not have been sent")
         XCTAssertEqual(posts, 2); XCTAssertEqual(keys, 1, "Both attempts sent the same key")
         XCTAssertEqual(stored, 1, "The server kept the message once")
         XCTAssertEqual(shown, 1)
     }
 
-    func testAfterARestartTheUnconfirmedMessageIsOfferedAgainAndSentWithItsKey() throws {
+    func testAfterARestartTheSameMessageIsSentWithItsKey() throws {
         let chat = try stageChat()
         openChat(chat, faults: ["--qa-lose-answer", "POST", "/api/users/chats/\(chat)", "1"])
         let text = "Synthetic restart \(UUID().uuidString.prefix(8))"
         composer.tap(); composer.typeText(text)
         send.tap()
         XCTAssertTrue(waitFor(30) { self.count("QA lost-answer") == 1 })
-        // Restart (no fault this time): the box shows the message again, with the note.
+        // Restart (no fault this time): the same message typed again reuses its saved key.
         openChat(chat)
-        let restored = waitFor(15) { (self.composer.value as? String) == text }
-        let note = app.descendants(matching: .any).matching(identifier: "chat-unconfirmed-note").firstMatch.waitForExistence(timeout: 5)
+        composer.tap(); composer.typeText(text)
         send.tap()
         XCTAssertTrue(waitFor(30) { ((self.composer.value as? String) ?? "") != text })
         sleep(2)
         let stored = try serverMessages(chat, text)
-        attach("restart", ["restored": restored, "note": note, "stored": stored, "keysAfterRestart": count("KEYS POST /api/users/chats/\(chat)")])
-        XCTAssertTrue(restored); XCTAssertTrue(note)
+        attach("restart", ["stored": stored, "keysAfterRestart": count("KEYS POST /api/users/chats/\(chat)")])
         XCTAssertEqual(stored, 1, "Sent with the same key: the server kept it once")
     }
 

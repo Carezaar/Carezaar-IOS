@@ -72,11 +72,10 @@ struct Endpoint {
 /// client's description as 409 `idempotency_expired`.
 ///
 /// One key per logical submission, kept in UserDefaults (scoped by account, operation, target
-/// and a hash of the data) until the outcome is known, so a retry after a timeout, a lost
+/// and a hash of the data) until a success confirms it, so a retry after a timeout, a lost
 /// connection, a renewed sign-in, an app restart or another visit to the screen sends the same
-/// key. A confirmed success, or an answer proving the request was not carried out, retires it;
-/// the next submission (even with identical text) gets a new key. An uncertain outcome keeps
-/// it: a request is never repeated with a new key on a guess.
+/// key. A confirmed success retires it; the next submission (even with identical text) gets a
+/// new key. Any other outcome keeps it.
 enum IdempotentOperation: String, Codable, Sendable {
     case chatMessage = "chat_message", issue, matchRequest = "match_request"
 }
@@ -87,36 +86,12 @@ struct PendingSubmission: Codable, Equatable, Sendable {
     let account: String
     let operation: IdempotentOperation
     let target: String
-    /// What the person submitted, so the screen can offer it again after a restart.
-    var draft: String?
-    /// Newest record id known when the submission began, for reconciliation.
-    var after: Int?
-    /// The message replied to, for a chat message.
-    var parent: Int?
-    /// An issue's free title or predefined type, to recognise it once filed.
-    var title: String?
-    var issuetypeId: Int?
 }
-
-/// The server's 409 for a key: `idempotency_conflict` or `idempotency_expired`.
-struct IdempotencyServerError: Error, Equatable { let code: String }
-/// Same key, different data: not resent, and not resent with a new key either.
-struct IdempotencyConflictError: Error, Equatable {}
-/// The server forgot the key and the resource shows the earlier attempt was not carried out.
-struct SubmissionNotCarriedOutError: Error, Equatable {}
 
 @MainActor
 final class IdempotencyStore {
     static let shared = IdempotencyStore()
     static let storageKey = "carezaar.pendingSubmissions.v1"
-    /// Longer than any write can take: a refused write is sent, its sign-in renewed and the write
-    /// replayed, each with a 120 s deadline (up to 6 minutes). A record older than this has had its
-    /// answer, or lost it, so screens may retire it once they see it carried out.
-    static let settledAfter: TimeInterval = 10 * 60
-
-    // Unresolved records are kept until their outcome is known, with no age limit. The server
-    // may forget a key sooner; it then answers `idempotency_expired` and the record is
-    // reconciled with the server before anything new is sent.
 
     /// The signed-in account submissions are scoped to (set by the session).
     var account: String?
@@ -151,69 +126,21 @@ final class IdempotencyStore {
             .sorted { $0.created > $1.created }
     }
 
-    /// Retires every unresolved submission for an operation and target, once the resource
-    /// shows how it ended (e.g. the profile shows the request as sent).
-    func retireAll(_ operation: IdempotentOperation, target: String) {
-        retireCarriedOut(operation, target: target) { _ in true }
-    }
-
-    /// Retires the signed-in account's unresolved submissions for an operation and target that
-    /// the server already shows as carried out (e.g. the message is in the loaded conversation),
-    /// so a later submission with the same words isn't taken for them. Returns how many.
-    @discardableResult
-    func retireCarriedOut(_ operation: IdempotentOperation, target: String, where carriedOut: (PendingSubmission) -> Bool) -> Int {
-        let all = readAll()
-        let kept = all.filter { !($0.value.account == accountKey && $0.value.operation == operation && $0.value.target == target && carriedOut($0.value)) }
-        if kept.count != all.count { writeAll(kept) }
-        return all.count - kept.count
-    }
-
     func clearAll() { defaults.removeObject(forKey: Self.storageKey) }
 
-    /// True when the answer proves the request was not carried out (or was refused for good).
-    /// No answer, a timeout or a server error is uncertain.
-    nonisolated static func isDefinitive(_ error: Error) -> Bool {
-        if error is IdempotencyConflictError || error is SubmissionNotCarriedOutError { return true }
-        if error is IdempotencyServerError { return (error as? IdempotencyServerError)?.code == "idempotency_conflict" }
-        if error is AuthorizationRejectedMutationError { return true }
-        guard let api = error as? APIError else { return false }
-        switch api {
-        case .validation, .forbidden, .notFound, .unknown, .unauthenticated: return true
-        case .server, .connectionUnavailable, .network, .timeout, .decoding: return false
-        }
-    }
-
     /// Sends one logical submission with its key: a new one, or the same one again while its
-    /// earlier attempt is unresolved.
+    /// earlier attempt is unconfirmed.
     func submit<T>(_ operation: IdempotentOperation, target: String, form: [String: FormValue?],
-                   draft: String? = nil, after: Int? = nil, parent: Int? = nil, title: String? = nil, issuetypeId: Int? = nil,
-                   send: (String) async throws -> T,
-                   reconcile: ((PendingSubmission) async throws -> T?)? = nil) async throws -> T {
+                   send: (String) async throws -> T) async throws -> T {
         let scope = scope(operation, target, form)
         var all = readAll()
         let record = all[scope] ?? PendingSubmission(key: UUID().uuidString.lowercased(), created: Date(), account: accountKey,
-                                                     operation: operation, target: target, draft: draft, after: after, parent: parent,
-                                                     title: title, issuetypeId: issuetypeId)
+                                                     operation: operation, target: target)
         all[scope] = record
         writeAll(all)
-        func retire() { var now = readAll(); now.removeValue(forKey: scope); writeAll(now) }
-        do {
-            let result = try await send(record.key)
-            retire()
-            return result
-        } catch let error as IdempotencyServerError where error.code == "idempotency_expired" {
-            // The server no longer knows this key: find out whether the earlier attempt went
-            // through before anything is sent again. A failed check leaves the key in place.
-            let found = try await reconcile?(record) ?? nil
-            retire()
-            if let found { return found }
-            throw SubmissionNotCarriedOutError()
-        } catch let error as IdempotencyServerError where error.code == "idempotency_conflict" {
-            retire()
-            throw IdempotencyConflictError()
-        } catch {
-            if Self.isDefinitive(error) { retire() }
-            throw error
-        }
+        let result = try await send(record.key)
+        var now = readAll()
+        if now[scope]?.key == record.key { now.removeValue(forKey: scope); writeAll(now) }
+        return result
     }
 }

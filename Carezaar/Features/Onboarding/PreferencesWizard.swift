@@ -109,13 +109,14 @@ struct PreferencesWizard: View {
                 if node.name == "Description" { return loc.t("signup_form_caregiver_match_description", "") }
                 return nil
             },
-            // The caregiver frame (715:11684) shows its own skills illustration.
-            isHidden: { node in !isClient && ["101:11970", "101:11969", "101:11971"].contains(node.id) }),
-            overlays: isClient ? [] : [
-                SceneOverlay(x: 94, y: 110, width: 224, height: 238) {
-                    if let url = SourceStore.assetURL("skills-illustration.png"), let image = UIImage(contentsOfFile: url.path) {
-                        Image(uiImage: image).resizable().scaledToFit()
-                    }
+            isHidden: { node in ["101:11970", "101:11969", "101:11971"].contains(node.id) }),
+            overlays: [isClient
+                ? SceneOverlay(x: 46, y: 65, width: 320, height: 320) {
+                    OrbitView(names: baseData.items(.clienttypes).compactMap(\.icon), radius: 96, size: 128)
+                }
+                : SceneOverlay(x: 94, y: 113, width: 224, height: 224) {
+                    OrbitView(names: ["ic_condition_feeding", "ic_special_calm", "ic_shift_weekends", "ic_certified_full"],
+                              radius: 72, size: 80, tint: Theme.Palette.primary)
                 },
             ],
             fitHeight: true)
@@ -232,10 +233,17 @@ struct PreferencesWizard: View {
                 ChipSection(title: loc.t("signup_form_client_gender_preference", ""), hint: hint,
                             items: baseData.items(.genders), selection: $genders, icons: true)
             }
-            SalaryRangeField(minimum: $salaryMin, maximum: $salaryMax)
+            SalaryRangeField(minimum: $salaryMin, maximum: $salaryMax, title: payTitle,
+                             unit: isClient ? loc.t("signup_form_client_usd_per_hour", "USD per hour") : loc.t("signup_form_caregiver_unit", "USD per hour"),
+                             hint: isClient ? loc.t("signup_form_client_hourly_budget_hint", "Enter the hourly amount you are willing to pay for care services.")
+                                 : loc.t("signup_form_caregiver_expected_hourly_pay_hint", "Enter your expected hourly pay rate."))
         default:
             reviewCard
         }
+    }
+
+    private var payTitle: String {
+        isClient ? loc.t("signup_form_client_hourly_budget", "Hourly Care Budget") : loc.t("signup_form_caregiver_expected_hourly_pay", "Expected Hourly Pay")
     }
 
     private var reviewCard: some View {
@@ -254,7 +262,7 @@ struct PreferencesWizard: View {
             reviewRow(loc.t("signup_form_client_care_days", "Care Days"), .caredays, days)
             reviewRow(loc.t("signup_form_client_work_type", "Work Type"), .worktypes, worktypes)
             if isClient { reviewRow(loc.t("signup_form_client_gender_preference", "Gender"), .genders, genders) }
-            reviewText(loc.t("signup_form_client_pay_rate", "Pay Rate"),
+            reviewText(payTitle,
                        "\(loc.t("signup_form_client_minimum", "Minimum")): $\(salaryMin.map(String.init) ?? "—")   \(loc.t("signup_form_client_maximum", "Maximum")): $\(salaryMax.map(String.init) ?? "—")")
         }
         .padding(.horizontal, 16)
@@ -693,5 +701,28 @@ struct MapLocationPicker: View {
             try? await Task.sleep(for: .seconds(4))
             if permissionNote == note { permissionNote = nil }
         }
+    }
+}
+
+struct OrbitView: View {
+    let names: [String]
+    let radius: CGFloat
+    let size: CGFloat
+    var tint: Color? = nil
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        TimelineView(.animation(paused: reduceMotion)) { timeline in
+            let turn = reduceMotion ? 0 : timeline.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 8) / 8 * 360
+            ZStack {
+                ForEach(Array(names.enumerated()), id: \.offset) { index, name in
+                    let radians = (turn + 360 / Double(names.count) * Double(index) - 90) * .pi / 180
+                    AppIcon(name: name, size: size, tint: tint)
+                        .offset(x: radius * cos(radians), y: radius * sin(radians))
+                }
+            }
+            .frame(width: radius * 2 + size, height: radius * 2 + size)
+        }
+        .accessibilityHidden(true)
     }
 }

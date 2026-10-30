@@ -259,10 +259,6 @@ actor APIClient {
             throw APIError.unauthenticated(message)
         case 404:
             throw APIError.notFound(message)
-        case 409 where endpoint.idempotencyKey != nil:
-            // The key was used for other data (`idempotency_conflict`) or has expired
-            // (`idempotency_expired`): IdempotencyStore decides what happens next.
-            throw IdempotencyServerError(code: Self.rawMetaCode(from: data) ?? "unknown")
         case 409 where endpoint.path == "auth/login":
             // B1: email verified but the profile/role entity was never finished.
             throw RegistrationIncompleteError(message: message, role: Self.rawMetaRole(from: data))
@@ -293,20 +289,14 @@ actor APIClient {
         }
     }
 
-    /// Android's `safeCall` waits (attempt + 1) × 500 ms before each of up to three retries.
+    /// Android's retry interceptor waits attempt × 500 ms before each of up to three retries.
     static let readRetryDelays: [Duration] = [.milliseconds(500), .milliseconds(1_000), .milliseconds(1_500)]
 
-    /// Failures Android's `safeCall` retries: any `IOException` except a `SocketException`,
-    /// so DNS failures, being offline (no DNS), timeouts, TLS and certificate failures and a
-    /// malformed or cut-off answer are retried, and a refused connection (`ConnectException`)
-    /// is not. iOS reports a dropped connection as one code, whether Android would have seen
-    /// an end of stream (retried) or a reset socket (not retried); it is retried here.
+    /// Failures Android's retry interceptor retries on a GET: a `SocketException` (a refused,
+    /// reset or dropped connection) or a connection abort. DNS failures, being offline,
+    /// timeouts, TLS failures and malformed answers are not retried.
     static func isTransientReadFailure(_ code: URLError.Code) -> Bool {
-        [.cannotFindHost, .dnsLookupFailed, .notConnectedToInternet, .dataNotAllowed, .internationalRoamingOff,
-         .timedOut, .networkConnectionLost, .badServerResponse, .cannotParseResponse, .zeroByteResource,
-         .secureConnectionFailed, .serverCertificateUntrusted, .serverCertificateHasBadDate,
-         .serverCertificateHasUnknownRoot, .serverCertificateNotYetValid,
-         .clientCertificateRejected, .clientCertificateRequired].contains(code)
+        [.cannotConnectToHost, .networkConnectionLost].contains(code)
     }
 
     private static func transportError(_ error: URLError) -> APIError {
@@ -480,11 +470,6 @@ actor APIClient {
     private static func rawMetaRole(from data: Data) -> UserRole? {
         let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
         return ((object?["meta"] as? [String: Any])?["role"] as? String).flatMap { UserRole(rawValue: $0.lowercased()) }
-    }
-
-    private static func rawMetaCode(from data: Data) -> String? {
-        let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
-        return (json?["meta"] as? [String: Any])?["code"] as? String
     }
 
     private static func rawErrors(from data: Data) -> [String: [String]]? {

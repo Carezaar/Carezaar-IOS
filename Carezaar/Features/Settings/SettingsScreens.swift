@@ -175,7 +175,7 @@ struct ReportAnIssueView: View {
         .backHeader(loc.t("report_an_issue_title", "Report An Issue"))
         .task { await load() }
         .sheet(isPresented: $composing) {
-            IssueComposer(submission: issueSubmission, existingIssues: issues) { created in
+            IssueComposer(submission: issueSubmission) { created in
                 // The server's answer is the issue as filed: shown at once, not after another
                 // load, so a later failed refresh can't make it look unsent.
                 composing = false
@@ -218,18 +218,7 @@ struct ReportAnIssueView: View {
     private func load() async {
         error = nil
         do {
-            let all = try await UserService().issues()
-            // An issue whose answer was lost but which the list shows went through: its pending key
-            // is retired, so a later issue with the same words gets its own. Not while one is filed.
-            if !ActionGuard.shared.isBusy(IssueSubmissionCoordinator.resource) {
-                let settled = Date().addingTimeInterval(-IdempotencyStore.settledAfter)
-                IdempotencyStore.shared.retireCarriedOut(.issue, target: "issues") { record in
-                    record.created < settled && all.contains { $0.id > (record.after ?? 0) && $0.description == record.draft
-                        && (record.issuetypeId != nil ? $0.issuetypeId == record.issuetypeId
-                            : record.title != nil && $0.title == record.title) }
-                }
-            }
-            issues = all
+            issues = try await UserService().issues()
         } catch { self.error = error }
     }
 }
@@ -238,7 +227,6 @@ struct ReportAnIssueView: View {
 /// takes either `issuetype_id` or `title`, never both.
 private struct IssueComposer: View {
     @ObservedObject var submission: IssueSubmissionCoordinator
-    let existingIssues: [Issue]?
     let onDone: (Issue) -> Void
     @ObservedObject private var guards = ActionGuard.shared
     @EnvironmentObject private var session: SessionManager
@@ -299,7 +287,7 @@ private struct IssueComposer: View {
         do {
             let created = try await submission.submit(IssueSubmissionDraft(issuetypeId: typeId,
                 title: typeId == nil ? subject.trimmingCharacters(in: .whitespaces) : nil,
-                description: description.trimmingCharacters(in: .whitespacesAndNewlines)), baseline: existingIssues, generation: generation)
+                description: description.trimmingCharacters(in: .whitespacesAndNewlines)), generation: generation)
             guard owner == session.state.user?.id, generation == TokenStore.shared.generation else { return }
             onDone(created)
         } catch is CancellationError { }
@@ -329,12 +317,12 @@ final class IssueSubmissionCoordinator: ObservableObject {
 
     var submitting: Bool { ActionGuard.shared.isBusy(Self.resource) }
 
-    func submit(_ draft: IssueSubmissionDraft, baseline: [Issue]?, generation: UUID? = nil) async throws -> Issue {
+    func submit(_ draft: IssueSubmissionDraft, generation: UUID? = nil) async throws -> Issue {
         let owner = await service.client.credentialGeneration()
         guard generation == nil || generation == owner else { throw CancellationError() }
         return try await ActionGuard.shared.run(Self.resource) {
             try await service.createIssue(issuetypeId: draft.issuetypeId, title: draft.title, description: draft.description,
-                                          ifGeneration: owner, after: baseline.map { $0.map(\.id).max() ?? 0 })
+                                          ifGeneration: owner)
         }
     }
 }
@@ -423,8 +411,7 @@ struct ChangePasswordView: View {
                 LabeledField(label: loc.t("settings_change_password_new_password", "New Password"),
                              placeholder: loc.t("settings_change_password_new_password_placeholder", "Enter your new password..."),
                              text: $updated, contentType: .newPassword, isSecure: true)
-                PasswordRulesView(password: updated, prefix: "settings_change_password",
-                                  special: PasswordValidator.changePasswordSpecialCharacters)
+                PasswordRulesView(password: updated, prefix: "settings_change_password")
                 LabeledField(label: loc.t("settings_change_password_confirm_password", "Confirm Password"),
                              placeholder: loc.t("settings_change_password_confirm_password_placeholder", "Confirm your new password..."),
                              text: $confirmation, contentType: .newPassword, isSecure: true,

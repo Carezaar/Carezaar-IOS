@@ -262,12 +262,12 @@ extension ClientFull {
 }
 
 extension CaregiverFull {
-    func with(matchStatus: String, matchId: Int) -> Self {
+    func with(matchStatus: String, matchId: Int?) -> Self {
         var copy = self; copy.matchStatus = matchStatus; copy.matchId = matchId; copy.isMatch = matchStatus == "active"; return copy
     }
 }
 extension ClientFull {
-    func with(matchStatus: String, matchId: Int) -> Self {
+    func with(matchStatus: String, matchId: Int?) -> Self {
         var copy = self; copy.matchStatus = matchStatus; copy.matchId = matchId; copy.isMatch = matchStatus == "active"; return copy
     }
 }

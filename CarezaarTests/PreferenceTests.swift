@@ -213,14 +213,13 @@ final class PreferenceTests: XCTestCase {
                      "ic_special_respectful", "ic_support", "ic_user"] {
             guard let vector = AndroidVectors.shared.vector(name) else { XCTFail("Icon missing: \(name)"); continue }
             XCTAssertFalse(AndroidVectors.shared.paths(name).isEmpty, name)
-            XCTAssertFalse(Self.removedPeopleVectors.contains(sha256(Data(vector.paths.map(\.d).joined().utf8))),
-                           "Removed people vector restored: \(name)")
+            XCTAssertEqual(Self.removedPeopleVectors.contains(sha256(Data(vector.paths.map(\.d).joined().utf8))), name != "ic_user",
+                           "Android vector differs: \(name)")
         }
         XCTAssertEqual(SourceStore.assetURL("92bf103484e337567f379617f79c6c37ba10484d.jpg")?.lastPathComponent, "welcome-hands.jpg")
         XCTAssertEqual(SourceStore.assetURL("2c0c41de4775bed358fedceb4f03ba6bd2b76913.png")?.lastPathComponent, "care-type-senior.png")
         XCTAssertEqual(SourceStore.assetURL("80e754df1acd580e680f27c317c16f17a8ffb0eb.png")?.lastPathComponent, "care-type-child.png")
         XCTAssertEqual(SourceStore.assetURL("b8a5332565873bf014bb9feaf8faef4b797407fe.png")?.lastPathComponent, "care-type-pregnancy.png")
-        XCTAssertNotNil(SourceStore.assetURL("skills-illustration.png"))
     }
 
     func testEqualAndReversedPayUseManagedRangeError() {

@@ -93,7 +93,7 @@ final class LoadingIdempotencyTests: XCTestCase {
         let store = IdempotencyStore(defaults: suite); store.account = "user-a"
         func key(_ s: IdempotencyStore, _ form: [String: FormValue?], target: String = "7") async -> String {
             var key = ""
-            _ = try? await s.submit(.chatMessage, target: target, form: form, draft: "Hello", parent: nil) { (k: String) -> String in key = k; throw APIError.network("lost") }
+            _ = try? await s.submit(.chatMessage, target: target, form: form) { (k: String) -> String in key = k; throw APIError.network("lost") }
             return key
         }
         let a = await key(store, form)
@@ -105,40 +105,25 @@ final class LoadingIdempotencyTests: XCTestCase {
         XCTAssertEqual(Set([a, other, reply, chat, account]).count, 5)
         // A restart: a new store over the same storage, the same account.
         let restarted = IdempotencyStore(defaults: suite); restarted.account = "user-a"
-        XCTAssertEqual(restarted.pending(.chatMessage, target: "7").first(where: { $0.key == a })?.draft, "Hello")
+        XCTAssertTrue(restarted.pending(.chatMessage, target: "7").contains { $0.key == a })
         let again = await key(restarted, form)
         XCTAssertEqual(again, a, "The retry after a restart sends the same key")
     }
 
-    func testDefinitiveRefusalRetiresTheKeyAndServerErrorKeepsIt() async {
+    func testEveryFailureKeepsTheKeyAsOnAndroid() async {
         let store = store()
-        _ = try? await store.submit(.issue, target: "issues", form: ["description": .string("x")]) { (_: String) -> String in throw APIError.validation(message: "x", fields: ["description": ["x"]]) }
-        XCTAssertTrue(store.pending(.issue, target: "issues").isEmpty)
-        _ = try? await store.submit(.issue, target: "issues", form: ["description": .string("y")]) { (_: String) -> String in throw APIError.server("500") }
+        let failures: [Error] = [APIError.validation(message: "x", fields: ["description": ["x"]]), APIError.server("500"),
+                                 APIError.unknown("This key was already used for a different request."), APIError.unauthenticated("x")]
+        var keys: [String] = []
+        for failure in failures {
+            _ = try? await store.submit(.issue, target: "issues", form: ["description": .string("x")]) { (k: String) -> String in keys.append(k); throw failure }
+        }
+        XCTAssertEqual(Set(keys).count, 1, "Only a confirmed success retires the key")
         XCTAssertEqual(store.pending(.issue, target: "issues").count, 1)
     }
 
-    func testConflictIsNotResentAndExpiredIsReconciledFirst() async throws {
-        let store = store()
-        var sends = 0
-        do {
-            _ = try await store.submit(.chatMessage, target: "7", form: form) { (_: String) -> String in sends += 1; throw IdempotencyServerError(code: "idempotency_conflict") }
-            XCTFail()
-        } catch { XCTAssertTrue(error is IdempotencyConflictError) }
-        XCTAssertEqual(sends, 1)
-        XCTAssertTrue(store.pending(.chatMessage, target: "7").isEmpty)
-        let expired = IdempotencyServerError(code: "idempotency_expired")
-        let found = try await store.submit(.chatMessage, target: "7", form: form) { (_: String) -> String in throw expired } reconcile: { _ in "already sent" }
-        XCTAssertEqual(found, "already sent")
-        do { _ = try await store.submit(.chatMessage, target: "7", form: form) { (_: String) -> String in throw expired } reconcile: { _ in nil }; XCTFail() }
-        catch { XCTAssertTrue(error is SubmissionNotCarriedOutError) }
-        XCTAssertTrue(store.pending(.chatMessage, target: "7").isEmpty)
-        do { _ = try await store.submit(.chatMessage, target: "7", form: form) { (_: String) -> String in throw expired } reconcile: { _ in throw APIError.network("x") }; XCTFail() }
-        catch {}
-        XCTAssertEqual(store.pending(.chatMessage, target: "7").count, 1, "An unfinished check keeps the key")
-    }
-
     // MARK: transport
+
 
     func testTheThreeWritesSendTheHeaderAndARenewedSignInResendsTheSameKey() async throws {
         let tokens = FixtureTokens()
@@ -148,8 +133,6 @@ final class LoadingIdempotencyTests: XCTestCase {
         StubHTTP.handler = { request in
             let path = request.url!.path
             if path.hasSuffix("auth/refresh") { return (200, Data(#"{"result":{"access_token":"new","refresh_token":"refresh-2"}}"#.utf8)) }
-            // The issue list read for the baseline when the screen's list isn't known.
-            if refused, request.httpMethod == "GET", path.hasSuffix("users/issues") { return (200, Data(#"{"result":[]}"#.utf8)) }
             posts.append((path, request.value(forHTTPHeaderField: "Idempotency-Key"), request.value(forHTTPHeaderField: "Authorization")))
             if !refused { refused = true; return (403, Data(#"{"message":"Token is invalid!"}"#.utf8)) }
             if path.hasSuffix("users/chats/7") { return (200, Data(#"{"result":{"id":7,"messages":[]}}"#.utf8)) }
@@ -174,7 +157,7 @@ final class LoadingIdempotencyTests: XCTestCase {
         XCTAssertNil(posts.first?.1, "Only the three named writes carry a key")
     }
 
-    func testConflictAnswerFromTheServerIsNotResent() async {
+    func testConflictAnswerFromTheServerIsShownAndNotResent() async {
         let tokens = FixtureTokens()
         tokens.save(Session(accessToken: "a", refreshToken: "r"))
         var posts = 0
@@ -184,8 +167,9 @@ final class LoadingIdempotencyTests: XCTestCase {
         }
         let service = UserService(client: APIClient(tokens: tokens, session: StubHTTP.session()))
         do { _ = try await service.sendMessage(chatId: 7, message: "Hello"); XCTFail() }
-        catch { XCTAssertTrue(error is IdempotencyConflictError, "\(error)") }
+        catch { XCTAssertEqual(error as? APIError, .unknown("This key was already used for a different request."), "\(error)") }
         XCTAssertEqual(posts, 1)
+        XCTAssertEqual(IdempotencyStore.shared.pending(.chatMessage, target: "7").count, 1, "The key is kept")
     }
 }
 
@@ -205,9 +189,9 @@ private final class RecordedWaits: @unchecked Sendable {
     func pause(_ duration: Duration) async throws { lock.withLock { waits.append(duration) } }
 }
 
-/// "Carezaar — Technical Alignment Tasks" (26 Oct 2026), iOS 4-6, against the Android 1.0.0
-/// APK (`je.safeCall`: up to 3 retries, (n + 1) × 500 ms, any IOException but a SocketException;
-/// `ms3.v()`: an unusable renewal clears the saved sign-in). Real APIClient on StubHTTP.
+/// "Carezaar — Technical Alignment Tasks" (26 Oct 2026), iOS 4-6, against the Android retry
+/// interceptor (GET only: up to 3 retries, n × 500 ms, on a SocketException or a connection
+/// abort; an unusable renewal clears the saved sign-in). Real APIClient on StubHTTP.
 @MainActor
 final class TechnicalAlignmentNetworkTests: XCTestCase {
     private let androidDelays: [Duration] = [.milliseconds(500), .milliseconds(1_000), .milliseconds(1_500)]
@@ -218,7 +202,7 @@ final class TechnicalAlignmentNetworkTests: XCTestCase {
     }
 
     func testTransientReadFailuresAreRetriedThreeTimesWithAndroidDelays() async {
-        for code: URLError.Code in [.cannotFindHost, .dnsLookupFailed, .notConnectedToInternet, .timedOut, .networkConnectionLost, .secureConnectionFailed] {
+        for code: URLError.Code in [.cannotConnectToHost, .networkConnectionLost] {
             let waits = RecordedWaits()
             var attempts = 0
             StubHTTP.handler = { _ in attempts += 1; throw URLError(code) }
@@ -229,12 +213,16 @@ final class TechnicalAlignmentNetworkTests: XCTestCase {
         }
     }
 
-    func testARefusedConnectionAndHTTPErrorsAreNotRetried() async {
+    func testDNSTimeoutTLSAndHTTPErrorsAreNotRetried() async {
         let waits = RecordedWaits()
         var attempts = 0
-        StubHTTP.handler = { _ in attempts += 1; throw URLError(.cannotConnectToHost) }
-        do { _ = try await client(waits: waits).sendIgnoringResult(Endpoint(method: .get, path: "users/notifications/count")); XCTFail() } catch {}
-        XCTAssertEqual(attempts, 1, "Android's ConnectException is a SocketException: not retried")
+        for code: URLError.Code in [.cannotFindHost, .dnsLookupFailed, .notConnectedToInternet, .timedOut, .secureConnectionFailed,
+                                    .serverCertificateUntrusted, .cannotParseResponse, .zeroByteResource] {
+            attempts = 0
+            StubHTTP.handler = { _ in attempts += 1; throw URLError(code) }
+            do { _ = try await client(waits: waits).sendIgnoringResult(Endpoint(method: .get, path: "users/notifications/count")); XCTFail() } catch {}
+            XCTAssertEqual(attempts, 1, "Not a SocketException on Android: not retried (\(code.rawValue))")
+        }
         attempts = 0
         StubHTTP.handler = { _ in attempts += 1; return (500, Data(#"{"message":"Server Error"}"#.utf8)) }
         do { _ = try await client(waits: waits).sendIgnoringResult(Endpoint(method: .get, path: "users/notifications/count")); XCTFail() } catch {}
@@ -247,7 +235,7 @@ final class TechnicalAlignmentNetworkTests: XCTestCase {
         var attempts = 0
         StubHTTP.handler = { _ in
             attempts += 1
-            if attempts < 3 { throw URLError(.notConnectedToInternet) }
+            if attempts < 3 { throw URLError(.networkConnectionLost) }
             return (200, Data(#"{"result":{"count":3},"meta":null,"message":"ok","errors":null}"#.utf8))
         }
         _ = try await client(waits: waits).sendIgnoringResult(Endpoint(method: .get, path: "users/notifications/count"))
@@ -281,7 +269,7 @@ final class TechnicalAlignmentNetworkTests: XCTestCase {
 
     func testCancellingDuringAWaitStopsRetrying() async {
         var attempts = 0
-        StubHTTP.handler = { _ in attempts += 1; throw URLError(.notConnectedToInternet) }
+        StubHTTP.handler = { _ in attempts += 1; throw URLError(.networkConnectionLost) }
         let tokens = FixtureTokens(); tokens.save(Session(accessToken: "access", refreshToken: "refresh"))
         let api = APIClient(tokens: tokens, session: StubHTTP.session(), pause: { _ in throw CancellationError() })
         do { _ = try await api.sendIgnoringResult(Endpoint(method: .get, path: "users/notifications/count")); XCTFail() }
@@ -294,7 +282,7 @@ final class TechnicalAlignmentNetworkTests: XCTestCase {
     private func seededStore(account: String, created: Date, form: [String: FormValue?], key: String) -> IdempotencyStore {
         let defaults = UserDefaults(suiteName: "TechnicalAlignment-\(UUID().uuidString)")!
         let scope = "\(account)|issue|issues|\(IdempotencyStore.payloadHash(form))"
-        let record = PendingSubmission(key: key, created: created, account: account, operation: .issue, target: "issues", after: 4)
+        let record = PendingSubmission(key: key, created: created, account: account, operation: .issue, target: "issues")
         defaults.set(try! JSONEncoder().encode([scope: record]), forKey: IdempotencyStore.storageKey)
         let store = IdempotencyStore(defaults: defaults)
         store.account = "account-a"
@@ -307,52 +295,25 @@ final class TechnicalAlignmentNetworkTests: XCTestCase {
         let store = seededStore(account: "account-a", created: Date().addingTimeInterval(-25 * 3600), form: form, key: old)
         XCTAssertEqual(store.pending(.issue, target: "issues").first?.key, old, "Still pending after 25 hours")
         var sent: [String] = []
-        let result = try await store.submit(.issue, target: "issues", form: form, after: 4) { (key: String) -> String in sent.append(key); return "filed" }
+        let result = try await store.submit(.issue, target: "issues", form: form) { (key: String) -> String in sent.append(key); return "filed" }
         XCTAssertEqual(result, "filed")
         XCTAssertEqual(sent, [old], "The original key, not a new one")
         XCTAssertTrue(store.pending(.issue, target: "issues").isEmpty, "Retired once confirmed")
     }
 
-    func testAfter25HoursAForgottenKeyIsReconciledBeforeAnythingNewIsSent() async throws {
+    func testAnExpiredKeyAnswerKeepsTheKeyAndReadsNothing() async throws {
         let form: [String: FormValue?] = ["title": .string("Login"), "description": .string("Can't sign in")]
         let old = "6d7c2b1e-0d1f-4a5b-9c8d-7e6f5a4b3c2d"
-        var sends = 0
-        var store = seededStore(account: "account-a", created: Date().addingTimeInterval(-25 * 3600), form: form, key: old)
-        let found = try await store.submit(.issue, target: "issues", form: form, after: 4) { (_: String) -> String in
-            sends += 1; throw IdempotencyServerError(code: "idempotency_expired")
-        } reconcile: { record in record.after == 4 ? "issue 5, filed earlier" : nil }
-        XCTAssertEqual(found, "issue 5, filed earlier")
-        XCTAssertEqual(sends, 1, "No second mutation")
-        store = seededStore(account: "account-a", created: Date().addingTimeInterval(-25 * 3600), form: form, key: old)
-        do {
-            _ = try await store.submit(.issue, target: "issues", form: form, after: 4) { (_: String) -> String in
-                throw IdempotencyServerError(code: "idempotency_expired")
-            } reconcile: { _ in nil }
-            XCTFail("Not found: not carried out")
-        } catch { XCTAssertTrue(error is SubmissionNotCarriedOutError) }
-    }
-
-    func testARecordTheServerShowsAsCarriedOutIsRetiredAndOthersAreKept() async throws {
-        let form: [String: FormValue?] = ["title": .string("Login"), "description": .string("Can't sign in")]
-        let store = seededStore(account: "account-a", created: Date().addingTimeInterval(-40 * 3600), form: form, key: "6d7c2b1e-0d1f-4a5b-9c8d-7e6f5a4b3c2d")
-        XCTAssertEqual(store.retireCarriedOut(.issue, target: "issues") { _ in false }, 0)
-        XCTAssertEqual(store.pending(.issue, target: "issues").count, 1, "Not shown as carried out: kept")
-        XCTAssertEqual(store.retireCarriedOut(.issue, target: "issues") { $0.after == 4 }, 1)
-        XCTAssertTrue(store.pending(.issue, target: "issues").isEmpty, "Shown as carried out: retired")
-        // The next identical issue is a new submission with a new key.
+        let store = seededStore(account: "account-a", created: Date().addingTimeInterval(-25 * 3600), form: form, key: old)
         var sent: [String] = []
-        _ = try await store.submit(.issue, target: "issues", form: form, after: 9) { (key: String) -> String in sent.append(key); return "filed" }
-        XCTAssertNotEqual(sent.first, "6d7c2b1e-0d1f-4a5b-9c8d-7e6f5a4b3c2d")
-    }
-
-    func testCertificateAndMalformedAnswerFailuresAreRetriedLikeAndroidIOExceptions() async {
-        for code: URLError.Code in [.serverCertificateUntrusted, .cannotParseResponse, .zeroByteResource] {
-            let waits = RecordedWaits()
-            var attempts = 0
-            StubHTTP.handler = { _ in attempts += 1; throw URLError(code) }
-            do { _ = try await client(waits: waits).sendIgnoringResult(Endpoint(method: .get, path: "users/notifications/count")); XCTFail() } catch {}
-            XCTAssertEqual(attempts, 4, "\(code.rawValue)")
-        }
+        do {
+            _ = try await store.submit(.issue, target: "issues", form: form) { (key: String) -> String in
+                sent.append(key); throw APIError.unknown("expired")
+            }
+            XCTFail()
+        } catch {}
+        XCTAssertEqual(sent, [old])
+        XCTAssertEqual(store.pending(.issue, target: "issues").first?.key, old, "Kept until a success confirms it")
     }
 
     func testAnotherAccountsPendingRecordIsNeverUsed() async throws {
@@ -360,7 +321,7 @@ final class TechnicalAlignmentNetworkTests: XCTestCase {
         let theirs = "11111111-1111-4111-8111-111111111111"
         let store = seededStore(account: "account-b", created: Date().addingTimeInterval(-30 * 3600), form: form, key: theirs)
         var sent: [String] = []
-        _ = try await store.submit(.issue, target: "issues", form: form, after: 4) { (key: String) -> String in sent.append(key); return "filed" }
+        _ = try await store.submit(.issue, target: "issues", form: form) { (key: String) -> String in sent.append(key); return "filed" }
         XCTAssertNotEqual(sent.first, theirs)
         store.account = "account-b"
         XCTAssertEqual(store.pending(.issue, target: "issues").first?.key, theirs, "Still kept for its own account")

@@ -26,8 +26,6 @@ struct ChatView: View {
     @ObservedObject private var guards = ActionGuard.shared
     private var sending: Bool { guards.isBusy(ChatSendCoordinator.resource(chatId)) }
     @State private var reloading = false
-    /// A message whose earlier send got no answer, offered again with its Idempotency-Key.
-    @State private var restoredDraft: String?
     @State private var visible = false
     @State private var scrollPosition = ChatViewportPosition()
     @State private var followIncoming = true
@@ -57,8 +55,7 @@ struct ChatView: View {
             // The draft lives in its own view: typing re-renders only the composer, not
             // the transcript (a long message there made every keystroke re-lay it out).
             ChatComposer(replyTo: Binding(get: { replyTo }, set: selectReply), focusRequest: focusRequest,
-                         isEnabled: !sending, isSending: sending, closedNote: closedNote,
-                         restoredDraft: restoredDraft, unconfirmed: (delivery.uncertain || restoredDraft != nil) && !sending, send: send)
+                         isEnabled: !sending, isSending: sending, closedNote: closedNote, send: send)
         }
         .backHeader(loc.t("chat_screen_messages_title", "Chat Messages"))
         .onAppear { visible = true }
@@ -69,9 +66,6 @@ struct ChatView: View {
                 try? await Task.sleep(for: Self.pollInterval)
                 if !Task.isCancelled, visible, scenePhase == .active { await refreshQuietly() }
             }
-        }
-        .onChange(of: scenePhase) { _, phase in
-            if phase == .active, visible { Task { await refreshQuietly() } }
         }
     }
 
@@ -206,8 +200,6 @@ struct ChatView: View {
             let full = try await UserService().chat(id: chatId)
             guard visible, !sending, !Task.isCancelled, operations.canCommit(owner) else { return }
             apply(full)
-            retireCarriedOut(in: full)
-            restorePending(in: full)
         } catch is CancellationError { return }
         catch {
             guard visible, !sending, !Task.isCancelled, operations.canCommit(owner) else { return }
@@ -225,58 +217,31 @@ struct ChatView: View {
         if full != chat { apply(full) }
     }
 
-    /// A message whose answer was lost but which the conversation shows went through: its pending
-    /// key is retired, so a later message with the same words gets a key of its own. Not while a
-    /// draft is in the box as "may not have been sent" (Send settles that one with its own key).
-    private func retireCarriedOut(in full: ChatFull) {
-        guard !sending, !delivery.uncertain, restoredDraft == nil else { return }
-        let settled = Date().addingTimeInterval(-IdempotencyStore.settledAfter)
-        IdempotencyStore.shared.retireCarriedOut(.chatMessage, target: String(chatId)) { record in
-            record.created < settled && full.messages.contains { $0.id > (record.after ?? 0) && $0.message == record.draft && $0.isMine(role: role)
-                && $0.parent?.value.id == record.parent }
-        }
-    }
-
-    /// After a restart or another visit: a message whose send got no answer comes back into
-    /// the box (with what it replied to), so Send repeats that same submission, not a new one.
-    private func restorePending(in full: ChatFull) {
-        guard restoredDraft == nil, !sending,
-              let pending = IdempotencyStore.shared.pending(.chatMessage, target: String(chatId)).first,
-              let text = pending.draft, !text.isEmpty else { return }
-        if let parent = pending.parent { selectReply(full.messages.first { $0.id == parent }) }
-        restoredDraft = text
-    }
-
     private func apply(_ full: ChatFull, revealAcknowledgedSend: Bool = false) {
         followIncoming = revealAcknowledgedSend || chat == nil || scrollPosition.isAtBottom
         chat = full
         messages = full.chronologicalMessages
     }
 
-    /// Returns true when sent, so the composer clears its draft.
+    /// Returns true when sent, so the composer clears its draft and reply if both are unchanged.
     private func send(_ text: String) async -> Bool {
         guard visible, !Task.isCancelled, !sending, let current = chat else { return false }
         let accountId = session.state.user?.id
         let generation = TokenStore.shared.generation
-        let submittedRole = role
         let submittedReply = replyOwnership.capture(parentId: replyTo?.id)
         let owner = operations.beginSend()
         do {
             // The loaded conversation already supplies the relationship context.
-            // Server authorization remains authoritative; reads are reserved for
-            // initial/explicit refresh and uncertain delivery reconciliation.
+            // Server authorization remains authoritative.
             // K2/K3: a closed conversation disables the composer and shows its note
             // above the box; this guard only covers a race with a refresh.
             guard ChatAvailability(chat: current, role: role) == .open else { return false }
-            let updated = try await delivery.submit(chatId: chatId, text: text, parentId: submittedReply.parentId,
-                                                    baseline: current.messages, role: submittedRole, generation: generation)
-            restoredDraft = nil
+            let updated = try await delivery.submit(chatId: chatId, text: text, parentId: submittedReply.parentId, generation: generation)
             // A deliberate, acknowledged send should reveal the new bubble even
             // when the keyboard reduced the viewport or the user was reading above.
             guard visible, !Task.isCancelled, operations.canCommit(owner),
                   session.state.user?.id == accountId, TokenStore.shared.generation == generation else { return false }
             apply(updated, revealAcknowledgedSend: true)
-            if replyOwnership.canClear(submittedReply, currentParentId: replyTo?.id) { selectReply(nil) }
             return true
         } catch is CancellationError { return false }
         catch is DuplicateActionError { return false }
@@ -321,10 +286,6 @@ private struct ChatComposer: View {
     /// K2/K3: when set, the conversation is closed: the note sits above a disabled
     /// typing box and a grey send button.
     let closedNote: String?
-    /// A message whose earlier send got no answer, put back into the box once.
-    var restoredDraft: String? = nil
-    /// Says that the message in the box may not have been sent, and Send will try it again.
-    var unconfirmed = false
     let send: (String) async -> Bool
     @EnvironmentObject private var loc: Localization
     @EnvironmentObject private var feedback: Feedback
@@ -347,12 +308,6 @@ private struct ChatComposer: View {
                 .accessibilityElement(children: .combine)
                 .accessibilityIdentifier("chat-closed-note")
             }
-            if unconfirmed, closedNote == nil, !draft.isEmpty {
-                Text(loc.t("chat_screen_message_unconfirmed", "This message may not have been sent. Tap Send to try again."))
-                    .font(Theme.Typography.body(13)).foregroundStyle(Theme.Palette.textSecondary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .accessibilityIdentifier("chat-unconfirmed-note")
-            }
             if let replyTo, closedNote == nil {
                 HStack(spacing: 8) {
                     AppIcon(name: "ic_reply", size: 18, tint: Theme.Palette.primary)
@@ -372,19 +327,19 @@ private struct ChatComposer: View {
                     .disabled(closedNote != nil)
                     .font(Theme.Typography.control(15))
                     .padding(.horizontal, 14).padding(.vertical, 12)
-                    .overlay(RoundedRectangle(cornerRadius: 22).stroke(Theme.Palette.line))
+                    .background(Color(hex: closedNote != nil ? 0xF5F5F5 : 0xEDF4FC), in: RoundedRectangle(cornerRadius: 16))
                 Button {
-                    let text = trimmed, sent = draft
+                    let sent = draft, parent = replyTo?.id
+                    focused = false
                     // K4: the button stays tappable and explains an empty message.
-                    guard !text.isEmpty else {
+                    guard !trimmed.isEmpty else {
                         feedback.toast(loc.t("chat_screen_message_required", "Please type a message first."))
                         return
                     }
                     Task {
-                        guard await send(text) else { return }
-                        // The keyboard stays usable behind the busy card: keep anything
-                        // typed while this message was sending.
-                        draft = ChatDraftReconciliation.afterAcknowledgedSend(current: draft, submitted: sent)
+                        guard await send(sent) else { return }
+                        // The box stays editable while sending: anything changed meanwhile is kept.
+                        if draft == sent && replyTo?.id == parent { draft = ""; replyTo = nil }
                     }
                 } label: {
                     Group {
@@ -407,14 +362,8 @@ private struct ChatComposer: View {
         .background(.white)
         .overlay(alignment: .top) { Divider() }
         .onChange(of: focusRequest) { _, _ in if closedNote == nil { focused = true } }
-        .onChange(of: restoredDraft) { _, text in if let text, draft.isEmpty { draft = text } }
-        .onAppear { if let restoredDraft, draft.isEmpty { draft = restoredDraft } }
         .onChange(of: closedNote) { _, note in if note != nil { focused = false } }
     }
-}
-
-private extension String {
-    var trimmingLeadingWhitespace: String { String(drop { $0.isWhitespace }) }
 }
 
 // MARK: - Manage matches
@@ -623,45 +572,22 @@ struct ChatViewportPreference: PreferenceKey {
 }
 
 /// Owns the boundary between a submitted message and its server acknowledgement.
-/// Each message is one submission with its own Idempotency-Key (IdempotencyStore): when a
-/// send gets no answer the key is kept, and Send repeats the same submission, which the
-/// server carries out at most once. No conversation read guesses the outcome from the text
-/// (client request, 25 Oct 2026). One send per conversation at a time (ActionGuard).
+/// Each message is one submission with its own Idempotency-Key (IdempotencyStore): the key is
+/// kept until a success confirms it, so Send repeats the same submission, which the server
+/// carries out at most once. One send per conversation at a time (ActionGuard).
 @MainActor
 final class ChatSendCoordinator: ObservableObject {
-    /// The last send got no answer; its key is kept for the next attempt.
-    @Published private(set) var uncertain = false
     private let service: UserService
     init(service: UserService = UserService()) { self.service = service }
 
     static func resource(_ chatId: Int) -> String { "chat:\(chatId):send" }
 
-    /// `baseline` is the conversation on screen (its newest id lets an expired key be reconciled).
-    func submit(chatId: Int, text: String, parentId: Int?,
-                baseline: [ChatMessage] = [], role: UserRole = .client, generation: UUID? = nil) async throws -> ChatFull {
+    func submit(chatId: Int, text: String, parentId: Int?, generation: UUID? = nil) async throws -> ChatFull {
         let owner = await service.client.credentialGeneration()
         guard generation == nil || generation == owner else { throw CancellationError() }
-        do {
-            let full = try await ActionGuard.shared.run(Self.resource(chatId)) {
-                try await service.sendMessage(chatId: chatId, message: text, parentId: parentId, ifGeneration: owner,
-                                              fromCaregiver: role == .caregiver, after: baseline.map(\.id).max())
-            }
-            uncertain = false
-            return full
-        } catch is CancellationError { throw CancellationError() }
-        catch let duplicate as DuplicateActionError { throw duplicate }
-        catch {
-            uncertain = !IdempotencyStore.isDefinitive(error)
-            throw error
+        return try await ActionGuard.shared.run(Self.resource(chatId)) {
+            try await service.sendMessage(chatId: chatId, message: text, parentId: parentId, ifGeneration: owner)
         }
-    }
-}
-
-/// Reconciles only the submitted prefix after acknowledgement; new typing belongs
-/// to the next message and must not be erased by an older request completing.
-enum ChatDraftReconciliation {
-    static func afterAcknowledgedSend(current: String, submitted: String) -> String {
-        current.hasPrefix(submitted) ? String(current.dropFirst(submitted.count)).trimmingLeadingWhitespace : current
     }
 }
 

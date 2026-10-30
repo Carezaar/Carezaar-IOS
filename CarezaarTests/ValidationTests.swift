@@ -131,13 +131,9 @@ final class TechnicalAlignmentPasswordTests: XCTestCase {
         XCTAssertEqual(failing("Abcdef1!\t"), [])
     }
 
-    func testExactSpecialSetsFullAndChangePassword() {
+    func testExactSpecialSetOnEveryPasswordScreen() {
         for c in "!@#$%^&*()_+[]{}|-;:,.<>?" { XCTAssertEqual(failing("Abcdefg1\(c)"), [], String(c)) }
         for c in "~=/\\'\"` §€" { XCTAssertEqual(failing("Abcdefg1\(c)"), ["1_special_symbol"], String(c)) }
-        let narrow = PasswordValidator.changePasswordSpecialCharacters
-        XCTAssertEqual(narrow, "!@#%^&*()?")
-        for c in narrow { XCTAssertEqual(failing("Abcdefg1\(c)", special: narrow), [], String(c)) }
-        for c in "$_+[]{}|-;:,.<>" { XCTAssertEqual(failing("Abcdefg1\(c)", special: narrow), ["1_special_symbol"], String(c)) }
     }
 
     func testPasswordResetGate() {
