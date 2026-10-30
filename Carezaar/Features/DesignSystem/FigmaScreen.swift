@@ -90,6 +90,7 @@ struct FigmaScreen<Overlay: View>: View {
                 }
                 .scrollIndicators(.hidden)
                 .scrollBounceBehavior(.basedOnSize)
+                .scrollDisabled(fitHeight)
                 .environment(\.sceneBinder, localisedBinder)
                 .accessibilityIdentifier(key)
                 // Status messages sit above the design rather than displacing it,

@@ -303,3 +303,13 @@ extension XCUIElement {
         return isSelected
     }
 }
+
+extension XCUIApplication {
+    /// The preference and skills editors open on their intro, as on Android; Get Started is its last button.
+    func passWizardIntro(timeout: TimeInterval = 60) {
+        let intro = descendants(matching: .any)["v2-65-19934"]
+        guard intro.waitForExistence(timeout: timeout) else { return }
+        let buttons = intro.buttons
+        buttons.element(boundBy: buttons.count - 1).tap()
+    }
+}

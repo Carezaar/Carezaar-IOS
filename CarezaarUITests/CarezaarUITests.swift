@@ -380,6 +380,7 @@ final class CarezaarUITests: XCTestCase {
         app.launchArguments = ["--qa-signout", "--qa-login", email, password, "--qa-push", "ClientPreferences"]
         app.launch()
         allowNotificationsIfAsked()
+        app.passWizardIntro()
         let next = app.buttons["Continue"].firstMatch
         XCTAssertTrue(next.waitForExistence(timeout: 40)); next.tap()
         let bathing = app.buttons["Bathing"].firstMatch

@@ -466,6 +466,7 @@ final class ParityV3UITests: XCTestCase {
         app.launchEnvironment["QA_CG_ID"] = try value("PV3_CG_ID")
         launch(["--qa-request-counts", "--qa-push", "ClientPreferences", "--qa-location-fixture", fixture,
                 "--qa-owned-profile-no-location", "GET", "clients/profile"], email: email, password: password)
+        app.passWizardIntro()
         XCTAssertTrue(app.staticTexts["qa-profile-no-location"].waitForExistence(timeout: 90))
         for _ in 0..<2 {
             let next = app.buttons[english ? "Continue" : "متابعة"].firstMatch
@@ -691,6 +692,7 @@ extension ParityV3UITests {
         launch(["--qa-push", "ClientPreferences"], email: email, password: password)
         let notificationPrompt = refuseSystemPrompt(timeout: 20)
         XCTAssertNotNil(notificationPrompt, "A1: no notification prompt at launch (is this a fresh install?)")
+        app.passWizardIntro()
         XCTAssertTrue(app.staticTexts["STEP 1"].waitForExistence(timeout: 90), "A1: app did not carry on after refusing")
         shot("device-A1-after-refusing-notifications")
         for _ in 0..<2 {

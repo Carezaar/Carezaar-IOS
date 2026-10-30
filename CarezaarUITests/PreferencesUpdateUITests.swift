@@ -244,9 +244,10 @@ final class PreferencesUpdateUITests: XCTestCase {
         app.launchArguments = ["-carezaar.languageId", "1", "-carezaar.languageCode", "en", "--qa-push", "ClientPreferences"] + extra
         if !retainSession { app.launchArguments += ["--qa-signout", "--qa-login-env"] }
         app.launch()
+        app.passWizardIntro()
         let continueControl = continueButton(fixture)
         XCTAssertTrue(continueControl.waitForExistence(timeout: 60), "Native edit wizard did not open")
-        // Edit mode has no Get Started screen and must prefill before interaction.
+        // Edit mode opens on the Get Started screen, as on Android, and must prefill before interaction.
         let typeCard = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", fixture.careTypeLabel)).firstMatch
         XCTAssertTrue(typeCard.waitForExistence(timeout: 30), "Saved client type card is missing")
         let selected = NSPredicate { _, _ in typeCard.isSelected }

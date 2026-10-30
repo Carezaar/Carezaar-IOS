@@ -2,7 +2,7 @@ import SwiftUI
 import Combine
 
 /// `Main` — the three-tab shell of the Android app: a top bar (logo, notifications
-/// bell with badge, avatar), the tab content, and a bottom bar
+/// bell, avatar), the tab content, and a bottom bar
 /// (`bottom_navigation_matches` / `_messages` / `_profile`).
 struct MainView: View {
     @EnvironmentObject private var router: AppRouter
@@ -68,15 +68,9 @@ struct MainView: View {
     private var topBarActions: some View {
         HStack(spacing: 10) {
             Button { router.push(.notifications) } label: {
-                AppIcon(name: unread > 0 ? "ic_notification_on" : "ic_notification_off", size: 26, tint: .black)
+                AppIcon(name: unread > 0 ? "ic_notification_on" : "ic_notification_off", size: 24,
+                        tint: unread > 0 ? Color(hex: 0xFF0000) : .black)
                     .frame(width: 44, height: 44)
-                    .overlay(alignment: .topTrailing) {
-                        if unread > 0 {
-                            Text(unread > 99 ? "99+" : "\(unread)").font(.system(size: 11, weight: .bold)).foregroundStyle(.white)
-                                .padding(.horizontal, 5).frame(minWidth: 18, minHeight: 18)
-                                .background(Theme.Palette.danger, in: Capsule())
-                        }
-                    }
             }
             .accessibilityLabel(unread > 0 ? "\(loc.t("general_notifications", "Notifications")), \(unread)" : loc.t("general_notifications", "Notifications"))
             Button { router.selectedTab = .profile } label: {

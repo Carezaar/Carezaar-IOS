@@ -192,6 +192,7 @@ final class LocationBoundaryUITests: XCTestCase {
             "--qa-location-fixture", mode, "--qa-owned-profile-no-location", "GET", f.endpoint,
             "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
         app.launch()
+        app.passWizardIntro()
         let attestation = app.staticTexts["qa-profile-no-location"]
         XCTAssertTrue(attestation.waitForExistence(timeout: 60))
         XCTAssertEqual(attestation.label, "path=\(f.endpoint) owned=true latitude=nil longitude=nil")

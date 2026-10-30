@@ -4,8 +4,8 @@ import UserNotifications
 
 /// Android polls `users/notifications/count?checked_at=` every 30 s while the app runs.
 /// When the count rises it posts a system notification ("New Notification(s)" /
-/// "You have N new notification(s).") that opens Notifications, and the bell badge
-/// follows the count. This reproduces that with a local notification.
+/// "You have N new notification(s).") that opens Notifications, and the bell turns
+/// red while the count is above zero. This reproduces that with a local notification.
 @MainActor
 final class NotificationPoller: NSObject, ObservableObject, UNUserNotificationCenterDelegate {
     @Published private(set) var unread = 0

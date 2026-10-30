@@ -408,6 +408,7 @@ final class CaregiverPreferencesUITests: XCTestCase {
         app.launchArguments = ["--qa-signout", "--qa-login-env", "--qa-push", "CaregiverSkills",
                                "-carezaar.languageId", "1", "-carezaar.languageCode", "en"]
         app.launch()
+        app.passWizardIntro()
         XCTAssertTrue(continueButton(fixture).waitForExistence(timeout: 60), "Caregiver edit wizard did not open")
         let type = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", fixture.selectedType)).firstMatch
         XCTAssertTrue(type.waitForExistence(timeout: 30), "Saved caregiver care type is absent")

@@ -204,6 +204,7 @@ final class PermissionSettingsBoundaryUITests: XCTestCase {
             }?["name"] as? String)
         }
         launchOwned(extra: ["--qa-push", owner.role == "client" ? "ClientPreferences" : "CaregiverSkills"])
+        app.passWizardIntro()
         let next = app.buttons[try text("signup_form_client_continue")].firstMatch
         let loaded = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
             next.exists && next.isEnabled && next.isHittable && !self.app.staticTexts["Please wait..."].exists
@@ -387,6 +388,7 @@ final class PermissionSettingsBoundaryUITests: XCTestCase {
         launchOwned(extra: ["--qa-push", owner.role == "client" ? "ClientPreferences" : "CaregiverSkills",
             "--qa-owned-profile-no-location", "GET", endpoint])
         answerNotificationIfPresent()
+        app.passWizardIntro()
         let attestation = app.staticTexts["qa-profile-no-location"]
         XCTAssertTrue(attestation.waitForExistence(timeout: 60))
         XCTAssertEqual(attestation.label, "path=\(endpoint) owned=true latitude=nil longitude=nil")

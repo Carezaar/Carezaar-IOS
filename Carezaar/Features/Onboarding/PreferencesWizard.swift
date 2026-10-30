@@ -71,7 +71,7 @@ struct PreferencesWizard: View {
 
     var body: some View {
         Group {
-            if !started && mode == .signup {
+            if !started {
                 intro
             } else if mode == .edit && !prefilled {
                 ScrollView { SkeletonDetail() }
@@ -286,8 +286,7 @@ struct PreferencesWizard: View {
 
     private func back() {
         if step > 0 { step -= 1 }
-        else if mode == .signup { started = false }
-        else { router.pop() }
+        else { started = false }
     }
 
     private func need(_ values: [Int], _ slug: String) -> String? {
@@ -709,11 +708,10 @@ struct OrbitView: View {
     let radius: CGFloat
     let size: CGFloat
     var tint: Color? = nil
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        TimelineView(.animation(paused: reduceMotion)) { timeline in
-            let turn = reduceMotion ? 0 : timeline.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 8) / 8 * 360
+        TimelineView(.animation) { timeline in
+            let turn = timeline.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 8) / 8 * 360
             ZStack {
                 ForEach(Array(names.enumerated()), id: \.offset) { index, name in
                     let radians = (turn + 360 / Double(names.count) * Double(index) - 90) * .pi / 180
