@@ -59,7 +59,7 @@ final class ValidationTests: XCTestCase {
 
 final class LegalConfigurationTests: XCTestCase {
     func testBuiltApplicationContainsLegalURLConfigurationKeysEvenWhenUnconfigured() throws {
-        XCTAssertEqual(Bundle.main.bundleIdentifier, "com.aariz51.carezaar", "Inspect the built application host, not a fabricated configuration dictionary")
+        XCTAssertEqual(Bundle.main.bundleIdentifier, "com.carezaar.app", "Inspect the built application host, not a fabricated configuration dictionary")
         for key in [LegalDocumentConfiguration.termsURLKey, LegalDocumentConfiguration.privacyURLKey] {
             let value = try XCTUnwrap(Bundle.main.object(forInfoDictionaryKey: key) as? String,
                                      "Built app Info.plist must contain \(key), including an empty string when unconfigured")

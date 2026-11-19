@@ -28,13 +28,13 @@ The native iOS app for Carezaar, written in SwiftUI. It connects families who ne
 
 ## Requirements
 
-| | |
-|---|---|
-| Xcode | 16 or later (last built with Xcode 26.6) |
-| Deployment target | iOS 17.0 |
-| Devices | iPhone, portrait |
-| Swift | Swift 5 language mode |
-| Dependencies | None; no Swift packages or CocoaPods |
+|                   |                                          |
+| ----------------- | ---------------------------------------- |
+| Xcode             | 16 or later (last built with Xcode 26.6) |
+| Deployment target | iOS 17.0                                 |
+| Devices           | iPhone, portrait                         |
+| Swift             | Swift 5 language mode                    |
+| Dependencies      | None; no Swift packages or CocoaPods     |
 
 ## Build and run
 
@@ -43,8 +43,9 @@ The native iOS app for Carezaar, written in SwiftUI. It connects families who ne
 3. Run.
 
 To run on a device:
-- set your development team under *Signing & Capabilities*;
-- if needed, change the bundle identifier (currently `com.aariz51.carezaar`) to one your team owns.
+
+- set your development team under _Signing & Capabilities_;
+- if needed, change the bundle identifier (currently `com.carezaar.app`) to one your team owns.
 
 To build from the command line:
 
@@ -57,18 +58,22 @@ xcodebuild -project Carezaar.xcodeproj -scheme Carezaar \
 ## Configuration
 
 **API**
+
 - The base URL is `https://new.carezaar.com/api/`, set in `Core/Networking/APIConfiguration.swift`.
 - Debug builds can point at another server through the `CAREZAAR_API_BASE_URL` environment variable in the scheme. Release builds always use production.
 
 **Authentication**
+
 - `auth/login` returns an access token and a refresh token, which are stored in the Keychain (`Core/Session/TokenStore.swift`).
 - APIClient uses one shared session renewal when the server rejects the access token. If the server answers the renewal with any HTTP error, the person is signed out. Only when the server cannot be reached does the managed Connection Problem/Retry window appear; the request that failed shows its own error and is not repeated, and a successful Retry renews the session and closes the window. A malformed success answer or a local Keychain failure keeps the credentials and shows the managed error. A known-refused mutation is distinguished from an uncertain write, and late results cannot affect another account.
 
 **Localisation**
+
 - UI text is served by the backend, not bundled. `GET base/contents` returns every label by slug and language (`Core/Storage/Localization.swift`).
 - Missing translations fall back to English.
 
 **Permissions** (Info.plist keys generated from build settings):
+
 - camera, for profile photos;
 - photo library, for profile photos;
 - location when in use, for nearby matches.
@@ -77,18 +82,18 @@ The project contains no API keys, secrets or signing credentials.
 
 ## Project structure
 
-| Folder | Contents |
-|---|---|
-| `Core/Networking` | `APIClient` (an actor):<br>• response envelope decoding;<br>• `Accept-Language` on every request;<br>• single-flight token refresh;<br>• 60-second timeouts.<br>Also `Endpoint` and `APIError`. |
-| `Core/Session` | `SessionManager`, Keychain tokens (`TokenStore`), the 30-second notification poll, device fields, UTC to local time |
-| `Core/Storage` | Base-table cache (`BaseDataStore`), server-driven copy (`Localization`) |
-| `Core/Validation` | Password, email and verification-code rules |
-| `Services` | One type per API group (`AuthService`, `UserService`, `ClientService`, `CaregiverService`, `BaseService`) |
-| `Models` | Wire models. Identity fields are strict; optional fields fall back to defaults. |
-| `Navigation` | `Route` (identifiers match the Android app's navigation), `AppRouter` and Debug-only launch arguments |
-| `Features` | Screens by area: `Auth`, `Onboarding`, `Main`, `Settings`, and `DesignSystem` (theme and shared components) |
-| `Design`, `Components`, `Screens`, `Resources/Scenes` | Renderer for the screens built directly from Figma frames: Splash, Intro, Sign In, Create Account and the preferences intro |
-| `scripts/prune-bundle.py` | Release build phase that strips design-review assets from the shipped app |
+| Folder                                                | Contents                                                                                                                                                                                        |
+| ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Core/Networking`                                     | `APIClient` (an actor):<br>• response envelope decoding;<br>• `Accept-Language` on every request;<br>• single-flight token refresh;<br>• 60-second timeouts.<br>Also `Endpoint` and `APIError`. |
+| `Core/Session`                                        | `SessionManager`, Keychain tokens (`TokenStore`), the 30-second notification poll, device fields, UTC to local time                                                                             |
+| `Core/Storage`                                        | Base-table cache (`BaseDataStore`), server-driven copy (`Localization`)                                                                                                                         |
+| `Core/Validation`                                     | Password, email and verification-code rules                                                                                                                                                     |
+| `Services`                                            | One type per API group (`AuthService`, `UserService`, `ClientService`, `CaregiverService`, `BaseService`)                                                                                       |
+| `Models`                                              | Wire models. Identity fields are strict; optional fields fall back to defaults.                                                                                                                 |
+| `Navigation`                                          | `Route` (identifiers match the Android app's navigation), `AppRouter` and Debug-only launch arguments                                                                                           |
+| `Features`                                            | Screens by area: `Auth`, `Onboarding`, `Main`, `Settings`, and `DesignSystem` (theme and shared components)                                                                                     |
+| `Design`, `Components`, `Screens`, `Resources/Scenes` | Renderer for the screens built directly from Figma frames: Splash, Intro, Sign In, Create Account and the preferences intro                                                                     |
+| `scripts/prune-bundle.py`                             | Release build phase that strips design-review assets from the shipped app                                                                                                                       |
 
 ## Debug-only tools
 
