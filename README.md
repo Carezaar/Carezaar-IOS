@@ -44,7 +44,7 @@ The native iOS app for Carezaar, written in SwiftUI. It connects families who ne
 
 To run on a device:
 - set your development team under *Signing & Capabilities*;
-- if needed, change the bundle identifier (currently `com.aariz51.carezaar`) to one your team owns.
+- the bundle identifier is `com.carezaar.app` (tests: `com.carezaar.app.tests`, `com.carezaar.app.uitests`).
 
 To build from the command line:
 
