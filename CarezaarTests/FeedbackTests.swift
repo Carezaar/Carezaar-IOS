@@ -22,6 +22,21 @@ final class FeedbackTests: XCTestCase {
         }
         XCTAssertEqual(Feedback.message(APIError.unauthenticated("Valid JWT token is required!")), "You can't do this right now.")
     }
+    func testSignInAndSignUpShowTheServersRejection() {
+        // Live answers: 400 for an email that already has an account, 400 for a wrong password.
+        XCTAssertEqual(Feedback.authMessage(APIError.unknown("The Email has already been taken.")), "The Email has already been taken.")
+        XCTAssertEqual(Feedback.authMessage(APIError.unknown("Invalid Credentials!")), "Invalid Credentials!")
+        XCTAssertEqual(Feedback.authMessage(APIError.validation(message: "The selected email is invalid.", fields: [:])), "The selected email is invalid.")
+        // Technical wording, the app's own messages, empty answers and other categories keep the managed copy.
+        for error in [APIError.unknown("Undefined array key \"email\" in AuthController.php"), .unknown("Malformed response."),
+                      .unknown("Login credentials could not be stored."), .unknown(""), .server("The Email has already been taken.")] {
+            XCTAssertEqual(Feedback.authMessage(error), "Something went wrong. Please try again.")
+        }
+        XCTAssertEqual(Feedback.authMessage(APIError.network("offline")), "Cannot communicate with server.")
+        // Everywhere else the policy is unchanged.
+        XCTAssertEqual(Feedback.message(APIError.unknown("The Email has already been taken.")), "Something went wrong. Please try again.")
+    }
+
     func testManagedErrorCategoriesUseActualCMSKeysWithoutObsoleteSuffixes() {
         let original = Feedback.translate
         defer { Feedback.translate = original }

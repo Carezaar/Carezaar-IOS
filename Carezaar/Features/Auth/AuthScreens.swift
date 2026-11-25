@@ -186,7 +186,7 @@ struct SignInView: View {
                 signUp.resume(role: incomplete.role ?? .client, email: email.trimmingCharacters(in: .whitespaces), password: password)
                 router.push(.signUpProfile)
             } catch {
-                feedback.toast(Feedback.message(error))
+                feedback.toast(Feedback.authMessage(error))
             }
         }
     }
@@ -452,7 +452,7 @@ struct SignUpCredentialsView: View {
                     errors[.email] = fields["email"]?.first
                     errors[.password] = fields["password"]?.first
                 } else {
-                    feedback.toast(Feedback.message(error))
+                    feedback.toast(Feedback.authMessage(error))
                 }
                 return
             }

@@ -144,6 +144,29 @@ final class Feedback: ObservableObject {
         }
     }
 
+    /// Sign In and Create Account: a server answer rejecting what the person typed (400 or a
+    /// 422 without field errors, e.g. "Invalid Credentials!" or "The Email has already been
+    /// taken.") shows the server's sentence, as the web app does. Technical wording and the
+    /// app's own internal messages still get the managed copy from `message(_:)`.
+    static func authMessage(_ error: Error) -> String {
+        if let api = error as? APIError, !api.isTechnical {
+            let text: String?
+            switch api {
+            case .unknown(let m): text = m
+            case .validation(let m, let fields) where fields.isEmpty: text = m
+            default: text = nil
+            }
+            if let text = text?.trimmingCharacters(in: .whitespacesAndNewlines), !text.isEmpty,
+               !appInternalMessages.contains(where: { text.hasPrefix($0) }) {
+                return text
+            }
+        }
+        return message(error)
+    }
+
+    /// Messages the app itself puts in `APIError.unknown`; never shown as a server answer.
+    private static let appInternalMessages = ["Malformed response.", "Could not build a URL", "Login credentials could not be stored."]
+
     /// A known unavailable action uses the same managed permission/action copy as
     /// other rejected actions. The feature name is context, not an English suffix.
     static func unavailable(_ feature: String) -> String {
