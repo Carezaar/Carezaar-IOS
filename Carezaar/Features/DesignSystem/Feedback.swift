@@ -40,13 +40,14 @@ final class ActionGuard: ObservableObject {
 /// action shows progress on its own control.
 @MainActor
 final class Feedback: ObservableObject {
-    struct Toast: Identifiable, Equatable { let id = UUID(); let message: String }
+    struct Toast: Identifiable, Equatable { let id = UUID(); let message: String; var success = false }
 
     @Published private(set) var toasts: [Toast] = []
 
-    func toast(_ message: String) {
+    /// `success` shows a confirmation (green, check mark) instead of the red error style.
+    func toast(_ message: String, success: Bool = false) {
         guard !message.isEmpty else { return }
-        let toast = Toast(message: message)
+        let toast = Toast(message: message, success: success)
         toasts.append(toast)
         Task { [weak self] in
             try? await Task.sleep(for: .seconds(4.5))
@@ -184,20 +185,21 @@ struct FeedbackOverlay: ViewModifier {
             .overlay(alignment: .bottom) {
                 VStack(spacing: 8) {
                     ForEach(feedback.toasts) { toast in
+                        let tint = toast.success ? Theme.Palette.successText : Theme.Palette.error
                         HStack(spacing: 12) {
-                            AppIcon(name: "ic_clear_circle", size: 28, tint: Theme.Palette.error)
+                            AppIcon(name: toast.success ? "ic_check_circle" : "ic_clear_circle", size: 28, tint: tint)
                             Text(toast.message)
                                 .font(Theme.Typography.control(14))
-                                .foregroundStyle(Theme.Palette.error)
+                                .foregroundStyle(tint)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             Button { feedback.dismiss(toast) } label: {
-                                AppIcon(name: "ic_clear", size: 16, tint: Theme.Palette.error)
+                                AppIcon(name: "ic_clear", size: 16, tint: tint)
                             }
                             .accessibilityLabel("Dismiss")
                         }
                         .padding(14)
-                        .background(Theme.Palette.error.opacity(0.08), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-                        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(Theme.Palette.error, lineWidth: 1.5))
+                        .background(tint.opacity(0.08), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(tint, lineWidth: 1.5))
                         .background(.white, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
                         .accessibilityElement(children: .combine)
                         .accessibilityAddTraits(.isStaticText)

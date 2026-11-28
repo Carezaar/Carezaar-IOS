@@ -51,6 +51,7 @@
 		7E888981FAC1E837C36D966A /* Chat.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA52E8E4D00E4B81B31B90FA /* Chat.swift */; };
 		7E9C56C2B5A2F2056F904BB3 /* SourceSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC37CE9F14BD69B0263201BB /* SourceSurface.swift */; };
 		813167FD8ADBFD267A9A8024 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EA3B86F62B6C67EC432F23BD /* Assets.xcassets */; };
+		2DD84E627DF5C20B59656F63 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = B045461D5399B5E7B4E7DE1C /* PrivacyInfo.xcprivacy */; };
 		819935D98413CB574FEBD7EF /* RoleWalkthroughTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3526773254951D939ADD03F5 /* RoleWalkthroughTests.swift */; };
 		8226A41381451A8C869C8170 /* PartnerDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADFA4857A404EEDCDCE9A66B /* PartnerDetailsView.swift */; };
 		8315D22239338AA27F4E0EB0 /* LiveAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C12E7A213DE92E3653CE11B /* LiveAPI.swift */; };
@@ -234,6 +235,7 @@
 		E58A9AC3D60ED3792B7E440E /* LocationProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LocationProvider.swift; path = Features/Onboarding/LocationProvider.swift; sourceTree = "<group>"; };
 		E5B0D74F20039CCB0819C43C /* CaregiverService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CaregiverService.swift; path = Services/CaregiverService.swift; sourceTree = "<group>"; };
 		EA3B86F62B6C67EC432F23BD /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B045461D5399B5E7B4E7DE1C /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		EA52E8E4D00E4B81B31B90FA /* Chat.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Chat.swift; path = Models/Chat.swift; sourceTree = "<group>"; };
 		ECA9ADB8C0E3022F7E369001 /* User.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = User.swift; path = Models/User.swift; sourceTree = "<group>"; };
 		F60C3C73C723AD0E63772EC6 /* FavoritesView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FavoritesView.swift; path = Features/Main/FavoritesView.swift; sourceTree = "<group>"; };
@@ -398,6 +400,7 @@
 				CCE6E2CA539898C6424EC58D /* UserService.swift */,
 				E5177C8809EEA513F7DD6F47 /* NotificationPoller.swift */,
 				EA3B86F62B6C67EC432F23BD /* Assets.xcassets */,
+				B045461D5399B5E7B4E7DE1C /* PrivacyInfo.xcprivacy */,
 				27703376A8DC8486EA8E6731 /* ServerTime.swift */,
 			);
 			name = Carezaar;
@@ -588,6 +591,7 @@
 				1682ED901C4673BFB3EE2AED /* Scenes in Resources */,
 				98A0217FBC55554F24E7C13D /* catalog.json in Resources */,
 				813167FD8ADBFD267A9A8024 /* Assets.xcassets in Resources */,
+				2DD84E627DF5C20B59656F63 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

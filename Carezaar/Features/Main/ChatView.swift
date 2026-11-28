@@ -13,8 +13,13 @@ struct ChatView: View {
     @EnvironmentObject private var session: SessionManager
     @EnvironmentObject private var loc: Localization
     @EnvironmentObject private var feedback: Feedback
+    @EnvironmentObject private var router: AppRouter
 
     @State private var chat: ChatFull?
+    @State private var reportingUser = false
+    @State private var reportingMessage: ChatMessage?
+    @State private var confirmingBlock = false
+    @State private var blocking = false
     @State private var messages: [ChatMessage] = []
     @State private var error: Error?
     @State private var replyTo: ChatMessage?
@@ -58,6 +63,23 @@ struct ChatView: View {
                          isEnabled: !sending, isSending: sending, closedNote: closedNote, send: send)
         }
         .backHeader(loc.t("chat_screen_messages_title", "Chat Messages"))
+        .sheet(isPresented: $reportingUser) {
+            ReportUserSheet(name: chat?.partner(for: role)?.displayName(loc) ?? "") { reason, details in
+                await report(reason: reason, details: details, message: nil)
+            } onClose: { reportingUser = false }
+        }
+        .sheet(item: $reportingMessage) { m in
+            ReportUserSheet(name: chat?.partner(for: role)?.displayName(loc) ?? "", message: m.message) { reason, details in
+                await report(reason: reason, details: details, message: m.message)
+            } onClose: { reportingMessage = nil }
+        }
+        .alert(String(format: loc.t("safety_block_title", "Block %@?"), chat?.partner(for: role)?.displayName(loc) ?? ""), isPresented: $confirmingBlock) {
+            Button(loc.t("general_cancel", "Cancel"), role: .cancel) {}
+            Button(loc.t("safety_block_user", "Block"), role: .destructive) { Task { await block() } }
+                .accessibilityIdentifier("safety-block-confirm")
+        } message: {
+            Text(loc.t("safety_block_message", "Your match or request with this person will end, you won't be able to message each other, and they won't appear in your lists on this device. The Carezaar team will be notified. They won't be told that you blocked them."))
+        }
         .onAppear { visible = true }
         .onDisappear { visible = false; operations.invalidate(); scrollPosition = ChatViewportPosition() }
         .task {
@@ -74,6 +96,9 @@ struct ChatView: View {
     /// (the server also reports `is_match: false` for it).
     private var closedNote: String? {
         guard let chat else { return nil }
+        if BlockedUsers.shared.contains(chat.partner(for: role)?.id) {
+            return loc.t("safety_chat_blocked", "You blocked this person. You can no longer send messages.")
+        }
         switch ChatAvailability(chat: chat, role: role) {
         case .open: return nil
         case .accountDeleted: return loc.t("chat_screen_account_deleted", "This account has been deleted. You can no longer send messages.")
@@ -87,6 +112,20 @@ struct ChatView: View {
             Avatar(url: partner?.photo, size: 44)
             Text(partner?.displayName(loc) ?? "").font(Theme.Typography.title(16))
             Spacer()
+            if partner != nil {
+                Menu {
+                    Button { reportingUser = true } label: { Label(loc.t("safety_report_user", "Report"), systemImage: "flag") }
+                    Button(role: .destructive) { confirmingBlock = true } label: {
+                        Label(loc.t("safety_block_user", "Block"), systemImage: "hand.raised")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle").font(.system(size: 22)).foregroundStyle(Theme.Palette.primary)
+                        .frame(width: 44, height: 44)
+                }
+                .disabled(blocking || BlockedUsers.shared.contains(partner?.id))
+                .accessibilityLabel(loc.t("safety_more_options", "More options"))
+                .accessibilityIdentifier("chat-safety-menu")
+            }
             Button { Task { await load() } } label: {
                 // Progress on the Refresh button itself; the conversation stays on screen.
                 Group {
@@ -183,6 +222,41 @@ struct ChatView: View {
     @ViewBuilder private func menuItems(_ m: ChatMessage) -> some View {
         Button(loc.t("chat_screen_reply", "Reply")) { selectReply(m); focusRequest += 1 }
         Button(loc.t("chat_screen_copy", "Copy")) { UIPasteboard.general.string = m.message }
+        if !m.isMine(role: role) {
+            Button(role: .destructive) { reportingMessage = m } label: {
+                Label(loc.t("safety_report_message", "Report message"), systemImage: "flag")
+            }
+        }
+    }
+
+    private func report(reason: String, details: String, message: String?) async -> Bool {
+        guard let partner = chat?.partner(for: role) else { return false }
+        do {
+            try await Safety.report(user: partner, name: partner.displayName(loc), reason: reason, details: details, message: message)
+            feedback.toast(loc.t("safety_report_sent", "Thanks. The Carezaar team will review your report."), success: true)
+            return true
+        } catch {
+            feedback.toast(Feedback.message(error))
+            return false
+        }
+    }
+
+    /// The chat doesn't carry the match: read it from the partner's profile, then block.
+    private func block() async {
+        guard let chat, let partner = chat.partner(for: role), !blocking else { return }
+        blocking = true
+        defer { blocking = false }
+        do {
+            let state: ProfileMatchState?
+            if role == .client, let id = chat.caregiver?.id { state = try await ClientService().caregiver(id: id).matchState }
+            else if let id = chat.client?.id { state = try await CaregiverService().client(id: id).matchState }
+            else { state = nil }
+            try await Safety.block(user: partner, name: partner.displayName(loc), state: state)
+            feedback.toast(String(format: loc.t("safety_blocked_toast", "You blocked %@."), partner.displayName(loc)), success: true)
+            router.pop()
+        } catch {
+            feedback.toast(Feedback.message(error))
+        }
     }
 
     private func selectReply(_ message: ChatMessage?) {

@@ -413,10 +413,12 @@ struct MatchesTab: View {
         return { page in
             if isClient {
                 let (list, meta) = try await ClientService().matches(sort: sort, page: page)
-                return (list.map { Card(id: $0.id, user: $0.user, min: $0.salaryMin, max: $0.salaryMax, distance: $0.distance, clienttypeId: nil, isMatch: $0.isMatch) }, meta)
+                let blocked = BlockedUsers.shared.ids
+                return (list.filter { !blocked.contains($0.user.id) }.map { Card(id: $0.id, user: $0.user, min: $0.salaryMin, max: $0.salaryMax, distance: $0.distance, clienttypeId: nil, isMatch: $0.isMatch) }, meta)
             } else {
                 let (list, meta) = try await CaregiverService().matches(sort: sort, page: page)
-                return (list.map { Card(id: $0.id, user: $0.user, min: $0.salaryMin, max: $0.salaryMax, distance: $0.distance, clienttypeId: $0.clienttypeId, isMatch: $0.isMatch) }, meta)
+                let blocked = BlockedUsers.shared.ids
+                return (list.filter { !blocked.contains($0.user.id) }.map { Card(id: $0.id, user: $0.user, min: $0.salaryMin, max: $0.salaryMax, distance: $0.distance, clienttypeId: $0.clienttypeId, isMatch: $0.isMatch) }, meta)
             }
         }
     }
@@ -603,7 +605,11 @@ struct MessagesTab: View {
         .accessibilityHint(loc.t("messages_open_conversation", "Open conversation"))
     }
 
-    private let fetch: Pager<ChatBrief>.Fetch = { page in try await UserService().chats(page: page) }
+    private let fetch: Pager<ChatBrief>.Fetch = { page in
+        let (list, meta) = try await UserService().chats(page: page)
+        let blocked = BlockedUsers.shared.ids
+        return (list.filter { !blocked.contains($0.caregiver?.user.id ?? "") && !blocked.contains($0.client?.user.id ?? "") }, meta)
+    }
 
     /// Page 1; the first load shows skeleton rows (PagedContent).
     private func reload() async {

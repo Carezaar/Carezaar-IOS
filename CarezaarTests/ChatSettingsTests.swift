@@ -499,3 +499,88 @@ final class SettingsMutationReconciliationTests: XCTestCase {
         XCTAssertFalse(tokens.hasSession)
     }
 }
+
+/// Report and block (App Review Guideline 1.2): the backend has no block list or report
+/// endpoint, so a report is an issue for the Carezaar team and a block ends the relationship
+/// on the server, hides the person on this device and files a report.
+@MainActor
+final class SafetyTests: XCTestCase {
+    private var account = ""
+    private let person = try! JSONDecoder().decode(User.self, from: Data(#"{"id":"u-blocked","gender_id":1,"role":"caregiver","email":null,"first_name":"Bo","last_name":"QA","photo":null,"bio":null,"date_of_birth":null,"status":"unverified","is_favorite":false,"is_deleted":false}"#.utf8))
+    private let issue = Data(#"{"result":{"id":7,"issuetype_id":null,"title":"t","description":"d","reply":null,"created_at":null,"replied_at":null,"is_replied":false},"meta":null,"message":"ok","errors":null}"#.utf8)
+
+    override func setUp() {
+        super.setUp()
+        account = "safety-test-\(UUID().uuidString)"
+        BlockedUsers.shared.account = account
+    }
+    override func tearDown() {
+        BlockedUsers.shared.unblock("u-blocked")
+        BlockedUsers.shared.account = nil
+        super.tearDown()
+    }
+    private func service() -> UserService {
+        let tokens = FixtureTokens()
+        tokens.save(Session(accessToken: "fixture", refreshToken: "fixture-refresh"))
+        return UserService(client: APIClient(tokens: tokens, session: StubHTTP.session()))
+    }
+
+    func testBlockedListBelongsToTheSignedInAccountAndCanBeUndone() {
+        BlockedUsers.shared.block("u-blocked")
+        XCTAssertTrue(BlockedUsers.shared.contains("u-blocked"))
+        BlockedUsers.shared.account = "another-account"
+        XCTAssertFalse(BlockedUsers.shared.contains("u-blocked"), "another account on this device has its own list")
+        BlockedUsers.shared.account = nil
+        BlockedUsers.shared.block("u-blocked")
+        XCTAssertTrue(BlockedUsers.shared.ids.isEmpty, "signed out: nothing is stored")
+        BlockedUsers.shared.account = account
+        BlockedUsers.shared.unblock("u-blocked")
+        XCTAssertFalse(BlockedUsers.shared.contains("u-blocked"))
+    }
+
+    func testBlockEndsTheRequestHidesThePersonAndNotifiesTheTeam() async throws {
+        for (status, path) in [(ProfileMatchStatus.sent, "/api/users/matches/41/withdraw"), (.received, "/api/users/matches/41/reject")] {
+            BlockedUsers.shared.unblock("u-blocked")
+            var calls: [String] = []
+            var issueBody = ""
+            StubHTTP.handler = { request in
+                calls.append("\(request.httpMethod ?? "") \(request.url?.path ?? "")")
+                if request.url?.path == "/api/users/issues" { issueBody = StubHTTP.body(request); return (200, self.issue) }
+                return (204, Data())
+            }
+            try await Safety.block(user: person, name: "Bo QA", state: ProfileMatchState(status: status.rawValue, id: 41), service: service())
+            XCTAssertEqual(calls, ["DELETE \(path)", "POST /api/users/issues"])
+            XCTAssertTrue(BlockedUsers.shared.contains("u-blocked"))
+            XCTAssertTrue(issueBody.contains("u-blocked"), issueBody)
+        }
+    }
+
+    func testFailedServerStepDoesNotHideThePerson() async {
+        StubHTTP.handler = { _ in (500, Data(#"{"message":"Server error"}"#.utf8)) }
+        do {
+            try await Safety.block(user: person, name: "Bo QA", state: ProfileMatchState(status: "sent", id: 41), service: service())
+            XCTFail("expected the failure to surface")
+        } catch {}
+        XCTAssertFalse(BlockedUsers.shared.contains("u-blocked"))
+    }
+
+    func testReportFilesAnIssueWithTheReasonAndTheMessage() async throws {
+        var body = ""
+        StubHTTP.handler = { request in
+            XCTAssertEqual(request.url?.path, "/api/users/issues")
+            body = StubHTTP.body(request)
+            return (200, self.issue)
+        }
+        try await Safety.report(user: person, name: "Bo QA", reason: "Harassment or abusive behaviour", details: " rude ",
+                                message: "offensive text", service: service())
+        let form = (URLComponents(string: "?" + body)?.queryItems ?? []).reduce(into: [String: String]()) {
+            $0[$1.name] = $1.value?.replacingOccurrences(of: "+", with: " ")
+        }
+        XCTAssertEqual(form["title"], "Report: Bo QA")
+        let description = form["description"] ?? ""
+        for expected in ["u-blocked", "Harassment or abusive behaviour", "offensive text", "Details: rude"] {
+            XCTAssertTrue(description.contains(expected), description)
+        }
+        XCTAssertNil(form["issuetype_id"], "a free title is sent, never together with a type")
+    }
+}

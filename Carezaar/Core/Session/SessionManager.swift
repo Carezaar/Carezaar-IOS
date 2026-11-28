@@ -29,6 +29,7 @@ final class SessionManager: ObservableObject {
             // Action guards and unfinished submissions belong to the signed-in account (25 Oct 2026).
             ActionGuard.shared.account = newValue.user?.id ?? "signed-out"
             IdempotencyStore.shared.account = newValue.user?.id
+            BlockedUsers.shared.account = newValue.user?.id
         }
     }
     var willSwitchGraph: (() -> Void)?

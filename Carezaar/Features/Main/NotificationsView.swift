@@ -154,7 +154,11 @@ struct NotificationsView: View {
         return partner.role == .caregiver ? .caregiverDetails(caregiverId: partner.id) : .clientDetails(clientId: partner.id)
     }
 
-    private let fetch: Pager<AppNotification>.Fetch = { page in try await UserService().notifications(page: page) }
+    private let fetch: Pager<AppNotification>.Fetch = { page in
+        let (list, meta) = try await UserService().notifications(page: page)
+        let blocked = BlockedUsers.shared.ids
+        return (list.filter { !blocked.contains($0.user?.id ?? "") }, meta)
+    }
 
     private func reload() async {
         await pager.reload(fetch) // the first load shows skeleton rows (PagedContent)

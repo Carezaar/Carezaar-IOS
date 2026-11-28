@@ -57,7 +57,11 @@ struct FavoritesView: View {
         .buttonStyle(.plain)
     }
 
-    private let fetch: Pager<User>.Fetch = { page in try await UserService().bookmarks(page: page) }
+    private let fetch: Pager<User>.Fetch = { page in
+        let (list, meta) = try await UserService().bookmarks(page: page)
+        let blocked = BlockedUsers.shared.ids
+        return (list.filter { !blocked.contains($0.id) }, meta)
+    }
 
     private func reload() async {
         await pager.reload(fetch) // the first load shows skeleton rows (PagedContent)

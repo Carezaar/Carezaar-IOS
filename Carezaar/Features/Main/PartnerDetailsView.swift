@@ -32,6 +32,10 @@ struct PartnerDetailsView: View {
     @State private var checkUnavailable = false
     @State private var pendingIntent: MatchActionIntent?
     @StateObject private var favorites = FavoriteMutationCoordinator.shared
+    @State private var reporting = false
+    @State private var confirmingBlock = false
+    @State private var blocking = false
+    @State private var blocked = false
 
     private var isCaregiver: Bool { if case .caregiver = kind { return true } else { return false } }
     private var partner: User? { caregiver?.user ?? client?.user }
@@ -55,6 +59,28 @@ struct PartnerDetailsView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             if let partner {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        Button { reporting = true } label: {
+                            Label(loc.t("safety_report_user", "Report"), systemImage: "flag")
+                        }
+                        if blocked {
+                            Button { BlockedUsers.shared.unblock(partner.id); blocked = false } label: {
+                                Label(loc.t("safety_unblock_user", "Unblock"), systemImage: "person.crop.circle.badge.checkmark")
+                            }
+                        } else {
+                            Button(role: .destructive) { confirmingBlock = true } label: {
+                                Label(loc.t("safety_block_user", "Block"), systemImage: "hand.raised")
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle").font(.system(size: 22)).foregroundStyle(Theme.Palette.primaryDark)
+                            .frame(width: 44, height: 44)
+                    }
+                    .disabled(blocking)
+                    .accessibilityLabel(loc.t("safety_more_options", "More options"))
+                    .accessibilityIdentifier("partner-safety-menu")
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button { Task { await toggleFavorite() } } label: {
                         AppIcon(name: partner.isFavorite ? "ic_favorite_on" : "ic_favorite_off", size: 28,
@@ -85,6 +111,27 @@ struct PartnerDetailsView: View {
             }
         } message: {
             Text(confirming.map(confirmMessage) ?? "")
+        }
+        .alert(String(format: loc.t("safety_block_title", "Block %@?"), partner?.displayName(loc) ?? ""), isPresented: $confirmingBlock) {
+            Button(loc.t("general_cancel", "Cancel"), role: .cancel) {}
+            Button(loc.t("safety_block_user", "Block"), role: .destructive) { Task { await block() } }
+                .accessibilityIdentifier("safety-block-confirm")
+        } message: {
+            Text(loc.t("safety_block_message", "Your match or request with this person will end, you won't be able to message each other, and they won't appear in your lists on this device. The Carezaar team will be notified. They won't be told that you blocked them."))
+        }
+        .sheet(isPresented: $reporting) {
+            if let partner {
+                ReportUserSheet(name: partner.displayName(loc)) { reason, details in
+                    do {
+                        try await Safety.report(user: partner, name: partner.displayName(loc), reason: reason, details: details)
+                        feedback.toast(loc.t("safety_report_sent", "Thanks. The Carezaar team will review your report."), success: true)
+                        return true
+                    } catch {
+                        feedback.toast(Feedback.message(error))
+                        return false
+                    }
+                } onClose: { reporting = false }
+            }
         }
         .sheet(isPresented: $requesting) {
             MatchRequestSheet(introduction: $introduction) {
@@ -291,6 +338,7 @@ struct PartnerDetailsView: View {
         error = nil
         do {
             try await fetch() // a skeleton stands in for the profile until it arrives
+            blocked = BlockedUsers.shared.contains(partner?.id)
             if matchState == nil { checkUnavailable = true }
         } catch is CancellationError { return }
         catch { failAndReturn(error) }
@@ -455,6 +503,20 @@ struct PartnerDetailsView: View {
         } catch {
             guard session.state.user?.id == accountId, TokenStore.shared.generation == generation else { return }
             setPartner(partner)
+            feedback.toast(Feedback.message(error))
+        }
+    }
+
+    private func block() async {
+        guard let partner, !blocking else { return }
+        blocking = true
+        defer { blocking = false }
+        do {
+            try await Safety.block(user: partner, name: partner.displayName(loc), state: matchState)
+            blocked = true
+            feedback.toast(String(format: loc.t("safety_blocked_toast", "You blocked %@."), partner.displayName(loc)), success: true)
+            router.pop()
+        } catch {
             feedback.toast(Feedback.message(error))
         }
     }
@@ -842,5 +904,149 @@ struct MatchedView: View {
                 router.push(.chat(chatId: conversation.id))
             }
         } catch { feedback.toast(Feedback.message(error)) }
+    }
+}
+
+// MARK: - Report and block (App Review Guideline 1.2)
+
+/// People the signed-in account has blocked, kept on this device. The backend has no block
+/// list, so blocking also ends any match or request between the two (the server then refuses
+/// messages between them) and files a report for the Carezaar team to review.
+final class BlockedUsers: @unchecked Sendable {
+    static let shared = BlockedUsers()
+    static let didChange = Notification.Name("carezaar.blockedUsersChanged")
+
+    private let defaults: UserDefaults
+    private let lock = NSLock()
+    private var current: String?
+
+    init(defaults: UserDefaults = .standard) { self.defaults = defaults }
+
+    /// The signed-in account (set by the session); each account has its own list.
+    var account: String? {
+        get { lock.withLock { current } }
+        set { lock.withLock { current = newValue } }
+    }
+
+    var ids: Set<String> {
+        guard let account else { return [] }
+        return Set(defaults.stringArray(forKey: Self.key(account)) ?? [])
+    }
+
+    func contains(_ userId: String?) -> Bool { userId.map { ids.contains($0) } ?? false }
+    func block(_ userId: String) { update { $0.insert(userId) } }
+    func unblock(_ userId: String) { update { $0.remove(userId) } }
+
+    private static func key(_ account: String) -> String { "carezaar.blockedUsers.\(account)" }
+
+    private func update(_ change: (inout Set<String>) -> Void) {
+        guard let account else { return }
+        var list = ids
+        change(&list)
+        defaults.set(list.sorted(), forKey: Self.key(account))
+        NotificationCenter.default.post(name: Self.didChange, object: nil)
+    }
+}
+
+/// Reports go to Report an Issue, the queue the Carezaar team already works from in the admin
+/// panel (the backend has no separate report endpoint).
+@MainActor
+enum Safety {
+    static let reasons: [(key: String, text: String)] = [
+        ("safety_reason_offensive", "Inappropriate or offensive content"),
+        ("safety_reason_harassment", "Harassment or abusive behaviour"),
+        ("safety_reason_scam", "Spam, scam or fraud"),
+        ("safety_reason_fake", "Fake profile"),
+        ("safety_reason_other", "Something else")
+    ]
+
+    static func report(user: User, name: String, reason: String, details: String, message: String? = nil,
+                       service: UserService = UserService()) async throws {
+        var lines = ["Reported user: \(name) (user id \(user.id))", "Reason: \(reason)"]
+        if let message, !message.isEmpty { lines.append("Reported message: \"\(message)\"") }
+        let extra = details.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !extra.isEmpty { lines.append("Details: \(extra)") }
+        lines.append("Sent from the Carezaar iOS app.")
+        _ = try await service.createIssue(issuetypeId: nil, title: "Report: \(name)", description: lines.joined(separator: "\n"))
+    }
+
+    /// Ends whatever links the two accounts (active match, sent or received request), hides the
+    /// person on this device and lets the Carezaar team know. Nothing is hidden if ending the
+    /// match fails, so the person is never told "blocked" while still able to message them.
+    static func block(user: User, name: String, state: ProfileMatchState?, service: UserService = UserService()) async throws {
+        if let state, let id = state.id {
+            switch state.status {
+            case .active: _ = try await service.breakMatch(id: id)
+            case .sent: try await service.withdrawMatch(id: id)
+            case .received: try await service.rejectMatch(id: id)
+            case .none: break
+            }
+        }
+        BlockedUsers.shared.block(user.id)
+        _ = try? await service.createIssue(issuetypeId: nil, title: "Blocked user: \(name)",
+                                           description: "A member blocked \(name) (user id \(user.id)). Please review this account.\nSent from the Carezaar iOS app.")
+    }
+}
+
+/// Report form: a reason (required) and optional details.
+struct ReportUserSheet: View {
+    let name: String
+    var message: String? = nil
+    let send: (_ reason: String, _ details: String) async -> Bool
+    let onClose: () -> Void
+
+    @EnvironmentObject private var loc: Localization
+    @State private var reason: String?
+    @State private var details = ""
+    @State private var sending = false
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                if let message, !message.isEmpty {
+                    Section(loc.t("safety_report_message_label", "Message")) { Text(message).lineLimit(4) }
+                }
+                Section(String(format: loc.t("safety_report_question", "Why are you reporting %@?"), name)) {
+                    ForEach(Safety.reasons, id: \.key) { r in
+                        let text = loc.t(r.key, r.text)
+                        Button { reason = text } label: {
+                            HStack {
+                                Text(text).foregroundStyle(Color.primary)
+                                Spacer()
+                                if reason == text { Image(systemName: "checkmark").foregroundStyle(Theme.Palette.primary) }
+                            }
+                        }
+                        .accessibilityAddTraits(reason == text ? .isSelected : [])
+                    }
+                }
+                Section {
+                    TextField(loc.t("safety_report_details_placeholder", "Anything else we should know (optional)"),
+                              text: $details, axis: .vertical)
+                        .lineLimit(3...6)
+                } footer: {
+                    Text(loc.t("safety_report_footer", "Reports are private. The Carezaar team reviews every report."))
+                }
+            }
+            .navigationTitle(loc.t("safety_report_title", "Report"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(loc.t("general_cancel", "Cancel"), action: onClose).disabled(sending)
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(loc.t("safety_report_send", "Send")) {
+                        guard let reason else { return }
+                        sending = true
+                        Task {
+                            let sent = await send(reason, details)
+                            sending = false
+                            if sent { onClose() }
+                        }
+                    }
+                    .disabled(reason == nil || sending)
+                    .accessibilityIdentifier("safety-report-send")
+                }
+            }
+        }
     }
 }
